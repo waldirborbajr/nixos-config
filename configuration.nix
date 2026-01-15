@@ -233,7 +233,7 @@
 
     # Rust
     rustup
-    cargo
+    # cargo
     rust-analyzer
 
     # Nix
