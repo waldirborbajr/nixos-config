@@ -208,6 +208,7 @@
 
     # Modern CLI tools
     eza
+    bat
     btop
     htop
     fd
