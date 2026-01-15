@@ -111,6 +111,7 @@
       enable = true;
       enableZshIntegration = true;
     };
+  };
 
   ############################################
   # Default Terminal
