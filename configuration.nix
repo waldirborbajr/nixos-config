@@ -108,6 +108,17 @@
     zsh.enable = true;
   };
 
+  ############################################
+  # Make Alacritty the default terminal
+  ############################################
+  environment.variables = {
+    TERMINAL = "alacritty";
+  };
+
+  xdg.mime.defaultApplications = {
+    "application/x-terminal-emulator" = "alacritty.desktop";
+  };
+
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
