@@ -111,11 +111,6 @@
 
     ripgrep.enable = true;
 
-    eza = {
-      enable = true;
-      enableZshIntegration = true;
-    };
-
     zoxide = {
       enable = true;
       enableZshIntegration = true;
@@ -173,6 +168,9 @@
     keepassxc
     waybar
     networkmanagerapplet
+
+    # Modern CLI tools
+    eza
     btop
     htop
 
