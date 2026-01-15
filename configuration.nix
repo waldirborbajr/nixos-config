@@ -133,8 +133,21 @@
     xclip
     coreutils
     tmux
-# language servers
+    # --- Go ---
+    go
     gopls
+
+    # --- Rust ---
+    rustup
+    cargo
+    rust-analyzer
+
+    # --- Nix ---
+    nixd
+    nil
+    statix
+    deadnix
+    nixfmt-rfc-style
   ];
 
   fonts = {
@@ -146,6 +159,7 @@
     ];
     fontconfig = {
         defaultFonts = {
+          monospace = [ "JetBrainsMono Nerd Font" ];
           sansSerif = [ "IBM Plex Sans" ];
           serif = [ "IBM Plex Serif" ];
           monospace = [ "Terminess Nerd Font" ];
