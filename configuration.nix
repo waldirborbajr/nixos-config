@@ -162,7 +162,7 @@
           monospace = [ "JetBrainsMono Nerd Font" ];
           sansSerif = [ "IBM Plex Sans" ];
           serif = [ "IBM Plex Serif" ];
-          monospace = [ "Terminess Nerd Font" ];
+         # monospace = [ "Terminess Nerd Font" ];
           emoji = [ "OpenMoji Color" ];
         };
     };
