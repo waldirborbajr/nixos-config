@@ -181,7 +181,7 @@
     # Wayland-native
     alacritty
     waybar
-    rofi-wayland
+    rofi
     wl-clipboard
 
     # Modern CLI tools
