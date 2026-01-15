@@ -5,8 +5,9 @@
 { config, pkgs, ... }:
 
 {
-  imports =
-    [ ./hardware-configuration.nix ];
+  imports = [
+    ./hardware-configuration.nix
+  ];
 
   ############################################
   # Bootloader
@@ -22,7 +23,7 @@
   networking.networkmanager.enable = true;
 
   ############################################
-  # Nix Garbage Collection (2 days max)
+  # Nix Garbage Collection (max 2 days)
   ############################################
   nix.gc = {
     automatic = true;
@@ -102,8 +103,25 @@
     firefox.enable = true;
     zsh.enable = true;
 
-    # zoxide shell integration
+    ##########################################
+    # Modern CLI tools (native NixOS modules)
+    ##########################################
+
+    fd.enable = true;
+
+    ripgrep.enable = true;
+
+    eza = {
+      enable = true;
+      enableZshIntegration = true;
+    };
+
     zoxide = {
+      enable = true;
+      enableZshIntegration = true;
+    };
+
+    yazi = {
       enable = true;
       enableZshIntegration = true;
     };
@@ -138,35 +156,25 @@
   nixpkgs.config.allowUnfree = true;
 
   ############################################
-  # System Packages
+  # System Packages (no duplicates)
   ############################################
   environment.systemPackages = with pkgs; [
-    # Core
     wget
     coreutils
     git
     gh
+    lazygit
     stow
     tmux
     xclip
     lshw
     iwd
-
-    # Modern CLI tools
-    fd
-    ripgrep
-    zoxide
-    yazi
-    eza
-    btop
-    htop
-
-    # UI / Utils
     rofi
     keepassxc
     waybar
     networkmanagerapplet
-    lazygit
+    btop
+    htop
 
     # Go
     go
