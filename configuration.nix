@@ -120,6 +120,21 @@
     "application/x-terminal-emulator" = "alacritty.desktop";
   };
 
+  ############################################
+  # SUDO: no password ONLY for nixos-rebuild
+  ############################################
+  security.sudo.extraRules = [
+    {
+      users = [ "borba" ];
+      commands = [
+        {
+          command = "/run/current-system/sw/bin/nixos-rebuild";
+          options = [ "NOPASSWD" ];
+        }
+      ];
+    }
+  ];
+
   nixpkgs.config.allowUnfree = true;
 
   ############################################
