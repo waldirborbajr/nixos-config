@@ -10,4 +10,6 @@
 
   # Enable catppuccin theming for btop.
   catppuccin.btop.enable = true;
+
+home.file.".config/btop/btop.conf".force = true;
 }
