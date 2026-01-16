@@ -9,27 +9,18 @@
   users.users = {
     borba = {
       isNormalUser = true;
-      group = "borba";
-      description = "BORBA JR W";
-      shell = pkgs.zsh;
-
-      extraGroups = [
-        "wheel"
-        "networkmanager"
-        "docker"
-      ];
+      description  = "Borba Jr W";
+      group        = "borba";
+      extraGroups  = [ "wheel" "networkmanager" "docker" ];
+      shell        = pkgs.zsh;
     };
 
     devops = {
       isNormalUser = true;
-      group = "devops";
-      description = "DevOps";
-      shell = pkgs.zsh;
-
-      extraGroups = [
-        "wheel"
-        "docker"
-      ];
+      description  = "DevOps User";
+      group        = "devops";
+      extraGroups  = [ "wheel" "docker" ];
+      shell        = pkgs.zsh;
     };
   };
 }

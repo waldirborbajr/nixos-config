@@ -3,7 +3,6 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.11";
 
     home-manager = {
@@ -12,24 +11,31 @@
     };
 
     hardware.url = "github:nixos/nixos-hardware";
-
     catppuccin.url = "github:catppuccin/nix";
   };
 
-  outputs = { self, nixpkgs, nixpkgs-stable, home-manager, ... }@inputs:
+  outputs = {
+    self,
+    nixpkgs,
+    nixpkgs-stable,
+    home-manager,
+    catppuccin,
+    ...
+  }@inputs:
   let
     system = "x86_64-linux";
 
     pkgs-stable = import nixpkgs-stable { inherit system; };
 
-    userConfigs = import ./common/users.nix;
+    # 🔹 Dados de usuários (NÃO é módulo)
+    userConfigs = import ./common/users-data.nix;
 
     mkHost = hostname:
       nixpkgs.lib.nixosSystem {
         inherit system;
 
         specialArgs = {
-          inherit inputs userConfigs pkgs-stable;
+          inherit inputs pkgs-stable userConfigs;
         };
 
         modules = [
@@ -37,13 +43,24 @@
           ./common/packages.nix
           ./common/programs.nix
           ./common/fonts.nix
- 	  ./common/users.nix 
+
+          # 👇 cria usuários no sistema
+          ./common/users.nix
+
           ./hosts/${hostname}
+
           home-manager.nixosModules.home-manager
+          catppuccin.nixosModules.catppuccin
+
           {
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
+
+              # ✅ API NOVA
+              sharedModules = [
+                catppuccin.homeModules.catppuccin
+              ];
 
               users = {
                 borba  = import ./home/borba;
@@ -51,7 +68,7 @@
               };
 
               extraSpecialArgs = {
-                inherit inputs userConfigs;
+                inherit userConfigs;
               };
             };
           }
@@ -64,3 +81,4 @@
     };
   };
 }
+
