@@ -123,6 +123,8 @@
       # Powerlevel10k
       source ${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme
 
+      export TERM="xterm-256color"
+
       # Configuração do usuário
       [[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
     '';
