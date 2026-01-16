@@ -1,89 +1,160 @@
-# My NixOS Configuration
+# ❄️ NixOS Configuration (Flakes + Home Manager)
 
-## ❄️ Overview
+Este repositório contém minha configuração pessoal de **NixOS**, utilizando **Flakes** e **Home Manager**, com suporte a **múltiplos hosts** e **múltiplos usuários**, mantendo uma separação clara entre:
 
-This repository contains my personal NixOS configuration, fully managed with **Nix Flakes**.  
-It supports **multiple hosts** and **multiple users**, with both **system-wide configuration** and **Home Manager** configurations for each user.
+- configuração de **sistema**
+- configuração de **usuário**
+- módulos **comuns**, **core**, **desktop** e **tooling**
 
 ---
 
-## 📁 Structure
+## 📁 Estrutura do Repositório
 
 ```text
 .
+├── Makefile
+├── build.sh
 ├── flake.nix
 ├── flake.lock
-├── common/
-│   ├── configuration.nix
-│   ├── packages.nix
-│   ├── programs.nix
-│   ├── fonts.nix
-│   ├── users.nix
-│   └── users-data.nix
+├── README.md
 │
-├── home/
-│   ├── common/
-│   │   ├── core/
-│   │   │   ├── git
-│   │   │   ├── zsh
-│   │   │   ├── alacritty
-│   │   │   ├── tmux
-│   │   │   └── default.nix
-│   │   │
-│   │   ├── profiles/
-│   │   │   ├── desktop
-│   │   │   ├── dev
-│   │   │   └── devops
-│   │   │
-│   │   └── default.nix
-│   │
-│   ├── borba/
-│   │   └── default.nix
-│   │
-│   └── devops/
+├── common/                  # Configuração NixOS compartilhada
+│   ├── configuration.nix    # Base do sistema
+│   ├── packages.nix         # systemPackages
+│   ├── programs.nix         # programas globais
+│   ├── fonts.nix            # fontes
+│   ├── users.nix            # definição de usuários do sistema
+│   └── users-data.nix       # dados dos usuários (nome, email, chaves)
+│
+├── hosts/                   # Hosts (máquinas)
+│   ├── dell/
+│   │   ├── default.nix
+│   │   └── hardware-configuration.nix
+│   └── macbook/
 │       └── default.nix
 │
-└── hosts/
-    ├── dell
-    └── macbook
+└── home/                    # Home Manager
+    ├── borba/               # Usuário borba
+    │   └── default.nix
+    │
+    ├── devops/              # Usuário devops
+    │   └── default.nix
+    │
+    └── common/              # Módulos compartilhados de Home Manager
+        ├── core/            # Essenciais (CLI / shell)
+        │   ├── atuin
+        │   ├── bat
+        │   ├── btop
+        │   ├── fastfetch
+        │   ├── fzf
+        │   ├── gh
+        │   ├── git
+        │   ├── gpg
+        │   ├── lazygit
+        │   ├── starship
+        │   ├── tmux
+        │   ├── zsh
+        │   └── default.nix
+        │
+        ├── desktop/         # Ambiente gráfico
+        │   ├── alacritty
+        │   ├── anydesk
+        │   ├── browsers
+        │   ├── telegram
+        │   ├── wayland
+        │   └── default.nix
+        │
+        ├── devtools/        # Ferramentas de desenvolvimento
+        │   ├── docker
+        │   ├── go
+        │   ├── neovim
+        │   ├── nix
+        │   ├── rust
+        │   └── default.nix
+        │
+        └── devopstools      # Ferramentas específicas de DevOps
+            ├── k8s
+            └── defaut.nix
 ```
 
 ---
 
-## 🖥️ Installation
+## 🧠 Conceito da Estrutura
 
+### 🔹 `common/` (NixOS)
+Configuração **global do sistema**, válida para todos os hosts:
+
+- pacotes essenciais
+- usuários
+- fontes
+- serviços
+- base do sistema
+
+---
+
+### 🔹 `hosts/`
+Cada host importa os módulos de `common` e define apenas o que é **específico da máquina**.
+
+Exemplo:
 ```bash
-sudo nixos-rebuild switch --flake .#<HOSTNAME>
-```
-
-Example:
-
-```bash
-sudo nixos-rebuild switch --flake .#dell
+hosts/dell
+hosts/macbook
 ```
 
 ---
 
-## 👤 Users & Home Manager
+### 🔹 `home/common/core`
+Ferramentas **básicas e obrigatórias** para qualquer usuário:
 
-Each user has its own Home Manager configuration:
+- shell (zsh)
+- git / gh / gpg
+- tmux
+- cli utilities
+- prompt
 
-```text
-home/<username>/default.nix
-```
+---
 
-Shared modules live under `home/common/`, divided into:
+### 🔹 `home/common/desktop`
+Tudo relacionado a **ambiente gráfico / Wayland**:
 
-- **core** → essentials (shell, git, terminal, tmux)
-- **profiles** → optional toolsets (desktop, dev, devops)
+- Alacritty
+- Browsers
+- Clipboard
+- Portais
+- UX / Performance
+- Apps desktop
 
-Example user import:
+---
+
+### 🔹 `home/common/devtools`
+Ferramentas de **desenvolvimento**:
+
+- Go + tooling
+- Rust + tooling
+- Neovim (config externa)
+- Docker client
+- Ferramentas Nix
+
+---
+
+### 🔹 `home/common/devopstools`
+Ferramentas **exclusivas de DevOps**:
+
+- Kubernetes
+- Containers
+- Cloud / Ops utilities
+
+---
+
+### 🔹 Usuários (`home/borba`, `home/devops`)
+Cada usuário decide **quais módulos importar**:
 
 ```nix
 imports = [
   ../common/core
-  ../common/profiles/dev
-  ../common/profiles/desktop
+  ../common/desktop
+  ../common/devtools
+  ../common/devopstools
 ];
 
 home.stateVersion = "25.11";
@@ -91,68 +162,37 @@ home.stateVersion = "25.11";
 
 ---
 
-## 🧰 What’s Installed
+## 🚀 Build & Deploy
 
-### System-wide (NixOS)
-
-- Base utilities
-- Fonts
-- Users & groups
-- Docker (system service)
-- Networking and hardware support
-
-### Home Manager
-
-**Core modules**:
-
-- Git
-- Zsh + Powerlevel10k
-- Alacritty (Catppuccin)
-- Tmux
-
-**Profiles**:
-
-- Desktop (Wayland stack, clipboard, screenshots, UX tools)
-- Dev (Go, Rust, LSPs, formatters)
-- DevOps (Docker tooling, cloud-native utilities)
-
----
-
-## 🖼️ Wayland Desktop
-
-Includes:
-
-- Waybar
-- Rofi
-- wl-clipboard + cliphist
-- grim / slurp / swappy
-- swaylock / swayidle / wlogout
-- PipeWire + xdg-desktop-portals (system side)
-
-Designed to work out-of-the-box on a graphical installation.
-
----
-
-## 🔧 Useful Commands
-
-Build system:
-
+### Build do sistema
 ```bash
 sudo nixos-rebuild switch --flake .#dell
 ```
 
-Apply Home Manager:
-
+### Home Manager
 ```bash
 home-manager switch --flake .#dell.borba
 ```
 
 ---
 
-## ❤️ Notes
+## ✅ Objetivos do Setup
 
-- Modular and reusable structure
-- Clear separation between system and user space
-- Easy to enable/disable features per user
+- Modularidade máxima
+- Reuso entre usuários
+- Separação clara entre sistema e usuário
+- Fácil manutenção
+- Setup completo para desktop + dev + devops
 
-Enjoy NixOS 🚀
+---
+
+## 🧊 Observações
+
+- Flake usa `nixos-unstable`
+- Catppuccin aplicado globalmente
+- Rust via `rust-overlay`
+- Configs de Neovim e Tmux externas, apenas *sourceadas*
+
+---
+
+Enjoy ❄️ NixOS
