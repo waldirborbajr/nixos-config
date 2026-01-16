@@ -5,7 +5,7 @@
     gnumake
     wget
     coreutils
-    git
+#    git
     gh
     lazygit
     stow
