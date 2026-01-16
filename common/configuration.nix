@@ -504,17 +504,17 @@
       };
     };
 
-    podman = {
-      enable = true;
-
-      # Permite usar docker CLI apontando para o podman
-      dockerCompat = true;
-
-      # Cria /run/docker.sock via podman (DevPod, compose, etc.)
-      dockerSocket.enable = true;
-
-      defaultNetwork.settings.dns_enabled = true;
-    };
+    # podman = {
+    #   enable = true;
+    #
+    #   # Permite usar docker CLI apontando para o podman
+    #   dockerCompat = true;
+    #
+    #   # Cria /run/docker.sock via podman (DevPod, compose, etc.)
+    #   dockerSocket.enable = true;
+    #
+    #   defaultNetwork.settings.dns_enabled = true;
+    # };
   };
 
   # Necessário para rootless containers (Podman)
