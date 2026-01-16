@@ -475,7 +475,21 @@
   ############################################
   # Docker — Disk & Performance
   ############################################
-  virtualisation.docker = {
+#  virtualisation.docker = {
+#    enable = true;
+#    enableOnBoot = true;
+#    autoPrune = {
+#      enable = true;
+#      dates = "daily";
+#      flags = [ "--all" "--volumes" ];
+#    };
+#  };
+
+############################################
+# Containers — Docker + Podman
+############################################
+virtualisation = {
+  docker = {
     enable = true;
     enableOnBoot = true;
     autoPrune = {
@@ -484,6 +498,23 @@
       flags = [ "--all" "--volumes" ];
     };
   };
+
+  podman = {
+    enable = true;
+
+    # Permite usar docker CLI apontando para o podman
+    dockerCompat = true;
+
+    # Cria /run/docker.sock via podman (DevPod, compose, etc.)
+    dockerSocket.enable = true;
+
+    defaultNetwork.settings.dns_enabled = true;
+  };
+};
+
+# Necessário para rootless containers (Podman)
+security.unprivilegedUsernsClone = true;
+
 
   ############################################
   # Users / Sudo
