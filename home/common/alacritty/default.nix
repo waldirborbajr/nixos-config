@@ -57,22 +57,22 @@
         size = if pkgs.stdenv.isDarwin then 15 else 12;
 
         normal = {
-          family = "MesloLGS Nerd Font";
+          family = "JetBrainsMono Nerd Font";
           style = "Regular";
         };
 
         bold = {
-          family = "MesloLGS Nerd Font";
+          family = "JetBrainsMono Nerd Font";
           style = "Bold";
         };
 
         italic = {
-          family = "MesloLGS Nerd Font";
+          family = "JetBrainsMono Nerd Font";
           style = "Italic";
         };
 
         bold_italic = {
-          family = "MesloLGS Nerd Font";
+          family = "JetBrainsMono Nerd Font";
           style = "Italic";
         };
       };
