@@ -2,46 +2,157 @@
 
 ## ❄️ Overview
 
-This is my personal NixOS system configuration flake. There are many like it, but this one is mine. I don't do anything particularly special, but you're free to look around and use what you want.
+This repository contains my personal NixOS configuration, fully managed with **Nix Flakes**.  
+It supports **multiple hosts** and **multiple users**, with both **system-wide configuration** and **Home Manager** configurations for each user.
 
-## 📁 Organization
+---
 
-The basic organization is something like this:
+## 📁 Structure
 
+```text
+.
+├── flake.nix
+├── flake.lock
+├── common/
+│   ├── configuration.nix
+│   ├── packages.nix
+│   ├── programs.nix
+│   ├── fonts.nix
+│   ├── users.nix
+│   └── users-data.nix
+│
+├── home/
+│   ├── common/
+│   │   ├── core/
+│   │   │   ├── git
+│   │   │   ├── zsh
+│   │   │   ├── alacritty
+│   │   │   ├── tmux
+│   │   │   └── default.nix
+│   │   │
+│   │   ├── profiles/
+│   │   │   ├── desktop
+│   │   │   ├── dev
+│   │   │   └── devops
+│   │   │
+│   │   └── default.nix
+│   │
+│   ├── borba/
+│   │   └── default.nix
+│   │
+│   └── devops/
+│       └── default.nix
+│
+└── hosts/
+    ├── dell
+    └── macbook
 ```
-nixos
-├─── README.md
-├─── assets
-│   ╰─── desktop.jpg
-├─── home
-│   ├─── default.nix
-│   ╰─── <username>
-│       ╰─── <user home-manager config>
-├─── host
-│   ├─── default.nix
-│   ╰─── <hostname>
-│       ╰─── <host machine config>
-╰─── secrets
-    ├─── secrets.nix
-    ╰─── <program_secret.age>
+
+---
+
+## 🖥️ Installation
+
+```bash
+sudo nixos-rebuild switch --flake .#<HOSTNAME>
 ```
 
-### 🖼️ Assets
+Example:
 
-Contains assets for the system, such as a desktop background image or profile picture.
+```bash
+sudo nixos-rebuild switch --flake .#dell
+```
 
-### 🏡 Home
+---
 
-User environment definition via [home-manager](https://github.com/nix-community/home-manager). Currently only one user defined, since I am the only one using these machines.
+## 👤 Users & Home Manager
 
-### 🖥️ Host
+Each user has its own Home Manager configuration:
 
-Contains host machine configuration. Basically what would be in configuration.nix on a non-flake system.
+```text
+home/<username>/default.nix
+```
 
-### 🔐 Secrets
+Shared modules live under `home/common/`, divided into:
 
-Nix friendly secrets storage using [agenix](https://github.com/ryantm/agenix).
+- **core** → essentials (shell, git, terminal, tmux)
+- **profiles** → optional toolsets (desktop, dev, devops)
 
+Example user import:
 
-ref: https://github.com/AlexNabokikh/nix-config
-grok: https://grok.com/c/eb9c2be6-3df9-43c3-9845-02a0f78393f7?rid=09479c4f-008d-4f93-87fe-7fb8d3339e1b
+```nix
+imports = [
+  ../common/core
+  ../common/profiles/dev
+  ../common/profiles/desktop
+];
+
+home.stateVersion = "25.11";
+```
+
+---
+
+## 🧰 What’s Installed
+
+### System-wide (NixOS)
+
+- Base utilities
+- Fonts
+- Users & groups
+- Docker (system service)
+- Networking and hardware support
+
+### Home Manager
+
+**Core modules**:
+
+- Git
+- Zsh + Powerlevel10k
+- Alacritty (Catppuccin)
+- Tmux
+
+**Profiles**:
+
+- Desktop (Wayland stack, clipboard, screenshots, UX tools)
+- Dev (Go, Rust, LSPs, formatters)
+- DevOps (Docker tooling, cloud-native utilities)
+
+---
+
+## 🖼️ Wayland Desktop
+
+Includes:
+
+- Waybar
+- Rofi
+- wl-clipboard + cliphist
+- grim / slurp / swappy
+- swaylock / swayidle / wlogout
+- PipeWire + xdg-desktop-portals (system side)
+
+Designed to work out-of-the-box on a graphical installation.
+
+---
+
+## 🔧 Useful Commands
+
+Build system:
+
+```bash
+sudo nixos-rebuild switch --flake .#dell
+```
+
+Apply Home Manager:
+
+```bash
+home-manager switch --flake .#dell.borba
+```
+
+---
+
+## ❤️ Notes
+
+- Modular and reusable structure
+- Clear separation between system and user space
+- Easy to enable/disable features per user
+
+Enjoy NixOS 🚀
