@@ -45,6 +45,11 @@
   services.xserver.displayManager.gdm = {
     enable = true;
     wayland = true;
+
+    autoLogin = {
+      enable = true;
+      user = "borba";
+    };
   };
 
   services.xserver.desktopManager.gnome.enable = true;
@@ -114,19 +119,6 @@
     enable = true;
     wheelNeedsPassword = false;
   };
-
-############################################
-# Auto Login (GDM)
-############################################
-services.xserver.displayManager.gdm = {
-  enable = true;
-  wayland = true;
-  autoLogin = {
-    enable = true;
-    user = "borba";
-  };
-};
-
 
   ############################################
   # System
