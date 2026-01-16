@@ -98,5 +98,25 @@
     enableOnBoot = true;
   };
 
+  ############################################
+  # Users / Sudo
+  ############################################
+  users.users.borba = {
+    isNormalUser = true;
+    extraGroups = [
+      "wheel"
+      "networkmanager"
+      "docker"
+    ];
+  };
+
+  security.sudo = {
+    enable = true;
+    wheelNeedsPassword = false;
+  };
+
+  ############################################
+  # System
+  ############################################
   system.stateVersion = "25.11";
 }
