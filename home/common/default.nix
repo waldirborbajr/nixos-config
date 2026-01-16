@@ -3,6 +3,7 @@
 {
   imports = [
     ./git/default.nix
+    ./gh/default.nix
     ./anydesk/default.nix
     ./alacritty/default.nix
     ./btop/default.nix
@@ -15,11 +16,6 @@
   ];
 
   home.stateVersion = "25.11";
-
-  programs.gh = {
-    enable = true;
-    gitCredentialHelper.enable = true;
-  };
 
   programs.zsh.enable = true;
 }
