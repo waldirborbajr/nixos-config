@@ -6,11 +6,11 @@ let
   CARGO_BIN   = "${CARGO_HOME}/bin";
 in
 {
-  home.packages = with pkgs; [
-    rustup
-    # Opcional: ajuda a evitar alguns conflitos de binários
-    # rust-analyzer   # ← descomente se quiser o oficial do Nix
-  ];
+home.packages = [
+  (pkgs.rust-bin.stable.latest.default.override {
+    extensions = [ "rust-src" "rust-analyzer" "clippy" "rustfmt" ];
+  })
+];
 
   home.sessionVariables = {
     RUSTUP_HOME = RUSTUP_HOME;
