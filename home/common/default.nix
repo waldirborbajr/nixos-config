@@ -2,10 +2,10 @@
 
 {
   imports = [
-    ./git.nix
-    ./alacritty.nix
-    ./btop.nix
-    ./tmux.nix
+    ./git/default.nix
+    ./alacritty/default.nix
+    ./btop/default.nix
+    ./tmux/default.nix
     # ./zsh.nix
     # ./neovim.nix
     # ./tmux.nix

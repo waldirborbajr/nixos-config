@@ -15,10 +15,10 @@ in
       pull.rebase = "true";
     };
 
-    signing = {
-      key = userConfig.gitKey;
-      signByDefault = userConfig.gitKey != null;
-    };
+  #  signing = {
+ #     key = userConfig.gitKey;
+#      signByDefault = userConfig.gitKey != null;
+   # };
   };
 
   programs.delta = {
