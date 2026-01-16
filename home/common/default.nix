@@ -5,7 +5,6 @@
     ./git/default.nix
     ./alacritty/default.nix
     ./btop/default.nix
-    ./tmux/default.nix
     ./zsh/default.nix
     ./go/default.nix
     ./rust/default.nix
