@@ -5,45 +5,41 @@
     gnumake
     wget
     coreutils
-#    git
-#    gh
-    lazygit
-    stow
     lshw
     iwd
 
-    # Containers
-    docker
-    docker-compose
-    devpod
+    # # Containers
+    # docker
+    # docker-compose
+    # devpod
 
-    # Wayland tools
-    waybar
-    rofi
-    wl-clipboard
+#     # Wayland tools
+#     waybar
+#     rofi
+#     wl-clipboard
 
-    # CLI
-    eza
-    btop
-    bat
-    htop
-    fd
-    ripgrep
-    yazi
+#     # CLI
+#     eza
+#     btop
+#     bat
+#     htop
+#     fd
+#     ripgrep
+#     yazi
 
-    # Go
-#    go
-#    gopls
+#     # Go
+# #    go
+# #    gopls
 
-    # Rust
-#    rustup
-#    rust-analyzer
+#     # Rust
+# #    rustup
+# #    rust-analyzer
 
-    # Nix
-#    nixd
-#    nil
-#    statix
-#    deadnix
-#    nixfmt-rfc-style
+#     # Nix
+# #    nixd
+# #    nil
+# #    statix
+# #    deadnix
+# #    nixfmt-rfc-style
   ];
 }

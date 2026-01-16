@@ -10,12 +10,11 @@
     ./zsh/default.nix
     ./go/default.nix
     ./rust/default.nix
+    ./nix/default.nix
     ./neovim/default.nix
     ./tmux/default.nix
     ./k8s/default.nix
   ];
-
-  home.stateVersion = "25.11";
 
 }
 
