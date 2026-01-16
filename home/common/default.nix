@@ -3,6 +3,9 @@
 {
   imports = [
     ./git.nix
+    ./alacritty.nix
+    ./btop.nix
+    ./tmux.nix
     # ./zsh.nix
     # ./neovim.nix
     # ./tmux.nix
@@ -15,9 +18,6 @@
     rustup
     neovim
     lazygit
-    alacritty
-    tmux
-    git
     gh
   ];
 
