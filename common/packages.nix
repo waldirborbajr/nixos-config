@@ -32,18 +32,18 @@
     yazi
 
     # Go
-    go
-    gopls
+#    go
+#    gopls
 
     # Rust
-    rustup
-    rust-analyzer
+#    rustup
+#    rust-analyzer
 
     # Nix
-    nixd
-    nil
-    statix
-    deadnix
-    nixfmt-rfc-style
+#    nixd
+#    nil
+#    statix
+#    deadnix
+#    nixfmt-rfc-style
   ];
 }
