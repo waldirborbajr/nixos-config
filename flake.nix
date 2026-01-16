@@ -80,6 +80,7 @@
     nixosConfigurations = {
       dell = mkHost "dell";
       macbook = mkHost "macbook";
+      ci = mkNixos "ci" [];
     };
   };
 }
