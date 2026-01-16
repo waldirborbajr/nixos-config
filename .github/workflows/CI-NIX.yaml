@@ -10,9 +10,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      ############################################
+      # Checkout
+      ############################################
+      - name: Checkout repository
         uses: actions/checkout@v4
 
+      ############################################
+      # Install Nix (with flakes enabled)
+      ############################################
       - name: Install Nix
         uses: cachix/install-nix-action@v27
         with:
@@ -21,7 +27,7 @@ jobs:
             access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
 
       ############################################
-      # Flake sanity
+      # Flake sanity (cheap & fast)
       ############################################
       - name: Flake metadata
         run: nix flake metadata
@@ -30,29 +36,23 @@ jobs:
         run: nix flake show
 
       ############################################
-      # Formatting (fail if not formatted)
+      # Formatter & Lint
+      #
+      # Fonte da verdade:
+      # - formatter.${system}
+      # - checks.${system}
       ############################################
-      - name: Check Nix formatting (alejandra)
+      - name: Run flake checks (fmt + lint)
+        run: nix flake check
+
+      ############################################
+      # Evaluate NixOS hosts (no build, no VM)
+      ############################################
+      - name: Evaluate CI host (headless)
         run: |
-          nix run nixpkgs#alejandra -- --check .
+          nix eval .#nixosConfigurations.ci.config.system.build.toplevel --raw
 
-      ############################################
-      # Lint
-      ############################################
-      - name: Nix lint (statix)
-        run: |
-          nix run nixpkgs#statix -- check .
-
-      ############################################
-      # Flake checks
-      ############################################
-      - name: Flake check
-        run: nix flake check --all-systems
-
-      ############################################
-      # Evaluate NixOS hosts
-      ############################################
-      - name: Evaluate NixOS configurations
+      - name: Evaluate Desktop hosts
         run: |
           nix eval .#nixosConfigurations.dell.config.system.build.toplevel --raw
           nix eval .#nixosConfigurations.macbook.config.system.build.toplevel --raw
