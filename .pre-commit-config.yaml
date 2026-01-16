@@ -1,0 +1,14 @@
+repos:
+  - repo: local
+    hooks:
+      - id: alejandra
+        name: nix fmt (alejandra)
+        entry: alejandra
+        language: system
+        types: [nix]
+
+      - id: statix
+        name: nix lint (statix)
+        entry: statix check
+        language: system
+        pass_filenames: false
