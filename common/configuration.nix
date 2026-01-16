@@ -127,7 +127,6 @@
 # #     "application/x-terminal-emulator" = "alacritty.desktop";
 # #   };
 
-
 # #   ############################################
 # #   # System
 # #   ############################################
@@ -347,7 +346,10 @@
   # Nix — Performance, Store e Flakes
   ############################################
   nix.settings = {
-    experimental-features = [ "nix-command" "flakes" ];
+    experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
     auto-optimise-store = true;
     max-jobs = "auto";
     cores = 0;
@@ -453,10 +455,10 @@
   ############################################
   # systemd — Boot mais rápido
   ############################################
-  systemd.extraConfig = ''
-    DefaultTimeoutStartSec=15s
-    DefaultTimeoutStopSec=10s
-  '';
+  systemd.settings.Manager = {
+    DefaultTimeoutStartSec = "15s";
+    DefaultTimeoutStopSec = "10s";
+  };
 
   ############################################
   # SSH
@@ -475,53 +477,59 @@
   ############################################
   # Docker — Disk & Performance
   ############################################
-#  virtualisation.docker = {
-#    enable = true;
-#    enableOnBoot = true;
-#    autoPrune = {
-#      enable = true;
-#      dates = "daily";
-#      flags = [ "--all" "--volumes" ];
-#    };
-#  };
+  #  virtualisation.docker = {
+  #    enable = true;
+  #    enableOnBoot = true;
+  #    autoPrune = {
+  #      enable = true;
+  #      dates = "daily";
+  #      flags = [ "--all" "--volumes" ];
+  #    };
+  #  };
 
-############################################
-# Containers — Docker + Podman
-############################################
-virtualisation = {
-  docker = {
-    enable = true;
-    enableOnBoot = true;
-    autoPrune = {
+  ############################################
+  # Containers — Docker + Podman
+  ############################################
+  virtualisation = {
+    docker = {
       enable = true;
-      dates = "daily";
-      flags = [ "--all" "--volumes" ];
+      enableOnBoot = true;
+      autoPrune = {
+        enable = true;
+        dates = "daily";
+        flags = [
+          "--all"
+          "--volumes"
+        ];
+      };
+    };
+
+    podman = {
+      enable = true;
+
+      # Permite usar docker CLI apontando para o podman
+      dockerCompat = true;
+
+      # Cria /run/docker.sock via podman (DevPod, compose, etc.)
+      dockerSocket.enable = true;
+
+      defaultNetwork.settings.dns_enabled = true;
     };
   };
 
-  podman = {
-    enable = true;
-
-    # Permite usar docker CLI apontando para o podman
-    dockerCompat = true;
-
-    # Cria /run/docker.sock via podman (DevPod, compose, etc.)
-    dockerSocket.enable = true;
-
-    defaultNetwork.settings.dns_enabled = true;
-  };
-};
-
-# Necessário para rootless containers (Podman)
-security.unprivilegedUsernsClone = true;
-
+  # Necessário para rootless containers (Podman)
+  security.unprivilegedUsernsClone = true;
 
   ############################################
   # Users / Sudo
   ############################################
   users.users.borba = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" "docker" ];
+    extraGroups = [
+      "wheel"
+      "networkmanager"
+      "docker"
+    ];
   };
 
   security.sudo = {
