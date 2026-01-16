@@ -7,6 +7,7 @@
     ./browsers/default.nix
     ./telegram/default.nix
     ./wayland/default.nxi
+    ./obsidian/default.nix
   ];
 
 }
