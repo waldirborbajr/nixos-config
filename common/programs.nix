@@ -2,13 +2,8 @@
 
 {
   programs = {
-    zsh.enable = true;
-
-    firefox.enable = true;
-
-    zoxide = {
-      enable = true;
-      enableZshIntegration = true;
-    };
+    nm-applet.enable = true;
+    dconf.enable = true;
+    gnupg.agent.enable = true;
   };
 }

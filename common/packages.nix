@@ -1,45 +1,72 @@
+# { pkgs, ... }:
+
+# {
+#   environment.systemPackages = with pkgs; [
+#     gnumake
+#     wget
+#     coreutils
+#     lshw
+#     iwd
+
+#   ];
+# }
+
 { pkgs, ... }:
 
 {
   environment.systemPackages = with pkgs; [
+    ############################################
+    # Core UNIX / Build
+    ############################################
+    coreutils
     gnumake
     wget
-    coreutils
+    curl
+    gnupg
+
+    ############################################
+    # Hardware / System Debug
+    ############################################
     lshw
+    pciutils      # lspci
+    usbutils      # lsusb
+    lm_sensors    # sensores de temperatura
+
+    ############################################
+    # Network / Connectivity
+    ############################################
     iwd
+    iproute2      # ip
+    iputils       # ping
+    traceroute
+    dnsutils      # dig, nslookup
+    nmap          # diagnóstico de rede
 
-    # # Containers
-    # docker
-    # docker-compose
-    # devpod
+    ############################################
+    # Storage / Filesystem
+    ############################################
+    e2fsprogs     # fsck, tune2fs
+    ntfs3g        # NTFS
+    dosfstools    # FAT
 
-#     # Wayland tools
-#     waybar
-#     rofi
-#     wl-clipboard
+    ############################################
+    # Process / System inspection
+    ############################################
+    procps        # ps, top
+    psmisc        # killall, fuser
+    util-linux    # mount, lsblk, etc
 
-#     # CLI
-#     eza
-#     btop
-#     bat
-#     htop
-#     fd
-#     ripgrep
-#     yazi
+    ############################################
+    # Archive / Recovery
+    ############################################
+    unzip
+    zip
+    rsync
+    file
 
-#     # Go
-# #    go
-# #    gopls
-
-#     # Rust
-# #    rustup
-# #    rust-analyzer
-
-#     # Nix
-# #    nixd
-# #    nil
-# #    statix
-# #    deadnix
-# #    nixfmt-rfc-style
+    ############################################
+    # Certificates / SSL
+    ############################################
+    cacert
   ];
 }
