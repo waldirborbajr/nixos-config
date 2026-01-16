@@ -121,6 +121,14 @@
   };
 
   ############################################
+  # Default Terminal (Global)
+  ############################################
+  xdg.mime.defaultApplications = {
+    "application/x-terminal-emulator" = "alacritty.desktop";
+  };
+
+
+  ############################################
   # System
   ############################################
   system.stateVersion = "25.11";
