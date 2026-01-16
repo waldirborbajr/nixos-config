@@ -16,6 +16,7 @@
     ./k8s/default.nix
     ./yazi/default.nix
     ./eza/default.nix
+    ./xdg/default.nix
   ];
 
 }
