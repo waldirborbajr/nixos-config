@@ -3,8 +3,6 @@
 {
   imports = [
     ../common/core
-    ../common/profiles/devops
-    ../common/profiles/desktop
   ];
 
   home.stateVersion = "25.11";
