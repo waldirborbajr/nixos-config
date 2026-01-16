@@ -466,7 +466,7 @@
   services.openssh = {
     enable = true;
     settings = {
-      UseDNS = false;
+      UseDNS = false; # ← chave correta
       PasswordAuthentication = false;
       KbdInteractiveAuthentication = false;
     };
@@ -501,6 +501,18 @@
           "--all"
           "--volumes"
         ];
+      };
+    };
+
+    # Containers: só Podman (recomendado)
+    virtualisation = {
+      docker.enable = false;
+
+      podman = {
+        enable = true;
+        dockerCompat = true;
+        dockerSocket.enable = true;
+        defaultNetwork.settings.dns_enabled = true;
       };
     };
 
