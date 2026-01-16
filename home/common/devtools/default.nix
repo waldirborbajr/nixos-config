@@ -7,6 +7,7 @@
     ./nix/default.nix
     ./neovim/default.nix
     ./docker/default.nix
+    ./devpod/default.nix
   ];
 
 }
