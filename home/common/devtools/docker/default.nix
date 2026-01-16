@@ -1,17 +1,18 @@
+# Seu home.nix
 { config, pkgs, ... }:
-
 {
-  virtualisation.docker = {
-    enable = true;
+  home.packages = with pkgs; [
+    docker
+    docker-compose
+    # lazydocker    # opcional, interface tui bem útil
+  ];
 
-    # Melhor performance e compatibilidade
-    storageDriver = "overlay2";
-    enableOnBoot = true;
-  };
+  # Opcional: tenta habilitar socket rootless (funciona só se o sistema já tiver
+  # rootless docker habilitado ou se você usar podman rootless)
+  # systemd.user.services.docker = {
+  #   ...
+  # };
 
-  # Opcional, mas recomendado
-  virtualisation.docker.autoPrune = {
-    enable = true;
-    dates = "weekly";
-  };
+  # Alternativa muito mais comum hoje em dia: usar podman rootless (mais fácil)
+  # programs.podman.enable = true;   ← existe no home-manager em versões recentes!
 }
