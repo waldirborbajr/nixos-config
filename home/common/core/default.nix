@@ -14,6 +14,7 @@
     ./neovim/default.nix
     ./tmux/default.nix
     ./k8s/default.nix
+    ./yazi/default.nix
   ];
 
 }
