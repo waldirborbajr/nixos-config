@@ -1,0 +1,58 @@
+name: Nix CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  nix:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+
+      ############################################
+      # Flake sanity
+      ############################################
+      - name: Flake metadata
+        run: nix flake metadata
+
+      - name: Flake show
+        run: nix flake show
+
+      ############################################
+      # Formatting (fail if not formatted)
+      ############################################
+      - name: Check Nix formatting (alejandra)
+        run: |
+          nix run nixpkgs#alejandra -- --check .
+
+      ############################################
+      # Lint
+      ############################################
+      - name: Nix lint (statix)
+        run: |
+          nix run nixpkgs#statix -- check .
+
+      ############################################
+      # Flake checks
+      ############################################
+      - name: Flake check
+        run: nix flake check --all-systems
+
+      ############################################
+      # Evaluate NixOS hosts
+      ############################################
+      - name: Evaluate NixOS configurations
+        run: |
+          nix eval .#nixosConfigurations.dell.config.system.build.toplevel --raw
+          nix eval .#nixosConfigurations.macbook.config.system.build.toplevel --raw
