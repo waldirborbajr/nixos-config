@@ -6,7 +6,7 @@
     wget
     coreutils
 #    git
-    gh
+#    gh
     lazygit
     stow
     lshw
