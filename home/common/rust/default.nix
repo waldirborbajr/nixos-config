@@ -1,22 +1,16 @@
 { config, pkgs, lib, ... }:
 
+let
+  # Cria um pkgs local só com o overlay (fallback se global não funcionar)
+  rustPkgs = import pkgs.nixpkgs {
+    inherit (pkgs) system;
+    overlays = [ (import <rust-overlay>) ];  # ou use inputs se disponível
+  };
+in
 {
   home.packages = [
-    (pkgs.rust-bin.stable.latest.default.override {
-      extensions = [
-        "rust-src"        # para rust-analyzer funcionar bem
-        "rust-analyzer"   # LSP oficial
-        "clippy"
-        "rustfmt"
-      ];
+    (rustPkgs.rust-bin.stable.latest.default.override {
+      extensions = [ "rust-src" "rust-analyzer" "clippy" "rustfmt" ];
     })
-    # Opcional: se precisar de wasm, cross, etc.
-    # pkgs.pkg-config
-    # pkgs.openssl
-    # pkgs.cargo-watch
   ];
-
-  # Não precisa mais disso tudo (remova para evitar confusão):
-  # RUSTUP_HOME, CARGO_HOME, sessionPath para ~/.cargo/bin
-  # script de ativação com rustup
 }
