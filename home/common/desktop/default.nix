@@ -6,7 +6,7 @@
     ./anydesk/default.nix
     ./browsers/default.nix
     ./telegram/default.nix
-    ./wayland/default.nxi
+    ./wayland/default.nix
     ./obsidian/default.nix
   ];
 
