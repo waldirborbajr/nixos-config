@@ -1,7 +1,13 @@
-{ pkgs, userConfigs, config, ... }:
+{
+  pkgs,
+  userConfigs,
+  config,
+  lib,
+  ...
+}:
 
 let
-  username   = config.home.username;
+  username = config.home.username;
   userConfig = userConfigs.${username};
 in
 {
@@ -10,25 +16,21 @@ in
 
     settings = {
       user = {
-        name  = userConfig.fullName;
+        name = userConfig.fullName;
         email = userConfig.email;
       };
 
       pull.rebase = true;
       init.defaultBranch = "main";
 
-      gpg = {
-        program = "gpg";
-      };
+      gpg.program = "gpg";
 
-      commit = {
-        gpgSign = userConfig.gitKey != null;
-      };
+      commit.gpgSign = userConfig.gitKey != null;
     };
 
-    signing = {
-      key = userConfig.gitKey;
-      signByDefault = userConfig.gitKey != null;
+    signing = lib.mkIf (userConfig.gitKey != null) {
+      key = "${userConfig.gitKey}!";
+      signByDefault = true;
     };
   };
 

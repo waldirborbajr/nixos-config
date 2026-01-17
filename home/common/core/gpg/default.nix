@@ -7,6 +7,15 @@
   # Install gpg via home-manager module
   programs.gpg = {
     enable = true;
+    publicKeys = [
+      {
+        source = ~/gpg-public.asc;
+        trust = 5; # 5 = ultimate trust (sua própria chave)
+      }
+    ];
+    # Opcional: permite editar/importar chaves manualmente depois
+    mutableKeys = true;
+
     settings = {
       personal-cipher-preferences = "AES256";
       personal-digest-preferences = "SHA512";

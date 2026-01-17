@@ -7,10 +7,10 @@
   ############################################
   # Nixpkgs global config (unfree + insecure)
   ############################################
-  nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.permittedInsecurePackages = [
-    "broadcom-sta-6.30.223.271"   # driver wl proprietário antigo, marcado como insecure
-  ];
+#  nixpkgs.config.allowUnfree = true;
+#  nixpkgs.config.permittedInsecurePackages = [
+#    "broadcom-sta-6.30.223.271"   # driver wl proprietário antigo, marcado como insecure
+#  ];
 
   ############################################
   # Host
@@ -36,9 +36,9 @@
   ############################################
   # Wi-Fi — Broadcom BCM4315 [14e4:4315]
   ############################################
-  boot.extraModulePackages = with config.boot.kernelPackages; [
-    broadcom_sta
-  ];
+ # boot.extraModulePackages = with config.boot.kernelPackages; [
+ #   broadcom_sta
+ # ];
 
   boot.kernelModules = [ "wl" ];
 
