@@ -1,10 +1,25 @@
 { config, pkgs, ... }:
 {
-  imports = [ ./hardware-configuration.nix ];
+  imports = [
+    ./hardware-configuration.nix
+  ];
 
+  ############################################
+  # Nixpkgs global config (unfree + insecure)
+  ############################################
+  nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.permittedInsecurePackages = [
+    "broadcom-sta-6.30.223.271"   # driver wl proprietário antigo, marcado como insecure
+  ];
+
+  ############################################
+  # Host
+  ############################################
   networking.hostName = "dell";
 
+  ############################################
   # Bootloader
+  ############################################
   boot.loader.grub = {
     enable = true;
     device = "/dev/sda";
@@ -12,12 +27,15 @@
     timeout = 2;
   };
 
-  # Kernel — 6.6 ainda costuma funcionar melhor com broadcom-sta do que kernels muito novos
-  boot.kernelPackages = pkgs.linuxPackages_6_6;
+  ############################################
+  # Kernel (compatível com broadcom-sta)
+  ############################################
+  # Use 6.6 ou mais antigo — kernels novos (>6.10) frequentemente quebram a compilação
+  boot.kernelPackages = pkgs.linuxPackages_6_6;   # ou teste linuxPackages_6_1 / linuxPackages_lts se falhar
 
+  ############################################
   # Wi-Fi — Broadcom BCM4315 [14e4:4315]
-  nixpkgs.config.allowUnfree = true;
-
+  ############################################
   boot.extraModulePackages = with config.boot.kernelPackages; [
     broadcom_sta
   ];
@@ -29,25 +47,38 @@
     "bcma"
     "ssb"
     "brcmsmac"
-    "iwlwifi"   # só por garantia mesmo
+    "iwlwifi"   # só por precaução
   ];
 
+  ############################################
   # CPU / Power
+  ############################################
   powerManagement.cpuFreqGovernor = "schedutil";
 
+  ############################################
   # Input
+  ############################################
   services.libinput.enable = true;
 
-  # Teclado BR
+  ############################################
+  # Keyboard (BR ABNT2)
+  ############################################
   services.xserver.xkb.layout = "br";
   console.keyMap = "br-abnt2";
 
-  # RTC
+  ############################################
+  # RTC (UTC recomendado para dual-boot)
+  ############################################
   time.hardwareClockInLocalTime = false;
 
-  # I/O Scheduler
+  ############################################
+  # I/O Scheduler otimizado
+  ############################################
   services.udev.extraRules = ''
     ACTION=="add|change", KERNEL=="nvme*", ATTR{queue/scheduler}="none"
     ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/scheduler}="mq-deadline"
   '';
+
+  # Opcional: habilita firmware non-free (pode ajudar em outros drivers)
+  # hardware.enableAllFirmware = true;
 }
