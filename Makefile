@@ -13,27 +13,29 @@ UNAME_S := $(shell uname -s)
 help:
 	@echo ""
 	@echo "Rebuild:"
-	@echo "  rebuild            Auto-detect OS and rebuild"
-	@echo "  rebuild-dry        Dry-run rebuild (no changes)"
-	@echo "  rollback           Rollback to previous generation"
+	@echo "  rebuild             Auto-detect OS and rebuild"
+	@echo "  rebuild-dry         Dry-run rebuild (no changes)"
+	@echo "  rebuild-pure        Pure build (flake strict)"
+	@echo "  rebuild-impure      Impure build (troubleshooting)"
+	@echo "  rollback            Rollback to previous generation"
 	@echo ""
 	@echo "Flakes:"
-	@echo "  flake-update       Update flake inputs"
-	@echo "  flake-check        Evaluate flake"
+	@echo "  flake-update        Update flake inputs"
+	@echo "  flake-check         Evaluate flake"
 	@echo ""
 	@echo "Garbage / Cleanup:"
-	@echo "  gc-soft            Safe GC (old generations)"
-	@echo "  gc-hard            Aggressive GC (everything unused)"
-	@echo "  store-optimize     Deduplicate /nix/store"
+	@echo "  gc-soft             Safe GC (old generations)"
+	@echo "  gc-hard             Aggressive GC (everything unused)"
+	@echo "  store-optimize      Deduplicate /nix/store"
 	@echo ""
 	@echo "Docker:"
-	@echo "  docker-clean       Remove unused containers/images"
-	@echo "  docker-nuke        Remove ALL unused data"
+	@echo "  docker-clean        Remove unused containers/images"
+	@echo "  docker-nuke         Remove ALL unused data"
 	@echo ""
 	@echo "Diagnostics:"
-	@echo "  store-size         Show /nix/store size"
-	@echo "  store-top          Biggest closures"
-	@echo "  diff-last          Diff last two generations"
+	@echo "  store-size          Show /nix/store size"
+	@echo "  store-top           Biggest closures"
+	@echo "  diff-last           Diff last two generations"
 	@echo ""
 
 # ---------------------------------------------------------
@@ -50,6 +52,17 @@ endif
 .PHONY: rebuild-dry
 rebuild-dry:
 	sudo nixos-rebuild dry-run --flake $(FLAKE)
+
+# ---------------------------------------------------------
+# Explicit builds (debugging)
+# ---------------------------------------------------------
+.PHONY: rebuild-pure
+rebuild-pure:
+	sudo nixos-rebuild switch --flake $(FLAKE) --pure
+
+.PHONY: rebuild-impure
+rebuild-impure:
+	sudo nixos-rebuild switch --flake $(FLAKE) --impure
 
 .PHONY: rollback
 rollback:
