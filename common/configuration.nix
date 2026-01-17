@@ -116,13 +116,16 @@
   ############################################
   # SSH — SEM duplicação
   ############################################
-  services.openssh = {
-    enable = true;
-    settings = {
-      PasswordAuthentication = false;
-      KbdInteractiveAuthentication = false;
-    };
+services.openssh = {
+  enable = true;
+  settings = {
+    PermitRootLogin = "no";
+    PasswordAuthentication = true;
+    KbdInteractiveAuthentication = true;
+    PubkeyAuthentication = true;
   };
+};
+
 
   networking.firewall.allowedTCPPorts = [ 22 ];
 
