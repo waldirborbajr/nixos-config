@@ -143,25 +143,6 @@
     };
   };
 
-  ############################################
-  # Users / Sudo
-  ############################################
-  users.users.borba = {
-    isNormalUser = true;
-    shell = pkgs.zsh;
-    extraGroups = [
-      "wheel"
-      "networkmanager"
-      "docker"
-    ];
-  };
-
-  users.users.devops = {
-    isNormalUser = true;
-    shell = pkgs.zsh;
-    extraGroups = [ "docker" ];
-  };
-
   security.sudo = {
     enable = true;
     wheelNeedsPassword = false;
