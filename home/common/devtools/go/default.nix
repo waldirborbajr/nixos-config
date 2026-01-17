@@ -5,7 +5,7 @@ let
 in
 {
   ############################################
-  # Go language support (Home Manager)
+  # Go (Home Manager)
   ############################################
   programs.go = {
     enable = true;
@@ -17,7 +17,7 @@ in
   };
 
   ############################################
-  # Ensure Go binaries are on PATH
+  # Ensure Go binaries are in PATH
   ############################################
   home.sessionPath = [
     "$HOME/go/bin"
@@ -26,11 +26,10 @@ in
   ############################################
   # Go development tools
   ############################################
-  home.packages = [
-    pkgs.gopls
-    pkgs.delve
-    pkgs.goPackages.goimports # ✅ CORRETO
-    pkgs.golangci-lint
-    pkgs.gotools
+  home.packages = with pkgs; [
+    gopls # LSP
+    delve # Debugger
+    golangci-lint # Linter
+    gotools # ✅ includes goimports (OFICIAL)
   ];
 }
