@@ -1,14 +1,13 @@
-{ pkgs, config, lib, ... }:
+{ pkgs, lib, config, ... }:
 
 {
-  # Commitizen CLI
   home.packages = with pkgs; [
     commitizen
+    nodePackages.cz-git
   ];
 
-  # Alias opcional
   programs.zsh.shellAliases = lib.mkIf config.programs.zsh.enable {
-    cz = "cz";
+    cz  = "cz";
     ccm = "cz commit";
   };
 }
