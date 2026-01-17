@@ -27,10 +27,10 @@ in
   # Go development tools
   ############################################
   home.packages = [
-    pkgs.gopls # LSP
-    pkgs.delve # Debugger (dlv)
-    pkgs.goimports # gofmt + imports
-    pkgs.golangci-lint # Linter all-in-one
-    pkgs.gotools # guru, godoc, etc.
+    pkgs.gopls
+    pkgs.delve
+    pkgs.goPackages.goimports # ✅ CORRETO
+    pkgs.golangci-lint
+    pkgs.gotools
   ];
 }
