@@ -31,7 +31,7 @@
   nixpkgs.config.allowUnfree = true;
 
   boot.extraModulePackages = [
-    pkgs.linuxPackages_6_6.broadcom_wl
+    config.boot.kernelPackages."broadcom-wl"
   ];
 
   boot.kernelModules = [ "wl" ];
