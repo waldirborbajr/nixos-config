@@ -10,9 +10,9 @@
   ];
 
   ############################################
-  # .czrc (global, declarativo)
+  # XDG config: ~/.config/commitizen/config.json
   ############################################
-  home.file.".czrc".text = ''
+  xdg.configFile."commitizen/config.json".text = ''
     {
       "path": "cz-git",
       "useEmoji": true
