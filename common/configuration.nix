@@ -119,7 +119,6 @@
   services.openssh = {
     enable = true;
     settings = {
-      UseDNS = false;
       PasswordAuthentication = false;
       KbdInteractiveAuthentication = false;
     };
