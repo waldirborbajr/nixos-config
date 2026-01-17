@@ -128,11 +128,6 @@
   networking.firewall.allowedTCPPorts = [ 22 ];
 
   ############################################
-  # Shell — Zsh (obrigatório)
-  ############################################
-  programs.zsh.enable = true;
-
-  ############################################
   # Containers — Docker
   ############################################
   virtualisation.docker = {
