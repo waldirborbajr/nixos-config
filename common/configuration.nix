@@ -62,16 +62,14 @@
   services.xserver.displayManager.gdm = {
     enable = true;
     wayland = true;
-    autoLogin = {
-      enable = true;
-      user = "borba";
-    };
+    autoLogin.enable = true;
+    autoLogin.user = "borba";
   };
 
   services.xserver.desktopManager.gnome.enable = true;
 
   ############################################
-  # Audio — PipeWire (Low Latency)
+  # Audio — PipeWire
   ############################################
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
@@ -81,15 +79,6 @@
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
-
-    extraConfig.pipewire."92-low-latency" = {
-      context.properties = {
-        default.clock.rate = 48000;
-        default.clock.quantum = 256;
-        default.clock.min-quantum = 128;
-        default.clock.max-quantum = 1024;
-      };
-    };
   };
 
   ############################################
@@ -125,7 +114,7 @@
   };
 
   ############################################
-  # SSH
+  # SSH — SEM duplicação
   ############################################
   services.openssh = {
     enable = true;
@@ -139,12 +128,16 @@
   networking.firewall.allowedTCPPorts = [ 22 ];
 
   ############################################
-  # Containers — Docker (Principal)
+  # Shell — Zsh (obrigatório)
+  ############################################
+  programs.zsh.enable = true;
+
+  ############################################
+  # Containers — Docker
   ############################################
   virtualisation.docker = {
     enable = true;
     enableOnBoot = true;
-
     autoPrune = {
       enable = true;
       dates = "daily";
@@ -155,31 +148,23 @@
     };
   };
 
-  # ------------------------------------------
-  # Podman (comentado — alternativo)
-  # ------------------------------------------
-  # virtualisation.podman = {
-  #   enable = true;
-  #   dockerCompat = true;
-  #   dockerSocket.enable = true;
-  #   defaultNetwork.settings.dns_enabled = true;
-  # };
-
-  ############################################
-  # Rootless containers (futuro / Podman)
-  ############################################
-  security.unprivilegedUsernsClone = true;
-
   ############################################
   # Users / Sudo
   ############################################
   users.users.borba = {
     isNormalUser = true;
+    shell = pkgs.zsh;
     extraGroups = [
       "wheel"
       "networkmanager"
       "docker"
     ];
+  };
+
+  users.users.devops = {
+    isNormalUser = true;
+    shell = pkgs.zsh;
+    extraGroups = [ "docker" ];
   };
 
   security.sudo = {
