@@ -10,6 +10,7 @@
     ./yazi/default.nix
     ./eza/default.nix
     ./xdg/default.nix
+    ./lazygit/default.nix
   ];
 
 }
