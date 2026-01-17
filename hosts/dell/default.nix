@@ -21,13 +21,17 @@
   };
 
   ############################################
+  # Kernel (fixado para compatibilidade Broadcom)
+  ############################################
+  boot.kernelPackages = pkgs.linuxPackages_6_6;
+
+  ############################################
   # Wi-Fi — Broadcom BCM4315 [14e4:4315]
   ############################################
-  # Driver proprietário broadcom-wl (wl)
   nixpkgs.config.allowUnfree = true;
 
-  boot.extraModulePackages = with config.boot.kernelPackages; [
-    broadcom-wl
+  boot.extraModulePackages = [
+    config.boot.kernelPackages.broadcom_wl
   ];
 
   boot.kernelModules = [ "wl" ];
@@ -39,11 +43,6 @@
     "brcmsmac"
     "iwlwifi"
   ];
-
-  ############################################
-  # Kernel (compatível com broadcom-wl)
-  ############################################
-  boot.kernelPackages = pkgs.linuxPackages_6_6;
 
   ############################################
   # CPU / Power
@@ -67,7 +66,7 @@
   time.hardwareClockInLocalTime = false;
 
   ############################################
-  # I/O Scheduler (SSD / HDD)
+  # I/O Scheduler
   ############################################
   services.udev.extraRules = ''
     ACTION=="add|change", KERNEL=="nvme*", ATTR{queue/scheduler}="none"
