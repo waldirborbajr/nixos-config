@@ -2,11 +2,11 @@
 
 {
   ############################################
-  # Commitizen + cz-git
+  # Commitizen
   ############################################
   home.packages = with pkgs; [
     commitizen
-    nodePackages.cz-git
+    nodePackages.cz-conventional-changelog
   ];
 
   ############################################
@@ -14,8 +14,7 @@
   ############################################
   xdg.configFile."commitizen/config.json".text = ''
     {
-      "path": "cz-git",
-      "useEmoji": true
+      "path": "cz-conventional-changelog"
     }
   '';
 
