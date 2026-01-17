@@ -1,12 +1,10 @@
 { pkgs, lib, config, ... }:
-
 {
   ############################################
   # Commitizen
   ############################################
   home.packages = with pkgs; [
     commitizen
-    nodePackages.cz-conventional-changelog
   ];
 
   ############################################
@@ -14,7 +12,7 @@
   ############################################
   xdg.configFile."commitizen/config.json".text = ''
     {
-      "path": "cz-conventional-changelog"
+      "name": "cz_conventional_commits"
     }
   '';
 
