@@ -196,3 +196,5 @@ home-manager switch --flake .#dell.borba
 ---
 
 Enjoy ❄️ NixOS
+
+.
