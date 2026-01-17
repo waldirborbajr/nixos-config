@@ -2,15 +2,16 @@
 
 {
   imports = [
-    ./git/default.nix
-    ./gh/default.nix
     ./btop/default.nix
-    ./zsh/default.nix
-    ./tmux/default.nix
-    ./yazi/default.nix
+    ./comitizen/default.nix
     ./eza/default.nix
-    ./xdg/default.nix
+    ./gh/default.nix
+    ./git/default.nix
     ./lazygit/default.nix
+    ./tmux/default.nix
+    ./xdg/default.nix
+    ./yazi/default.nix
+    ./zsh/default.nix
   ];
 
 }
