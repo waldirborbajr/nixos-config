@@ -23,14 +23,14 @@ in
       pull.rebase = true;
       init.defaultBranch = "main";
 
-      # ❌ Nunca assinar automaticamente
+      # 🔕 Nunca assinar automaticamente
       commit.gpgSign = false;
 
-      # Apenas informa qual GPG usar (não ativa signing)
+      # Apenas declara o backend (não ativa)
       gpg.program = "gpg";
     };
 
-    # ❌ Remove qualquer signing implícito
-    signing = lib.mkForce null;
+    # 🚫 NÃO declare signing se não for usar
+    # signing = { ... };  <-- removido
   };
 }
