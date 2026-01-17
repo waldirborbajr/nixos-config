@@ -21,7 +21,7 @@
   };
 
   ############################################
-  # Kernel (fixado para compatibilidade Broadcom)
+  # Kernel (compatível com Broadcom WL)
   ############################################
   boot.kernelPackages = pkgs.linuxPackages_6_6;
 
@@ -31,7 +31,7 @@
   nixpkgs.config.allowUnfree = true;
 
   boot.extraModulePackages = [
-    config.boot.kernelPackages.broadcom_wl
+    pkgs.linuxPackages_6_6.broadcom_wl
   ];
 
   boot.kernelModules = [ "wl" ];
