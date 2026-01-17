@@ -7,7 +7,6 @@
     ############################################
     packages = with pkgs; [
       nerd-fonts.jetbrains-mono
-      noto-fonts-emoji
     ];
 
     ############################################
@@ -20,15 +19,11 @@
         monospace = [
           "JetBrainsMono Nerd Font"
         ];
-
-        emoji = [
-          "Noto Color Emoji"
-        ];
       };
     };
 
     ############################################
-    # Não instalar defaults automáticos
+    # Evita instalar fontes padrão automaticamente
     ############################################
     enableDefaultFonts = false;
   };
