@@ -155,6 +155,8 @@
     "application/x-terminal-emulator" = "alacritty.desktop";
   };
 
+  programs.zsh.enable = true;
+
   ############################################
   # System
   ############################################
