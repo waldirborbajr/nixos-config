@@ -23,10 +23,12 @@
   ############################################
   # Wi-Fi — Broadcom BCM4315 [14e4:4315]
   ############################################
-  # Driver proprietário (wl) — mais estável
+  # Driver proprietário broadcom-wl (wl)
   nixpkgs.config.allowUnfree = true;
 
-  hardware.broadcom.wl.enable = true;
+  boot.extraModulePackages = with config.boot.kernelPackages; [
+    broadcom-wl
+  ];
 
   boot.kernelModules = [ "wl" ];
 
@@ -39,9 +41,8 @@
   ];
 
   ############################################
-  # Kernel (compatível com wl)
+  # Kernel (compatível com broadcom-wl)
   ############################################
-  # Broadcom wl é mais estável aqui
   boot.kernelPackages = pkgs.linuxPackages_6_6;
 
   ############################################
