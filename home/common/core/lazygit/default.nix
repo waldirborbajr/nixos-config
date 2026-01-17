@@ -1,6 +1,6 @@
-{ ... }:
+{ pkgs, config, lib, ... }:
+
 {
-  # Install lazygit via home-manager module
   programs.lazygit = {
     enable = true;
 
@@ -11,6 +11,19 @@
           pager = "delta --color-only --dark --paging=never";
         };
       };
+
+      customCommands = [
+        {
+          key = "C";
+          context = "files";
+          description = "Commitizen (cz-git)";
+          command = "cz commit";
+        }
+      ];
     };
+  };
+
+  programs.zsh.shellAliases = lib.mkIf config.programs.zsh.enable {
+    lg = "lazygit";
   };
 }
