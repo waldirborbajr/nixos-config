@@ -19,47 +19,47 @@
     ####################
     # Status bar / launcher
     ####################
-    waybar # barra de status Wayland
-    rofi # launcher nativo Wayland (preferir ao rofi X11)
+    waybar
+    rofi
 
     ####################
     # Clipboard
     ####################
-    wl-clipboard # clipboard nativo
-    cliphist # histórico de clipboard (opcional, mas recomendado)
+    wl-clipboard
+    cliphist
 
     ####################
     # Screenshot / Screencast
     ####################
-    grim # screenshot
-    slurp # seleção de área
-    swappy # editor de screenshot
-    wf-recorder # gravação de tela (Wayland)
+    grim
+    slurp
+    swappy
+    wf-recorder
 
     ####################
     # Input / automação
     ####################
-    wtype # simulação de teclado (scripts, automações)
+    wtype
 
     ####################
     # Utilitários Wayland
     ####################
-    wayland-utils # wayland-info (debug)
-    wlr-randr # controle de monitores
+    wayland-utils
+    wlr-randr
 
     ####################
     # Lock / idle / logout
     ####################
-    swaylock # lockscreen
-    swayidle # idle manager
-    wlogout # menu de logout
+    swaylock
+    swayidle
+    wlogout
 
     ####################
     # UX / Qualidade visual
     ####################
-    nwg-look # configuração GTK
-    qt5ct # controle Qt5
-    qt6ct # controle Qt6
+    nwg-look
+    libsForQt5.qt5ct
+    qt6ct
   ];
 
   ############################################
