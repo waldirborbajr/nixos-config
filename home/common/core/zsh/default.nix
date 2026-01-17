@@ -66,7 +66,7 @@
     ############################################
     # Init
     ############################################
-    initExtra = ''
+    initContent = ''
       # kubectl auto-complete (incluindo alias k)
       source <(kubectl completion zsh)
       complete -o default -F __start_kubectl k

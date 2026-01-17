@@ -19,47 +19,47 @@
     ####################
     # Status bar / launcher
     ####################
-    waybar                 # barra de status Wayland
-    rofi-wayland           # launcher nativo Wayland (preferir ao rofi X11)
+    waybar # barra de status Wayland
+    rofi # launcher nativo Wayland (preferir ao rofi X11)
 
     ####################
     # Clipboard
     ####################
-    wl-clipboard           # clipboard nativo
-    cliphist               # histórico de clipboard (opcional, mas recomendado)
+    wl-clipboard # clipboard nativo
+    cliphist # histórico de clipboard (opcional, mas recomendado)
 
     ####################
     # Screenshot / Screencast
     ####################
-    grim                   # screenshot
-    slurp                  # seleção de área
-    swappy                 # editor de screenshot
-    wf-recorder            # gravação de tela (Wayland)
+    grim # screenshot
+    slurp # seleção de área
+    swappy # editor de screenshot
+    wf-recorder # gravação de tela (Wayland)
 
     ####################
     # Input / automação
     ####################
-    wtype                  # simulação de teclado (scripts, automações)
+    wtype # simulação de teclado (scripts, automações)
 
     ####################
     # Utilitários Wayland
     ####################
-    wayland-utils          # wayland-info (debug)
-    wlr-randr              # controle de monitores
+    wayland-utils # wayland-info (debug)
+    wlr-randr # controle de monitores
 
     ####################
     # Lock / idle / logout
     ####################
-    swaylock               # lockscreen
-    swayidle               # idle manager
-    wlogout                # menu de logout
+    swaylock # lockscreen
+    swayidle # idle manager
+    wlogout # menu de logout
 
     ####################
     # UX / Qualidade visual
     ####################
-    nwg-look               # configuração GTK
-    qt5ct                  # controle Qt5
-    qt6ct                  # controle Qt6
+    nwg-look # configuração GTK
+    qt5ct # controle Qt5
+    qt6ct # controle Qt6
   ];
 
   ############################################
@@ -83,39 +83,39 @@
   ############################################
 
   /*
-  ############################################
-  # XDG DESKTOP PORTALS (SYSTEM)
-  ############################################
-  xdg.portal = {
-    enable = true;
-    xdgOpenUsePortal = true;
+    ############################################
+    # XDG DESKTOP PORTALS (SYSTEM)
+    ############################################
+    xdg.portal = {
+      enable = true;
+      xdgOpenUsePortal = true;
 
-    extraPortals = with pkgs; [
-      xdg-desktop-portal-wlr
-      xdg-desktop-portal-gtk
-    ];
-  };
+      extraPortals = with pkgs; [
+        xdg-desktop-portal-wlr
+        xdg-desktop-portal-gtk
+      ];
+    };
   */
 
   /*
-  ############################################
-  # ÁUDIO MODERNO (PIPEWIRE) — SYSTEM
-  ############################################
-  services.pipewire = {
-    enable = true;
-    pulse.enable = true;
-    alsa.enable = true;
-    jack.enable = true;
-  };
+    ############################################
+    # ÁUDIO MODERNO (PIPEWIRE) — SYSTEM
+    ############################################
+    services.pipewire = {
+      enable = true;
+      pulse.enable = true;
+      alsa.enable = true;
+      jack.enable = true;
+    };
   */
 
   /*
-  ############################################
-  # PERFORMANCE / WAYLAND GLOBAL (SYSTEM)
-  ############################################
-  environment.variables = {
-    NIXOS_OZONE_WL = "1";
-    MOZ_ENABLE_WAYLAND = "1";
-  };
+    ############################################
+    # PERFORMANCE / WAYLAND GLOBAL (SYSTEM)
+    ############################################
+    environment.variables = {
+      NIXOS_OZONE_WL = "1";
+      MOZ_ENABLE_WAYLAND = "1";
+    };
   */
 }
