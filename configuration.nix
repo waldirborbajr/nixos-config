@@ -55,6 +55,8 @@
 
     # Users
     ./modules/user-borba.nix
+
+    ././modules/k3s.nix
   ];
 
   ############################################
