@@ -1,17 +1,23 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 
 {
   ############################################
-  # Shell / Core programs
+  # Core Programs
   ############################################
   programs = {
     zsh.enable = true;
-    firefox.enable = true;
+
+    firefox = {
+      enable = true;
+      package = pkgs.firefox;
+    };
 
     zoxide = {
       enable = true;
       enableZshIntegration = true;
     };
+
+    dconf.enable = true;
   };
 
   ############################################
@@ -19,7 +25,11 @@
   ############################################
   virtualisation.libvirtd = {
     enable = true;
-    allowedBridges = [ "virbr0" ];
+
+    allowedBridges = [
+      "virbr0"
+      "br0"
+    ];
 
     qemu = {
       swtpm.enable = true;
@@ -27,5 +37,30 @@
     };
   };
 
-  programs.dconf.enable = true;
+  ############################################
+  # Docker (opcional)
+  ############################################
+  virtualisation.docker = {
+    enable = true;
+    enableOnBoot = false;
+  };
+
+  ############################################
+  # Podman (rootless / docker-compatible)
+  ############################################
+  virtualisation.podman = {
+    enable = true;
+    dockerCompat = true;
+    defaultNetwork.settings.dns_enabled = true;
+  };
+
+  ############################################
+  # AnyDesk
+  ############################################
+  services.anydesk.enable = true;
+
+  ############################################
+  # Polkit (virt-manager, GUI auth)
+  ############################################
+  security.polkit.enable = true;
 }
