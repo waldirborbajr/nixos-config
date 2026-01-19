@@ -34,16 +34,16 @@ in
     # Motivo: Podman não deve ser ativado junto com Docker, pois dockerCompat entra em conflito.
     # Para ativar no futuro, descomente estas linhas e comente Docker.
 
-    ##########################################
-    # Virtualization (clients & tools)
-    ##########################################
-    virt-viewer
-    qemu
-    win-virtio
+##########################################
+# Virtualization (clients & tools)
+##########################################
+virt-viewer
+qemu
+virtio-win      # Substitui o antigo win-virtio
 
-    spice
-    spice-gtk
-    spice-protocol
+spice
+spice-gtk
+spice-protocol
 
     ##########################################
     # System Information
