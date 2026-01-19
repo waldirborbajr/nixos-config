@@ -1,5 +1,5 @@
 # =========================================================
-# NixOS Makefile (No Flakes, no Home Manager)
+# NixOS Makefile (Non-Flake, no Home Manager)
 # =========================================================
 
 # -------------------------
@@ -18,8 +18,10 @@ help:
 	@echo "NixOS Makefile targets:"
 	@echo ""
 	@echo "Build / Switch:"
-	@echo "  switch             - Rebuild & switch"
-	@echo "  switch-impure      - Rebuild & switch (impure)"
+	@echo "  switch             - Rebuild & switch system"
+	@echo "  switch-impure      - Rebuild & switch system (impure)"
+	@echo "  build              - Build system (no switch)"
+	@echo "  build-impure       - Build system (impure, no switch)"
 	@echo ""
 	@echo "Containers:"
 	@echo "  containers-docker  - Enable Docker (default)"
@@ -38,11 +40,11 @@ help:
 build:
 	sudo nixos-rebuild build
 
-switch:
-	sudo nixos-rebuild switch
-
 build-impure:
 	sudo nixos-rebuild build --impure
+
+switch:
+	sudo nixos-rebuild switch
 
 switch-impure:
 	sudo nixos-rebuild switch --impure
@@ -69,16 +71,12 @@ containers-podman:
 # ---------------------------------------------------------
 # Maintenance
 # ---------------------------------------------------------
-
-## ↩️ Rollback system
 rollback:
 	sudo nixos-rebuild switch --rollback
 
-## 🧹 Garbage collection (safe)
 gc-soft:
 	sudo nix-collect-garbage --delete-older-than 7d
 
-## 💣 Garbage collection (aggressive)
 gc-hard:
 	sudo nix-collect-garbage -d
 	sudo nix-store --gc
