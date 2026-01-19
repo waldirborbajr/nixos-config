@@ -6,6 +6,16 @@
   ############################################
   environment.systemPackages = with pkgs; [
 
+    # --- Containers / Cloud ---
+    podman
+    podman-compose
+    buildah
+    skopeo
+    cri-tools
+
+    # --- Kubernet
+    k3s
+
     ############################################
     # Virtualization (hardware-agnostic)
     ############################################
