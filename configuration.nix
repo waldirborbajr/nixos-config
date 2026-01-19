@@ -38,6 +38,7 @@
     # Desktop (choose ONE)
     ./modules/desktop-gnome.nix
     # ./modules/desktop-cosmic.nix
+    # ./modules/desktop-hyprland.nix
 
     # Base system
     ./modules/fonts.nix
