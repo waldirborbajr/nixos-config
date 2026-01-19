@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
 {
   ############################################
@@ -33,12 +33,13 @@
 
     qemu = {
       swtpm.enable = true;
-      ovmf.enable = true;
+      # OVMF images are now available by default in recent NixOS/Nixpkgs,
+      # no need for ovmf.enable anymore
     };
   };
 
   ############################################
-  # Docker (opcional)
+  # Docker (priority)
   ############################################
   virtualisation.docker = {
     enable = true;
@@ -48,14 +49,21 @@
   ############################################
   # Podman (rootless / docker-compatible)
   ############################################
-  virtualisation.podman = {
-    enable = true;
-    dockerCompat = true;
-    defaultNetwork.settings.dns_enabled = true;
-  };
+  # Podman is commented out because Docker is currently enabled.
+  # Podman with dockerCompat cannot coexist with Docker enabled.
+  #
+  # To switch to Podman in the future:
+  # 1. Disable Docker: virtualisation.docker.enable = false;
+  # 2. Uncomment the following Podman block
+  #
+  # virtualisation.podman = {
+  #   enable = true;
+  #   dockerCompat = true;
+  #   defaultNetwork.settings.dns_enabled = true;
+  # };
 
   ############################################
-  # Polkit (virt-manager, GUI auth)
+  # Polkit (for virt-manager GUI authorization)
   ############################################
   security.polkit.enable = true;
 }
