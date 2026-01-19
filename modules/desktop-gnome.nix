@@ -9,9 +9,21 @@
   services.xserver.displayManager.gdm = {
     enable = true;
     wayland = true;
+    # Evita atrasos esperando sessão anterior
+    autoSuspend = false;
   };
 
   services.xserver.desktopManager.gnome.enable = true;
+
+  # Login automático
+  services.xserver.displayManager.autoLogin = {
+    enable = true;
+    user = "borba";
+  };
+
+  # Remove TTY concorrente
+  systemd.services."getty@tty1".enable = false;
+  systemd.services."autovt@tty1".enable = false;
 
   ############################################
   # Wayland Environment Variables
@@ -36,33 +48,8 @@
   };
 
   ############################################
-  # GNOME / GDM Fast Boot
-  ############################################
-
-  services.xserver.enable = true;
-
-  services.xserver.displayManager.gdm = {
-    enable = true;
-    wayland = true;
-
-    # Evita atrasos esperando sessão anterior
-    autoSuspend = false;
-  };
-
-  # Login automático
-  services.xserver.displayManager.autoLogin = {
-    enable = true;
-    user = "borba";
-  };
-
-  # Remove TTY concorrente
-  systemd.services."getty@tty1".enable = false;
-  systemd.services."autovt@tty1".enable = false;
-
-  ############################################
   # GNOME performance tweaks
   ############################################
-
   # Não esperar network-online no boot gráfico
   systemd.services.NetworkManager-wait-online.enable = false;
 
@@ -77,5 +64,4 @@
     SystemMaxUse=200M
     RuntimeMaxUse=50M
   '';
-  
 }
