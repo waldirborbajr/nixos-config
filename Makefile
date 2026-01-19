@@ -1,20 +1,12 @@
 # =========================================================
-# NixOS Makefile (Flake-based, no Home Manager)
+# NixOS Makefile (No Flakes, no Home Manager)
 # =========================================================
-
-# -------------------------
-# Variables
-# -------------------------
-HOSTNAME ?= $(shell hostname)
-FLAKE ?= .#$(HOSTNAME)
-EXPERIMENTAL ?= --extra-experimental-features "nix-command flakes"
 
 # -------------------------
 # Phony targets
 # -------------------------
 .PHONY: help \
         switch switch-impure build build-impure \
-        check update \
         containers-docker containers-podman \
         rollback gc-soft gc-hard doctor
 
@@ -26,18 +18,12 @@ help:
 	@echo "NixOS Makefile targets:"
 	@echo ""
 	@echo "Build / Switch:"
-	@echo "  switch             - Rebuild & switch (pure flake)"
+	@echo "  switch             - Rebuild & switch"
 	@echo "  switch-impure      - Rebuild & switch (impure)"
-	@echo "  build              - Build system (pure, no switch)"
-	@echo "  build-impure       - Build system (impure, no switch)"
 	@echo ""
 	@echo "Containers:"
 	@echo "  containers-docker  - Enable Docker (default)"
 	@echo "  containers-podman  - Enable Podman (rootless)"
-	@echo ""
-	@echo "Flake:"
-	@echo "  check              - Run flake checks"
-	@echo "  update             - Update flake inputs"
 	@echo ""
 	@echo "Maintenance:"
 	@echo "  rollback           - Rollback to previous generation"
@@ -50,9 +36,15 @@ help:
 # Build / Switch
 # -------------------------
 build:
+	sudo nixos-rebuild build
+
+switch:
 	sudo nixos-rebuild switch
 
 build-impure:
+	sudo nixos-rebuild build --impure
+
+switch-impure:
 	sudo nixos-rebuild switch --impure
 
 # -------------------------
@@ -73,15 +65,6 @@ containers-podman:
 		-e 's|^./modules/containers/docker.nix|# ./modules/containers/docker.nix|' \
 		configuration.nix
 	@echo ">> Podman enabled. Run: make switch"
-
-# -------------------------
-# Flake
-# -------------------------
-check:
-	nix flake check
-
-update:
-	nix flake update
 
 # ---------------------------------------------------------
 # Maintenance
