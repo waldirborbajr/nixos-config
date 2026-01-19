@@ -6,6 +6,11 @@
   ############################################
   environment.systemPackages = with pkgs; [
 
+    ############################################
+    # Virtualization (hardware-agnostic)
+    ############################################
+    unstable.virt-manager
+    
     ##########################################
     # Containers / Cloud / Kubernetes
     ##########################################
@@ -24,7 +29,6 @@
     ##########################################
     # Virtualization (clients & tools)
     ##########################################
-    virt-manager
     virt-viewer
     qemu
     win-virtio
@@ -55,8 +59,7 @@
 
     ##########################################
     # Editors / Git
-    ##########################################
-    neovim
+    unstable.neovim
     lazygit
     git
     gh
