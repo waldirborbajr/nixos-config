@@ -1,25 +1,59 @@
 { config, pkgs, ... }:
 
 {
+  # imports = [
+  #   ./hardware-configuration.nix
+
+  #   # Core system
+  #   ./modules/system-programs.nix
+  #   ./modules/system-packages.nix
+
+  #   ./modules/maintenance.nix
+  #   ./modules/maintenance-hm.nix
+
+  #   # User
+  #   ./modules/user-borba.nix
+
+  #   # Desktop (ESCOLHA UM)
+  #   ./modules/desktop-gnome.nix
+  #   # ./modules/desktop-cosmic.nix
+
+  #   # Kernel / Boot tuning
+  #   ./modules/kernel-tuning.nix
+  # ];
+
   imports = [
-    ./hardware-configuration.nix
+    ./hardware-configuration-dell.nix
 
-    # Core system
-    ./modules/system-programs.nix
-    ./modules/system-packages.nix
+    # Hardware profile
+    ./modules/hardware-dell.nix
 
-    ./modules/maintenance.nix
-    ./modules/maintenance-hm.nix
+    # MacBook profile
+    # ./modules/hardware-macbook.nix
+    # ./modules/hardware-macbook-efi.nix    
 
-    # User
-    ./modules/user-borba.nix
+    # Kernel / performance
+    ./modules/kernel-tuning.nix
 
-    # Desktop (ESCOLHA UM)
+    # Desktop (choose ONE)
     ./modules/desktop-gnome.nix
     # ./modules/desktop-cosmic.nix
 
-    # Kernel / Boot tuning
-    ./modules/kernel-tuning.nix
+    # Base system
+    ./modules/fonts.nix
+    ./modules/system-programs.nix
+    ./modules/system-packages.nix
+
+    # Virtualization
+    # ./modules/virtualisation-bridge.nix
+    # ./modules/virt-wayland-tuning.nix
+
+    # Maintenance
+    ./modules/maintenance.nix
+    ./modules/maintenance-hm.nix
+
+    # Users
+    ./modules/user-borba.nix
   ];
 
   ############################################

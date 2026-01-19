@@ -6,6 +6,21 @@
   ############################################
   environment.systemPackages = with pkgs; [
 
+    ############################################
+    # Virtualization (hardware-agnostic)
+    ############################################
+    virt-manager
+    virt-viewer
+    spice
+    spice-gtk
+    spice-protocol
+    win-virtio
+
+    qemu
+    
+    # System info
+    microfetch    
+
     # -------------------------
     # Terminals
     # -------------------------
