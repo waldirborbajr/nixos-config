@@ -8,16 +8,34 @@
     isNormalUser = true;
     description = "BORBA JR W";
 
-    # Shell padrão do usuário
+    # Default shell
     shell = pkgs.zsh;
 
     extraGroups = [
       "wheel"
       "networkmanager"
       "docker"
-      "libvirtd"    
-       "dialout"   # required for CHIRP / serial radios
+      "libvirtd"
+      "dialout"   # required for CHIRP / serial radios
     ];
+  };
+
+  ############################################
+  # Zsh shell initialization for user
+  ############################################
+  programs.zsh = {
+    enable = true;
+
+    shellInit = ''
+      # Clipboard alias (Wayland/X11)
+      if command -v wl-copy &>/dev/null && [ -n "$WAYLAND_DISPLAY" ]; then
+        alias clip='wl-copy'
+        alias paste='wl-paste'
+      elif command -v xclip &>/dev/null && [ -n "$DISPLAY" ]; then
+        alias clip='xclip -selection clipboard'
+        alias paste='xclip -selection clipboard -o'
+      fi
+    '';
   };
 
   ############################################
