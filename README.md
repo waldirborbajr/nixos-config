@@ -245,3 +245,9 @@ Boring means reliable, fast, reproducible — and easy to throw away and rebuild
 If you like it, steal it 😄
 
 ## v1.0.1
+
+## Ref
+
+```
+https://chatgpt.com/share/696e41df-f250-8001-9e17-41f3c4a9b18a
+```

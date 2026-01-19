@@ -2,7 +2,7 @@
 
 {
   ############################################
-  # System Packages (global)
+  # System Packages (global / hardware-agnostic)
   ############################################
   environment.systemPackages = with pkgs; [
 
@@ -10,50 +10,63 @@
     # Virtualization (hardware-agnostic)
     ############################################
     unstable.virt-manager
+    
+    ##########################################
+    # Containers / Cloud / Kubernetes
+    ##########################################
+    docker
+    docker-compose
+    lazydocker
+
+    podman
+    podman-compose
+    buildah
+    skopeo
+    cri-tools
+
+    k3s
+
+    ##########################################
+    # Virtualization (clients & tools)
+    ##########################################
     virt-viewer
+    qemu
+    win-virtio
+
     spice
     spice-gtk
     spice-protocol
-    win-virtio
 
-    qemu
-    
-    # System info
-    microfetch    
+    ##########################################
+    # System Information
+    ##########################################
+    microfetch
 
-    # -------------------------
+    ##########################################
     # Terminals
-    # -------------------------
+    ##########################################
     alacritty
     kitty
 
-    # -------------------------
-    # Shell / Multiplexer
-    # -------------------------
+    ##########################################
+    # Shells / Multiplexers
+    ##########################################
     zsh
     fish
     tmux
     tmuxifier
     stow
 
-    # -------------------------
+    ##########################################
     # Editors / Git
-    # -------------------------
     unstable.neovim
     lazygit
     git
     gh
 
-    # -------------------------
-    # Containers
-    # -------------------------
-    docker
-    docker-compose
-    lazydocker
-
-    # -------------------------
+    ##########################################
     # Languages / Toolchains
-    # -------------------------
+    ##########################################
     gcc
     libgcc
     glibc
@@ -65,9 +78,9 @@
     rustup
     rust-analyzer
 
-    # -------------------------
-    # Build / Dev tools
-    # -------------------------
+    ##########################################
+    # Build / Development Tools
+    ##########################################
     cmake
     gnumake
     libtool
@@ -78,18 +91,18 @@
     llvm
     lld
 
-    # -------------------------
-    # Nix tooling
-    # -------------------------
+    ##########################################
+    # Nix Tooling
+    ##########################################
     nixd
     nil
     statix
     deadnix
     nixfmt-rfc-style
 
-    # -------------------------
-    # Modern CLI
-    # -------------------------
+    ##########################################
+    # Modern CLI Utilities
+    ##########################################
     eza
     btop
     bat
@@ -99,9 +112,9 @@
     yazi
     xclip
 
-    # -------------------------
-    # Core UNIX
-    # -------------------------
+    ##########################################
+    # Core UNIX Utilities
+    ##########################################
     coreutils
     curl
     wget
@@ -111,17 +124,17 @@
     unzip
     zip
 
-    # -------------------------
-    # Hardware / Debug
-    # -------------------------
+    ##########################################
+    # Hardware / System Debug
+    ##########################################
     lshw
     pciutils
     usbutils
     lm_sensors
 
-    # -------------------------
+    ##########################################
     # Network / Connectivity
-    # -------------------------
+    ##########################################
     iwd
     iproute2
     iputils
@@ -129,33 +142,35 @@
     dnsutils
     nmap
 
-    # -------------------------
-    # Storage / FS
-    # -------------------------
+    ##########################################
+    # Storage / Filesystems
+    ##########################################
     e2fsprogs
     ntfs3g
     dosfstools
 
-    # -------------------------
-    # Process / System
-    # -------------------------
+    ##########################################
+    # Process / System Inspection
+    ##########################################
     procps
     psmisc
     util-linux
 
-    # -------------------------
-    # Certificates
-    # -------------------------
+    ##########################################
+    # Certificates / SSL
+    ##########################################
     cacert
 
-    # -------------------------
+    ##########################################
     # GUI Applications (global)
-    # -------------------------
+    ##########################################
     firefox
     firefox-developer-edition
     chromium
     brave
     discord
     flameshot
+    anydesk
+    chirp
   ];
 }
