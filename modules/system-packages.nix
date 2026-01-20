@@ -1,7 +1,10 @@
 { pkgs, ... }:
 
 let
-  unstable = import <nixpkgs-unstable> {};
+  # Canal unstable com unfree permitido
+  unstable = import <nixpkgs-unstable> {
+    config = { allowUnfree = true; };
+  };
 in
 {
   ############################################
@@ -41,8 +44,8 @@ in
     # Editors / IDEs / Git
     ##########################################
     unstable.neovim
-    # unstable.vscode
-    # vscode-extensions.ms-vscode-remote.remote-containers
+    unstable.vscode
+    unstable.vscode-extensions.ms-vscode-remote.remote-containers
     lazygit
     git
     gh
@@ -51,7 +54,7 @@ in
     ##########################################
     # Notes / Knowledge Base
     ##########################################
-    obsidian
+    unstable.obsidian
 
     ##########################################
     # Containers / Virtualization / Cloud / Kubernetes
@@ -66,7 +69,7 @@ in
     skopeo
     cri-tools
     k9s
-    # lazypodman
+    lazypodman
 
     virt-manager
     virt-viewer
