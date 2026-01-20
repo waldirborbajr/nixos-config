@@ -1,0 +1,68 @@
+name: NixOS Nightly Channel Regression
+
+on:
+  schedule:
+    # Every day at 03:00 UTC
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+jobs:
+  nightly:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        profile:
+          - dell
+          - macbook
+
+    name: Nightly check (${{ matrix.profile }})
+
+    steps:
+      # --------------------------------------------------
+      # Checkout
+      # --------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # --------------------------------------------------
+      # Install Nix
+      # --------------------------------------------------
+      - name: Install Nix
+        uses: cachix/install-nix-action@v25
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+          extra_nix_config: |
+            keep-outputs = true
+            keep-derivations = true
+
+      # --------------------------------------------------
+      # Channel update (detect regressions)
+      # --------------------------------------------------
+      - name: Update channels
+        run: |
+          sudo nix-channel --add https://nixos.org/channels/nixos-unstable nixpkgs-unstable || true
+          sudo nix-channel --update
+
+      # --------------------------------------------------
+      # Evaluate configuration
+      # --------------------------------------------------
+      - name: Evaluate configuration
+        run: |
+          nix-instantiate \
+            '<nixpkgs/nixos>' \
+            -A system \
+            -I nixos-config=./configuration.nix \
+            --argstr profile "${{ matrix.profile }}" \
+            >/dev/null
+
+      # --------------------------------------------------
+      # Build (dry-run)
+      # --------------------------------------------------
+      - name: Build system (dry-run)
+        run: |
+          nix-shell -p nixos-rebuild --run \
+            "nixos-rebuild build \
+              -I nixos-config=$(pwd) \
+              --dry-run"
