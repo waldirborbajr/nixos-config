@@ -28,7 +28,7 @@ jobs:
         run: |
           nix-instantiate '<nixpkgs/nixos>' \
             -A system \
-            -I nixos-config=$(pwd) \
+            -I nixos-config=$(pwd)/configuration.nix \
             > /dev/null
 
       - name: Nightly summary
