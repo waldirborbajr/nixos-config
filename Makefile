@@ -1,13 +1,25 @@
 # =========================================================
 # NixOS Maintenance Makefile
 # Repo-based (no /etc/nixos, no flakes, no Home Manager)
+#
+# Philosophy:
+# - Configuration lives in a Git repo
+# - System is built from where files are, not from /etc/nixos
+# - Safe defaults, explicit commands, zero magic
 # =========================================================
 
+# Absolute path to the NixOS config repository
 CONFIG_DIR ?= $(HOME)/nixos-config
 
-.PHONY: help switch build rollback \
-        channels gc-soft gc-hard optimise verify \
-        doctor generations space
+# ---------------------------------------------------------
+# Phony targets
+# ---------------------------------------------------------
+.PHONY: help \
+        build switch rollback \
+        channels \
+        gc-soft gc-hard optimise verify \
+        eval build-check ci \
+        generations space doctor
 
 # ---------------------------------------------------------
 # Help
@@ -17,8 +29,8 @@ help:
 	@echo "NixOS Maintenance Makefile"
 	@echo ""
 	@echo "Build / Switch:"
-	@echo "  make switch        - Rebuild & switch system"
-	@echo "  make build         - Build system only"
+	@echo "  make build         - Build system only (no switch)"
+	@echo "  make switch        - Build and activate system"
 	@echo "  make rollback      - Rollback to previous generation"
 	@echo ""
 	@echo "Channels:"
@@ -32,10 +44,15 @@ help:
 	@echo "  make optimise      - Deduplicate Nix store"
 	@echo "  make verify        - Verify store integrity"
 	@echo ""
+	@echo "Validation / CI:"
+	@echo "  make eval          - Evaluate NixOS configuration"
+	@echo "  make build-check   - Dry build (no activation)"
+	@echo "  make ci            - Full local CI (fmt, lint, eval, build)"
+	@echo ""
 	@echo "Diagnostics:"
-	@echo "  make doctor        - System health overview"
 	@echo "  make generations   - List system generations"
 	@echo "  make space         - Disk usage overview"
+	@echo "  make doctor        - System health overview"
 	@echo ""
 
 # ---------------------------------------------------------
@@ -80,10 +97,42 @@ verify:
 	sudo nix-store --verify --check-contents
 
 # ---------------------------------------------------------
+# Validation / CI (local mirror of GitHub Actions)
+# ---------------------------------------------------------
+eval:
+	@echo ">> Evaluating NixOS configuration..."
+	nix-instantiate \
+		'<nixpkgs/nixos>' \
+		-A system \
+		-I nixos-config=$(CONFIG_DIR)/configuration.nix \
+		>/dev/null
+	@echo "✔ Evaluation successful"
+
+build-check:
+	@echo ">> Dry building system (no switch)..."
+	sudo nixos-rebuild build \
+		-I nixos-config=$(CONFIG_DIR) \
+		--dry-run
+	@echo "✔ Build check successful"
+
+ci:
+	@echo ">> Running full local CI pipeline..."
+	@echo ">> Formatting check"
+	nix-shell -p nixfmt-rfc-style --run "nixfmt --check $(shell find . -name '*.nix')"
+	@echo ">> Static analysis"
+	nix-shell -p statix deadnix --run "statix check && deadnix"
+	@echo ">> Evaluation"
+	$(MAKE) eval
+	@echo ">> Build check"
+	$(MAKE) build-check
+	@echo "✔ CI completed successfully"
+
+# ---------------------------------------------------------
 # Diagnostics
 # ---------------------------------------------------------
 generations:
-	sudo nix-env --list-generations --profile /nix/var/nix/profiles/system
+	sudo nix-env --list-generations \
+		--profile /nix/var/nix/profiles/system
 
 space:
 	@echo ">> Disk usage:"
@@ -97,7 +146,7 @@ doctor:
 	nix --version || true
 	@echo ""
 	@echo ">> Active system generation:"
-	readlink /nix/var/nix/profiles/system
+	readlink /nix/var/nix/profiles/system || true
 	@echo ""
 	@echo ">> GC timers:"
 	systemctl list-timers | grep nix || true
