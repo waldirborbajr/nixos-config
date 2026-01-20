@@ -179,6 +179,6 @@ in
     unstable.discord
     flameshot
     chirp
-    anydesk
+    unstable.anydesk
   ];
 }
