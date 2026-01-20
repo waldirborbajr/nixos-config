@@ -1,3 +1,6 @@
+# =========================================================
+# NixOS Configuration - Dell Inspiron 1564
+# =========================================================
 { config, pkgs, lib, ... }:
 
 {
@@ -15,7 +18,6 @@
     ./modules/system-packages.nix
     ./modules/containers/docker.nix
     ./modules/containers/k3s.nix
-    # ./modules/containers/podman.nix   # Desativado enquanto Docker estiver ativo
     ./modules/maintenance.nix
     ./modules/maintenance-hm.nix
     ./modules/user-borba.nix
@@ -48,10 +50,7 @@
   # Nix configuration
   ############################################
   nixpkgs.config.allowUnfree = true;
-  nix.settings.experimental-features = [
-    "nix-command"
-    "flakes"
-  ];
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   ############################################
   # Remote access (SSH)
@@ -60,47 +59,17 @@
   networking.firewall.allowedTCPPorts = [ 22 ];
 
   ############################################
-  # GNOME + Wayland
-  ############################################
-  services.xserver.enable = true;
-  services.displayManager.gdm.enable = true;
-  services.displayManager.gdm.wayland = true;
-  services.displayManager.gdm.autoSuspend = false;
-  services.displayManager.autoLogin = {
-    enable = true;
-    user = "borba";
-  };
-  services.desktopManager.gnome.enable = true;
-
-  # Força GNOME core-apps para evitar conflito de módulos
-  services.gnome.core-apps.enable = lib.mkForce true;
-  services.gnome.gnome-keyring.enable = true;
-
-  # Sessão Wayland
-  environment.sessionVariables = {
-    XDG_SESSION_TYPE = "wayland";
-    QT_QPA_PLATFORM = "wayland";
-    MOZ_ENABLE_WAYLAND = "1";
-    NIXOS_OZONE_WL = "1";
-    TERMINAL = "alacritty";
-  };
-
-  # XDG portals
-  xdg.portal.enable = true;
-  xdg.portal.extraPortals = with pkgs; [
-    xdg-desktop-portal-gnome
-    xdg-desktop-portal-gtk
-  ];
-
-  ############################################
   # Wi-Fi e Bluetooth (Broadcom BCM4312)
   ############################################
   networking.networkmanager.enable = true;
-  hardware.enableRedistributableFirmware = true;
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
+  hardware.enableRedistributableFirmware = true;
 
-  # Firmware Broadcom
+  boot.initrd.kernelModules = [ "ssb" "b43" "btusb" ];
+  boot.kernelModules = [ "ssb" "b43" ];
+  boot.blacklistedKernelModules = [ "bcma" "brcmsmac" "wl" ];
+
   environment.systemPackages = with pkgs; [
     linux-firmware
     bluez
@@ -109,30 +78,62 @@
     wirelesstools
     pciutils
     usbutils
-    rfkill
+    (import <nixpkgs-unstable> {}).rfkill
   ];
 
-  # Carregamento dos módulos corretos
-  boot.initrd.kernelModules = [ "ssb" "b43" "btusb" ];
-  boot.kernelModules = [ "ssb" "b43" ];
-  boot.blacklistedKernelModules = [ "bcma" "brcmsmac" "wl" ];
-
   ############################################
-  # Docker (prioridade)
-  ############################################
-  virtualisation.docker.enable = true;
-  virtualisation.docker.enableOnBoot = true;
-
-  # Podman comentado para uso futuro
-  # virtualisation.podman.enable = true;
-  # virtualisation.podman.dockerCompat = true;
-
-  ############################################
-  # Bootloader (GRUB)
+  # GRUB bootloader
   ############################################
   boot.loader.grub.enable = true;
+  boot.loader.grub.version = 2;
   boot.loader.grub.useOSProber = false;
-  boot.loader.grub.devices = [ "/dev/sda" ]; # Dell Inspiron BIOS legacy
+  boot.loader.grub.devices = [ "/dev/sda" ];
+
+  ############################################
+  # Desktop - GNOME
+  ############################################
+  services.xserver.enable = true;
+  services.displayManager.gdm = {
+    enable = true;
+    wayland = true;
+    autoSuspend = false;
+  };
+  services.desktopManager.gnome.enable = true;
+  services.gnome = {
+    core-apps.enable = true;
+    gnome-keyring.enable = true;
+  };
+
+  environment.sessionVariables = {
+    XDG_SESSION_TYPE = "wayland";
+    QT_QPA_PLATFORM = "wayland";
+    MOZ_ENABLE_WAYLAND = "1";
+    NIXOS_OZONE_WL = "1";
+    TERMINAL = "alacritty";
+  };
+
+  xdg.portal = {
+    enable = true;
+    extraPortals = with pkgs; [
+      xdg-desktop-portal-gnome
+      xdg-desktop-portal-gtk
+    ];
+  };
+
+  services.displayManager.autoLogin = {
+    enable = true;
+    user = "borba";
+  };
+
+  systemd.services."getty@tty1".enable = false;
+  systemd.services."autovt@tty1".enable = false;
+
+  services.journald.extraConfig = ''
+    SystemMaxUse=200M
+    RuntimeMaxUse=50M
+  '';
+
+  systemd.services.NetworkManager-wait-online.enable = false;
 
   ############################################
   # System state version
