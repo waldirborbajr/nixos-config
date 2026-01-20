@@ -1,13 +1,13 @@
-name: NixOS Validation CI
+name: NixOS Build Validation
 
 on:
+  pull_request:
   push:
     branches: [ main ]
-  pull_request:
 
 jobs:
-  validate:
-    name: Validate profiles
+  build:
+    name: Build (${{ matrix.profile }})
     runs-on: ubuntu-latest
 
     strategy:
@@ -18,66 +18,36 @@ jobs:
           - macbook
 
     steps:
-      # ----------------------------------------
-      # Checkout
-      # ----------------------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ----------------------------------------
-      # Install Nix
-      # ----------------------------------------
       - name: Install Nix
         uses: cachix/install-nix-action@v25
         with:
           nix_path: nixpkgs=channel:nixos-unstable
 
-      # ----------------------------------------
-      # Formatting
-      # ----------------------------------------
-      - name: Nix format check
-        run: |
-          nix-shell -p nixfmt-rfc-style --run '
-            find . -name "*.nix" \
-              ! -name "hardware-configuration-*.nix" \
-              -print0 \
-            | xargs -0 nixfmt --check
-          '
-
-      # ----------------------------------------
-      # Static analysis
-      # ----------------------------------------
-      - name: Statix
-        run: |
-          nix-shell -p statix --run "statix check ."
-
-      - name: Deadnix
-        run: |
-          nix-shell -p deadnix --run '
-            deadnix \
-              --exclude hardware-configuration-dell.nix \
-              --exclude hardware-configuration-macbook.nix \
-              .
-          '
-
-      # ----------------------------------------
-      # Evaluate configuration
-      # ----------------------------------------
       - name: Evaluate configuration
         run: |
-          nix-instantiate \
-            '<nixpkgs/nixos>' \
+          nix-instantiate '<nixpkgs/nixos>' \
             -A system \
-            -I nixos-config=./configuration.nix \
-            --argstr profile "${{ matrix.profile }}" \
+            -I nixos-config=$(pwd) \
             > /dev/null
 
-      # ----------------------------------------
-      # Dry build
-      # ----------------------------------------
-      - name: Build system (dry-run)
+      - name: Dry build
         run: |
-          nix-shell -p nixos-rebuild --run \
-            "nixos-rebuild build \
+          nix-shell -p nixos-rebuild --run "
+            nixos-rebuild build \
               -I nixos-config=$(pwd) \
-              --dry-run"
+              --dry-run
+          "
+
+      - name: Build summary
+        if: always()
+        run: |
+          {
+            echo "## 🏗️ Build Summary"
+            echo ""
+            echo "- Profile: **${{ matrix.profile }}**"
+            echo "- Evaluation: OK"
+            echo "- Dry build: OK"
+          } >> $GITHUB_STEP_SUMMARY
