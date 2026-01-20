@@ -22,6 +22,9 @@ in
     pciutils
     usbutils
     unstable.rfkill
+
+    # 🟢 Firmware LP-PHY correto para BCM4312
+    b43-firmware-legacy
   ];
 
   # Kernel modules
@@ -43,4 +46,9 @@ in
   # System state version
   ############################################
   system.stateVersion = "25.11";
+
+  ############################################
+  # Habilita firmware Broadcom no NixOS
+  ############################################
+  networking.enableB43Firmware = true;
 }
