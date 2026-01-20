@@ -2,20 +2,29 @@
 
 {
   ############################################
-  # X Server + GNOME
+  # Wayland + GNOME
   ############################################
   services.xserver.enable = true;
 
+  ############################################
+  # Display Manager (GDM)
+  ############################################
   services.displayManager.gdm = {
     enable = true;
     wayland = true;
     autoSuspend = false;
   };
 
+  ############################################
+  # Desktop Manager (GNOME)
+  ############################################
   services.desktopManager.gnome.enable = true;
 
+  ############################################
+  # GNOME performance tweaks
+  ############################################
   services.gnome = {
-    core-apps.enable = true;   # Mantemos true para compatibilidade
+    core-apps.enable = true;     # Ativa os aplicativos básicos do GNOME
     gnome-keyring.enable = true;
   };
 
@@ -64,7 +73,7 @@
   '';
 
   ############################################
-  # Network
+  # Network tweaks
   ############################################
   systemd.services.NetworkManager-wait-online.enable = false;
 }
