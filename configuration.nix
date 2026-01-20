@@ -22,7 +22,6 @@ imports = [
   ./modules/networking.nix
   ./modules/audio.nix
   ./modules/fonts.nix
-  ./modules/kernel-tuning.nix
 
   ##########################################
   # Desktop
