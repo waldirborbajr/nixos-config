@@ -1,54 +1,66 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
-let
-  unstable = import <nixpkgs-unstable> { };
-in
 {
   ############################################
-  # Wi-Fi e Bluetooth
+  # Dell Inspiron 1564 — Broadcom BCM4312 LP-PHY
   ############################################
-  networking.networkmanager.enable = true;
-  hardware.bluetooth.enable = true;
-  services.blueman.enable = true;
+
+  ############################################
+  # Firmware
+  ############################################
   hardware.enableRedistributableFirmware = true;
 
-  # Firmware específico para Broadcom BCM4312 LP-PHY
-  environment.systemPackages = with pkgs; [
-    linux-firmware
-    bluez
-    blueman
-    b43-fwcutter
-    wirelesstools
-    pciutils
-    usbutils
-    unstable.rfkill
+  ############################################
+  # Network & Bluetooth
+  ############################################
+  networking.networkmanager.enable = true;
 
-    # 🟢 Firmware LP-PHY correto para BCM4312
-    b43-firmware-legacy
-  ];
-
-  # Kernel modules
-  boot.initrd.kernelModules = [ "ssb" "b43" "btusb" "bcma" ];
-  boot.kernelModules = [ "ssb" "b43" "bcma" ];
-
-  # Evita drivers conflitantes
-  boot.blacklistedKernelModules = [ "brcmsmac" "wl" ];
+  hardware.bluetooth.enable = true;
+  services.blueman.enable = true;
 
   ############################################
-  # GRUB bootloader
+  # Broadcom LP-PHY firmware (CORRETO)
+  ############################################
+  environment.systemPackages = with pkgs; [
+    b43-firmware-legacy
+    b43-fwcutter
+
+    pciutils
+    usbutils
+    wirelesstools
+    rfkill
+  ];
+
+  ############################################
+  # Kernel modules — ORDEM IMPORTA
+  ############################################
+
+  # Initrd
+  boot.initrd.kernelModules = [
+    "ssb"
+    "b43"
+  ];
+
+  # Runtime
+  boot.kernelModules = [
+    "ssb"
+    "b43"
+  ];
+
+  ############################################
+  # Blacklist — EVITA CONFLITO (CRÍTICO)
+  ############################################
+  boot.blacklistedKernelModules = [
+    "bcma"
+    "brcmsmac"
+    "wl"
+  ];
+
+  ############################################
+  # Bootloader (Dell legacy BIOS)
   ############################################
   boot.loader.grub.enable = true;
   boot.loader.grub.version = 2;
   boot.loader.grub.useOSProber = false;
   boot.loader.grub.devices = [ "/dev/sda" ];
-
-  ############################################
-  # System state version
-  ############################################
-  system.stateVersion = "25.11";
-
-  ############################################
-  # Habilita firmware Broadcom no NixOS
-  ############################################
-  networking.enableB43Firmware = true;
 }

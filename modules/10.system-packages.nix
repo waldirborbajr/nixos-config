@@ -1,29 +1,11 @@
 { pkgs, ... }:
 
 let
-  # Canal unstable com unfree permitido
-  unstable = import <nixpkgs-unstable> {
-    config = { allowUnfree = true; };
-  };
+  unstable = import <nixpkgs-unstable> { };
 in
 {
-  ############################################
-  # Programs / System-level
-  ############################################
-  programs = {
-    zsh.enable = true;
-    firefox.enable = true;
-
-    zoxide = {
-      enable = true;
-      enableZshIntegration = true;
-    };
-  };
-
-  ############################################
-  # System Packages (consolidado)
-  ############################################
   environment.systemPackages = with pkgs; [
+
     ##########################################
     # Terminals
     ##########################################
@@ -58,7 +40,7 @@ in
     unstable.obsidian
 
     ##########################################
-    # Containers / Virtualization / Cloud / Kubernetes
+    # Containers / Virtualization / Kubernetes
     ##########################################
     docker
     docker-compose

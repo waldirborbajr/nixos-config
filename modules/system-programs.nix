@@ -2,23 +2,18 @@
 
 {
   ############################################
-  # Core Programs
+  # Core system services (NOT user packages)
   ############################################
-  programs = {
-    zsh.enable = true;
 
-    firefox = {
-      enable = true;
-      package = pkgs.firefox;
-    };
+  ############################################
+  # DConf (GNOME / desktop settings backend)
+  ############################################
+  programs.dconf.enable = true;
 
-    zoxide = {
-      enable = true;
-      enableZshIntegration = true;
-    };
-
-    dconf.enable = true;
-  };
+  ############################################
+  # Polkit (GUI authorization: virt-manager, NM)
+  ############################################
+  security.polkit.enable = true;
 
   ############################################
   # Virtualization (KVM / QEMU / Libvirt)
@@ -31,39 +26,6 @@
       "br0"
     ];
 
-    qemu = {
-      swtpm.enable = true;
-      # OVMF images are now available by default in recent NixOS/Nixpkgs,
-      # no need for ovmf.enable anymore
-    };
+    qemu.swtpm.enable = true;
   };
-
-  ############################################
-  # Docker (priority)
-  ############################################
-  virtualisation.docker = {
-    enable = true;
-    enableOnBoot = false;
-  };
-
-  ############################################
-  # Podman (rootless / docker-compatible)
-  ############################################
-  # Podman is commented out because Docker is currently enabled.
-  # Podman with dockerCompat cannot coexist with Docker enabled.
-  #
-  # To switch to Podman in the future:
-  # 1. Disable Docker: virtualisation.docker.enable = false;
-  # 2. Uncomment the following Podman block
-  #
-  # virtualisation.podman = {
-  #   enable = true;
-  #   dockerCompat = true;
-  #   defaultNetwork.settings.dns_enabled = true;
-  # };
-
-  ############################################
-  # Polkit (for virt-manager GUI authorization)
-  ############################################
-  security.polkit.enable = true;
 }

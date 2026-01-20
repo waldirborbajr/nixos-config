@@ -21,6 +21,17 @@ Dotfiles and user-level configs are managed externally via **GNU Stow**, keeping
 
 ---
 
+## Mapa mental atual
+
+```
+user-borba.nix        → comportamento de login
+desktop-gnome.nix    → GNOME puro
+system-programs.nix  → serviços do sistema
+kernel-tuning.nix    → infra / journald / boot
+hardware-*.nix       → drivers e firmware
+```
+---
+
 ## 📁 Repository Structure
 
 ```

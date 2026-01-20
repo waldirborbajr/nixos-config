@@ -1,10 +1,10 @@
-{ config, pkgs, lib, ... }:
-
+{ pkgs, ... }:
 {
   users.users.borba = {
     isNormalUser = true;
     description = "BORBA JR W";
     shell = pkgs.zsh;
+
     extraGroups = [
       "wheel"
       "networkmanager"
@@ -14,18 +14,15 @@
     ];
   };
 
-  services.displayManager.autoLogin = {
-    enable = true;
-    user = "borba";
-  };
-
-  systemd.services."getty@tty1".enable = false;
-  systemd.services."autovt@tty1".enable = false;
-
   security.sudo.extraRules = [
     {
       users = [ "borba" ];
-      commands = [ { command = "ALL"; options = [ "NOPASSWD" ]; } ];
+      commands = [
+        {
+          command = "/run/current-system/sw/bin/nixos-rebuild";
+          options = [ "NOPASSWD" ];
+        }
+      ];
     }
   ];
 }
