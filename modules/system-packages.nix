@@ -69,7 +69,6 @@ in
     skopeo
     cri-tools
     k9s
-    lazypodman
 
     virt-manager
     virt-viewer
