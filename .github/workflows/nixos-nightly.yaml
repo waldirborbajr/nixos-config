@@ -2,7 +2,7 @@ name: NixOS Nightly Channel Check
 
 on:
   schedule:
-    - cron: "0 3 * * *"   # Daily at 03:00 UTC
+    - cron: "0 3 * * *"
   workflow_dispatch:
 
 jobs:
@@ -19,7 +19,7 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-unstable
 
-      - name: Channel update
+      - name: Update channels
         run: |
           nix-channel --add https://nixos.org/channels/nixos-unstable nixpkgs-unstable || true
           nix-channel --update
@@ -28,7 +28,7 @@ jobs:
         run: |
           nix-instantiate '<nixpkgs/nixos>' \
             -A system \
-            -I nixos-config=$(pwd)/configuration.nix \
+            -I nixos-config=$(pwd) \
             > /dev/null
 
       - name: Nightly summary

@@ -6,14 +6,20 @@ on:
     branches: [ main ]
 
 jobs:
+  lint:
+    uses: ./.github/workflows/nixos-lint.yaml
+
   build:
+    needs: lint
     name: Build (${{ matrix.profile }})
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
-        profile: [ dell, macbook ]
+        profile:
+          - dell
+          - macbook
 
     steps:
       - name: Checkout repository
@@ -24,54 +30,8 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-unstable
 
-      - name: Generate CI entrypoint
-        run: |
-          cat > ci-configuration.nix <<EOF
-          { ... }:
-          {
-            imports = [
-              ./profiles/${{ matrix.profile }}.nix
-              ./hardware-configuration-${{ matrix.profile }}.nix
-
-              ./modules/base.nix
-              ./modules/networking.nix
-              ./modules/audio.nix
-              ./modules/fonts.nix
-              ./modules/kernel-tuning.nix
-
-              ./modules/desktops/gnome.nix
-              ./modules/autologin.nix
-
-              ./modules/containers/docker.nix
-              ./modules/containers/k3s.nix
-              ./modules/virtualization/libvirt.nix
-
-              ./modules/users/borba.nix
-              ./modules/system-packages.nix
-              ./modules/nixpkgs.nix
-
-              ./modules/maintenance.nix
-              ./modules/maintenance-hm.nix
-            ];
-
-            system.stateVersion = "25.11";
-          }
-          EOF
-
-      - name: Evaluate configuration
-        run: |
-          nix-instantiate '<nixpkgs/nixos>' \
-            -A system \
-            -I nixos-config=$(pwd)/ci-configuration.nix \
-            > /dev/null
-
-      - name: Dry build
-        run: |
-          nix-shell -p nixos-rebuild --run "
-            nixos-rebuild build \
-              -I nixos-config=$(pwd)/ci-configuration.nix \
-              --dry-run
-          "
+      - name: Build via Makefile
+        run: make build
 
       - name: Build summary
         if: always()
@@ -80,6 +40,5 @@ jobs:
             echo "## 🏗️ Build Summary"
             echo ""
             echo "- Profile: **${{ matrix.profile }}**"
-            echo "- Evaluation: OK"
-            echo "- Dry build: OK"
-          } >> \$GITHUB_STEP_SUMMARY
+            echo "- Build: OK"
+          } >> $GITHUB_STEP_SUMMARY
