@@ -39,6 +39,7 @@ in
     tmux
     tmuxifier
     stow
+    tree
 
     ##########################################
     # Editors / IDEs / Git
