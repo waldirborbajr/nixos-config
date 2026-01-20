@@ -42,7 +42,7 @@ in
     ##########################################
     unstable.neovim
     # unstable.vscode
-    vscode-extensions.ms-vscode-remote.remote-containers
+    # vscode-extensions.ms-vscode-remote.remote-containers
     lazygit
     git
     gh
