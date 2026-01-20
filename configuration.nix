@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   ############################################
@@ -7,7 +7,6 @@
   imports = [
     ./hardware-configuration-dell.nix
     ./modules/hardware-dell.nix
-    ./modules/hardware-radio-chirp.nix
     ./modules/kernel-tuning.nix
     ./modules/desktop-gnome.nix
     ./modules/fonts.nix
@@ -47,7 +46,10 @@
   # Nix configuration
   ############################################
   nixpkgs.config.allowUnfree = true;
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 
   ############################################
   # Remote access (SSH)
@@ -63,75 +65,47 @@
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
 
-  # Firmware Broadcom BCM4312 LP-PHY
-  environment.systemPackages = with pkgs; [
-    linux-firmware
-    bluez
-    blueman
-    b43-fwcutter
-    wireless-tools
-    pciutils
-    usbutils
-  ];
-
-  # Módulos para initrd e kernel
+  # Força carregamento dos módulos corretos
   boot.initrd.kernelModules = [ "ssb" "b43" "btusb" ];
   boot.kernelModules = [ "ssb" "b43" ];
 
   # Evita conflitos com outros drivers Broadcom
   boot.blacklistedKernelModules = [ "bcma" "brcmsmac" "wl" ];
 
-  ############################################
-  # GRUB (Legacy BIOS Dell)
-  ############################################
-  boot.loader.grub.enable = true;
-  boot.loader.grub.version = 2;
-  boot.loader.grub.useOSProber = false;
-  boot.loader.grub.devices = [ "/dev/sda" ];
-
-  ############################################
-  # Desktop (GNOME / Wayland)
-  ############################################
-  services.displayManager.gdm.enable = true;
-  services.displayManager.gdm.wayland = true;
-  services.displayManager.gdm.autoSuspend = false;
-
-  services.desktopManager.gnome.enable = true;
-
-  services.gnome.core-apps.enable = true;
-  services.gnome.gnome-keyring.enable = true;
-
-  environment.sessionVariables = {
-    XDG_SESSION_TYPE = "wayland";
-    QT_QPA_PLATFORM = "wayland";
-    MOZ_ENABLE_WAYLAND = "1";
-    NIXOS_OZONE_WL = "1";
-    TERMINAL = "alacritty";
-  };
-
-  xdg.portal.enable = true;
-  xdg.portal.extraPortals = with pkgs; [
-    xdg-desktop-portal-gnome
-    xdg-desktop-portal-gtk
+  # Pacotes de firmware e utilitários
+  environment.systemPackages = with pkgs; [
+    linux-firmware
+    bluez
+    blueman
+    b43-fwcutter
+    wirelesstools
+    pciutils
+    usbutils
   ];
 
-  services.displayManager.autoLogin = {
+  ############################################
+  # Bootloader GRUB (Legacy BIOS)
+  ############################################
+  boot.loader.grub = {
     enable = true;
-    user = "borba";
+    version = 2;
+    useOSProber = false;
+    devices = [ "/dev/sda" ];  # disco de boot principal
   };
-
-  systemd.services."getty@tty1".enable = false;
-  systemd.services."autovt@tty1".enable = false;
-
-  services.journald.extraConfig = ''
-    SystemMaxUse=200M
-    RuntimeMaxUse=50M
-  '';
-
-  systemd.services.NetworkManager-wait-online.enable = false;
 
   ############################################
   # System state version
   ############################################
   system.stateVersion = "25.11";
+
+  ############################################
+  # Docker & Podman
+  ############################################
+  virtualisation.docker.enable = true;
+  virtualisation.docker.enableOnBoot = true;
+
+  # Podman para uso futuro, não ativo agora
+  # virtualisation.podman.enable = true;
+
+  users.users.borba.extraGroups = [ "docker" ];
 }
