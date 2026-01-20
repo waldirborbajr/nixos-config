@@ -1,4 +1,720 @@
 ----
+.editorconfig
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.nix]
+indent_style = space
+indent_size = 2
+
+----
+.github/workflows/nixos-ci.yaml
+
+name: NixOS Build Validation
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build (${{ matrix.profile }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        profile:
+          - dell
+          - macbook
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v25
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - name: Evaluate configuration
+        run: |
+          nix-instantiate '<nixpkgs/nixos>' \
+            -A system \
+            -I nixos-config=$(pwd) \
+            > /dev/null
+
+      - name: Dry build
+        run: |
+          nix-shell -p nixos-rebuild --run "
+            nixos-rebuild build \
+              -I nixos-config=$(pwd) \
+              --dry-run
+          "
+
+      - name: Build summary
+        if: always()
+        run: |
+          {
+            echo "## 🏗️ Build Summary"
+            echo ""
+            echo "- Profile: **${{ matrix.profile }}**"
+            echo "- Evaluation: OK"
+            echo "- Dry build: OK"
+          } >> $GITHUB_STEP_SUMMARY
+
+----
+.github/workflows/nixos-lint.yaml
+
+name: NixOS Lint
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  lint:
+    name: Lint Nix files
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v25
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - name: nixfmt check
+        run: |
+          nix-shell -p nixfmt-rfc-style --run '
+            find . -name "*.nix" \
+              ! -name "hardware-configuration-*.nix" \
+              -print0 \
+            | xargs -0 nixfmt --check
+          '
+
+      - name: statix
+        run: nix-shell -p statix --run "statix check ."
+
+      - name: deadnix
+        run: |
+          nix-shell -p deadnix --run '
+            deadnix \
+              --exclude hardware-configuration-dell.nix \
+              --exclude hardware-configuration-macbook.nix \
+              .
+          '
+
+      - name: Lint summary
+        if: always()
+        run: |
+          {
+            echo "## 🧹 Lint Summary"
+            echo ""
+            echo "- nixfmt: checked"
+            echo "- statix: checked"
+            echo "- deadnix: checked"
+          } >> $GITHUB_STEP_SUMMARY
+
+----
+.github/workflows/nixos-nightly.yaml
+
+name: NixOS Nightly Channel Check
+
+on:
+  schedule:
+    - cron: "0 3 * * *"   # Daily at 03:00 UTC
+  workflow_dispatch:
+
+jobs:
+  nightly:
+    name: Nightly evaluation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v25
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - name: Channel update
+        run: |
+          nix-channel --add https://nixos.org/channels/nixos-unstable nixpkgs-unstable || true
+          nix-channel --update
+
+      - name: Evaluate system
+        run: |
+          nix-instantiate '<nixpkgs/nixos>' \
+            -A system \
+            -I nixos-config=$(pwd) \
+            > /dev/null
+
+      - name: Nightly summary
+        if: always()
+        run: |
+          {
+            echo "## 🌙 Nightly CI"
+            echo ""
+            echo "- Channel: nixos-unstable"
+            echo "- Evaluation: OK"
+            echo "- Purpose: regression detection"
+          } >> $GITHUB_STEP_SUMMARY
+
+----
+ARCHITECTURE.md
+
+# ARCHITECTURE.md
+
+# NixOS System Architecture
+
+This document describes the architectural design of this NixOS configuration repository.
+It focuses on structure, responsibility boundaries, and long-term maintainability.
+
+The goal is to make the system easy to understand, modify, and rebuild on any supported machine.
+
+---
+
+## Architectural Principles
+
+- Single entrypoint
+- Explicit imports
+- Clear separation of concerns
+- Hardware-aware but hardware-isolated
+- Declarative over imperative
+- Repo-based rebuilds (no /etc/nixos)
+- Disposable systems by design
+
+This repository assumes the system can be destroyed and rebuilt at any time.
+
+---
+
+## High-Level Design
+
+The architecture follows a layered model:
+
+1. Entry point
+2. Host identity
+3. Hardware definition
+4. Core system
+5. Desktop
+6. Containers and virtualization
+7. Users
+8. Maintenance
+
+Each layer only depends on layers below it.
+
+---
+
+## Entrypoint Layer
+
+### configuration.nix
+
+This is the only entrypoint.
+
+Responsibilities:
+- Import modules
+- Select host profile
+- Select hardware configuration
+- Define system.stateVersion
+
+Non-responsibilities:
+- No logic
+- No hardware tuning
+- No package lists
+- No user configuration
+
+configuration.nix is wiring only.
+
+---
+
+## Host Identity Layer
+
+### profiles/*.nix
+
+Each profile defines:
+- networking.hostName
+- Bootloader type and configuration
+
+Examples:
+- Legacy BIOS (GRUB)
+- EFI (systemd-boot)
+
+Only one profile must be imported at a time.
+
+Profiles never define:
+- Packages
+- Users
+- Services
+
+---
+
+## Hardware Layer
+
+### hardware-configuration-*.nix
+
+- Generated by nixos-generate-config
+- Disk layout
+- Filesystems
+- Kernel modules
+- CPU microcode
+
+These files must never be edited manually.
+
+### modules/hardware/*.nix
+
+Vendor-specific hardware tuning:
+- Firmware
+- Wireless drivers
+- Kernel blacklists
+- Vendor quirks
+
+Hardware modules must not define:
+- Desktop environment
+- Users
+- Applications
+
+---
+
+## Core System Layer
+
+### modules/base.nix
+
+Defines system fundamentals:
+- Locale
+- Timezone
+- Console keymap
+- Nix experimental features
+
+### modules/networking.nix
+
+- NetworkManager
+- Faster boot by disabling wait-online
+
+### modules/audio.nix
+
+- PipeWire stack
+- PulseAudio disabled
+- ALSA enabled
+
+### modules/fonts.nix
+
+- System-wide fonts
+- Fontconfig defaults
+
+These modules are hardware-agnostic.
+
+---
+
+## Desktop Layer
+
+### modules/desktops/gnome.nix
+
+Defines:
+- X server
+- Display manager
+- Desktop environment
+- Wayland configuration
+- Portals
+
+### modules/autologin.nix
+
+- Automatic graphical login
+- TTY conflict prevention
+
+Only one desktop module should be active.
+
+Desktop modules must not:
+- Install developer tools
+- Define users
+- Manage containers
+
+---
+
+## Application Layer
+
+### modules/system-packages.nix
+
+Defines all global packages:
+- Development toolchains
+- Editors and IDEs
+- CLI utilities
+- Browsers
+- Container tooling
+
+Packages are:
+- System-wide
+- Declarative
+- Reproducible
+
+No per-user packages are defined here.
+
+---
+
+## Containers and Virtualization Layer
+
+### Docker
+
+- Enabled as a system service
+- Boot-time activation
+- User group integration
+
+### Podman
+
+- Rootless
+- Docker-compatible
+- Disabled by default
+- Explicit migration path
+
+### K3s
+
+- Single-node Kubernetes
+- Server role
+- Minimal components
+- Firewall-aware
+
+### Libvirt
+
+- QEMU/KVM
+- virt-manager support
+- Polkit integration
+
+---
+
+## User Layer
+
+### modules/users/borba.nix
+
+Defines:
+- User account
+- Shell
+- Groups
+- Sudo rules
+
+Does not manage:
+- Dotfiles
+- Editor configuration
+- Shell configuration
+
+Dotfiles are managed externally via GNU Stow.
+
+---
+
+## Maintenance Layer
+
+Maintenance is intentionally explicit and manual.
+
+There is no hidden automation that mutates the system unexpectedly.
+
+Maintenance tasks are exposed via:
+- Makefile
+- nixos-rebuild
+- nix-collect-garbage
+
+---
+
+## Rebuild Model
+
+- Repository lives in $HOME/nixos-config
+- No symlinks to /etc/nixos
+- Rebuilds reference repo path explicitly
+- System is always built from the repo state
+
+---
+
+## Failure Model
+
+This system assumes failure is acceptable.
+
+If something breaks:
+- Roll back generation
+- Fix config
+- Rebuild
+
+No mutable state is relied upon.
+
+---
+
+## Summary
+
+This architecture favors:
+- Clarity over cleverness
+- Explicitness over automation
+- Rebuildability over persistence
+
+If you can delete the system and rebuild it without fear, the architecture is correct.
+
+Version: v1.0
+
+----
+OPERATIONS.md
+
+# OPERATIONS.md
+
+# Day-2 Operations Guide
+
+This document describes day-2 operational tasks for this NixOS system.
+It focuses on maintenance, upgrades, recovery, and diagnostics.
+
+All operations assume the repository lives at:
+
+$HOME/nixos-config
+
+---
+
+## Core Rule
+
+Never edit the running system directly.
+
+All changes must be made in the repository and applied via rebuild.
+
+---
+
+## Common Operations
+
+### Rebuild and Switch
+
+Apply current configuration:
+
+make switch
+
+Build without switching:
+
+make build
+
+Rollback to previous generation:
+
+make rollback
+
+---
+
+## System Updates
+
+### Update Nix Channels
+
+Update channels (including unstable):
+
+make channels
+
+Then rebuild:
+
+make switch
+
+---
+
+## Garbage Collection
+
+### Soft Cleanup
+
+Remove old generations older than 7 days:
+
+make gc-soft
+
+### Hard Cleanup
+
+Aggressive cleanup:
+
+make gc-hard
+
+Use hard GC only when disk space is critically low.
+
+---
+
+## Store Maintenance
+
+### Optimize Store
+
+Deduplicate store paths:
+
+make optimise
+
+### Verify Store Integrity
+
+Check for corruption:
+
+make verify
+
+---
+
+## Disk Space Management
+
+Check disk usage:
+
+make space
+
+Inspect store size:
+
+du -sh /nix/store
+
+List generations:
+
+make generations
+
+Delete old generations manually if required:
+
+sudo nix-env --delete-generations old --profile /nix/var/nix/profiles/system
+
+---
+
+## Diagnostics
+
+Run system diagnostics:
+
+make doctor
+
+Doctor checks:
+- Nix availability
+- Active system generation
+- GC timers
+- Docker and K3s status
+- Store size
+
+---
+
+## Container Operations
+
+### Docker
+
+Check status:
+
+systemctl status docker
+
+Restart Docker:
+
+sudo systemctl restart docker
+
+### Podman
+
+Ensure Docker is disabled before enabling Podman.
+
+Switch requires editing configuration and rebuilding.
+
+### K3s
+
+Check status:
+
+systemctl status k3s
+
+Kubeconfig location:
+
+/etc/rancher/k3s/k3s.yaml
+
+---
+
+## Virtualization
+
+Check libvirt:
+
+systemctl status libvirtd
+
+User must belong to libvirtd group.
+
+virt-manager is the primary GUI.
+
+---
+
+## Kernel and Boot Issues
+
+List available generations:
+
+sudo nix-env --list-generations --profile /nix/var/nix/profiles/system
+
+Reboot into an older generation via boot menu if system does not start.
+
+---
+
+## Recovery Procedure
+
+If the system fails to boot:
+
+1. Select a previous generation in the bootloader
+2. Boot successfully
+3. Fix configuration in repo
+4. Run make switch
+
+If the system is completely broken:
+
+1. Boot from NixOS installer
+2. Mount disks
+3. Chroot if necessary
+4. Clone repo
+5. Rebuild system
+
+---
+
+## Adding New Software
+
+Never install software imperatively.
+
+Do not use:
+- nix-env -i
+- nix profile install
+
+Always:
+- Edit modules/system-packages.nix
+- Rebuild
+
+---
+
+## Removing Software
+
+Remove packages from system-packages.nix.
+Rebuild.
+Run garbage collection if needed.
+
+---
+
+## Hardware Changes
+
+When moving to new hardware:
+
+1. Generate new hardware-configuration.nix
+2. Create or adjust hardware module
+3. Select appropriate profile
+4. Rebuild
+
+---
+
+## Backups
+
+This repository is the backup.
+
+Ensure it is:
+- Committed
+- Pushed
+- Versioned
+
+Optional:
+- Back up /home separately
+
+---
+
+## Operational Philosophy
+
+- Rebuilds are cheap
+- Rollbacks are safe
+- State is disposable
+- Configuration is the source of truth
+
+If a fix cannot be expressed declaratively, it is not acceptable.
+
+---
+
+Version: v1.0
+
+----
 configuration.nix
 
 { config, pkgs, ... }:
@@ -407,30 +1123,35 @@ in
     ##########################################
     # Terminals
     ##########################################
-    alacritty
-    kitty
-    gnome-console
+    alacritty          # GPU-accelerated terminal
+    kitty              # Feature-rich terminal
+    gnome-console      # GNOME default terminal
 
     ##########################################
-    # Shells / Multiplexers
+    # Shells & Multiplexers
     ##########################################
-    zsh
-    fish
-    tmux
-    tmuxifier
-    stow
-    tree
+    zsh                # Primary shell
+    fish               # Alternative shell
+    tmux               # Terminal multiplexer
+    tmuxifier          # tmux session manager
+    zellij             # Modern tmux alternative
 
     ##########################################
-    # Editors / IDEs / Git
+    # Editors & Development UX
     ##########################################
-    unstable.neovim
+    unstable.neovim    # Neovim (unstable for faster updates)
+    helix              # Modal editor, LSP-first
     unstable.vscode
     unstable.vscode-extensions.ms-vscode-remote.remote-containers
-    lazygit
+
+    ##########################################
+    # Git & Developer Workflow
+    ##########################################
     git
-    gh
-    devcontainer
+    gh                 # GitHub CLI
+    lazygit            # TUI for git
+    commitizen         # Conventional commits helper
+    devcontainer       # Dev container tooling
 
     ##########################################
     # Notes / Knowledge Base
@@ -472,7 +1193,7 @@ in
     rust-analyzer
 
     ##########################################
-    # Build / Development Tools
+    # Build & Debug Tooling
     ##########################################
     cmake
     gnumake
@@ -486,22 +1207,41 @@ in
     ##########################################
     # Nix Tooling
     ##########################################
-    nixd
-    nil
-    statix
-    deadnix
-    nixfmt-rfc-style
+    nixd               # Nix language server
+    nil                # Alternative Nix LSP
+    statix             # Static analysis for Nix
+    deadnix            # Find unused Nix code
+    nixfmt-rfc-style   # Nix formatter
 
     ##########################################
-    # Modern CLI Utilities
+    # Modern CLI Utilities (Shell-first / DevOps)
     ##########################################
-    eza
-    btop
-    bat
+    eza                # ls replacement
+    bat                # cat replacement
+    fd                 # find replacement
+    ripgrep            # grep replacement
+    yazi               # Terminal file manager
+    dust               # du replacement
+    ncdu               # Disk usage analyzer
+    zoxide             # Smarter cd
+    atuin              # Shell history with sync
+    tldr               # Simplified man pages
+    sd                 # sed replacement
+    jq                 # JSON processor
+    fx                 # Interactive JSON viewer
+    httpie             # Modern HTTP client
+    curlie             # curl + httpie hybrid
+    fzf                # Fuzzy finder
+    direnv             # Per-directory environments
+    entr               # Run commands on file changes
+    procs              # ps replacement
+    bottom             # Advanced system monitor
+    btop               # Resource monitor
     htop
-    fd
-    ripgrep
-    yazi
+
+    ##########################################
+    # Clipboard / Wayland Utilities
+    ##########################################
     xclip
     wl-clipboard
     clipster
@@ -520,9 +1260,11 @@ in
     procps
     psmisc
     util-linux
+    tree
+    stow
 
     ##########################################
-    # Hardware / System Debug
+    # Hardware / System Diagnostics
     ##########################################
     lshw
     pciutils
@@ -530,7 +1272,7 @@ in
     lm_sensors
 
     ##########################################
-    # Network / Connectivity
+    # Networking
     ##########################################
     iwd
     iproute2
