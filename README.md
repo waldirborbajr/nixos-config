@@ -287,3 +287,23 @@ Boring means reliable, predictable, reproducible, and disposable.
 Version: v1.2.1
 
 GPT: https://chatgpt.com/share/696fa14b-4160-800c-8714-210ff3688f73
+
+
+````
+.git/hook/pre-commit
+
+#!/usr/bin/env bash
+set -e
+
+echo "Running nixfmt..."
+nix-shell -p nixfmt-rfc-style --run '
+  find . -name "*.nix" \
+    ! -name "hardware-configuration-*.nix" \
+    -exec nixfmt {} \;
+'
+
+git diff --quiet || {
+  echo "Nix files were reformatted. Please review and commit again."
+  exit 1
+}
+```
