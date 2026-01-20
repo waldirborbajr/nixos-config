@@ -46,6 +46,7 @@ in
     ##########################################
     alacritty
     kitty
+    gnome-console
 
     ##########################################
     # Shells / Multiplexers
