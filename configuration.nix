@@ -2,15 +2,15 @@
 
 {
   imports = [
-    ./hardware-configuration-dell.nix
+    ./hardware-configuration.nix
   ];
 
   ############################################
   # Bootloader
   ############################################
   boot.loader.grub.enable = true;
-  boot.loader.grub.device = "/dev/sda";      # seu disco root
-  boot.loader.grub.useOSProber = true;       # detecta outros OS, evita erro de mirroredBoots
+  boot.loader.grub.device = "/dev/sda";
+  boot.loader.grub.useOSProber = true;
 
   ############################################
   # Networking
@@ -50,12 +50,12 @@
   ############################################
   services.xserver.enable = true;
 
-  services.xserver.displayManager.gdm = {
-    enable = true;
-    wayland = true;
+  services.displayManager.gdm = {
+    enable = true;      # atualizado
+    wayland = true;     # atualizado
   };
 
-  services.xserver.desktopManager.gnome.enable = true;
+  services.desktopManager.gnome.enable = true; # atualizado
 
   services.xserver.xkb = {
     layout = "br";
@@ -120,8 +120,10 @@
     ];
   };
 
-  services.xserver.displayManager.autoLogin.enable = true;
-  services.xserver.displayManager.autoLogin.user = "borba";
+  services.displayManager.autoLogin = {   # atualizado
+    enable = true;
+    user = "borba";
+  };
 
   systemd.services."getty@tty1".enable = false;
   systemd.services."autovt@tty1".enable = false;
@@ -239,7 +241,7 @@
       emoji = [ "OpenMoji Color" ];
     };
 
-    enableDefaultFonts = true;
+    enableDefaultPackages = true; # atualizado
   };
 
   ############################################
