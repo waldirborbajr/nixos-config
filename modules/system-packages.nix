@@ -41,7 +41,7 @@ in
     # Editors / IDEs / Git
     ##########################################
     unstable.neovim
-    vscode
+    unstable.vscode
     vscode-extensions.ms-vscode-remote.remote-containers
     lazygit
     git
