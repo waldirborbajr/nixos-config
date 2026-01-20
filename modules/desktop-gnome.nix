@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
 {
   ############################################
@@ -6,24 +6,27 @@
   ############################################
   services.xserver.enable = true;
 
-  services.xserver.displayManager.gdm = {
+  ############################################
+  # Display Manager (GDM)
+  ############################################
+  services.displayManager.gdm = {
     enable = true;
-    wayland = true;
-    # Evita atrasos esperando sessão anterior
-    autoSuspend = false;
+    wayland = true;       # antigo: services.xserver.displayManager.gdm.wayland
+    autoSuspend = false;  # antigo: services.xserver.displayManager.gdm.autoSuspend
   };
 
-  services.xserver.desktopManager.gnome.enable = true;
+  ############################################
+  # Desktop Manager (GNOME)
+  ############################################
+  services.desktopManager.gnome.enable = true; # antigo: services.xserver.desktopManager.gnome.enable
 
-  # Login automático
-  services.xserver.displayManager.autoLogin = {
-    enable = true;
-    user = "borba";
+  ############################################
+  # GNOME performance tweaks
+  ############################################
+  services.gnome = {
+    core-apps.enable = false;    # antigo: services.gnome.core-utilities.enable
+    gnome-keyring.enable = true;
   };
-
-  # Remove TTY concorrente
-  systemd.services."getty@tty1".enable = false;
-  systemd.services."autovt@tty1".enable = false;
 
   ############################################
   # Wayland Environment Variables
@@ -48,20 +51,29 @@
   };
 
   ############################################
-  # GNOME performance tweaks
+  # Auto-login
   ############################################
-  # Não esperar network-online no boot gráfico
-  systemd.services.NetworkManager-wait-online.enable = false;
-
-  # Menos serviços inúteis no desktop
-  services.gnome = {
-    core-utilities.enable = false;
-    gnome-keyring.enable = true;
+  services.displayManager.autoLogin = {
+    enable = true;      # antigo: services.xserver.displayManager.autoLogin
+    user = "borba";
   };
 
-  # Reduz overhead de logs em desktop
+  ############################################
+  # Remove TTY concorrente
+  ############################################
+  systemd.services."getty@tty1".enable = false;
+  systemd.services."autovt@tty1".enable = false;
+
+  ############################################
+  # Journald logs limits
+  ############################################
   services.journald.extraConfig = ''
     SystemMaxUse=200M
     RuntimeMaxUse=50M
   '';
+  
+  ############################################
+  # Network
+  ############################################
+  systemd.services.NetworkManager-wait-online.enable = false;
 }
