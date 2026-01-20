@@ -1,20 +1,31 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   ############################################
-  # Wi-Fi
+  # Wi-Fi (Dell Inspiron)
   ############################################
   networking.networkmanager.enable = true;
 
   hardware.enableRedistributableFirmware = true;
 
+  # Firmware Broadcom b43
+  hardware.firmware = [
+    pkgs.firmware.b43
+    pkgs.firmware.b43-open
+  ];
+
+  # Kernel modules para Broadcom
+  boot.kernelModules = lib.mkDefault [
+    "b43"
+    "ssb"       # Broadcom support
+    "bcma"
+  ];
+
   ############################################
   # Bluetooth
   ############################################
-  hardware.bluetooth = {
-    enable = true;
-    powerOnBoot = true;
-  };
+  hardware.bluetooth.enable = true;
+  hardware.bluetooth.powerOnBoot = true;
 
   services.blueman.enable = true;
 
@@ -22,7 +33,6 @@
   # Audio (PipeWire)
   ############################################
   services.pulseaudio.enable = false;
-
   security.rtkit.enable = true;
 
   services.pipewire = {
@@ -35,14 +45,11 @@
   ############################################
   # Keyboard — Dell Inspiron (pt_BR)
   ############################################
-
-  # Teclado gráfico (X11 / Wayland via XKB)
   services.xserver.xkb = {
     layout = "br";
     variant = "";
   };
 
-  # Teclado de console (TTY / initrd)
   console.keyMap = "br-abnt2";
 
   ############################################
@@ -53,5 +60,4 @@
     device = "/dev/sda";
     useOSProber = true;
   };
-      
 }
