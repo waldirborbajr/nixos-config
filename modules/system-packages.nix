@@ -46,6 +46,7 @@ in
     lazygit
     git
     gh
+    devcontainer
 
     ##########################################
     # Notes / Knowledge Base
