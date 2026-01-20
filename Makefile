@@ -5,10 +5,13 @@
 
 CONFIG_DIR ?= $(HOME)/nixos-config
 
-.PHONY: help switch build rollback \
-        channels gc-soft gc-hard optimise verify \
-        doctor generations space \
-        fmt lint ci
+.PHONY: help \
+        build switch rollback \
+        channels \
+        gc-soft gc-hard \
+        optimise verify \
+        generations space doctor \
+        lint fmt
 
 # ---------------------------------------------------------
 # Help
@@ -22,17 +25,25 @@ help:
 	@echo "  make build         - Build system only"
 	@echo "  make rollback      - Rollback to previous generation"
 	@echo ""
-	@echo "Lint / Format:"
-	@echo "  make fmt           - Format all Nix files"
-	@echo "  make lint          - Run all linters"
-	@echo "  make ci            - Lint + build (CI target)"
+	@echo "Formatting / Lint:"
+	@echo "  make fmt           - Format Nix files and auto-commit if changed"
+	@echo "  make lint          - Run nixfmt (check), statix and deadnix"
 	@echo ""
 	@echo "Channels:"
-	@echo "  make channels      - Update nix channels"
+	@echo "  make channels      - Update Nix channels"
 	@echo ""
 	@echo "Garbage Collection:"
 	@echo "  make gc-soft       - GC older than 7 days"
 	@echo "  make gc-hard       - Full GC (delete all old generations)"
+	@echo ""
+	@echo "Store Maintenance:"
+	@echo "  make optimise      - Deduplicate Nix store"
+	@echo "  make verify        - Verify store integrity"
+	@echo ""
+	@echo "Diagnostics:"
+	@echo "  make doctor        - System health overview"
+	@echo "  make generations   - List system generations"
+	@echo "  make space         - Disk usage overview"
 	@echo ""
 
 # ---------------------------------------------------------
@@ -49,40 +60,6 @@ switch:
 rollback:
 	sudo nixos-rebuild switch --rollback \
 		-I nixos-config=$(CONFIG_DIR)
-
-# ---------------------------------------------------------
-# Format
-# ---------------------------------------------------------
-fmt:
-	@echo ">> Formatting Nix files"
-	find . -name "*.nix" \
-	  ! -name "hardware-configuration-*.nix" \
-	  -print0 \
-	| xargs -0 nix run nixpkgs#nixfmt-rfc-style -- nixfmt
-
-# ---------------------------------------------------------
-# Lint
-# ---------------------------------------------------------
-lint:
-	@echo ">> nixfmt check"
-	find . -name "*.nix" \
-	  ! -name "hardware-configuration-*.nix" \
-	  -print0 \
-	| xargs -0 nix run nixpkgs#nixfmt-rfc-style -- nixfmt --check
-
-	@echo ">> statix"
-	nix run nixpkgs#statix -- check .
-
-	@echo ">> deadnix"
-	nix run nixpkgs#deadnix -- \
-	  --exclude hardware-configuration-dell.nix \
-	  --exclude hardware-configuration-macbook.nix \
-	  .
-
-# ---------------------------------------------------------
-# CI aggregate
-# ---------------------------------------------------------
-ci: lint build
 
 # ---------------------------------------------------------
 # Channels
@@ -111,19 +88,78 @@ verify:
 	sudo nix-store --verify --check-contents
 
 # ---------------------------------------------------------
+# Formatting (AUTO-COMMIT)
+# ---------------------------------------------------------
+fmt:
+	@echo ">> Formatting Nix files..."
+	@nix-shell -p nixfmt-rfc-style --run '\
+		find . -name "*.nix" \
+		  ! -name "hardware-configuration-*.nix" \
+		  -print0 \
+		| xargs -0 nixfmt \
+	'
+	@echo ""
+	@echo ">> Git status after formatting:"
+	@git status --short
+	@echo ""
+	@if git diff --quiet; then \
+		echo ">> No formatting changes detected. Nothing to commit."; \
+	else \
+		echo ">> Committing formatting changes..."; \
+		git commit -am "chore: format nix files"; \
+	fi
+
+# ---------------------------------------------------------
+# Lint (CHECK ONLY)
+# ---------------------------------------------------------
+lint:
+	@echo ">> Running nixfmt check..."
+	@nix-shell -p nixfmt-rfc-style --run '\
+		find . -name "*.nix" \
+		  ! -name "hardware-configuration-*.nix" \
+		  -print0 \
+		| xargs -0 nixfmt --check \
+	'
+	@echo ">> Running statix..."
+	@nix-shell -p statix --run "statix check ."
+	@echo ">> Running deadnix..."
+	@nix-shell -p deadnix --run '\
+		deadnix \
+		  --exclude hardware-configuration-dell.nix \
+		  --exclude hardware-configuration-macbook.nix \
+		  . \
+	'
+
+# ---------------------------------------------------------
 # Diagnostics
 # ---------------------------------------------------------
 generations:
 	sudo nix-env --list-generations --profile /nix/var/nix/profiles/system
 
 space:
+	@echo ">> Disk usage:"
 	df -h /
+	@echo ""
+	@echo ">> Nix store size:"
 	du -sh /nix/store
 
 doctor:
+	@echo ">> Nix version:"
 	nix --version || true
+	@echo ""
+	@echo ">> Active system generation:"
 	readlink /nix/var/nix/profiles/system
+	@echo ""
+	@echo ">> GC timers:"
 	systemctl list-timers | grep nix || true
+	@echo ""
+	@echo ">> Docker:"
 	systemctl is-active docker || true
+	@echo ""
+	@echo ">> K3s:"
 	systemctl is-active k3s || true
+	@echo ""
+	@echo ">> Store size:"
 	du -sh /nix/store
+	@echo ""
+	@echo ">> Doctor finished"
