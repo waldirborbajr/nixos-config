@@ -1,105 +1,114 @@
 # =========================================================
-# NixOS Makefile (non-flake, no Home Manager)
+# NixOS Maintenance Makefile
+# Repo-based (no /etc/nixos, no flakes, no Home Manager)
 # =========================================================
 
-# -------------------------
-# Variables
-# -------------------------
 CONFIG_DIR ?= $(HOME)/nixos-config
 
-# -------------------------
-# Phony targets
-# -------------------------
-.PHONY: help switch build containers-docker containers-podman \
-        rollback gc-soft gc-hard doctor update-channels
+.PHONY: help switch build rollback \
+        channels gc-soft gc-hard optimise verify \
+        doctor generations space
 
-# -------------------------
+# ---------------------------------------------------------
 # Help
-# -------------------------
+# ---------------------------------------------------------
 help:
 	@echo ""
-	@echo "NixOS Makefile targets:"
+	@echo "NixOS Maintenance Makefile"
 	@echo ""
 	@echo "Build / Switch:"
-	@echo "  switch             - Rebuild & switch"
-	@echo "  build              - Build system (no switch)"
-	@echo ""
-	@echo "Containers:"
-	@echo "  containers-docker  - Enable Docker (default)"
-	@echo "  containers-podman  - Enable Podman (rootless, disables Docker)"
+	@echo "  make switch        - Rebuild & switch system"
+	@echo "  make build         - Build system only"
+	@echo "  make rollback      - Rollback to previous generation"
 	@echo ""
 	@echo "Channels:"
-	@echo "  update-channels    - Add/update nixpkgs-unstable channel"
+	@echo "  make channels      - Update nix channels"
 	@echo ""
-	@echo "Maintenance:"
-	@echo "  rollback           - Rollback to previous generation"
-	@echo "  gc-soft            - Garbage collection (older than 7 days)"
-	@echo "  gc-hard            - Aggressive garbage collection"
+	@echo "Garbage Collection:"
+	@echo "  make gc-soft       - GC older than 7 days"
+	@echo "  make gc-hard       - Full GC (delete all old generations)"
+	@echo ""
+	@echo "Store Maintenance:"
+	@echo "  make optimise      - Deduplicate Nix store"
+	@echo "  make verify        - Verify store integrity"
 	@echo ""
 	@echo "Diagnostics:"
-	@echo "  doctor             - Sanity checks (nix, docker, podman, k3s, k9s)"
+	@echo "  make doctor        - System health overview"
+	@echo "  make generations   - List system generations"
+	@echo "  make space         - Disk usage overview"
 	@echo ""
 
-# -------------------------
+# ---------------------------------------------------------
 # Build / Switch
-# -------------------------
+# ---------------------------------------------------------
 build:
-	sudo nixos-rebuild build -I nixos-config=$(CONFIG_DIR)/configuration.nix
+	sudo nixos-rebuild build \
+		-I nixos-config=$(CONFIG_DIR)
 
 switch:
-	sudo nixos-rebuild switch -I nixos-config=$(CONFIG_DIR)/configuration.nix
+	sudo nixos-rebuild switch \
+		-I nixos-config=$(CONFIG_DIR)
 
-# -------------------------
-# Containers switch
-# -------------------------
-containers-docker:
-	@echo ">> Enabling Docker (disabling Podman)..."
-	@sed -i \
-		-e 's|^# ./modules/containers/docker.nix|./modules/containers/docker.nix|' \
-		-e 's|^./modules/containers/podman.nix|# ./modules/containers/podman.nix|' \
-		$(CONFIG_DIR)/configuration.nix
-	@echo ">> Docker enabled. Run: make switch"
+rollback:
+	sudo nixos-rebuild switch --rollback \
+		-I nixos-config=$(CONFIG_DIR)
 
-containers-podman:
-	@echo ">> Enabling Podman (disabling Docker)..."
-	@sed -i \
-		-e 's|^# ./modules/containers/podman.nix|./modules/containers/podman.nix|' \
-		-e 's|^./modules/containers/docker.nix|# ./modules/containers/docker.nix|' \
-		$(CONFIG_DIR)/configuration.nix
-	@echo ">> Podman enabled. Run: make switch"
-	@echo ">> NOTE: Podman is rootless. Make sure to disable Docker first if switching."
-
-# -------------------------
-# Nix Channel Update
-# -------------------------
-update-channels:
-	@echo ">> Adding/updating NixOS unstable channel..."
+# ---------------------------------------------------------
+# Channels
+# ---------------------------------------------------------
+channels:
+	@echo ">> Updating Nix channels..."
 	sudo nix-channel --add https://nixos.org/channels/nixos-unstable nixpkgs-unstable || true
 	sudo nix-channel --update
-	@echo ">> Nix channels updated"
 
 # ---------------------------------------------------------
-# Maintenance
+# Garbage Collection
 # ---------------------------------------------------------
-rollback:
-	sudo nixos-rebuild switch --rollback -I nixos-config=$(CONFIG_DIR)/configuration.nix
-
 gc-soft:
 	sudo nix-collect-garbage --delete-older-than 7d
 
 gc-hard:
 	sudo nix-collect-garbage -d
-	sudo nix-store --gc
 
 # ---------------------------------------------------------
-# Doctor (sanity checks)
+# Store Maintenance
 # ---------------------------------------------------------
+optimise:
+	sudo nix store optimise
+
+verify:
+	sudo nix-store --verify --check-contents
+
+# ---------------------------------------------------------
+# Diagnostics
+# ---------------------------------------------------------
+generations:
+	sudo nix-env --list-generations --profile /nix/var/nix/profiles/system
+
+space:
+	@echo ">> Disk usage:"
+	df -h /
+	@echo ""
+	@echo ">> Nix store size:"
+	du -sh /nix/store
+
 doctor:
-	@echo ">> Running system sanity checks..."
-	@command -v nix >/dev/null || echo "WARN: nix not found"
-	@command -v nixos-rebuild >/dev/null || echo "WARN: nixos-rebuild not found"
-	@command -v docker >/dev/null || echo "INFO: docker not installed"
-	@command -v podman >/dev/null || echo "INFO: podman not installed"
-	@command -v k3s >/dev/null || echo "INFO: k3s not installed"
-	@command -v k9s >/dev/null || echo "INFO: k9s not installed"
+	@echo ">> Nix version:"
+	nix --version || true
+	@echo ""
+	@echo ">> Active system generation:"
+	readlink /nix/var/nix/profiles/system
+	@echo ""
+	@echo ">> GC timers:"
+	systemctl list-timers | grep nix || true
+	@echo ""
+	@echo ">> Docker:"
+	systemctl is-active docker || true
+	@echo ""
+	@echo ">> K3s:"
+	systemctl is-active k3s || true
+	@echo ""
+	@echo ">> Store size:"
+	du -sh /nix/store
+	@echo ""
 	@echo ">> Doctor finished"

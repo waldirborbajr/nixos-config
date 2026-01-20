@@ -1,56 +1,43 @@
 { pkgs, ... }:
 
 let
-  # Canal unstable com unfree permitido
-  unstable = import <nixpkgs-unstable> {
-    config = { allowUnfree = true; };
-  };
+  unstable = pkgs.unstable or pkgs;
 in
 {
-  ############################################
-  # Programs / System-level
-  ############################################
-  programs = {
-    zsh.enable = true;
-    firefox.enable = true;
-
-    zoxide = {
-      enable = true;
-      enableZshIntegration = true;
-    };
-  };
-
-  ############################################
-  # System Packages (consolidado)
-  ############################################
   environment.systemPackages = with pkgs; [
+
     ##########################################
     # Terminals
     ##########################################
-    alacritty
-    kitty
-    gnome-console
+    alacritty          # GPU-accelerated terminal
+    kitty              # Feature-rich terminal
+    gnome-console      # GNOME default terminal
 
     ##########################################
-    # Shells / Multiplexers
+    # Shells & Multiplexers
     ##########################################
-    zsh
-    fish
-    tmux
-    tmuxifier
-    stow
-    tree
+    zsh                # Primary shell
+    fish               # Alternative shell
+    tmux               # Terminal multiplexer
+    tmuxifier          # tmux session manager
+    zellij             # Modern tmux alternative
 
     ##########################################
-    # Editors / IDEs / Git
+    # Editors & Development UX
     ##########################################
-    unstable.neovim
+    unstable.neovim    # Neovim (unstable for faster updates)
+    helix              # Modal editor, LSP-first
     unstable.vscode
     unstable.vscode-extensions.ms-vscode-remote.remote-containers
-    lazygit
+
+    ##########################################
+    # Git & Developer Workflow
+    ##########################################
     git
-    gh
-    devcontainer
+    gh                 # GitHub CLI
+    lazygit            # TUI for git
+    commitizen         # Conventional commits helper
+    devcontainer       # Dev container tooling
 
     ##########################################
     # Notes / Knowledge Base
@@ -58,7 +45,7 @@ in
     unstable.obsidian
 
     ##########################################
-    # Containers / Virtualization / Cloud / Kubernetes
+    # Containers / Virtualization / Kubernetes
     ##########################################
     docker
     docker-compose
@@ -92,7 +79,7 @@ in
     rust-analyzer
 
     ##########################################
-    # Build / Development Tools
+    # Build & Debug Tooling
     ##########################################
     cmake
     gnumake
@@ -106,22 +93,41 @@ in
     ##########################################
     # Nix Tooling
     ##########################################
-    nixd
-    nil
-    statix
-    deadnix
-    nixfmt-rfc-style
+    nixd               # Nix language server
+    nil                # Alternative Nix LSP
+    statix             # Static analysis for Nix
+    deadnix            # Find unused Nix code
+    nixfmt-rfc-style   # Nix formatter
 
     ##########################################
-    # Modern CLI Utilities
+    # Modern CLI Utilities (Shell-first / DevOps)
     ##########################################
-    eza
-    btop
-    bat
+    eza                # ls replacement
+    bat                # cat replacement
+    fd                 # find replacement
+    ripgrep            # grep replacement
+    yazi               # Terminal file manager
+    dust               # du replacement
+    ncdu               # Disk usage analyzer
+    zoxide             # Smarter cd
+    atuin              # Shell history with sync
+    tldr               # Simplified man pages
+    sd                 # sed replacement
+    jq                 # JSON processor
+    fx                 # Interactive JSON viewer
+    httpie             # Modern HTTP client
+    curlie             # curl + httpie hybrid
+    fzf                # Fuzzy finder
+    direnv             # Per-directory environments
+    entr               # Run commands on file changes
+    procs              # ps replacement
+    bottom             # Advanced system monitor
+    btop               # Resource monitor
     htop
-    fd
-    ripgrep
-    yazi
+
+    ##########################################
+    # Clipboard / Wayland Utilities
+    ##########################################
     xclip
     wl-clipboard
     clipster
@@ -140,9 +146,11 @@ in
     procps
     psmisc
     util-linux
+    tree
+    stow
 
     ##########################################
-    # Hardware / System Debug
+    # Hardware / System Diagnostics
     ##########################################
     lshw
     pciutils
@@ -150,7 +158,7 @@ in
     lm_sensors
 
     ##########################################
-    # Network / Connectivity
+    # Networking
     ##########################################
     iwd
     iproute2
