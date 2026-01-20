@@ -119,7 +119,7 @@ in
     xclip
     wl-clipboard
     clipster
-    haskellPackages.greenclip
+    # haskellPackages.greenclip
 
     ##########################################
     # Core UNIX Utilities
