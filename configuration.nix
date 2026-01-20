@@ -120,24 +120,23 @@
   boot.blacklistedKernelModules = [ "bcma" "brcmsmac" "wl" ];
 
   ############################################
-  # Pacotes de firmware e utilitários (adicione ou mescle com system-packages.nix)
+  # Pacotes de firmware e utilitários
   ############################################
   environment.systemPackages = with pkgs; [
     linux-firmware
     bluez
     blueman
-    b43-fwcutter          # Para extrair firmware manualmente se necessário
-    wirelesstools         # iwconfig, etc.
-    pciutils              # lspci
-    usbutils              # lsusb
-    rfkill                # rfkill list
+    b43-fwcutter
+    wirelesstools
+    pciutils
+    usbutils
+    rfkill
   ];
 
   ############################################
-  # Bootloader (GRUB)
+  # Bootloader (GRUB) - Removido devices daqui; confie no hardware-configuration.nix
   ############################################
   boot.loader.grub.enable = true;
-  boot.loader.grub.devices = [ "/dev/sda" ]; # disco de boot principal
   boot.loader.grub.useOSProber = false; # evita warnings de outros OS
 
   ############################################
