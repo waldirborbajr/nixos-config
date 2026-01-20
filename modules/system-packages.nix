@@ -175,7 +175,6 @@ spice-protocol
     # GUI Applications (global)
     ##########################################
     firefox
-    firefox-developer-edition
     chromium
     brave
     discord
