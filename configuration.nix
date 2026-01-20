@@ -2,7 +2,7 @@
 
 {
   imports = [
-    ./hardware-configuration-del.nix
+    ./hardware-configuration-dell.nix
   ];
 
   ############################################
