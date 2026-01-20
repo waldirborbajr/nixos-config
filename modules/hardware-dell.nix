@@ -2,7 +2,7 @@
 
 {
   ############################################
-  # Rede e Bluetooth
+  # Wi-Fi e Bluetooth
   ############################################
   networking.networkmanager.enable = true;
 
@@ -20,8 +20,15 @@
   # Pacotes de firmware e utilitários
   ############################################
   environment.systemPackages = with pkgs; [
-    linuxFirmware        # Inclui firmware para Wi-Fi Broadcom e outros
-    bluez                # Bluetooth CLI utilities
+    linuxFirmware        # Inclui firmware Broadcom e outros
+    bluez                # CLI Bluetooth
     blueman              # GUI para BT
   ];
+
+  ############################################
+  # Bootloader (GRUB)
+  ############################################
+  boot.loader.grub.enable = true;
+  boot.loader.grub.devices = [ "/dev/sda" ];  # disco de boot principal
+  boot.loader.grub.useOSProber = false;       # evita warnings de outros OS
 }
