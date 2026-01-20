@@ -6,40 +6,22 @@ let
 in
 {
   ############################################
-  # System Packages (global / hardware-agnostic)
+  # Programs / System-level
+  ############################################
+  programs = {
+    zsh.enable = true;
+    firefox.enable = true;
+
+    zoxide = {
+      enable = true;
+      enableZshIntegration = true;
+    };
+  };
+
+  ############################################
+  # System Packages (consolidado)
   ############################################
   environment.systemPackages = with pkgs; [
-
-    ############################################
-    # Virtualization (hardware-agnostic)
-    ############################################
-    unstable.virt-manager
-
-    ##########################################
-    # Containers / Cloud / Kubernetes
-    ##########################################
-    docker
-    docker-compose
-    docker-buildx
-    lazydocker
-
-    # Kubernetes
-    k9s
-
-    ##########################################
-    # Virtualization (clients & tools)
-    ##########################################
-    virt-viewer
-    qemu
-    virtio-win
-    spice
-    spice-gtk
-    spice-protocol
-
-    ##########################################
-    # System Information
-    ##########################################
-    microfetch
 
     ##########################################
     # Terminals
@@ -71,6 +53,29 @@ in
     # Notes / Knowledge Base
     ##########################################
     obsidian
+
+    ##########################################
+    # Containers / Virtualization / Cloud / Kubernetes
+    ##########################################
+    docker
+    docker-compose
+    docker-buildx
+    lazydocker
+    podman
+    podman-compose
+    buildah
+    skopeo
+    cri-tools
+    k9s
+    lazypodman
+
+    virt-manager
+    virt-viewer
+    qemu
+    virtio-win
+    spice
+    spice-gtk
+    spice-protocol
 
     ##########################################
     # Languages / Toolchains
@@ -133,6 +138,9 @@ in
     rsync
     unzip
     zip
+    procps
+    psmisc
+    util-linux
 
     ##########################################
     # Hardware / System Debug
@@ -160,13 +168,6 @@ in
     dosfstools
 
     ##########################################
-    # Process / System Inspection
-    ##########################################
-    procps
-    psmisc
-    util-linux
-
-    ##########################################
     # Certificates / SSL
     ##########################################
     cacert
@@ -181,6 +182,6 @@ in
     flameshot
     chirp
     anydesk
-    # unstable.balena-etcher # not working
+    # unstable.balena-etcher # opcional, não funcionando
   ];
 }
