@@ -43,11 +43,6 @@ imports = [
   ./modules/system-packages.nix
   ./modules/nixpkgs.nix
 
-  ##########################################
-  # Maintenance
-  ##########################################
-  ./modules/maintenance.nix
-  ./modules/maintenance-hm.nix
 ];
 
 
