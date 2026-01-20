@@ -4,32 +4,13 @@
   ############################################
   # Docker (system service)
   ############################################
-  virtualisation.docker = {
-    enable = true;
-
-    # Força Docker para iniciar no boot, sobrescrevendo qualquer outro valor
-    enableOnBoot = lib.mkForce true;
-  };
+  virtualisation.docker.enable = true;
+  virtualisation.docker.enableOnBoot = lib.mkForce true;
 
   ############################################
-  # User access
+  # Podman (comentado, use no futuro se desligar Docker)
   ############################################
-  # Adiciona borba ao grupo docker
-  users.users = lib.mkForce (
-    config.users.users // {
-      borba = config.users.users.borba // {
-        extraGroups = (config.users.users.borba.extraGroups or []) ++ [ "docker" ];
-      };
-    }
-  );
-
-  ############################################
-  # Podman (rootless / docker-compatible)
-  ############################################
-  # Para usar Podman no futuro (desative Docker primeiro)
-  # virtualisation.podman = {
-  #   enable = true;
-  #   dockerCompat = true;
-  #   defaultNetwork.settings.dns_enabled = true;
-  # };
+  # virtualisation.podman.enable = true;
+  # virtualisation.podman.dockerCompat = true;
+  # virtualisation.podman.defaultNetwork.settings.dns_enabled = true;
 }
