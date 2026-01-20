@@ -1,26 +1,16 @@
 { config, pkgs, ... }:
 
 {
-  ############################################
-  # Imports
-  ############################################
   imports = [
-    ./hardware-configuration-dell.nix
-    ./modules/desktop-gnome.nix
-    ./modules/system-packages.nix
-    ./modules/kernel-tuning.nix
-    ./modules/containers/docker.nix
-    ./modules/containers/k3s.nix
-    ./modules/maintenance.nix
-    ./modules/user-borba.nix
+    ./hardware-configuration.nix
   ];
 
   ############################################
   # Bootloader
   ############################################
   boot.loader.grub.enable = true;
-  boot.loader.grub.device = "/dev/sda";  # Ajuste conforme seu disco root
-  boot.loader.grub.useOSProber = true;
+  boot.loader.grub.device = "/dev/sda";      # seu disco root
+  boot.loader.grub.useOSProber = true;       # detecta outros OS, evita erro de mirroredBoots
 
   ############################################
   # Networking
@@ -29,38 +19,19 @@
   networking.networkmanager.enable = true;
 
   ############################################
-  # Wi-Fi / Bluetooth (Dell Inspiron 1564)
+  # Nix Garbage Collection (max 2 days)
   ############################################
-  hardware.enableRedistributableFirmware = true;
-  hardware.bluetooth.enable = true;
-  services.blueman.enable = true;
-
-  # Força carregamento dos módulos corretos
-  boot.initrd.kernelModules = [ "ssb" "b43" "btusb" ];
-  boot.kernelModules = [ "ssb" "b43" ];
-
-  # Evita conflitos com outros drivers Broadcom
-  boot.blacklistedKernelModules = [ "bcma" "brcmsmac" "wl" ];
-
-  environment.systemPackages = with pkgs; [
-    linux-firmware
-    bluez
-    blueman
-    b43-fwcutter
-    pciutils
-    usbutils
-    wget
-    git
-    coreutils
-    alacritty
-    tmux
-    neovim
-  ];
+  nix.gc = {
+    automatic = true;
+    dates = "daily";
+    options = "--delete-older-than 2d";
+  };
 
   ############################################
   # Locale / Time
   ############################################
   time.timeZone = "America/Sao_Paulo";
+
   i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "pt_BR.UTF-8";
@@ -75,39 +46,32 @@
   };
 
   ############################################
-  # Users
+  # Wayland + GNOME
   ############################################
-  users.users.borba = {
-    isNormalUser = true;
-    description = "BORBA JR W";
-    extraGroups = [ "networkmanager" "wheel" "docker" ];
-    shell = pkgs.zsh;
-    packages = with pkgs; [ neovim ];
-  };
+  services.xserver.enable = true;
 
-  ############################################
-  # Auto-login
-  ############################################
-  services.displayManager.autoLogin = {
+  services.xserver.displayManager.gdm = {
     enable = true;
-    user = "borba";
+    wayland = true;
   };
 
-  ############################################
-  # Console / Keymap
-  ############################################
-  console.keyMap = "br-abnt2";
+  services.xserver.desktopManager.gnome.enable = true;
+
   services.xserver.xkb = {
     layout = "br";
     variant = "";
   };
 
+  console.keyMap = "br-abnt2";
+
   ############################################
   # Printing / Audio
   ############################################
   services.printing.enable = true;
+
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
+
   services.pipewire = {
     enable = true;
     alsa.enable = true;
@@ -116,15 +80,8 @@
   };
 
   ############################################
-  # Wayland / GNOME
+  # Wayland Environment Variables
   ############################################
-  services.xserver.enable = true;
-  services.xserver.displayManager.gdm = {
-    enable = true;
-    wayland = true;
-  };
-  services.desktopManager.gnome.enable = true;
-
   environment.sessionVariables = {
     XDG_SESSION_TYPE = "wayland";
     QT_QPA_PLATFORM = "wayland";
@@ -147,16 +104,153 @@
   };
 
   ############################################
-  # System services tweaks
+  # User
   ############################################
+  users.users.borba = {
+    isNormalUser = true;
+    description = "BORBA JR W";
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "docker"
+    ];
+    shell = pkgs.zsh;
+    packages = with pkgs; [
+      neovim
+    ];
+  };
+
+  services.xserver.displayManager.autoLogin.enable = true;
+  services.xserver.displayManager.autoLogin.user = "borba";
+
   systemd.services."getty@tty1".enable = false;
   systemd.services."autovt@tty1".enable = false;
-  systemd.services.NetworkManager-wait-online.enable = false;
 
   ############################################
-  # Nix / Unfree
+  # Programs
   ############################################
+  programs = {
+    firefox.enable = true;
+
+    zsh = {
+      enable = true;
+    };
+
+    zoxide = {
+      enable = true;
+      enableZshIntegration = true;
+    };
+  };
+
+  ############################################
+  # Docker
+  ############################################
+  virtualisation.docker = {
+    enable = true;
+    enableOnBoot = true;
+  };
+
+  ############################################
+  # Default Terminal
+  ############################################
+  xdg.mime.defaultApplications = {
+    "application/x-terminal-emulator" = "alacritty.desktop";
+  };
+
+  ############################################
+  # SUDO: no password ONLY for nixos-rebuild
+  ############################################
+  security.sudo.extraRules = [
+    {
+      users = [ "borba" ];
+      commands = [
+        {
+          command = "/run/current-system/sw/bin/nixos-rebuild";
+          options = [ "NOPASSWD" ];
+        }
+      ];
+    }
+  ];
+
   nixpkgs.config.allowUnfree = true;
+
+  ############################################
+  # System Packages
+  ############################################
+  environment.systemPackages = with pkgs; [
+    wget
+    coreutils
+    git
+    gh
+    lazygit
+    stow
+    tmux
+    tmuxifier
+    lshw
+    iwd
+    networkmanagerapplet
+
+    docker
+    docker-compose
+    devpod
+
+    alacritty
+    waybar
+    rofi
+    wl-clipboard
+
+    eza
+    btop
+    bat
+    htop
+    fd
+    ripgrep
+    yazi
+
+    go
+    gopls
+
+    rustup
+    rust-analyzer
+
+    nixd
+    nil
+    statix
+    deadnix
+    nixfmt-rfc-style
+  ];
+
+  ############################################
+  # Fonts
+  ############################################
+  fonts = {
+    packages = with pkgs; [
+      nerd-fonts.jetbrains-mono
+      nerd-fonts.terminess-ttf
+      nerd-fonts.blex-mono
+      ibm-plex
+      openmoji-color
+    ];
+
+    fontconfig.defaultFonts = {
+      monospace = [ "JetBrainsMono Nerd Font" ];
+      sansSerif = [ "IBM Plex Sans" ];
+      serif = [ "IBM Plex Serif" ];
+      emoji = [ "OpenMoji Color" ];
+    };
+
+    enableDefaultFonts = true;
+  };
+
+  ############################################
+  # Services
+  ############################################
+  services.openssh.enable = true;
+  networking.firewall.allowedTCPPorts = [ 22 ];
+
+  ############################################
+  # Nix Features
+  ############################################
   nix.extraOptions = ''
     experimental-features = nix-command flakes
   '';
