@@ -1,7 +1,4 @@
-# =========================================================
-# NixOS Configuration - Dell Inspiron 1564
-# =========================================================
-{ config, pkgs, lib, ... }:
+{ config, pkgs, ... }:
 
 {
   ############################################
@@ -62,27 +59,30 @@
   # Wi-Fi e Bluetooth (Broadcom BCM4312)
   ############################################
   networking.networkmanager.enable = true;
+  hardware.enableRedistributableFirmware = true;
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
-  hardware.enableRedistributableFirmware = true;
 
-  boot.initrd.kernelModules = [ "ssb" "b43" "btusb" ];
-  boot.kernelModules = [ "ssb" "b43" ];
-  boot.blacklistedKernelModules = [ "bcma" "brcmsmac" "wl" ];
-
+  # Firmware Broadcom BCM4312 LP-PHY
   environment.systemPackages = with pkgs; [
     linux-firmware
     bluez
     blueman
     b43-fwcutter
-    wirelesstools
+    wireless-tools
     pciutils
     usbutils
-    (import <nixpkgs-unstable> {}).rfkill
   ];
 
+  # Módulos para initrd e kernel
+  boot.initrd.kernelModules = [ "ssb" "b43" "btusb" ];
+  boot.kernelModules = [ "ssb" "b43" ];
+
+  # Evita conflitos com outros drivers Broadcom
+  boot.blacklistedKernelModules = [ "bcma" "brcmsmac" "wl" ];
+
   ############################################
-  # GRUB bootloader
+  # GRUB (Legacy BIOS Dell)
   ############################################
   boot.loader.grub.enable = true;
   boot.loader.grub.version = 2;
@@ -90,19 +90,16 @@
   boot.loader.grub.devices = [ "/dev/sda" ];
 
   ############################################
-  # Desktop - GNOME
+  # Desktop (GNOME / Wayland)
   ############################################
-  services.xserver.enable = true;
-  services.displayManager.gdm = {
-    enable = true;
-    wayland = true;
-    autoSuspend = false;
-  };
+  services.displayManager.gdm.enable = true;
+  services.displayManager.gdm.wayland = true;
+  services.displayManager.gdm.autoSuspend = false;
+
   services.desktopManager.gnome.enable = true;
-  services.gnome = {
-    core-apps.enable = true;
-    gnome-keyring.enable = true;
-  };
+
+  services.gnome.core-apps.enable = true;
+  services.gnome.gnome-keyring.enable = true;
 
   environment.sessionVariables = {
     XDG_SESSION_TYPE = "wayland";
@@ -112,13 +109,11 @@
     TERMINAL = "alacritty";
   };
 
-  xdg.portal = {
-    enable = true;
-    extraPortals = with pkgs; [
-      xdg-desktop-portal-gnome
-      xdg-desktop-portal-gtk
-    ];
-  };
+  xdg.portal.enable = true;
+  xdg.portal.extraPortals = with pkgs; [
+    xdg-desktop-portal-gnome
+    xdg-desktop-portal-gtk
+  ];
 
   services.displayManager.autoLogin = {
     enable = true;
