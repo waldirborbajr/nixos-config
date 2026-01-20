@@ -14,7 +14,14 @@
   ############################################
   # User access
   ############################################
-  users.users.borba.extraGroups = lib.mkForce (users.users.borba.extraGroups ++ [ "docker" ]);
+  # Adiciona borba ao grupo docker
+  users.users = lib.mkForce (
+    config.users.users // {
+      borba = config.users.users.borba // {
+        extraGroups = (config.users.users.borba.extraGroups or []) ++ [ "docker" ];
+      };
+    }
+  );
 
   ############################################
   # Podman (rootless / docker-compatible)
