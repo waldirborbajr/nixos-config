@@ -2,16 +2,12 @@
 
 {
   ############################################
-  # Wi-Fi
+  # Wi-Fi e Bluetooth
   ############################################
   networking.networkmanager.enable = true;
 
-  # Enable redistributable firmware (needed for Dell Wi-Fi/Bluetooth)
   hardware.enableRedistributableFirmware = true;
 
-  ############################################
-  # Bluetooth
-  ############################################
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
@@ -44,11 +40,17 @@
   console.keyMap = "br-abnt2";
 
   ############################################
-  # Bootloader (Legacy BIOS - Dell)
+  # Bootloader (GRUB + desativa os-prober)
   ############################################
-  boot.loader.grub = {
-    enable = true;
-    device = "/dev/sda";
-    useOSProber = true;
-  };
+  boot.loader.grub.enable = true;
+  boot.loader.grub.device = "/dev/sda";
+  boot.loader.grub.useOSProber = false;
+  boot.loader.grub.extraEntries = '' '';
+
+  ############################################
+  # Kernel Modules
+  ############################################
+  boot.initrd.availableKernelModules = [ "ehci_pci" "ahci" "ums_realtek" "usb_storage" "sd_mod" "sr_mod" ];
+  boot.kernelModules = [ "kvm-intel" ];
+  boot.extraModulePackages = [ ];
 }
