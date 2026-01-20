@@ -122,6 +122,13 @@ spice-protocol
     wl-clipboard            # Wayland clipboard
     clipster
 
+    # Greenclip clipboard manager
+    # Two options:
+    # 1. Package only (manual execution): pkgs.haskellPackages.greenclip
+    # 2. Enable systemd service: services.greenclip.enable = true
+    pkgs.haskellPackages.greenclip
+
+
     ##########################################
     # Core UNIX Utilities
     ##########################################
