@@ -10,10 +10,10 @@
   ############################################
   # systemd startup optimizations
   ############################################
-
+  
   systemd.services.systemd-udev-settle.enable = false;
   systemd.services.systemd-timesyncd.enable = true;
-
+  
   systemd.settings.Manager = {
     DefaultTimeoutStartSec = "10s";
     DefaultTimeoutStopSec  = "10s";
@@ -81,11 +81,6 @@
     enable = true;
     algorithm = "zstd";
     memoryPercent = 25;
-  };
-
-  systemd.settings.Manager = {
-    DefaultTimeoutStartSec = "10s";
-    DefaultTimeoutStopSec  = "10s";
   };
 
 }
