@@ -7,18 +7,19 @@ on:
 
 jobs:
   lint:
-    name: Lint
+    name: Lint (validation only)
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Install Nix
         uses: cachix/install-nix-action@v25
         with:
           nix_path: nixpkgs=channel:nixos-unstable
 
-      - name: nixfmt
+      - name: nixfmt (check only)
         run: |
           nix-shell -p nixfmt-rfc-style --run '
             find . -name "*.nix" \
@@ -43,30 +44,36 @@ jobs:
         run: |
           {
             echo "## 🧹 Lint"
-            echo "- nixfmt: OK"
+            echo ""
+            echo "- nixfmt: check only"
             echo "- statix: OK"
             echo "- deadnix: OK"
+            echo ""
+            echo "_Formatting is local-only (`make fmt`)._"
           } >> $GITHUB_STEP_SUMMARY
 
   build:
     name: Build (${{ matrix.profile }})
-    needs: lint   # ⬅️ AQUI ESTÁ A ORDEM
+    needs: lint
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
-        profile: [ dell, macbook ]
+        profile:
+          - dell
+          - macbook
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Install Nix
         uses: cachix/install-nix-action@v25
         with:
           nix_path: nixpkgs=channel:nixos-unstable
 
-      - name: Generate CI entrypoint
+      - name: Generate CI configuration
         run: |
           cat > ci-configuration.nix <<EOF
           { ... }:
@@ -90,20 +97,17 @@ jobs:
           }
           EOF
 
-      - name: Evaluate
+      - name: Evaluate configuration
         run: |
           nix-instantiate '<nixpkgs/nixos>' \
-            -I nixos-config=$(pwd) \
+            -I nixos-config=$(pwd)/ci-configuration.nix \
             -A system \
-            -I nixos-config=$(pwd) \
-            -I nixos-config=$(pwd) \
-            ./ci-configuration.nix > /dev/null
+            > /dev/null
 
       - name: Dry build
         run: |
           nix-shell -p nixos-rebuild --run "
             nixos-rebuild build \
-              -I nixos-config=$(pwd) \
               -I nixos-config=$(pwd)/ci-configuration.nix \
               --dry-run
           "
@@ -113,6 +117,7 @@ jobs:
         run: |
           {
             echo "## 🏗️ Build"
+            echo ""
             echo "- Profile: **${{ matrix.profile }}**"
             echo "- Evaluation: OK"
             echo "- Dry build: OK"
