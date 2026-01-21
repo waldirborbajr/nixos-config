@@ -1,20 +1,18 @@
 # ==========================================
-# NixOS Infra Makefile
+# NixOS Infra Makefile (NO FLAKES)
 # ==========================================
 
-FLAKE ?= .
-HOST  ?= caveos
 NIXOS_CONFIG ?= $(HOME)/nixos-config
 
 .PHONY: help build switch switch-off upgrade gc gc-hard fmt status
 
 help:
-	@echo "NixOS Infra Commands"
+	@echo "NixOS Infra Commands (no flakes)"
 	@echo ""
 	@echo "  make build        -> nixos-rebuild build"
 	@echo "  make switch       -> rebuild keeping graphical session"
 	@echo "  make switch-off   -> rebuild in multi-user.target (safe)"
-	@echo "  make upgrade      -> rebuild with --upgrade"
+	@echo "  make upgrade      -> rebuild with channel upgrade"
 	@echo "  make gc           -> nix garbage collection"
 	@echo "  make gc-hard      -> aggressive garbage collection"
 	@echo "  make fmt          -> format nix files"
@@ -25,7 +23,6 @@ help:
 # ------------------------------------------
 build:
 	sudo nixos-rebuild build \
-		--flake '$(FLAKE)#$(HOST)' \
 		-I nixos-config=$(NIXOS_CONFIG)
 
 # ------------------------------------------
@@ -33,7 +30,6 @@ build:
 # ------------------------------------------
 switch:
 	sudo nixos-rebuild switch \
-		--flake '$(FLAKE)#$(HOST)' \
 		-I nixos-config=$(NIXOS_CONFIG)
 
 # ------------------------------------------
@@ -42,17 +38,15 @@ switch:
 switch-off:
 	sudo systemctl isolate multi-user.target
 	sudo nixos-rebuild switch \
-		--flake '$(FLAKE)#$(HOST)' \
 		-I nixos-config=$(NIXOS_CONFIG)
 	sudo systemctl isolate graphical.target
 
 # ------------------------------------------
-# Upgrade system
+# Upgrade system (channels)
 # ------------------------------------------
 upgrade:
+	sudo nix-channel --update
 	sudo nixos-rebuild switch \
-		--upgrade \
-		--flake '$(FLAKE)#$(HOST)' \
 		-I nixos-config=$(NIXOS_CONFIG)
 
 # ------------------------------------------
