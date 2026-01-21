@@ -1,5 +1,5 @@
 # modules/flatpak/packages.nix
-{ config, pkgs, lib, ... }:
+{ config, pkgs, ... }:
 
 let
   desired = [
@@ -7,14 +7,14 @@ let
     "org.mozilla.firefox"
     "com.brave.Browser"
 
-    # Development
+    # Development / IDE
     "com.visualstudio.code"
 
     # Communication
     "com.discordapp.Discord"
     "me.proton.Mail"
 
-    # Knowledge
+    # Knowledge / Media
     "md.obsidian.Obsidian"
 
     # Utilities
@@ -28,13 +28,12 @@ let
     "io.mpv.Mpv"
     "org.imagemagick.ImageMagick"
 
-    # Downloads
+    # Downloads / Torrents
     "com.transmissionbt.Transmission"
 
-    # Screenshot
+    # Screen Shot
     "be.alexandervanhee.gradia"
     "org.flameshot.Flameshot"
-
 #    "org.mozilla.firefoxdeveloperedition"
 #    "org.chromium.Chromium"
 #    "com.vivaldi.Vivaldi"
@@ -43,45 +42,37 @@ let
 #    "com.ticktick.TickTick"
 #    "com.calibre_ebook.calibre"
 #    "org.libreoffice.LibreOffice"
-
   ];
 in
 {
-  # Make sure Flatpak is enabled (redundant if already in enable.nix, but safe)
-  services.flatpak.enable = true;
-
-  system.userActivationScripts.installFlatpaks = {
-    # text = the bash script to run for each user on activation
+  system.userActivationScripts.flatpakInstall = {
     text = ''
-      # Add Flathub if missing (redundant with remotes= but harmless)
+      # Ensure Flathub remote (redundant but safe)
       ${pkgs.flatpak}/bin/flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 
-      # Get currently installed apps (only apps, not runtimes)
       installed=$(${pkgs.flatpak}/bin/flatpak list --app --columns=application)
 
-      # Install missing ones
-      for app in ${lib.escapeShellArgs desired}; do
+      for app in ${builtins.toString desired}; do
         if ! echo "$installed" | grep -q -F "$app"; then
-          echo "Installing Flatpak: $app"
+          echo "Installing missing Flatpak: $app"
           ${pkgs.flatpak}/bin/flatpak install -y --noninteractive flathub "$app" || true
         fi
       done
 
-      # Optional: update everything (can take time, comment out if unwanted)
-      echo "Updating all Flatpaks..."
+      # Optional: update all
+      echo "Updating Flatpaks..."
       ${pkgs.flatpak}/bin/flatpak update -y --noninteractive || true
 
-      # Optional: remove unused runtimes/deps
+      # Clean up unused runtimes
       ${pkgs.flatpak}/bin/flatpak uninstall --unused -y || true
 
-      # Optional strict mode: remove apps not in your list
+      # Uncomment below if you want strict mode (remove apps not in list)
       # for app in $installed; do
-      #   if ! echo "${lib.concatStringsSep " " desired}" | grep -q -F "$app"; then
-      #     echo "Removing unmanaged Flatpak: $app"
+      #   if ! echo "${builtins.toString desired}" | grep -q -F "$app"; then
+      #     echo "Removing unmanaged: $app"
       #     ${pkgs.flatpak}/bin/flatpak uninstall -y --noninteractive "$app" || true
       #   fi
       # done
     '';
   };
 }
-
