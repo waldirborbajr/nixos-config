@@ -5,15 +5,7 @@
   # Boot & system noise reduction
   ############################################
 
-#  boot.kernelParams = [
-#    "quiet"
-#    "loglevel=3"
-#    "rd.systemd.show_status=false"
-#    "udev.log_level=3"
-#  ];
-
   boot.consoleLogLevel = 0;
-
 
   ############################################
   # systemd startup optimizations
@@ -22,11 +14,10 @@
   systemd.services.systemd-udev-settle.enable = false;
   systemd.services.systemd-timesyncd.enable = true;
 
-  systemd.extraConfig = ''
-    DefaultTimeoutStartSec=10s
-    DefaultTimeoutStopSec=10s
-  '';
-
+  systemd.settings.Manager = {
+    DefaultTimeoutStartSec = "10s";
+    DefaultTimeoutStopSec  = "10s";
+  };
 
   ############################################
   # Memory & VM tuning (safe defaults)
@@ -39,7 +30,6 @@
     "vm.dirty_ratio" = 15;
   };
 
-
   ############################################
   # Nix daemon performance
   ############################################
@@ -50,7 +40,6 @@
     keep-outputs = true;
     keep-derivations = true;
   };
-
 
   ############################################
   # Journal & logging (reduce IO)
@@ -63,15 +52,13 @@
     Compress=yes
   '';
 
-
   ############################################
   # Disable unnecessary background services
   ############################################
 
   services.udisks2.enable = lib.mkDefault true;
-  services.fwupd.enable = lib.mkDefault false;
+  services.fwupd.enable  = lib.mkDefault false;
   services.printing.enable = lib.mkDefault false;
-
 
   ############################################
   # DNS (faster, less blocking)
@@ -86,7 +73,6 @@
     ];
   };
 
-
   ############################################
   # ZRAM (safe for low/mid RAM systems)
   ############################################
@@ -96,5 +82,4 @@
     algorithm = "zstd";
     memoryPercent = 25;
   };
-
 }
