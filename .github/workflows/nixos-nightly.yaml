@@ -1,4 +1,4 @@
-name: NixOS Nightly Channel Check
+name: NixOS Nightly (unstable)
 
 on:
   schedule:
@@ -16,17 +16,14 @@ jobs:
 
       - name: Install Nix
         uses: cachix/install-nix-action@v25
-
-      - name: Update channels
-        run: |
-          nix-channel --add https://nixos.org/channels/nixos-unstable nixpkgs-unstable || true
-          nix-channel --update
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
 
       - name: Evaluate system
         run: |
           nix-instantiate '<nixpkgs/nixos>' \
-            -A system \
             -I nixos-config=$(pwd) \
+            -A system \
             > /dev/null
 
       - name: Nightly summary
