@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, ... }:
 
 {
   ##########################################
@@ -7,16 +7,8 @@
 
   services.flatpak.enable = true;
 
-  # Add Flathub (system-wide)
-  services.flatpak.remotes = lib.mkBefore [
-    {
-      name = "flathub";
-      location = "https://dl.flathub.org/repo/flathub.flatpakrepo";
-    }
-  ];
-
   ##########################################
-  # XDG Portal
+  # XDG Portal (needed for Flatpak apps)
   ##########################################
 
   xdg.portal.enable = true;
