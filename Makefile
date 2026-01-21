@@ -21,7 +21,7 @@ help:
 	@echo "NixOS Maintenance Makefile"
 	@echo ""
 	@echo "Build / Switch:"
-	@echo "  make switch        - Rebuild & switch system"
+	@echo "  make switch        - Safe rebuild & switch (no GNOME deadlocks)"
 	@echo "  make build         - Build system only"
 	@echo "  make rollback      - Rollback to previous generation"
 	@echo ""
@@ -54,8 +54,19 @@ build:
 		-I nixos-config=$(CONFIG_DIR)
 
 switch:
+	@echo ">> Ensuring Flathub remote exists..."
+	sudo flatpak remote-add --if-not-exists flathub \
+		https://flathub.org/repo/flathub.flatpakrepo
+
+	@echo ">> Switching to multi-user.target (safe rebuild)..."
+	sudo systemctl isolate multi-user.target
+
+	@echo ">> Running nixos-rebuild switch..."
 	sudo nixos-rebuild switch \
 		-I nixos-config=$(CONFIG_DIR)
+
+	@echo ">> Returning to graphical.target..."
+	sudo systemctl isolate graphical.target
 
 rollback:
 	sudo nixos-rebuild switch --rollback \
