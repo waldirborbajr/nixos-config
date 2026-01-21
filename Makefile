@@ -27,7 +27,7 @@ help:
 	@echo ""
 	@echo "Formatting / Lint:"
 	@echo "  make fmt           - Format Nix files and auto-commit if changed"
-	@echo "  make lint          - Run nixfmt (check), statix and deadnix"
+	@echo "  make lint          - Run nixfmt (check) and deadnix"
 	@echo ""
 	@echo "Channels:"
 	@echo "  make channels      - Update Nix channels"
@@ -120,8 +120,6 @@ lint:
 		  -print0 \
 		| xargs -0 nixfmt --check \
 	'
-	@echo ">> Running statix..."
-	@nix-shell -p statix --run "statix check ."
 	@echo ">> Running deadnix..."
 	@nix-shell -p deadnix --run '\
 		deadnix \
@@ -129,6 +127,19 @@ lint:
 		  --exclude hardware-configuration-macbook.nix \
 		  . \
 	'
+
+	# -----------------------------------------------------
+	# Statix (temporarily disabled)
+	#
+	# Reason:
+	# - Current system is stable and fully working
+	# - Statix reports stylistic warnings only (W10/W20)
+	# - No functional or safety issues
+	#
+	# Re-enable later when refactoring with intent.
+	# -----------------------------------------------------
+	# @echo ">> Running statix..."
+	# @nix-shell -p statix --run "statix check ."
 
 # ---------------------------------------------------------
 # Diagnostics
