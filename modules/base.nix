@@ -35,5 +35,10 @@
     build   = "sudo nixos-rebuild switch -I nixos-config=$HOME/nixos-config";
     upgrade = "sudo nixos-rebuild switch --upgrade";
   };
+  
+  systemd.user.extraConfig = ''
+    DefaultTimeoutStartSec=30s
+    DefaultTimeoutStopSec=30s
+  '';
     
 }
