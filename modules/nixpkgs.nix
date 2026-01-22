@@ -1,3 +1,5 @@
+# modules/nixpkgs.nix
+# ---
 { lib, pkgs, ... }:
 
 let
