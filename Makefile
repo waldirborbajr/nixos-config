@@ -36,7 +36,8 @@ build:
 # Debug build (verbose + show-trace)
 # ------------------------------------------
 build-debug:
-	$(call NIXOS_CMD,"build --verbose --show-trace")
+	sudo nixos-rebuild build --verbose --show-trace $(if $(HOST),--flake $(NIXOS_CONFIG)#$(HOST),-I nixos-config=$(NIXOS_CONFIG))
+
 
 # ------------------------------------------
 # Normal rebuild (graphical session)
