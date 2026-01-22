@@ -16,8 +16,8 @@
     ##########################################
     # Desktop
     ##########################################
-    ./modules/desktops/gnome.nix
-    ./modules/autologin.nix
+    # ./modules/desktops/gnome.nix
+    # ./modules/autologin.nix
 
     ##########################################
     # Containers / Virtualization
