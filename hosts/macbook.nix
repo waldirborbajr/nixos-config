@@ -15,6 +15,7 @@
     ../hardware-configuration-macbook.nix
 
     # Desktop apenas no MacBook
+    ../modules/desktops/hyprland/default.nix
     ../modules/desktops/gnome.nix
     ../modules/desktops/hyprland.nix
     ../modules/autologin.nix
