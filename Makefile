@@ -5,13 +5,13 @@
 NIXOS_CONFIG ?= $(HOME)/nixos-config
 HOST ?=   # Ex: macbook ou dell
 
-.PHONY: help build switch switch-off upgrade gc gc-hard fmt status flatpak-update build-debug
+.PHONY: help build build-debug switch switch-off upgrade gc gc-hard fmt status flatpak-update
 
 help:
 	@echo "NixOS Infra Commands (flakes optional)"
 	@echo ""
 	@echo "  make build [HOST=host]        -> nixos-rebuild build"
-	@echo "  make build-debug [HOST=host]  -> nixos-rebuild build with debug (verbose + show-trace)"
+	@echo "  make build-debug [HOST=host]  -> build + switch with verbose + show-trace"
 	@echo "  make switch [HOST=host]       -> rebuild keeping graphical session"
 	@echo "  make switch-off [HOST=host]   -> rebuild in multi-user.target (safe)"
 	@echo "  make upgrade [HOST=host]      -> rebuild with channel upgrade"
@@ -22,7 +22,7 @@ help:
 	@echo "  make flatpak-update             -> update all flatpaks"
 
 # ------------------------------------------
-# Internal command to handle flakes
+# Internal function to handle flakes
 # ------------------------------------------
 NIXOS_CMD = sudo nixos-rebuild $(1) $(if $(HOST),--flake $(NIXOS_CONFIG)#$(HOST),-I nixos-config=$(NIXOS_CONFIG))
 
@@ -33,11 +33,10 @@ build:
 	$(call NIXOS_CMD,build)
 
 # ------------------------------------------
-# Debug build (verbose + show-trace)
+# Build + switch with debug (verbose + show-trace)
 # ------------------------------------------
 build-debug:
-	sudo nixos-rebuild build --verbose --show-trace $(if $(HOST),--flake $(NIXOS_CONFIG)#$(HOST),-I nixos-config=$(NIXOS_CONFIG))
-
+	$(call NIXOS_CMD,"switch --verbose --show-trace")
 
 # ------------------------------------------
 # Normal rebuild (graphical session)
