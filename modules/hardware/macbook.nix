@@ -1,3 +1,4 @@
+# modules/hardware/macbook.nix
 { pkgs, ... }:
 
 let
@@ -14,8 +15,8 @@ in
   ];
 
   environment.systemPackages = with pkgs; [
-    linuxPkgs.b43-fwcutter  # se precisar
-    linuxPkgs.broadcom-sta   # driver proprietário
+    linuxPkgs.b43-fwcutter  # Broadcom firmware tool
+    linuxPkgs.broadcom-sta   # Proprietary driver
     wirelesstools
     rfkill
   ];
