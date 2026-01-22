@@ -1,3 +1,5 @@
+# modules/flatpak/enable.nix
+# ---
 { config, pkgs, ... }:
 
 {

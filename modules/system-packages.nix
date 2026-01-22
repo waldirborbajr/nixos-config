@@ -1,3 +1,5 @@
+# modules/system-packages.nix
+# ---
 { pkgs, ... }:
 
 let

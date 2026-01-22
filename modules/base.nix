@@ -1,3 +1,5 @@
+# modules/base.nix
+# ---
 { pkgs, ... }:
 {
   nix.extraOptions = ''

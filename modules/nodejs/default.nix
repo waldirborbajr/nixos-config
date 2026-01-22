@@ -1,3 +1,5 @@
+# modules/nodejs/default.nix
+# ---
 { lib, ... }:
 
 let

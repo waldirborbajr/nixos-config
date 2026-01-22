@@ -1,3 +1,5 @@
+# modules/users/borba.nix
+# ---
 { pkgs, ... }:
 {
   users.users.borba = {

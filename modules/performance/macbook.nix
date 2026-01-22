@@ -1,3 +1,5 @@
+# modules/performance/macbook.nix
+# ---
 { lib, ... }:
 
 {

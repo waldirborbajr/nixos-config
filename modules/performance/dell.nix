@@ -1,3 +1,5 @@
+# modules/performance/dell.nix
+# ---
 { lib, ... }:
 
 {

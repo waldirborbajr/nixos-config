@@ -1,3 +1,5 @@
+# modules/nodejs/enable.nix
+# ---
 { pkgs, ... }:
 
 {

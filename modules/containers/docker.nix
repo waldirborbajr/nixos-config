@@ -1,3 +1,5 @@
+# modules/containers/docker.nix
+# ---
 { config, pkgs, lib, ... }:
 
 {

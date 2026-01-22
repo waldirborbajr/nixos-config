@@ -1,3 +1,5 @@
+# modules/nodejs/common.nix
+# ---
 { pkgs, ... }:
 
 {

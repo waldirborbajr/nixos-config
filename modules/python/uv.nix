@@ -1,3 +1,5 @@
+# modules/python/uv.nix
+# ---
 { pkgs, ... }:
 
 {

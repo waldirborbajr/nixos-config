@@ -1,3 +1,5 @@
+# modules/virtualization/libvirt.nix
+# ---
 { ... }:
 {
   virtualisation.libvirtd = {

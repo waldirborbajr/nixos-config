@@ -1,3 +1,5 @@
+# modules/python/poetry.nix
+# ---
 { pkgs, ... }:
 
 {

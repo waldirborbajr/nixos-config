@@ -1,3 +1,5 @@
+# modules/hardware/dell.nix
+# ---
 {
   config,
   pkgs,

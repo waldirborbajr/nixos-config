@@ -1,3 +1,5 @@
+# modules/containers/podman.nix
+# ---
 { config, pkgs, lib, ... }:
 
 {

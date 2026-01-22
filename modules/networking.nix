@@ -1,3 +1,5 @@
+# modules/networking.nix
+# ---
 { ... }:
 {
   networking.networkmanager.enable = true;

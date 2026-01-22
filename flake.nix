@@ -1,3 +1,5 @@
+# flake.nix
+# ---
 {
   description = "Multi-host NixOS flake for Borba";
 

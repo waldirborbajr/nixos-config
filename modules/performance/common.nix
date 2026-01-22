@@ -1,3 +1,5 @@
+# modules/performance/common.nix
+# ---
 { lib, pkgs, ... }:
 
 {

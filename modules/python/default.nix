@@ -1,3 +1,5 @@
+# modules/python/default.nix
+# ---
 { config, lib, ... }:
 
 let

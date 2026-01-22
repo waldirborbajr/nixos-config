@@ -1,3 +1,5 @@
+# modules/desktops/gnome.nix
+# ---
 { pkgs, ... }:
 
 {

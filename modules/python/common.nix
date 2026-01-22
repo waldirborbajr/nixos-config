@@ -1,3 +1,5 @@
+# modules/python/common.nix
+# ---
 { pkgs, ... }:
 
 {
