@@ -27,10 +27,6 @@
   console.keyMap = "us";
 
   services.xserver.enable = true;
-  services.xserver.layout = {
-    xkb = {
-      layout = "us";
-      variant = "";
-    };
-  };
+  services.xserver.layout = "us";
+  services.xserver.xkbVariant = "";
 }
