@@ -1,81 +1,69 @@
+
 ----
 configuration.nix
 
-{ config, pkgs, ... }:
+{ ... }:
+
+{
+  imports = [
+    ./hosts/macbook.nix
+    # ./hosts/dell.nix
+
+    ./core.nix
+  ];
+
+  system.stateVersion = "25.11";
+}
+
+----
+core.nix
+
+{ ... }:
 
 {
   imports = [
 
     ##########################################
-    # Host profile (choose ONE)
-    ##########################################
-    ./profiles/dell.nix
-    # ./profiles/macbook.nix
-
-    ##########################################
-    # Hardware
-    ##########################################
-    ./hardware-configuration-dell.nix
-    ./modules/hardware/dell.nix
-
-    ##########################################
-    # Performance tuning (choose ONE)
-    ##########################################
-    ./modules/performance/common.nix
-    ./modules/performance/dell.nix
-    # ./modules/performance/macbook.nix
-
-    ##########################################
     # Core system
     ##########################################
-    ./modules/base.nix
-    ./modules/networking.nix
-    ./modules/audio.nix
-    ./modules/fonts.nix
+    ../modules/base.nix
+    ../modules/networking.nix
+    ../modules/audio.nix
+    ../modules/fonts.nix
+    ../modules/nixpkgs.nix
 
     ##########################################
     # Desktop
     ##########################################
-    ./modules/desktops/gnome.nix
-    ./modules/autologin.nix
+    ../modules/desktops/gnome.nix
+    ../modules/autologin.nix
 
     ##########################################
     # Containers / Virtualization
     ##########################################
-
-    ./modules/containers/docker.nix
-    # ./modules/containers/podman.nix
-    ./modules/containers/k3s.nix
-    ./modules/virtualization/libvirt.nix
+    ../modules/containers/docker.nix
+    ../modules/containers/k3s.nix
+    ../modules/virtualization/libvirt.nix
 
     ##########################################
-    # Users / Packages / Nix
+    # Users / Dev
     ##########################################
-    ./modules/users/borba.nix
-    ./modules/system-packages.nix
-    ./modules/nixpkgs.nix
+    ../modules/users/borba.nix
+    ../modules/system-packages.nix
+    ../modules/python/default.nix
+    ../modules/nodejs/default.nix
 
     ##########################################
-    # Enable FlatPak
+    # Flatpak
     ##########################################
-    ./modules/flatpak/enable.nix
-    ./modules/flatpak/packages.nix
+    ../modules/flatpak/enable.nix
+    ../modules/flatpak/packages.nix
 
     ##########################################
-    # Enable Python (UV -or- Poetry)
+    # Access
     ##########################################
-    ./modules/python/default.nix
-
-    ##########################################
-    # Enable NodeJS
-    ##########################################
-    ./modules/nodejs/default.nix
+    ../modules/ssh.nix
   ];
-
-  ############################################
-  # System state version
-  ############################################
-  system.stateVersion = "25.11";
 }
 
 ----
@@ -89,66 +77,6 @@ default.nix
 # Do not add logic here.
 
 import ./configuration.nix
-
-----
-.github/workflows/nixos.yaml
-
-name: Nix Lint
-
-on:
-  pull_request:
-  push:
-    branches: [ main ]
-
-jobs:
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install Nix
-        uses: cachix/install-nix-action@v25
-        with:
-          nix_path: nixpkgs=channel:nixos-unstable
-
-      - name: nixfmt check
-        run: |
-          nix-shell -p nixfmt-rfc-style --run '
-            find . -name "*.nix" \
-              ! -name "hardware-configuration-*.nix" \
-              -print0 | xargs -0 nixfmt --check
-          '
-
-      # statix intentionally disabled:
-      # - generates noisy warnings on working configs
-      # - risky to auto-fix without manual review
-      # - will be re-enabled after config stabilization
-      #
-      # - name: statix
-      #   run: nix-shell -p statix --run "statix check ."
-
-      - name: deadnix
-        run: |
-          nix-shell -p deadnix --run '
-            deadnix \
-              --exclude hardware-configuration-dell.nix,hardware-configuration-macbook.nix \
-              .
-          '
-
-      - name: Lint summary
-        if: always()
-        run: |
-          {
-            echo "## 🧹 Nix Lint"
-            echo ""
-            echo "- nixfmt: OK"
-            echo "- deadnix: OK"
-            echo ""
-            echo "_Build and evaluation intentionally disabled._"
-          } >> $GITHUB_STEP_SUMMARY
 
 ----
 hardware-configuration-dell.nix
@@ -202,14 +130,20 @@ hardware-configuration-macbook.nix
     [ (modulesPath + "/installer/scan/not-detected.nix")
     ];
 
-  boot.initrd.availableKernelModules = [ "ehci_pci" "ahci" "ums_realtek" "usb_storage" "sd_mod" "sr_mod" ];
+  boot.initrd.availableKernelModules = [ "uhci_hcd" "ehci_pci" "ahci" "firewire_ohci" "usbhid" "usb_storage" "sd_mod" "sr_mod" "sdhci_pci" ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
 
   fileSystems."/" =
-    { device = "/dev/disk/by-uuid/1acae91f-ffb3-40e6-8e0d-dd2b63c6c4bb";
+    { device = "/dev/disk/by-uuid/603dddd0-c90c-423c-add7-8691178dd12e";
       fsType = "ext4";
+    };
+
+  fileSystems."/boot" =
+    { device = "/dev/disk/by-uuid/75E6-696A";
+      fsType = "vfat";
+      options = [ "fmask=0077" "dmask=0077" ];
     };
 
   swapDevices = [ ];
@@ -217,31 +151,29 @@ hardware-configuration-macbook.nix
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 }
+----
+hosts/dell.nix
+
+../hardware/dell.nix
+../modules/hardware/dell.nix
+../modules/performance/dell.nix
 
 ----
-LICENSE
+hosts/macbook.nix
 
-MIT License
+{ ... }:
 
-Copyright (c) 2026 Borba
+{
+  imports = [
+    ##########################################
+    # Hardware
+    ##########################################
+    ../hardware/macbook.nix
+    ../modules/hardware/macbook.nix
+    ../modules/performance/macbook.nix
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+  ];
+}
 
 ----
 modules/audio.nix
@@ -301,7 +233,7 @@ modules/base.nix
     LC_TIME = "pt_BR.UTF-8";
   };
 
-  console.keyMap = "br-abnt2";
+  # console.keyMap = "br-abnt2";
 
   ############################################
   # Infra aliases (NixOS lifecycle)
@@ -743,10 +675,10 @@ modules/performance/common.nix
   ############################################
   # systemd startup optimizations
   ############################################
-
+  
   systemd.services.systemd-udev-settle.enable = false;
   systemd.services.systemd-timesyncd.enable = true;
-
+  
   systemd.settings.Manager = {
     DefaultTimeoutStartSec = "10s";
     DefaultTimeoutStopSec  = "10s";
@@ -814,11 +746,6 @@ modules/performance/common.nix
     enable = true;
     algorithm = "zstd";
     memoryPercent = 25;
-  };
-
-  systemd.settings.Manager = {
-    DefaultTimeoutStartSec = "10s";
-    DefaultTimeoutStopSec  = "10s";
   };
 
 }
@@ -1020,6 +947,43 @@ modules/python/uv.nix
     venv = "uv venv";
     py   = "uv run python";
     pip  = "uv pip";
+  };
+}
+
+----
+modules/ssh.nix
+
+## Relation truth
+
+#{ ... }:
+#
+#{
+#  services.openssh = {
+#    enable = true;
+#    openFirewall = true;
+#
+#    settings = {
+#      PermitRootLogin = "no";
+#      PasswordAuthentication = false;
+#      KbdInteractiveAuthentication = false;
+#    };
+#  };
+#}
+
+
+## Aak for user and password
+
+{ ... }:
+
+{
+  services.openssh = {
+    enable = true;
+
+    settings = {
+      PasswordAuthentication = true;
+      KbdInteractiveAuthentication = true;
+      PermitRootLogin = "no";
+    };
   };
 }
 
@@ -1231,6 +1195,12 @@ modules/users/borba.nix
       "libvirtd"
       "dialout"
     ];
+
+    ## Relation Truth
+
+    #openssh.authorizedKeys.keys = [
+    #  "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... borba@laptop"
+    #];
   };
 
   ############################################
@@ -1293,6 +1263,16 @@ profiles/dell.nix
     enable = true;
     devices = [ "/dev/sda" ];
   };
+
+  ############################################
+  # Keyboard (Dell)
+  ############################################
+  console.keyMap = "br-abnt2";
+
+  services.xserver.xkb = {
+    layout = "br";
+    variant = "abnt2";
+  };
 }
 
 ----
@@ -1311,5 +1291,15 @@ profiles/macbook.nix
   ############################################
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+
+  ############################################
+  # Keyboard (MacBook)
+  ############################################
+  console.keyMap = "us";
+
+  services.xserver.xkb = {
+    layout = "us";
+    variant = "";
+  };
 }
 

@@ -10,6 +10,8 @@ find . -type f \
   ! -name ".*" \
   ! -name "*.sh" \
   ! -name "Makefile" \
+  ! -name "Makefile" \
+  ! -name "LICENSE" \
   ! -name "*.md" \
   ! -path "./.git/*" \
 | sort \
