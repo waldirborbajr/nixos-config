@@ -1,9 +1,5 @@
 # hosts/macbook.nix
 # ---
-# ==========================================
-# hosts/macbook.nix
-# ==========================================
-
 { config, pkgs, lib, ... }:
 
 {
@@ -11,7 +7,7 @@
   # Hardware & Performance
   ############################################
   imports = [
-    ../modules/nixpkgs.nix              # Módulo Nixpkgs primeiro para allowUnfree
+    ../modules/nixpkgs.nix
     ../modules/hardware/macbook.nix
     ../modules/performance/macbook.nix
     ../hardware-configuration-macbook.nix
@@ -56,6 +52,6 @@
     iw
     wirelesstools
     util-linux              # garante rfkill
-    linuxPackages.broadcom_sta
+    config.boot.kernelPackages.broadcom_sta
   ];
 }
