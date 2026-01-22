@@ -49,7 +49,7 @@
   environment.systemPackages = with pkgs; [
     iw
     wirelesstools
-    util-linux  # garante rfkill
-    broadcom-sta
+    util-linux              # garante rfkill
+    linuxPackages.broadcom_sta
   ];
 }
