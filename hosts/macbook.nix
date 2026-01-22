@@ -28,14 +28,25 @@
   console.keyMap = "us";
 
   services.xserver.enable = true;
-  services.xserver.layout = "us";
-  services.xserver.xkbVariant = "";
+  services.xserver.xkb = {
+    layout = "us";
+    variant = "";
+  };
 
   ############################################
-  # System packages (wireless/debug tools)
+  # Permitir pacote Broadcom STA inseguro
+  ############################################
+  nixpkgs.config.permittedInsecurePackages = [
+    "broadcom-sta-6.30.223.271-59-6.12.65"
+  ];
+
+  ############################################
+  # Pacotes extras para Wi-Fi e debug
   ############################################
   environment.systemPackages = with pkgs; [
-    iw            # Wireless tools
-    wirelesstools # iwconfig, ifconfig, etc.
+    iw
+    wirelesstools
+    rfkill
+    broadcom-sta
   ];
 }
