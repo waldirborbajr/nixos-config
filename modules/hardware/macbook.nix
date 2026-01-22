@@ -1,4 +1,5 @@
 { pkgs, ... }:
+
 {
   hardware.enableRedistributableFirmware = true;
 
@@ -10,10 +11,9 @@
   ];
 
   environment.systemPackages = with pkgs; [
-    b43-firmware-legacy
     b43-fwcutter
+    broadcom-sta   # substitui b43-firmware-legacy
     wirelesstools
     rfkill
   ];
-
 }
