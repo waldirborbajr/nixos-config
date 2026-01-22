@@ -2,10 +2,14 @@
 { config, pkgs, ... }:
 
 {
-  # Habilita firmware redistribuível
+  ############################################
+  # Firmware & drivers
+  ############################################
+
+  # Habilita firmware redistribuível Broadcom / Intel / Realtek
   hardware.enableRedistributableFirmware = true;
 
-  # Blacklist módulos open-source que conflitam com o driver proprietário
+  # Blacklist drivers open-source que podem conflitar com o Broadcom proprietário
   boot.blacklistedKernelModules = [
     "b43"
     "brcmsmac"
@@ -13,18 +17,12 @@
     "ssb"
   ];
 
-  # Carrega o módulo proprietário Broadcom (wl)
+  # Carrega o driver proprietário Broadcom (wl)
   boot.kernelModules = [ "wl" ];
 
-  # Pacote do driver como extra module
-  boot.extraModulePackages = with config.boot.kernelPackages; [
-    linuxPackages.broadcom-sta
-  ];
-
-  # Pacotes úteis para debug/wireless
+  # Pacotes úteis para debug / wireless
   environment.systemPackages = with pkgs; [
-    iw
-    wirelesstools  # inclui iwconfig, ifconfig e ferramentas wireless
-    # rfkill removido, não existe no Nixpkgs 25.11
+    iw            # Ferramenta wireless avançada
+    wirelesstools # Inclui iwconfig, ifconfig, etc.
   ];
 }
