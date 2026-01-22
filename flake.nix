@@ -1,41 +1,50 @@
-# flake.nix
-# ---
 {
   description = "BORBA JR W - Multi-host NixOS Flake";
 
   inputs = {
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs-stable, nixpkgs-unstable, flake-utils, ... }: flake-utils.lib.eachSystem
-    (system: let
-      nixpkgs = if system == "x86_64-linux" then nixpkgs-stable else nixpkgs-unstable;
-    in {
-      nixosConfigurations = {
-        # ==========================================
-        # MacBook host (continua com GNOME)
-        # ==========================================
-        macbook = nixpkgs.lib.nixosSystem {
-          system = system;
-          modules = [
-            ./core.nix
-            ./hosts/macbook.nix
-          ];
-        };
+  outputs = { self, nixpkgs-stable, nixpkgs-unstable, ... }:
+  let
+    system = "x86_64-linux";
 
-        # ==========================================
-        # Dell host (i3 agora)
-        # ==========================================
-        dell = nixpkgs.lib.nixosSystem {
-          system = system;
-          modules = [
-            ./core.nix
-            ./hosts/dell.nix
-            ./modules/performance/dell.nix  # Adicione o módulo de performance se necessário
-          ];
-        };
+    # pkgs stable (base do sistema)
+    pkgsStable = import nixpkgs-stable {
+      inherit system;
+      config.allowUnfree = true;
+    };
+
+    # pkgs unstable (para uso pontual via pkgs.unstable)
+    pkgsUnstable = import nixpkgs-unstable {
+      inherit system;
+      config.allowUnfree = true;
+    };
+
+    # overlay para expor pkgs.unstable
+    unstableOverlay = final: prev: {
+      unstable = pkgsUnstable;
+    };
+  in {
+    nixosConfigurations = {
+      macbook = nixpkgs-stable.lib.nixosSystem {
+        inherit system;
+        modules = [
+          ({ ... }: { nixpkgs.overlays = [ unstableOverlay ]; })
+          ./core.nix
+          ./hosts/macbook.nix
+        ];
       };
-    });
+
+      dell = nixpkgs-stable.lib.nixosSystem {
+        inherit system;
+        modules = [
+          ({ ... }: { nixpkgs.overlays = [ unstableOverlay ]; })
+          ./core.nix
+          ./hosts/dell.nix
+        ];
+      };
+    };
+  };
 }
