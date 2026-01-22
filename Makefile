@@ -10,7 +10,7 @@ ifndef HOST
 $(error HOST is required. Example: make switch HOST=macbook)
 endif
 
-.PHONY: help build switch switch-off upgrade gc gc-hard fmt status flatpak-update
+.PHONY: help build switch switch-off upgrade gc gc-hard fmt status flatpak-update flatpak-update-repo
 
 # Help command
 help:
@@ -25,6 +25,8 @@ help:
 	@echo "  make fmt                    -> Formats nix files and shows git status"
 	@echo "  make status                 -> Shows active systemd user jobs"
 	@echo "  make flatpak-update         -> Updates all Flatpak packages"
+	@echo "  make flatpak-update-repo    -> Updates Flatpak repository information (from flatpak.org)"
+	@echo "  make rollback               -> Rollback to previous system configuration"
 	@echo ""
 	@echo "Notes:"
 	@echo "  - Use 'HOST=macbook' or 'HOST=dell' to specify the host"
@@ -32,6 +34,7 @@ help:
 	@echo "  - The Makefile uses flakes to build the system for the specified host."
 	@echo "  - The 'make upgrade' command updates the flake and the system"
 	@echo "  - The 'make build' and 'make switch' now support an optional '--impure' flag to allow impure builds"
+	@echo "  - The 'make flatpak-update-repo' command updates the Flatpak repository data from flatpak.org"
 	@echo "  - For more details, refer to the documentation or the NixOS repository"
 
 # ------------------------------------------
@@ -60,6 +63,7 @@ build: check_git_status
 	$(call NIXOS_CMD,build)
 	@echo "System rebuilt successfully!"
 	@echo "System version: $(shell nixos-version)"
+	@echo "Build finished at: $(shell date)"
 
 # ------------------------------------------
 # Normal rebuild (keeping graphical session)
@@ -68,16 +72,20 @@ switch: check_git_status
 	$(call NIXOS_CMD,switch)
 	@echo "System rebuilt and switched successfully!"
 	@echo "System version: $(shell nixos-version)"
+	@echo "Switch finished at: $(shell date)"
 
 # ------------------------------------------
-# Safe rebuild (isolating to multi-user.target)
+# Safe rebuild (drop to multi-user.target)
 # ------------------------------------------
-switch-off: check_git_status
+switch-off:
+	# Isola em multi-user.target (sem interface gráfica)
 	sudo systemctl isolate multi-user.target
+
+	# Executa a reconstrução
 	$(call NIXOS_CMD,switch)
+
+	# Após a execução, retorna ao graphical.target (interface gráfica)
 	sudo systemctl isolate graphical.target
-	@echo "System rebuilt and switched successfully!"
-	@echo "System version: $(shell nixos-version)"
 
 # ------------------------------------------
 # Upgrade system (channels)
@@ -87,6 +95,7 @@ upgrade: check_git_status
 	$(call NIXOS_CMD,switch)
 	@echo "System upgraded successfully!"
 	@echo "System version: $(shell nixos-version)"
+	@echo "Upgrade finished at: $(shell date)"
 
 # ------------------------------------------
 # Garbage collection
@@ -115,3 +124,18 @@ status:
 # ------------------------------------------
 flatpak-update:
 	flatpak update -y
+
+# ------------------------------------------
+# Update Flatpak repository data from flatpak.org
+# ------------------------------------------
+flatpak-update-repo:
+	flatpak update --appstream -y
+	flatpak update -y
+
+# ------------------------------------------
+# Rollback to the previous configuration
+# ------------------------------------------
+rollback:
+	@echo "Rolling back to the previous system configuration..."
+	sudo nixos-rebuild switch --rollback
+	@echo "Rollback completed!"

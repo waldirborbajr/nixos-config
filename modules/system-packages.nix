@@ -9,6 +9,14 @@ in
   environment.systemPackages = with pkgs; [
 
     ##########################################
+    # Networking / Diagnostics (global)
+    ##########################################
+    iw
+    wirelesstools
+    util-linux
+    linuxPackages.broadcom_sta
+
+    ##########################################
     # Terminals
     ##########################################
     alacritty # GPU-accelerated terminal

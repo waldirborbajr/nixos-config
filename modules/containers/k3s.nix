@@ -1,3 +1,5 @@
+# modules/containers/k3s.nix
+# ---
 { config, pkgs, lib, ... }:
 
 {

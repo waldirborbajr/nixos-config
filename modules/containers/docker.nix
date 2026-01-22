@@ -1,3 +1,4 @@
+# modules/containers/docker.nix
 { config, pkgs, lib, ... }:
 
 {
@@ -8,15 +9,16 @@
   };
 
   environment.systemPackages =
-    lib.optionals config.virtualisation.docker.enable (with pkgs; [
-      docker
-      docker-compose
-      docker-buildx
-      lazydocker
-    ]);
+    lib.optionals config.virtualisation.docker.enable [
+      pkgs.docker
+      pkgs.docker-compose
+      pkgs.docker-buildx
+      pkgs.lazydocker
+    ];
 
   users.users.borba.extraGroups = lib.mkAfter [ "docker" ];
 }
+
 
 # # modules/containers/docker.nix
 # # ---
