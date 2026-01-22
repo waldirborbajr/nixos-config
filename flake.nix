@@ -5,14 +5,14 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
   };
 
-  outputs = { self, nixpkgs }: {
+  outputs = { self, nixpkgs, ... }: {
 
     nixosConfigurations = {
 
       # ==========================================
       # MacBook host
       # ==========================================
-      macbook = {
+      macbook = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
           ./core.nix
@@ -23,7 +23,7 @@
       # ==========================================
       # Dell host
       # ==========================================
-      dell = {
+      dell = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
           ./core.nix
