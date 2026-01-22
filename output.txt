@@ -1,23 +1,93 @@
+----
+.github/workflows/nixos.yaml
+
+name: Nix Lint
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v25
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - name: nixfmt check
+        run: |
+          nix-shell -p nixfmt-rfc-style --run '
+            find . -name "*.nix" \
+              ! -name "hardware-configuration-*.nix" \
+              -print0 | xargs -0 nixfmt --check
+          '
+
+      # statix intentionally disabled:
+      # - generates noisy warnings on working configs
+      # - risky to auto-fix without manual review
+      # - will be re-enabled after config stabilization
+      #
+      # - name: statix
+      #   run: nix-shell -p statix --run "statix check ."
+
+      - name: deadnix
+        run: |
+          nix-shell -p deadnix --run '
+            deadnix \
+              --exclude hardware-configuration-dell.nix,hardware-configuration-macbook.nix \
+              .
+          '
+
+      - name: Lint summary
+        if: always()
+        run: |
+          {
+            echo "## 🧹 Nix Lint"
+            echo ""
+            echo "- nixfmt: OK"
+            echo "- deadnix: OK"
+            echo ""
+            echo "_Build and evaluation intentionally disabled._"
+          } >> $GITHUB_STEP_SUMMARY
 
 ----
 configuration.nix
 
-{ ... }:
+# configuration.nix
+{ config, pkgs, lib, ... }:
 
 {
+  ############################################
+  # Host-specific configurations
+  ############################################
   imports = [
     ./hosts/macbook.nix
     # ./hosts/dell.nix
 
+    ############################################
+    # Core system modules
+    ############################################
     ./core.nix
   ];
 
+  ############################################
+  # NixOS version compatibility
+  ############################################
   system.stateVersion = "25.11";
 }
 
 ----
 core.nix
 
+# core.nix
 { ... }:
 
 {
@@ -26,43 +96,44 @@ core.nix
     ##########################################
     # Core system
     ##########################################
-    ../modules/base.nix
-    ../modules/networking.nix
-    ../modules/audio.nix
-    ../modules/fonts.nix
-    ../modules/nixpkgs.nix
+    ./modules/nixpkgs.nix    
+    ./modules/base.nix
+    ./modules/networking.nix
+    ./modules/audio.nix
+    ./modules/fonts.nix
+    
 
     ##########################################
     # Desktop
     ##########################################
-    ../modules/desktops/gnome.nix
-    ../modules/autologin.nix
+    ./modules/desktops/gnome.nix
+    ./modules/autologin.nix
 
     ##########################################
     # Containers / Virtualization
     ##########################################
-    ../modules/containers/docker.nix
-    ../modules/containers/k3s.nix
-    ../modules/virtualization/libvirt.nix
+    ./modules/containers/docker.nix
+    ./modules/containers/k3s.nix
+    ./modules/virtualization/libvirt.nix
 
     ##########################################
     # Users / Dev
     ##########################################
-    ../modules/users/borba.nix
-    ../modules/system-packages.nix
-    ../modules/python/default.nix
-    ../modules/nodejs/default.nix
+    ./modules/users/borba.nix
+    ./modules/system-packages.nix
+    ./modules/python/default.nix
+    ./modules/nodejs/default.nix
 
     ##########################################
     # Flatpak
     ##########################################
-    ../modules/flatpak/enable.nix
-    ../modules/flatpak/packages.nix
+    ./modules/flatpak/enable.nix
+    ./modules/flatpak/packages.nix
 
     ##########################################
     # Access
     ##########################################
-    ../modules/ssh.nix
+    ./modules/ssh.nix
   ];
 }
 
@@ -79,8 +150,52 @@ default.nix
 import ./configuration.nix
 
 ----
+flake.nix
+
+# flake.nix
+# ---
+{
+  description = "Multi-host NixOS flake for Borba";
+
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
+  };
+
+  outputs = { self, nixpkgs, ... }: {
+
+    nixosConfigurations = {
+
+      # ==========================================
+      # MacBook host
+      # ==========================================
+      macbook = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          ./core.nix
+          ./hosts/macbook.nix
+        ];
+      };
+
+      # ==========================================
+      # Dell host
+      # ==========================================
+      dell = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          ./core.nix
+          ./hosts/dell.nix
+        ];
+      };
+
+    };
+  };
+}
+
+----
 hardware-configuration-dell.nix
 
+# hardware-configuration-dell.nix
+# ---
 # Do not modify this file!  It was generated by ‘nixos-generate-config’
 # and may be overwritten by future invocations.  Please make changes
 # to /etc/nixos/configuration.nix instead.
@@ -120,6 +235,8 @@ hardware-configuration-dell.nix
 ----
 hardware-configuration-macbook.nix
 
+# hardware-configuration-macbook.nix
+# ---
 # Do not modify this file!  It was generated by ‘nixos-generate-config’
 # and may be overwritten by future invocations.  Please make changes
 # to /etc/nixos/configuration.nix instead.
@@ -154,30 +271,109 @@ hardware-configuration-macbook.nix
 ----
 hosts/dell.nix
 
-../hardware/dell.nix
-../modules/hardware/dell.nix
-../modules/performance/dell.nix
+# hosts/dell.nix
+# ---
+#     nixos-config/hosts/dell.nix
+
+{ config, pkgs, lib, ... }:
+{
+  ############################################
+  # Hardware
+  ############################################
+  imports = [
+    ../modules/hardware/dell.nix
+    ../modules/performance/dell.nix
+    ../hardware-configuration-dell.nix
+  ];
+  ############################################
+  # Host identity
+  ############################################
+  networking.hostName = "dell-nixos";
+  ############################################
+  # Bootloader (Legacy BIOS)
+  ############################################
+  boot.loader.grub.enable = true;
+  boot.loader.grub.devices = [ "/dev/sda" ];
+  ############################################
+  # Keyboard (Dell)
+  ############################################
+  console.keyMap = "br-abnt2";
+  services.xserver.xkb = {
+    layout = "br";
+    variant = "abnt2";
+  };
+}
 
 ----
 hosts/macbook.nix
 
-{ ... }:
+# hosts/macbook.nix
+# ---
+# ==========================================
+# hosts/macbook.nix
+# ==========================================
+
+{ config, pkgs, lib, ... }:
 
 {
+  ############################################
+  # Hardware & Performance
+  ############################################
   imports = [
-    ##########################################
-    # Hardware
-    ##########################################
-    ../hardware/macbook.nix
+    ../modules/nixpkgs.nix              # Módulo Nixpkgs primeiro para allowUnfree
     ../modules/hardware/macbook.nix
     ../modules/performance/macbook.nix
+    ../hardware-configuration-macbook.nix
+  ];
 
+  ############################################
+  # Host identity
+  ############################################
+  networking.hostName = "macbook-nixos";
+
+  ############################################
+  # Bootloader (EFI)
+  ############################################
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+
+  ############################################
+  # Keyboard layout
+  ############################################
+  console.keyMap = "us";
+
+  ############################################
+  # X11 layout
+  ############################################
+  services.xserver.enable = true;
+  services.xserver.xkb = {
+    layout = "us";
+    variant = "";
+  };
+
+  ############################################
+  # Permitir pacote Broadcom STA inseguro
+  ############################################
+  nixpkgs.config.permittedInsecurePackages = [
+    "broadcom-sta-6.30.223.271-59-6.12.66"
+  ];
+
+  ############################################
+  # Pacotes extras para Wi-Fi e debug
+  ############################################
+  environment.systemPackages = with pkgs; [
+    iw
+    wirelesstools
+    util-linux              # garante rfkill
+    linuxPackages.broadcom_sta
   ];
 }
 
 ----
 modules/audio.nix
 
+# modules/audio.nix
+# ---
 { ... }:
 {
   services.pulseaudio.enable = false;
@@ -194,6 +390,8 @@ modules/audio.nix
 ----
 modules/autologin.nix
 
+# modules/autologin.nix
+# ---
 { ... }:
 
 {
@@ -210,6 +408,8 @@ modules/autologin.nix
 ----
 modules/base.nix
 
+# modules/base.nix
+# ---
 { pkgs, ... }:
 {
   nix.extraOptions = ''
@@ -276,6 +476,8 @@ modules/containers/common.nix
 ----
 modules/containers/docker.nix
 
+# modules/containers/docker.nix
+# ---
 { config, pkgs, lib, ... }:
 
 {
@@ -302,6 +504,8 @@ modules/containers/docker.nix
 ----
 modules/containers/k3s.nix
 
+# modules/containers/k3s.nix
+# ---
 { config, pkgs, ... }:
 
 {
@@ -330,6 +534,8 @@ modules/containers/k3s.nix
 ----
 modules/containers/podman.nix
 
+# modules/containers/podman.nix
+# ---
 { config, pkgs, lib, ... }:
 
 {
@@ -357,6 +563,8 @@ modules/containers/podman.nix
 ----
 modules/desktops/gnome.nix
 
+# modules/desktops/gnome.nix
+# ---
 { pkgs, ... }:
 
 {
@@ -399,6 +607,8 @@ modules/desktops/gnome.nix
 ----
 modules/flatpak/enable.nix
 
+# modules/flatpak/enable.nix
+# ---
 { config, pkgs, ... }:
 
 {
@@ -504,8 +714,9 @@ in
 ----
 modules/fonts.nix
 
+# modules/fonts.nix
+# ---
 { pkgs, ... }:
-
 {
   ############################################
   # Fonts
@@ -514,10 +725,8 @@ modules/fonts.nix
     packages = with pkgs; [
       nerd-fonts.jetbrains-mono
     ];
-
     fontconfig = {
       enable = true;
-
       defaultFonts = {
         monospace = [ "JetBrainsMono Nerd Font" ];
       };
@@ -528,6 +737,8 @@ modules/fonts.nix
 ----
 modules/hardware/dell.nix
 
+# modules/hardware/dell.nix
+# ---
 {
   config,
   pkgs,
@@ -552,29 +763,45 @@ modules/hardware/dell.nix
 ----
 modules/hardware/macbook.nix
 
-{ pkgs, ... }:
+# modules/hardware/macbook.nix
+{ config, pkgs, ... }:
+
 {
+  ############################################
+  # Broadcom / Wireless
+  ############################################
   hardware.enableRedistributableFirmware = true;
 
-  networking.enableB43Firmware = true;
-
+  # Blacklist drivers que conflitam com Broadcom proprietário
   boot.blacklistedKernelModules = [
+    "b43"
     "brcmsmac"
-    "wl"
+    "bcma"
+    "ssb"
   ];
 
+  # Driver proprietário Broadcom
+  boot.kernelModules = [ "wl" ];
+
+  # Pacote do driver para o kernel ativo
+  boot.extraModulePackages = with config.boot.kernelPackages; [
+    broadcom_sta
+  ];
+
+  ############################################
+  # Pacotes úteis para debug e configuração wireless
+  ############################################
   environment.systemPackages = with pkgs; [
-    b43-firmware-legacy
-    b43-fwcutter
+    iw
     wirelesstools
-    rfkill
   ];
-
 }
 
 ----
 modules/networking.nix
 
+# modules/networking.nix
+# ---
 { ... }:
 {
   networking.networkmanager.enable = true;
@@ -585,18 +812,23 @@ modules/networking.nix
 ----
 modules/nixpkgs.nix
 
-{ lib, ... }:
+# modules/nixpkgs.nix
+{ lib, pkgs, ... }:
+
+let
+  unstablePkgs = import (builtins.fetchTarball {
+    url = "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz";
+  }) {
+    config = { allowUnfree = true; };
+  };
+in
 {
   nixpkgs = {
-    config = {
-      allowUnfree = true;
-    };
+    config.allowUnfree = true;
 
     overlays = [
       (final: prev: {
-        unstable = import <nixpkgs-unstable> {
-          config.allowUnfree = true;
-        };
+        unstable = unstablePkgs;
       })
     ];
   };
@@ -605,6 +837,8 @@ modules/nixpkgs.nix
 ----
 modules/nodejs/common.nix
 
+# modules/nodejs/common.nix
+# ---
 { pkgs, ... }:
 
 {
@@ -622,6 +856,8 @@ modules/nodejs/common.nix
 ----
 modules/nodejs/default.nix
 
+# modules/nodejs/default.nix
+# ---
 { lib, ... }:
 
 let
@@ -637,6 +873,8 @@ in
 ----
 modules/nodejs/enable.nix
 
+# modules/nodejs/enable.nix
+# ---
 { pkgs, ... }:
 
 {
@@ -663,6 +901,8 @@ modules/nodejs/enable.nix
 ----
 modules/performance/common.nix
 
+# modules/performance/common.nix
+# ---
 { lib, pkgs, ... }:
 
 {
@@ -753,6 +993,8 @@ modules/performance/common.nix
 ----
 modules/performance/dell.nix
 
+# modules/performance/dell.nix
+# ---
 { lib, ... }:
 
 {
@@ -821,6 +1063,8 @@ modules/performance/dell.nix
 ----
 modules/performance/macbook.nix
 
+# modules/performance/macbook.nix
+# ---
 { lib, ... }:
 
 {
@@ -861,6 +1105,8 @@ modules/performance/macbook.nix
 ----
 modules/python/common.nix
 
+# modules/python/common.nix
+# ---
 { pkgs, ... }:
 
 {
@@ -883,6 +1129,8 @@ modules/python/common.nix
 ----
 modules/python/default.nix
 
+# modules/python/default.nix
+# ---
 { config, lib, ... }:
 
 let
@@ -901,6 +1149,8 @@ in
 ----
 modules/python/poetry.nix
 
+# modules/python/poetry.nix
+# ---
 { pkgs, ... }:
 
 {
@@ -928,6 +1178,8 @@ modules/python/poetry.nix
 ----
 modules/python/uv.nix
 
+# modules/python/uv.nix
+# ---
 { pkgs, ... }:
 
 {
@@ -953,6 +1205,8 @@ modules/python/uv.nix
 ----
 modules/ssh.nix
 
+# modules/ssh.nix
+# ---
 ## Relation truth
 
 #{ ... }:
@@ -990,6 +1244,8 @@ modules/ssh.nix
 ----
 modules/system-packages.nix
 
+# modules/system-packages.nix
+# ---
 { pkgs, ... }:
 
 let
@@ -1181,6 +1437,8 @@ in
 ----
 modules/users/borba.nix
 
+# modules/users/borba.nix
+# ---
 { pkgs, ... }:
 {
   users.users.borba = {
@@ -1225,6 +1483,8 @@ modules/users/borba.nix
 ----
 modules/virtualization/libvirt.nix
 
+# modules/virtualization/libvirt.nix
+# ---
 { ... }:
 {
   virtualisation.libvirtd = {
@@ -1248,6 +1508,8 @@ output.txt
 ----
 profiles/dell.nix
 
+# profiles/dell.nix
+# ---
 { ... }:
 
 {
@@ -1278,6 +1540,8 @@ profiles/dell.nix
 ----
 profiles/macbook.nix
 
+# profiles/macbook.nix
+# ---
 { ... }:
 
 {

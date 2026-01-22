@@ -1,56 +1,92 @@
 # ==========================================
-# NixOS Infra Makefile (with optional flakes)
+# NixOS Infrastructure Makefile (with optional flakes and --impure flag)
 # ==========================================
 
 NIXOS_CONFIG ?= $(HOME)/nixos-config
-HOST ?=   # Ex: macbook ou dell
+HOST ?=
+IMPURE ?=
+
+ifndef HOST
+$(error HOST is required. Example: make switch HOST=macbook)
+endif
 
 .PHONY: help build switch switch-off upgrade gc gc-hard fmt status flatpak-update
 
+# Help command
 help:
-	@echo "NixOS Infra Commands (flakes optional)"
+	@echo "NixOS Infrastructure Commands (flakes optional)"
 	@echo ""
-	@echo "  make build [HOST=host]      -> nixos-rebuild build"
-	@echo "  make switch [HOST=host]     -> rebuild keeping graphical session"
-	@echo "  make switch-off [HOST=host] -> rebuild in multi-user.target (safe)"
-	@echo "  make upgrade [HOST=host]    -> rebuild with channel upgrade"
-	@echo "  make gc                           -> nix garbage collection"
-	@echo "  make gc-hard                      -> aggressive garbage collection"
-	@echo "  make fmt                           -> format nix files"
-	@echo "  make status                        -> systemd user jobs"
-	@echo "  make flatpak-update                -> update all flatpaks"
+	@echo "  make build [HOST=host]      -> Executes 'nixos-rebuild build' for the specified host"
+	@echo "  make switch [HOST=host]     -> Rebuild keeping graphical session"
+	@echo "  make switch-off [HOST=host] -> Rebuild in multi-user.target mode (safe)"
+	@echo "  make upgrade [HOST=host]    -> Rebuild with channel upgrade"
+	@echo "  make gc                     -> Garbage collection"
+	@echo "  make gc-hard                -> Aggressive garbage collection (deletes older objects)"
+	@echo "  make fmt                    -> Formats nix files and shows git status"
+	@echo "  make status                 -> Shows active systemd user jobs"
+	@echo "  make flatpak-update         -> Updates all Flatpak packages"
+	@echo ""
+	@echo "Notes:"
+	@echo "  - Use 'HOST=macbook' or 'HOST=dell' to specify the host"
+	@echo "  - For any other command, 'HOST' must be defined."
+	@echo "  - The Makefile uses flakes to build the system for the specified host."
+	@echo "  - The 'make upgrade' command updates the flake and the system"
+	@echo "  - The 'make build' and 'make switch' now support an optional '--impure' flag to allow impure builds"
+	@echo "  - For more details, refer to the documentation or the NixOS repository"
 
 # ------------------------------------------
-# Internal command to handle flakes
+# Internal command to run flakes with optional --impure flag
 # ------------------------------------------
-NIXOS_CMD = sudo nixos-rebuild $(1) $(if $(HOST),--flake $(NIXOS_CONFIG)#$(HOST),-I nixos-config=$(NIXOS_CONFIG))
+NIXOS_CMD = sudo nixos-rebuild $(1) --flake $(NIXOS_CONFIG)#$(HOST) $(if $(IMPURE),--impure)
+
+# ------------------------------------------
+# Function to check for uncommitted changes in Git
+# ------------------------------------------
+check_git_status:
+	@echo "Checking Git status..."
+	@if ! git diff --exit-code > /dev/null; then \
+		echo "There are uncommitted changes, performing commit..."; \
+		git add .; \
+		git commit -m 'Auto commit before rebuild'; \
+		git push; \
+	else \
+		echo "No uncommitted changes in the repository."; \
+	fi
 
 # ------------------------------------------
 # Build only (no activation)
 # ------------------------------------------
-build:
+build: check_git_status
 	$(call NIXOS_CMD,build)
+	@echo "System rebuilt successfully!"
+	@echo "System version: $(shell nixos-version)"
 
 # ------------------------------------------
-# Normal rebuild (graphical session)
+# Normal rebuild (keeping graphical session)
 # ------------------------------------------
-switch:
+switch: check_git_status
 	$(call NIXOS_CMD,switch)
+	@echo "System rebuilt and switched successfully!"
+	@echo "System version: $(shell nixos-version)"
 
 # ------------------------------------------
-# Safe rebuild (drop to multi-user.target)
+# Safe rebuild (isolating to multi-user.target)
 # ------------------------------------------
-switch-off:
+switch-off: check_git_status
 	sudo systemctl isolate multi-user.target
 	$(call NIXOS_CMD,switch)
 	sudo systemctl isolate graphical.target
+	@echo "System rebuilt and switched successfully!"
+	@echo "System version: $(shell nixos-version)"
 
 # ------------------------------------------
 # Upgrade system (channels)
 # ------------------------------------------
-upgrade:
-	sudo nix-channel --update
+upgrade: check_git_status
+	nix flake update $(NIXOS_CONFIG)
 	$(call NIXOS_CMD,switch)
+	@echo "System upgraded successfully!"
+	@echo "System version: $(shell nixos-version)"
 
 # ------------------------------------------
 # Garbage collection
@@ -69,7 +105,7 @@ fmt:
 	git status
 
 # ------------------------------------------
-# Debug helpers
+# List systemd user jobs
 # ------------------------------------------
 status:
 	systemctl --user list-jobs

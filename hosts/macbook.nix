@@ -52,10 +52,10 @@
   ############################################
   # Pacotes extras para Wi-Fi e debug
   ############################################
-  environment.systemPackages = with pkgs; [
-    iw
-    wirelesstools
-    util-linux              # garante rfkill
-    linuxPackages.broadcom_sta
-  ];
+  # environment.systemPackages = with pkgs; [
+  #   iw
+  #   wirelesstools
+  #   util-linux              # garante rfkill
+  #   linuxPackages.broadcom_sta
+  # ];
 }

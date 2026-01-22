@@ -1,7 +1,7 @@
 # flake.nix
 # ---
 {
-  description = "Multi-host NixOS flake for Borba";
+  description = "BORBA JR W - Multi-host NixOS Flake";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";

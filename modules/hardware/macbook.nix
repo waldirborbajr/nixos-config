@@ -29,5 +29,9 @@
   environment.systemPackages = with pkgs; [
     iw
     wirelesstools
+    util-linux
+    linuxPackages.broadcom_sta    
+    # iw
+    # wirelesstools
   ];
 }
