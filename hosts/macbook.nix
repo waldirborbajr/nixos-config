@@ -1,3 +1,4 @@
+# hosts/macbook.nix
 { config, pkgs, lib, ... }:
 
 {
@@ -31,21 +32,10 @@
   services.xserver.xkbVariant = "";
 
   ############################################
-  # Firmware & Broadcom wireless fix
+  # System packages (wireless/debug tools)
   ############################################
-  hardware.enableRedistributableFirmware = true;
-  networking.enableB43Firmware = true;
-
-  boot.blacklistedKernelModules = [
-    "brcmsmac"
-    "wl"
-  ];
-
   environment.systemPackages = with pkgs; [
-    firmware.b43          # Broadcom open firmware
-    firmware.b43legacy    # Broadcom legacy firmware
-    linuxPackages.broadcom-sta  # Proprietary STA driver
-    wirelesstools
-    rfkill
+    iw            # Wireless tools
+    wirelesstools # iwconfig, ifconfig, etc.
   ];
 }
