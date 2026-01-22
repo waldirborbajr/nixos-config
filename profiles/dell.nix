@@ -1,10 +1,12 @@
+# profiles/dell.nix
+# ---
 { config, pkgs, lib, ... }:
 
 {
   system.stateVersion = "25.11";
 
   ############################################
-  # Hardware
+  # Hardware (Dell-only)
   ############################################
   imports = [
     ../modules/hardware/dell.nix
@@ -24,7 +26,7 @@
   boot.loader.grub.devices = [ "/dev/sda" ];
 
   ############################################
-  # X11 + i3 (somente Dell)
+  # X11 + i3 (Dell-only)
   ############################################
   services.xserver.enable = true;
 
@@ -33,7 +35,7 @@
   };
 
   ############################################
-  # Keyboard
+  # Keyboard (Dell)
   ############################################
   console.keyMap = "br-abnt2";
 
@@ -43,7 +45,7 @@
   };
 
   ############################################
-  # Pacotes específicos do Dell
+  # Dell-only desktop packages
   ############################################
   environment.systemPackages = with pkgs; [
     i3
