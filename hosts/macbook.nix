@@ -13,6 +13,10 @@
     ../modules/hardware/macbook.nix
     ../modules/performance/macbook.nix
     ../hardware-configuration-macbook.nix
+
+    # Desktop apenas no MacBook
+    ../modules/desktops/gnome.nix
+    ../modules/autologin.nix
   ];
 
   ############################################
