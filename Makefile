@@ -1,9 +1,10 @@
 # ==========================================
-# NixOS Infra Makefile (with optional flakes)
+# NixOS Infra Makefile (flakes + debug logs)
 # ==========================================
 
 NIXOS_CONFIG ?= $(HOME)/nixos-config
 HOST ?=   # Ex: macbook ou dell
+DEBUG_LOG ?= /tmp/nixos-build-debug.log
 
 .PHONY: help build build-debug switch switch-off upgrade gc gc-hard fmt status flatpak-update
 
@@ -11,7 +12,7 @@ help:
 	@echo "NixOS Infra Commands (flakes optional)"
 	@echo ""
 	@echo "  make build [HOST=host]        -> nixos-rebuild build"
-	@echo "  make build-debug [HOST=host]  -> build + switch with verbose + show-trace"
+	@echo "  make build-debug [HOST=host]  -> build + switch with verbose + show-trace, logs at $(DEBUG_LOG)"
 	@echo "  make switch [HOST=host]       -> rebuild keeping graphical session"
 	@echo "  make switch-off [HOST=host]   -> rebuild in multi-user.target (safe)"
 	@echo "  make upgrade [HOST=host]      -> rebuild with channel upgrade"
@@ -36,7 +37,9 @@ build:
 # Build + switch with debug (verbose + show-trace)
 # ------------------------------------------
 build-debug:
-	$(call NIXOS_CMD,"switch --verbose --show-trace")
+	@echo "Starting build-debug for HOST=$(HOST), log at $(DEBUG_LOG)"
+	@echo "Command: $(call NIXOS_CMD,switch --verbose --show-trace)"
+	$(call NIXOS_CMD,switch --verbose --show-trace) 2>&1 | tee $(DEBUG_LOG)
 
 # ------------------------------------------
 # Normal rebuild (graphical session)
