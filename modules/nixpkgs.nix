@@ -1,15 +1,20 @@
-{ lib, ... }:
+# modules/nixpkgs.nix
+{ lib, pkgs, ... }:
+
+let
+  unstablePkgs = import (builtins.fetchTarball {
+    url = "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz";
+  }) {
+    config = { allowUnfree = true; };
+  };
+in
 {
   nixpkgs = {
-    config = {
-      allowUnfree = true;
-    };
+    config.allowUnfree = true;
 
     overlays = [
       (final: prev: {
-        unstable = import <nixpkgs-unstable> {
-          config.allowUnfree = true;
-        };
+        unstable = unstablePkgs;
       })
     ];
   };
