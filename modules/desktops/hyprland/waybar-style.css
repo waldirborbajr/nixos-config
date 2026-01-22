@@ -1,28 +1,129 @@
+/* -------------------------------------------------
+ * Catppuccin Mocha - Waybar
+ * https://github.com/catppuccin/catppuccin
+ * ------------------------------------------------- */
+
 * {
   font-family: "JetBrainsMono Nerd Font", monospace;
   font-size: 12px;
+  min-height: 0;
 }
 
 window#waybar {
-  background: rgba(15, 15, 15, 0.85);
-  color: #eaeaea;
+  background: rgba(30, 30, 46, 0.95); /* base */
+  color: #cdd6f4;                     /* text */
+  border-radius: 0;
+}
+
+/* -------------------------------------------------
+ * Workspaces
+ * ------------------------------------------------- */
+#workspaces {
+  margin-left: 6px;
 }
 
 #workspaces button {
-  padding: 0 8px;
-  margin: 4px 2px;
-  border-radius: 10px;
-  background: rgba(255,255,255,0.06);
-  color: #eaeaea;
+  padding: 0 10px;
+  margin: 4px 3px;
+  border-radius: 12px;
+  background: #313244; /* surface0 */
+  color: #cdd6f4;
+  transition: all 0.2s ease-in-out;
 }
 
 #workspaces button.active {
-  background: rgba(255,255,255,0.16);
+  background: #89b4fa; /* blue */
+  color: #1e1e2e;
 }
 
-#tray, #network, #bluetooth, #cpu, #memory, #battery, #pulseaudio, #clock {
-  padding: 0 10px;
-  margin: 4px 2px;
-  border-radius: 10px;
-  background: rgba(255,255,255,0.06);
+#workspaces button:hover {
+  background: #45475a; /* surface1 */
+}
+
+/* -------------------------------------------------
+ * Modules common style
+ * ------------------------------------------------- */
+#tray,
+#network,
+#bluetooth,
+#cpu,
+#memory,
+#battery,
+#pulseaudio,
+#clock {
+  padding: 0 12px;
+  margin: 4px 3px;
+  border-radius: 12px;
+  background: #313244; /* surface0 */
+  color: #cdd6f4;
+}
+
+/* -------------------------------------------------
+ * Individual module accents
+ * ------------------------------------------------- */
+#clock {
+  background: #45475a;
+  color: #f5e0dc; /* rosewater */
+}
+
+#network {
+  color: #a6e3a1; /* green */
+}
+
+#bluetooth {
+  color: #89b4fa; /* blue */
+}
+
+#cpu {
+  color: #f9e2af; /* yellow */
+}
+
+#memory {
+  color: #fab387; /* peach */
+}
+
+#battery {
+  color: #a6e3a1; /* green */
+}
+
+#battery.warning {
+  color: #f9e2af; /* yellow */
+}
+
+#battery.critical {
+  color: #f38ba8; /* red */
+}
+
+#pulseaudio {
+  color: #cba6f7; /* mauve */
+}
+
+/* -------------------------------------------------
+ * Tray
+ * ------------------------------------------------- */
+#tray {
+  padding-right: 10px;
+}
+
+#tray > .passive {
+  -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+  -gtk-icon-effect: highlight;
+  background-color: #f38ba8;
+}
+
+/* -------------------------------------------------
+ * Tooltips
+ * ------------------------------------------------- */
+tooltip {
+  background: #1e1e2e;
+  border-radius: 12px;
+  border: 1px solid #45475a;
+  color: #cdd6f4;
+}
+
+tooltip label {
+  padding: 6px;
 }
