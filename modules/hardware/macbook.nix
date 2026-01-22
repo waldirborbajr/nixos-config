@@ -1,5 +1,8 @@
 { pkgs, ... }:
 
+let
+  linuxPkgs = pkgs.linuxPackages;
+in
 {
   hardware.enableRedistributableFirmware = true;
 
@@ -11,8 +14,8 @@
   ];
 
   environment.systemPackages = with pkgs; [
-    b43-fwcutter
-    broadcom-sta   # substitui b43-firmware-legacy
+    linuxPkgs.b43-fwcutter  # se precisar
+    linuxPkgs.broadcom-sta   # driver proprietário
     wirelesstools
     rfkill
   ];
