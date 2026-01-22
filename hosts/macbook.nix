@@ -25,13 +25,12 @@
   # Keyboard layout
   ############################################
   console.keyMap = "us";
-  services.xserver = {
-    enable = true;
-    layout = {
-      xkb = {
-        layout = "us";
-        variant = "";
-      };
+
+  services.xserver.enable = true;
+  services.xserver.layout = {
+    xkb = {
+      layout = "us";
+      variant = "";
     };
   };
 }
