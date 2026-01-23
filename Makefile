@@ -28,17 +28,15 @@ define require_host
 	fi
 endef
 
-# Robust host validation (no UTF drawing chars)
-# Looks for a line like: "    macbook: NixOS configuration"
 define require_flake_host
 	@echo "Validating flake host: $(HOST) in $(NIXOS_CONFIG)..."; \
-	if ! nix --extra-experimental-features "nix-command flakes" flake show "$(NIXOS_CONFIG)" 2>/dev/null \
-		| grep -Eq "^[[:space:]]*$(HOST):[[:space:]]*NixOS configuration$$"; then \
-		echo "ERROR: HOST='$(HOST)' not found in flake outputs (nixosConfigurations.$(HOST))."; \
+	if ! nix --extra-experimental-features "nix-command flakes" eval --raw "$(NIXOS_CONFIG)#nixosConfigurations.$(HOST).config.system.build.toplevel.drvPath" >/dev/null 2>&1; then \
+		echo "ERROR: HOST='$(HOST)' not found or not evaluatable in flake outputs (nixosConfigurations.$(HOST))."; \
 		echo "HINT: Run: nix flake show $(NIXOS_CONFIG)"; \
 		exit 1; \
 	fi
 endef
+
 
 # nixos-rebuild command (flake-based)
 # Usage: $(call NIXOS_CMD,<action>,<extra_args>)
