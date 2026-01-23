@@ -26,10 +26,21 @@
     unstableOverlay = final: prev: {
       unstable = pkgsUnstable;
     };
-  in {
+
+    # Feature flags (require --impure to read env)
+    devopsEnabled = builtins.getEnv "DEVOPS" == "1";
+    qemuEnabled = builtins.getEnv "QEMU" == "1";
+  in
+  {
     nixosConfigurations = {
       macbook = nixpkgs-stable.lib.nixosSystem {
         inherit system;
+
+        # Pass flags into modules (used by modules/features/*.nix)
+        specialArgs = {
+          inherit devopsEnabled qemuEnabled;
+        };
+
         modules = [
           ({ ... }: { nixpkgs.overlays = [ unstableOverlay ]; })
           ./core.nix
@@ -39,6 +50,12 @@
 
       dell = nixpkgs-stable.lib.nixosSystem {
         inherit system;
+
+        # Pass flags into modules (used by modules/features/*.nix)
+        specialArgs = {
+          inherit devopsEnabled qemuEnabled;
+        };
+
         modules = [
           ({ ... }: { nixpkgs.overlays = [ unstableOverlay ]; })
           ./core.nix
@@ -48,4 +65,3 @@
     };
   };
 }
-
