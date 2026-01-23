@@ -8,6 +8,10 @@
 # - List generations after operations
 # - Post-build validation info
 # - Flatpak Flathub remote setup + flatpak-sync (manual)
+# - Feature flags (independent):
+#     DEVOPS=1  -> exports DEVOPS=1 and adds --impure automatically (for env-based flags)
+#     QEMU=1    -> exports QEMU=1 and adds --impure automatically (for env-based flags)
+#   You can enable either one or both independently.
 # ==========================================
 
 NIXOS_CONFIG ?= $(HOME)/nixos-config
@@ -17,6 +21,10 @@ DEBUG_LOG ?= /tmp/nixos-build-debug.log
 
 GIT_COMMIT_MSG ?= chore: auto-commit before rebuild
 GIT_PUSH ?=             # Set to 1 to push after auto-commit
+
+# Manual feature flags (independent)
+DEVOPS ?=               # Set to 1 to enable DevOps services (docker/k3s) via flake env
+QEMU ?=                 # Set to 1 to enable QEMU/libvirt via flake env
 
 # Flatpak sync script (manual run)
 FLATPAK_SYNC_SCRIPT ?= $(NIXOS_CONFIG)/scripts/flatpak-sync.sh
@@ -48,20 +56,31 @@ define require_flatpak_script
 	fi
 endef
 
+# Feature env prefix (independent)
+FEATURE_ENV = $(if $(DEVOPS),DEVOPS=1,) $(if $(QEMU),QEMU=1,)
+
+# If either DEVOPS or QEMU is enabled, we must add --impure (because flake reads env vars)
+AUTO_IMPURE = $(if $(or $(DEVOPS),$(QEMU)),--impure,)
+
+# Effective impure flag:
+# - explicit IMPURE=1 OR auto-impure due to DEVOPS/QEMU flags
+EFFECTIVE_IMPURE = $(if $(IMPURE),--impure,) $(AUTO_IMPURE)
+
 # nixos-rebuild command (flake-based)
 # Usage: $(call NIXOS_CMD,<action>,<extra_args>)
 # NOTE: We intentionally do NOT quote --flake to avoid line truncation in some shells/editors.
-NIXOS_CMD = sudo nixos-rebuild $(1) --flake $(NIXOS_CONFIG)#$(HOST) $(if $(IMPURE),--impure,) $(2)
+NIXOS_CMD = $(FEATURE_ENV) sudo nixos-rebuild $(1) --flake $(NIXOS_CONFIG)#$(HOST) $(EFFECTIVE_IMPURE) $(2)
 
 define print_cmd
 	@echo ">>> nixos-rebuild command:"
-	@echo "    sudo nixos-rebuild $(1) --flake $(NIXOS_CONFIG)#$(HOST) $(if $(IMPURE),--impure,) $(2)"
+	@echo "    $(FEATURE_ENV) sudo nixos-rebuild $(1) --flake $(NIXOS_CONFIG)#$(HOST) $(EFFECTIVE_IMPURE) $(2)"
 endef
 
 .PHONY: \
 	help update-flake check_git_status list-generations post-info \
 	build build-debug switch switch-off upgrade rollback \
-	gc gc-hard fmt status flatpak-setup flatpak-sync flatpak-update flatpak-update-repo \
+	gc gc-hard fmt status \
+	flatpak-setup flatpak-sync flatpak-update flatpak-update-repo \
 	debug-cmd flake-show
 
 # ------------------------------------------
@@ -74,39 +93,37 @@ help:
 	@echo "  HOST=macbook | HOST=dell"
 	@echo ""
 	@echo "Common:"
-	@echo "  make build HOST=<host>            -> flake update + auto-commit + nixos-rebuild build + list generations + post-info"
-	@echo "  make switch HOST=<host>           -> flake update + auto-commit + nixos-rebuild switch + list generations + post-info"
-	@echo "  make switch-off HOST=<host>       -> safe switch (multi-user.target) + list generations + post-info"
-	@echo "  make upgrade HOST=<host>          -> flake update + auto-commit + switch + list generations + post-info"
-	@echo "  make build-debug HOST=<host>      -> flake update + auto-commit + switch --verbose --show-trace (logs) + list generations + post-info"
+	@echo "  make build HOST=<host>                         -> flake update + auto-commit + nixos-rebuild build + list generations + post-info"
+	@echo "  make switch HOST=<host>                        -> flake update + auto-commit + nixos-rebuild switch + list generations + post-info"
+	@echo "  make switch HOST=<host> DEVOPS=1               -> enables DevOps services (docker/k3s) via env + --impure"
+	@echo "  make switch HOST=<host> QEMU=1                 -> enables QEMU/libvirt via env + --impure"
+	@echo "  make switch HOST=<host> DEVOPS=1 QEMU=1         -> enables both (independent flags) via env + --impure"
+	@echo "  make switch-off HOST=<host>                    -> safe switch (multi-user.target) + list generations + post-info"
+	@echo "  make upgrade HOST=<host>                       -> flake update + auto-commit + switch + list generations + post-info"
+	@echo "  make build-debug HOST=<host>                   -> flake update + auto-commit + switch --verbose --show-trace (logs)"
 	@echo ""
 	@echo "Options:"
-	@echo "  IMPURE=1                          -> adds --impure to nixos-rebuild"
-	@echo "  GIT_PUSH=1                        -> pushes after auto-commit"
-	@echo "  GIT_COMMIT_MSG='...'              -> commit message override"
-	@echo "  DEBUG_LOG=/path/file.log          -> debug log path (build-debug)"
+	@echo "  IMPURE=1                                       -> forces --impure even without flags"
+	@echo "  GIT_PUSH=1                                     -> pushes after auto-commit"
+	@echo "  GIT_COMMIT_MSG='...'                           -> commit message override"
+	@echo "  DEBUG_LOG=/path/file.log                       -> debug log path (build-debug)"
 	@echo ""
 	@echo "Diagnostics:"
-	@echo "  make debug-cmd HOST=<host>        -> prints the resolved nixos-rebuild command"
-	@echo "  make flake-show                   -> nix flake show (to see nixosConfigurations.*)"
+	@echo "  make debug-cmd HOST=<host>                     -> prints the resolved nixos-rebuild command"
+	@echo "  make flake-show                                -> nix flake show"
 	@echo ""
 	@echo "Flatpak (manual):"
-	@echo "  make flatpak-setup                -> add Flathub remote if missing"
-	@echo "  make flatpak-sync                 -> run scripts/flatpak-sync.sh (install/update apps on-demand)"
-	@echo "  make flatpak-update               -> flatpak update -y"
-	@echo "  make flatpak-update-repo          -> flatpak update --appstream -y + update -y"
+	@echo "  make flatpak-setup                             -> add Flathub remote if missing"
+	@echo "  make flatpak-sync                              -> run scripts/flatpak-sync.sh (install/update apps on-demand)"
+	@echo "  make flatpak-update                            -> flatpak update -y"
+	@echo "  make flatpak-update-repo                       -> flatpak update --appstream -y + update -y"
 	@echo ""
 	@echo "Maintenance:"
-	@echo "  make gc                           -> nix garbage collection"
-	@echo "  make gc-hard                      -> aggressive garbage collection"
-	@echo "  make fmt                          -> nix fmt + git status"
-	@echo "  make status                       -> systemd --user list-jobs"
-	@echo "  make rollback                     -> nixos-rebuild switch --rollback + list generations + post-info"
-	@echo ""
-	@echo "Notes:"
-	@echo "  - build/switch/upgrade/build-debug always run: nix flake update"
-	@echo "  - auto-commit runs only if there are local changes"
-	@echo "  - rollback is not per-HOST; it rolls back the currently booted machine"
+	@echo "  make gc                                        -> nix garbage collection"
+	@echo "  make gc-hard                                   -> aggressive garbage collection"
+	@echo "  make fmt                                       -> nix fmt + git status"
+	@echo "  make status                                    -> systemd --user list-jobs"
+	@echo "  make rollback                                  -> nixos-rebuild switch --rollback + list generations + post-info"
 
 # ------------------------------------------
 # Diagnostics
@@ -116,6 +133,7 @@ flake-show:
 
 debug-cmd:
 	@$(require_host)
+	@$(require_flake_host)
 	$(call print_cmd,switch,)
 
 # ------------------------------------------
@@ -158,6 +176,7 @@ post-info:
 	@echo ""
 	@echo "=== Post-build validation ==="
 	@echo "Host (flake):        $(HOST)"
+	@echo "Flags:               DEVOPS=$(if $(DEVOPS),1,0) QEMU=$(if $(QEMU),1,0) IMPURE=$(if $(IMPURE),1,0) (effective impure: $(if $(EFFECTIVE_IMPURE),yes,no))"
 	@echo "NixOS version:       $$(nixos-version)"
 	@echo "Kernel:              $$(uname -r)"
 	@echo "Uptime:              $$(uptime -p 2>/dev/null || true)"
@@ -191,9 +210,8 @@ switch:
 	@$(require_flake_host)
 	$(MAKE) update-flake
 	$(MAKE) check_git_status
-	@echo ">>> nixos-rebuild command:"
-	@echo "    sudo nixos-rebuild switch --flake $(NIXOS_CONFIG)#$(HOST) $(if $(IMPURE),--impure,)"
-	sudo nixos-rebuild switch --flake $(NIXOS_CONFIG)#$(HOST) $(if $(IMPURE),--impure,)
+	$(call print_cmd,switch,)
+	$(call NIXOS_CMD,switch,)
 	$(MAKE) list-generations
 	$(MAKE) post-info
 
