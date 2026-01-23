@@ -33,6 +33,5 @@
   # Containers disabled by default
   ############################################
 
-  virtualisation.docker.enable = lib.mkForce false;
   systemd.services.k3s.wantedBy = lib.mkForce [];
 }
