@@ -1,316 +1,208 @@
 [![NixOS CI](https://github.com/waldirborbajr/nixos-config/actions/workflows/nixos.yaml/badge.svg)](https://github.com/waldirborbajr/nixos-config/actions/workflows/nixos.yaml)
 
-
-
 # BORBA JR W – NixOS Configuration ❄️
 
-Personal NixOS workstation configuration focused on clarity, reproducibility, low maintenance, and fast recovery.
+# 🧊 nixos-config
 
-This repository intentionally does NOT use Home Manager.
-User dotfiles and application-level configuration are managed externally via GNU Stow.
+Declarative, modular **multi-host NixOS configuration**, focused on performance, clarity, and on-demand features.
 
-Philosophy:
-If I reinstall the OS, everything I need must be installed and working — no manual steps, no leftovers.
+This repository is the **single source of truth** for my personal Linux infrastructure, supporting machines with very different capabilities while keeping one consistent workflow.
 
 ---
 
-## Goals
+## 🎯 Project Goals
 
-- Fast boot and responsive desktop
-- Simple and reliable reinstallation
-- Predictable cleanup and disk space control
-- Clear separation between system, hardware, desktop, and user
-- Laptop-focused workstation (Dell / MacBook)
-- No Home Manager
-- No flakes
-- Deterministic system-wide packages
-- Long-term maintainability
+- One repository, multiple hosts
+- Clear separation between:
+  - Core system
+  - Hardware
+  - Desktop environments
+  - Optional features
+- Avoid unnecessary heavy rebuilds
+- Containers, Kubernetes and virtualization **only when explicitly enabled**
+- Predictable performance, even on old hardware
 
 ---
 
-## Repository Layout
+## 🖥️ Supported Hardware
+
+### 🍎 MacBook Pro 13" (2011)
+- Architecture: x86_64
+- RAM: 16 GB
+- Storage: 500 GB SSD
+- Role: main workstation
+- Desktop: Hyprland (Wayland) + GNOME (via GDM)
+- Optional features: DEVOPS / QEMU (on-demand)
+
+### 💻 Dell Inspiron 1456
+- Architecture: x86_64
+- RAM: 4 GB
+- Storage: 120 GB SSD
+- Role: basic usage / study machine
+- Desktop: i3 (X11)
+- Optional features: all disabled (Docker, K3s, QEMU)
+
+---
+
+## 🧱 Repository Architecture
 
 ```
 .
+├── ARCHITECTURE.md
+├── CHANGELOG.md
+├── IINSTALL.md
+├── LICENSE
 ├── Makefile
+├── NEWHOST.md
+├── OPERATIONS.md
 ├── README.md
+├── VERSIONING.md
 ├── build.sh
+├── core.nix
+├── default.nix
 ├── dump.sh
-├── init.sh
-├── link.sh
-├── configuration.nix
+├── flake.lock
+├── flake.nix
 ├── hardware-configuration-dell.nix
 ├── hardware-configuration-macbook.nix
+├── hosts
+│ ├── dell.nix
+│ └── macbook.nix
+├── init.sh
+├── link.sh
 ├── modules
-│   ├── audio.nix
-│   ├── autologin.nix
-│   ├── base.nix
-│   ├── containers
-│   │   ├── docker.nix
-│   │   ├── k3s.nix
-│   │   └── podman.nix
-│   ├── desktops
-│   │   └── gnome.nix
-│   ├── fonts.nix
-│   ├── hardware
-│   │   ├── dell.nix
-│   │   └── macbook.nix
-│   ├── networking.nix
-│   ├── nixpkgs.nix
-│   ├── system-packages.nix
-│   ├── users
-│   │   └── borba.nix
-│   └── virtualization
-│       └── libvirt.nix
-├── output.txt
-└── profiles
-    ├── dell.nix
-    └── macbook.nix
+│ ├── audio.nix
+│ ├── autologin.nix
+│ ├── base.nix
+│ ├── containers
+│ │ ├── common.nix
+│ │ ├── docker.nix
+│ │ ├── k3s.nix
+│ │ └── podman.nix
+│ ├── desktops
+│ │ ├── gnome.nix
+│ │ └── hyprland
+│ │ ├── default.nix
+│ │ ├── hyprland.conf
+│ │ ├── waybar-config.json
+│ │ └── waybar-style.css
+│ ├── features
+│ │ ├── devops.nix
+│ │ └── qemu.nix
+│ ├── flatpak
+│ │ ├── enable.nix
+│ │ └── packages.nix
+│ ├── fonts.nix
+│ ├── hardware
+│ │ ├── dell.nix
+│ │ └── macbook.nix
+│ ├── networking.nix
+│ ├── nixpkgs.nix
+│ ├── nodejs
+│ │ ├── common.nix
+│ │ ├── default.nix
+│ │ └── enable.nix
+│ ├── performance
+│ │ ├── common.nix
+│ │ ├── dell.nix
+│ │ └── macbook.nix
+│ ├── python
+│ │ ├── common.nix
+│ │ ├── default.nix
+│ │ ├── poetry.nix
+│ │ └── uv.nix
+│ ├── ssh.nix
+│ ├── system-packages.nix
+│ ├── users
+│ │ └── borba.nix
+│ └── virtualization
+│ └── libvirt.nix
+├── profiles
+│ ├── dell.nix
+│ └── macbook.nix
+├── scripts
+│ ├── ci-build.sh
+│ ├── ci-checks.sh
+│ ├── ci-eval.sh
+│ └── flatpak-sync.sh
+└── troubleshoot.sh
 ```
 
 ---
 
-## Architecture
+## 🧩 Feature Flags (On-Demand)
 
-Single entrypoint design.
+Heavy components are **disabled by default**.
 
-configuration.nix is the only entrypoint.
-It only wires modules together and defines top-level system concerns.
+### DEVOPS
+- Docker
+- K3s
+- DevOps tooling
 
-No logic lives in configuration.nix.
+### QEMU
+- libvirtd
+- QEMU
+- virt-manager
 
----
-
-## Host Profiles
-
-profiles/dell.nix
-- Hostname
-- Legacy BIOS GRUB bootloader
-
-profiles/macbook.nix
-- Hostname
-- EFI + systemd-boot
-
-Only one profile must be enabled at a time.
+Flags are **independent** and can be combined freely.
 
 ---
 
-## Hardware
-
-hardware-configuration-*.nix files are generated by nixos-generate-config.
-They must not be edited manually.
-
-modules/hardware/*
-- Firmware and microcode
-- Wi-Fi drivers
-- Blacklisted kernel modules
-- Vendor-specific quirks
-
----
-
-## Core System
-
-modules/base.nix
-- Locale and timezone
-- Console keymap
-- Experimental Nix features
-
-modules/networking.nix
-- NetworkManager
-- Faster boot (wait-online disabled)
-
-modules/audio.nix
-- PipeWire
-- PulseAudio disabled
-- ALSA with 32-bit support
-
-modules/fonts.nix
-- JetBrainsMono Nerd Font
-- Fontconfig defaults
-
----
-
-## Desktop
-
-modules/desktops/gnome.nix
-- GNOME on Wayland
-- GDM
-- Wayland-native environment variables
-- XDG portals
-
-modules/autologin.nix
-- Automatic login for user borba
-
----
-
-## Packages
-
-modules/system-packages.nix defines all system-wide packages.
-
-Includes:
-- Terminals
-- Shells and multiplexers
-- Editors and IDEs
-- Containers and Kubernetes tooling
-- Languages and compilers
-- CLI utilities
-- Browsers
-- Virtualization tools
-
-Everything is declarative and reproducible.
-
----
-
-## Containers and Virtualization
-
-Docker
-- Enabled as a system service
-- Starts on boot
-
-Podman
-- Rootless
-- Docker-compatible CLI
-- Disabled by default
-
-K3s
-- Single-node Kubernetes
-- Server role
-- Traefik and ServiceLB disabled
-- Firewall port 6443 open
-
-Libvirt
-- QEMU/KVM
-- virt-manager support
-- Polkit enabled
-
----
-
-## User
-
-modules/users/borba.nix
-- User borba
-- ZSH shell
-- Groups: wheel, docker, libvirtd, networkmanager
-- Passwordless sudo for nixos-rebuild
-- Dotfiles managed via GNU Stow
-
----
-
-## Makefile Usage
-
-## This repository must live at:
+## 🧪 Usage (Makefile)
 
 ```
-$HOME/nixos-config
+make switch HOST=macbook  
+DEVOPS=1 make switch HOST=macbook  
+QEMU=1 make switch HOST=macbook  
+DEVOPS=1 QEMU=1 make switch HOST=macbook  
 ```
 
-## No symlinks to /etc/nixos are used.
-
-## Common commands:
+Dell (always minimal):
 
 ```
-make switch
-make build
-make rollback
+make switch HOST=dell
 ```
 
-## Channel management:
+Run:
 
 ```
-make channels
-```
-
-## Garbage collection:
-
-```
-make gc-soft
-make gc-hard
-```
-
-## Store maintenance:
-
-```
-make optimise
-make verify
-```
-
-## Diagnostics:
-
-```
-make doctor
-make generations
-make space
+make help
 ```
 
 ---
 
-## Reinstallation Workflow
+## ⚡ Performance Strategy
+
+- schedutil CPU governor (MacBook)
+- ZRAM enabled
+- systemd startup optimizations
+- journald size limits
+- heavy services disabled by default
+- Dell treated as low-resource machine
+
+Troubleshooting:
 
 ```
-1. Install NixOS (minimal installer)
-2. Clone the repository into $HOME/nixos-config
-3. Select the correct host profile in configuration.nix
-4. Import the correct hardware-configuration file
-5. Run make switch
-6. Restore dotfiles using GNU Stow
-```
-
----
-
-## Design Decisions
-
-- No Home Manager
-- No flakes
-- Declarative system only
-- Explicit maintenance
-- Clear module boundaries
-- Easy hardware swap
-- Repo-based rebuilds (no /etc/nixos)
-
----
-
-## References
-
-https://nixos.org/manual  
-https://wiki.nixos.org  
-https://github.com/AlexNabokikh/nix-config  
-
----
-
-Final Notes
-
-This configuration is boring by design.
-Boring means reliable, predictable, reproducible, and disposable.
-
-Version: v1.2.1
-
-GPT: [https://chatgpt.com/share/696fa14b-4160-800c-8714-210ff3688f73](https://chatgpt.com/share/697289a7-2498-800c-b917-8d9c82d4d6ce)
-
-
-````
-.git/hook/pre-commit
-
-#!/usr/bin/env bash
-set -e
-
-echo "Running nixfmt..."
-nix-shell -p nixfmt-rfc-style --run '
-  find . -name "*.nix" \
-    ! -name "hardware-configuration-*.nix" \
-    -exec nixfmt {} \;
-'
-
-git diff --quiet || {
-  echo "Nix files were reformatted. Please review and commit again."
-  exit 1
-}
+./troubleshoot.sh
 ```
 
 ---
 
-## Add FlatPak Support
+## ➕ Adding a New Host
 
+See:
+NEWHOST.md
 
-````
-flatpak override --user --filesystem=home md.obsidian.Obsidian
-```
+---
+
+## 📜 License
+
+MIT
+
+---
+
+## 👤 Author
+
+BORBA JR W
+
+Declarative infrastructure. Pragmatic design. Zero waste.
