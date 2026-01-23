@@ -9,7 +9,6 @@
   # Hardware & Performance
   ############################################
   imports = [
-    ../modules/nixpkgs.nix
     ../modules/hardware/macbook.nix
     ../modules/performance/macbook.nix
     ../hardware-configuration-macbook.nix
@@ -18,7 +17,6 @@
     ../modules/desktops/hyprland/default.nix
     ../modules/desktops/gnome.nix
     ../modules/autologin.nix
-    ../modules/features/devops.nix
   ];
 
   ############################################
@@ -27,14 +25,7 @@
   networking.hostName = "macbook-nixos";
 
   ############################################
-  # Docker ON no MacBook (DevOps)
-  ############################################
-  virtualisation.docker.enable = lib.mkForce true;
-
-  ############################################
   # GNOME services (safe)
-  # - Keyring is useful even in Hyprland (browsers, git creds, ssh agents)
-  # - Avoid enabling extra GNOME-only services here
   ############################################
   services.gnome.gnome-keyring.enable = true;
 
