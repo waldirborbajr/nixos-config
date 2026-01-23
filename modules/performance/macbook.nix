@@ -17,7 +17,7 @@
   # CPU (aggressive power saving)
   ############################################
 
-  powerManagement.cpuFreqGovernor = "powersave";
+  powerManagement.cpuFreqGovernor = "schedutil";
 
 
   ############################################
