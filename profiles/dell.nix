@@ -14,8 +14,13 @@
     ../hardware-configuration-dell.nix
   ];
 
-  # Docker OFF no Dell (máquina lenta)
+  ############################################
+  # Hard-disable on Dell (slow machine)
+  # - Never run DEVOPS/Docker/K3s/QEMU here
+  ############################################
   virtualisation.docker.enable = lib.mkForce false;
+  services.k3s.enable = lib.mkForce false;
+  virtualisation.libvirtd.enable = lib.mkForce false;
 
   ############################################
   # Host identity
