@@ -178,8 +178,9 @@ switch:
 	@$(require_flake_host)
 	$(MAKE) update-flake
 	$(MAKE) check_git_status
-	$(call print_cmd,switch,)
-	$(call NIXOS_CMD,switch,)
+	@echo ">>> nixos-rebuild command:"
+	@echo "    sudo nixos-rebuild switch --flake $(NIXOS_CONFIG)#$(HOST) $(if $(IMPURE),--impure,)"
+	sudo nixos-rebuild switch --flake $(NIXOS_CONFIG)#$(HOST) $(if $(IMPURE),--impure,)
 	$(MAKE) list-generations
 	$(MAKE) post-info
 
