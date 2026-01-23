@@ -1,17 +1,41 @@
-# Changelog
+# 📜 Changelog
 
-All notable changes to this repository will be documented in this file.
-
-This project follows **Conventional Commits** and **infra-style versioning**.
+All notable changes to this repository are documented in this file.  
+This project follows **Conventional Commits** and **Infra-Style Versioning**.
 
 ---
 
 ## [Unreleased]
 
 ### Added
-- Initial project structure
-- Base NixOS modules
-- Host-specific configuration layout
+- Initial project structure improvements
+- Core Makefile refinements
+- Feature flags for DEVOPS and QEMU support
+- Unified hyprland desktop module with XDG config management
+
+### Changed
+- Refactor system-packages to include build tooling
+- Flatten and simplify desktop modules
+- Update performance defaults for MacBook and Dell
+
+### Fixed
+- Flake host validation logic
+- Symlink user config behavior
+
+### Removed
+- Deprecated operations documentation (OPERATIONS.md)
+- Legacy modules no longer in use
+
+---
+
+## [v1.0.0] — Initial Release
+
+### Added
+- Stable baseline configuration
+- Multi-host NixOS support (MacBook, Dell)
+- Performance and system modular organization
+- Basic container support (Docker, Podman)
+- Desktop environments: GNOME and Hyprland
 
 ### Changed
 - Centralized system packages by responsibility
@@ -22,28 +46,21 @@ This project follows **Conventional Commits** and **infra-style versioning**.
 
 ---
 
-## [v1.0.0] - Initial Release
-
-### Added
-- Stable baseline configuration
-- Docker as the primary container runtime
-- Performance and system organization foundations
-
----
-
-## Changelog Rules
+## 📘 Changelog Rules
 
 - Keep entries short and objective
 - Group changes by type
-- Never remove released entries
+- Do **not remove released entries**
 - Always update before tagging a release
 
 ---
 
-## Commit Types Mapping
+## 🧩 Commit Types Mapping
 
-- feat     → Added
-- fix      → Fixed
-- refactor → Changed
-- chore    → Changed
-- docs     → Documentation
+| Commit Type | Changelog Section |
+|-------------|-------------------|
+| `feat`      | Added             |
+| `fix`       | Fixed             |
+| `refactor`  | Changed           |
+| `chore`     | Changed           |
+| `docs`      | Documentation     |
