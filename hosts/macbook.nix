@@ -18,6 +18,7 @@
     ../modules/desktops/hyprland/default.nix
     ../modules/desktops/gnome.nix
     ../modules/autologin.nix
+    ../modules/features/devops.nix
   ];
 
   ############################################
