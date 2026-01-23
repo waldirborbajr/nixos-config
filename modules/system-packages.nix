@@ -3,7 +3,7 @@
 { pkgs, ... }:
 
 let
-  unstable = pkgs.unstable or pkgs;
+  unstable hookup = pkgs.unstable or pkgs;
 in
 {
   environment.systemPackages =
@@ -78,6 +78,26 @@ in
       rust-analyzer
       lua
       lua-language-server
+
+      ##########################################
+      # Build essentials (ADD)
+      ##########################################
+      gnumake
+      binutils
+      pkg-config
+      cmake
+      ninja
+      meson
+      autoconf
+      automake
+      libtool
+      patchelf
+
+      ##########################################
+      # Common native deps used in builds (ADD)
+      ##########################################
+      openssl
+      zlib
 
       ##########################################
       # Nix Tooling (stable)
@@ -183,6 +203,10 @@ in
       llvm
       lld
       gdb
+
+      # Optional but useful for native debugging alongside gdb (ADD)
+      lldb
+
       # neovim
       # vscode
       # discord
