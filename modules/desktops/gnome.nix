@@ -31,7 +31,7 @@
 
   # Portals (required for Wayland apps)
   xdg.portal = {
-    enable = true;
+    enable = false;
     extraPortals = with pkgs; [
       xdg-desktop-portal-gnome
       xdg-desktop-portal-gtk
