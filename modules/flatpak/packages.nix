@@ -44,6 +44,19 @@ let
 #    "org.libreoffice.LibreOffice"
   ];
 in
+
+{
+  services.flatpak.enable = true;
+
+  # Garanta o remote, mas NÃO faça update/install/uninstall no rebuild
+  system.userActivationScripts.flatpak-remote = ''
+    if command -v flatpak >/dev/null 2>&1; then
+      flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo >/dev/null 2>&1 || true
+    fi
+  '';
+}
+
+/*
 {
   system.userActivationScripts.flatpakInstall = {
     text = ''
@@ -76,3 +89,4 @@ in
     '';
   };
 }
+*/
