@@ -12,7 +12,6 @@
     ../modules/nixpkgs.nix
     ../modules/hardware/macbook.nix
     ../modules/performance/macbook.nix
-    # ../modules/desktops/hyprland.nix
     ../hardware-configuration-macbook.nix
 
     # Desktop apenas no MacBook
@@ -21,24 +20,22 @@
     ../modules/autologin.nix
   ];
 
-  # Docker ON no MacBook (DevOps)
-  virtualisation.docker.enable = lib.mkForce true;
-
-
-  ############################################
-  # Hardware & Performance
-  ############################################
-  #imports = [
-  #  ../modules/nixpkgs.nix              # Módulo Nixpkgs primeiro para allowUnfree
-  #  ../modules/hardware/macbook.nix
-  #  ../modules/performance/macbook.nix
-  #  ../hardware-configuration-macbook.nix
-  #];
-
   ############################################
   # Host identity
   ############################################
   networking.hostName = "macbook-nixos";
+
+  ############################################
+  # Docker ON no MacBook (DevOps)
+  ############################################
+  virtualisation.docker.enable = lib.mkForce true;
+
+  ############################################
+  # GNOME services (safe)
+  # - Keyring is useful even in Hyprland (browsers, git creds, ssh agents)
+  # - Avoid enabling extra GNOME-only services here
+  ############################################
+  services.gnome.gnome-keyring.enable = true;
 
   ############################################
   # Bootloader (EFI)
@@ -52,7 +49,7 @@
   console.keyMap = "us";
 
   ############################################
-  # X11 layout
+  # X11 layout (needed for GDM / GNOME selection screen)
   ############################################
   services.xserver.enable = true;
   services.xserver.xkb = {
@@ -73,7 +70,7 @@
   environment.systemPackages = with pkgs; [
     iw
     wirelesstools
-    util-linux              # garante rfkill
+    util-linux
     config.boot.kernelPackages.broadcom_sta
   ];
 }
