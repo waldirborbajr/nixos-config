@@ -6,6 +6,7 @@
 # - keep existing behavior (DEVOPS/QEMU/IMPURE flags, auto-commit support)
 # ==========================================
 SHELL := /run/current-system/sw/bin/bash
+.ONESHELL:
 .SHELLFLAGS := -euo pipefail -c
 NIXOS_CONFIG ?= $(HOME)/nixos-config
 HOST ?=
@@ -100,7 +101,8 @@ build-debug dry-switch dry-build \
 list-generations current-system why-no-new-generation \
 fmt status \
 gc gc-hard \
-flatpak-setup flatpak-update flatpak-update-repo
+flatpak-setup flatpak-update flatpak-update-repo \
+switch-prod
 # ------------------------------------------
 # Help
 # ------------------------------------------
@@ -113,7 +115,8 @@ help:
 	@echo ""
 	@echo "Build/Switch:"
 	@echo " make build HOST=<host> [DEVOPS=1] [QEMU=1] [IMPURE=1]"
-	@echo " make switch HOST=<host> [DEVOPS=1] [QEMU=1] [IMPURE=1]"
+	@echo " make switch HOST=<host> [DEVOPS=1] [QEMU=1] [IMPURE=1]          # rápido, sem flake-check"
+	@echo " make switch-prod HOST=<host> [DEVOPS=1] [QEMU=1] [IMPURE=1]     # com flake-check obrigatório"
 	@echo " make dry-switch HOST=<host> # shows what would happen"
 	@echo ""
 	@echo "Upgrade (updates flake.lock):"
@@ -252,6 +255,17 @@ switch:
 	@$(MAKE) preflight
 	@if [[ "$(AUTO_UPDATE_FLAKE)" == "1" ]]; then $(MAKE) update-flake; else echo "AUTO_UPDATE_FLAKE=0 -> skipping flake update."; fi
 	@$(MAKE) check_git_status
+	@echo "Before:"
+	@$(MAKE) current-system
+	@$(call print_cmd,switch,)
+	@$(call nixos_cmd,switch,)
+	@echo "After:"
+	@$(MAKE) current-system
+	@$(MAKE) list-generations
+switch-prod:
+	@$(MAKE) preflight
+	@if [[ "$(AUTO_UPDATE_FLAKE)" == "1" ]]; then $(MAKE) update-flake; else echo "AUTO_UPDATE_FLAKE=0 -> skipping flake update."; fi
+	@$(MAKE) check_git_status
 	@$(MAKE) flake-check
 	@echo "Before:"
 	@$(MAKE) current-system
@@ -277,6 +291,7 @@ build-debug:
 	@$(MAKE) preflight
 	@if [[ "$(AUTO_UPDATE_FLAKE)" == "1" ]]; then $(MAKE) update-flake; else echo "AUTO_UPDATE_FLAKE=0 -> skipping flake update."; fi
 	@$(MAKE) check_git_status
+	@$(MAKE) flake-check
 	@$(call print_cmd,switch,--verbose --show-trace)
 	@$(call nixos_cmd,switch,--verbose --show-trace) | tee $(DEBUG_LOG)
 	@echo "Saved log: $(DEBUG_LOG)"
@@ -311,4 +326,3 @@ flatpak-update:
 	@flatpak update -y
 flatpak-update-repo:
 	@flatpak update --appstream -y && flatpak update -y
-
