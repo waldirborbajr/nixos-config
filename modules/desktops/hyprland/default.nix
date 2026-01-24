@@ -45,13 +45,13 @@
   ############################################
   # Portals (crucial for Flatpak apps, file picker, screenshots, screen-share)
   ############################################
-  xdg.portal = {
-    enable = true;
-    extraPortals = with pkgs; [
-      xdg-desktop-portal-hyprland
-      xdg-desktop-portal-gtk
-    ];
-  };
+#  xdg.portal = {
+#    enable = true;
+#    extraPortals = with pkgs; [
+#      xdg-desktop-portal-hyprland
+#      xdg-desktop-portal-gtk
+#    ];
+#  };
 
   ############################################
   # Session variables (safe globally; do NOT force session type)

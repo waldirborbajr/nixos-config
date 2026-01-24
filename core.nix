@@ -38,6 +38,7 @@
     ##########################################
     ./modules/flatpak/enable.nix
     ./modules/flatpak/packages.nix
+    ./modules/xdg-portal.nix      # ← adicione aqui
 
     ##########################################
     # Access
