@@ -17,6 +17,11 @@
     ../modules/desktops/hyprland/default.nix
     ../modules/desktops/gnome.nix
     ../modules/autologin.nix
+
+    ../modules/apps/kitty.nix
+    ../modules/apps/alacritty.nix
+    ../modules/apps/zsh.nix
+
   ];
 
   ############################################
