@@ -17,9 +17,8 @@ in
     ./modules/apps/gh.nix
     ./modules/apps/go.nix
     ./modules/apps/rust.nix
+    ./modules/apps/niri.nix
 
-    # Niri só no macbook — avalia o módulo corretamente
-    (lib.mkIf isMacbook (import ./modules/apps/niri.nix { inherit config pkgs lib; }))
   ];
 
   # Pacotes comuns a todos
