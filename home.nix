@@ -1,10 +1,7 @@
 # home.nix
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, hostname, ... }:  # ← recebe hostname do specialArgs
 
 let
-  # Usa builtins.getEnv para evitar qualquer dependência de config
-  # (HOSTNAME geralmente está setado no shell; se não, fallback para "unknown")
-  hostname = builtins.getEnv "HOSTNAME";
   isMacbook = (hostname == "macbook-nixos") || (hostname == "macbook");
 in
 {
@@ -20,11 +17,10 @@ in
     ./modules/apps/go.nix
     ./modules/apps/rust.nix
 
-    # Niri só no macbook (import condicional + avaliação correta)
+    # Niri só no macbook
     (lib.mkIf isMacbook (import ./modules/apps/niri.nix { inherit config pkgs lib; }))
   ];
 
-  # Pacotes comuns a todos os hosts
   home.packages = with pkgs; [
     git
     fzf
