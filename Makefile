@@ -26,13 +26,8 @@ AUTO_UPDATE_FLAKE ?= 0   # 0 = safer default; set to 1 if you really want auto u
 AUTO_GIT_COMMIT ?= 1     # keep your current behavior as default
 
 # ------------------------------------------
-# Internal helpers (shell-safe)
+# Internal helpers
 # ------------------------------------------
-define die
-	@echo "ERROR: $(1)" >&2
-	@exit 1
-endef
-
 define require_host
 	@if [[ -z "$(HOST)" ]]; then \
 		echo "ERROR: HOST is required."; \
@@ -85,6 +80,15 @@ endef
 
 define show_flags
 	@echo "Flags: HOST=$(HOST) IMPURE=$(IMPURE) DEVOPS=$(DEVOPS) QEMU=$(QEMU)"
+endef
+
+define maybe_update_flake
+	@if [[ "$(AUTO_UPDATE_FLAKE)" == "1" ]]; then \
+		echo "AUTO_UPDATE_FLAKE=1 -> updating flake.lock"; \
+		$(MAKE) update-flake; \
+	else \
+		echo "AUTO_UPDATE_FLAKE=0 -> skipping flake update."; \
+	fi
 endef
 
 # ------------------------------------------
@@ -145,7 +149,7 @@ help:
 	@echo "  make gc | make gc-hard CONFIRM=YES"
 	@echo ""
 	@echo "Notes:"
-	@echo "  - AUTO_UPDATE_FLAKE=0 by default (safer)."
+	@echo "  - AUTO_UPDATE_FLAKE=0 by default (safer). Set AUTO_UPDATE_FLAKE=1 if you want."
 	@echo "  - AUTO_GIT_COMMIT=1 by default."
 
 # ------------------------------------------
@@ -154,9 +158,13 @@ help:
 hosts:
 	@$(call require_repo)
 	@echo "Available hosts from flake outputs:"
-	@cd $(NIXOS_CONFIG) && nix --extra-experimental-features "nix-command flakes" flake show --json \
-		| jq -r '.nixosConfigurations | keys[]' 2>/dev/null || \
-		(echo "HINT: install jq for pretty host listing, or run: make flake-show"; exit 0)
+	@cd $(NIXOS_CONFIG) && \
+	(nix --extra-experimental-features "nix-command flakes" flake show --json \
+		| jq -r '.nixosConfigurations | keys[]' 2>/dev/null) \
+	|| (echo "NOTE: jq not found (or json parsing failed). Showing non-json output:"; \
+		nix --extra-experimental-features "nix-command flakes" flake show | sed -n '1,120p'; \
+		echo "TIP: install jq for clean host listing."; \
+		exit 0)
 
 flake-show:
 	@$(call require_repo)
@@ -213,11 +221,11 @@ check_git_status:
 		echo "AUTO_GIT_COMMIT=0 -> skipping auto-commit."; \
 		exit 0; \
 	fi
-	@if [ -n "$$(git -C $(NIXOS_CONFIG) status --porcelain)" ]; then \
+	@if [[ -n "$$(git -C $(NIXOS_CONFIG) status --porcelain)" ]]; then \
 		echo "Git changes detected -> auto add/commit..."; \
 		git -C $(NIXOS_CONFIG) add .; \
 		git -C $(NIXOS_CONFIG) commit -m "$(GIT_COMMIT_MSG)" || true; \
-		if [ "$(GIT_PUSH)" = "1" ]; then \
+		if [[ "$(GIT_PUSH)" == "1" ]]; then \
 			git -C $(NIXOS_CONFIG) push; \
 		fi; \
 	else \
@@ -271,7 +279,7 @@ dry-build:
 
 build:
 	@$(MAKE) preflight
-	@if [[ "$(AUTO_UPDATE_FLAKE)" == "1" ]]; then $(MAKE) update-flake; else echo "AUTO_UPDATE_FLAKE=0 -> skipping flake update."; fi
+	@$(call maybe_update_flake)
 	@$(MAKE) check_git_status
 	@$(MAKE) flake-check
 	@echo "Before:"
@@ -284,14 +292,7 @@ build:
 
 switch:
 	@$(MAKE) preflight
-
- @if [[ "$(AUTO_UPDATE_FLAKE)" == "1" ]]; then \
-	 echo "AUTO_UPDATE_FLAKE=1 -> updating flake"; \
-  	$(MAKE) update-flake; \
- else \
-	 echo "AUTO_UPDATE_FLAKE=0 -> skipping flake     update."; \
- fi
-
+	@$(call maybe_update_flake)
 	@$(MAKE) check_git_status
 	@$(MAKE) flake-check
 	@echo "Before:"
@@ -319,7 +320,7 @@ upgrade:
 
 build-debug:
 	@$(MAKE) preflight
-	@if [[ "$(AUTO_UPDATE_FLAKE)" == "1" ]]; then $(MAKE) update-flake; else echo "AUTO_UPDATE_FLAKE=0 -> skipping flake update."; fi
+	@$(call maybe_update_flake)
 	@$(MAKE) check_git_status
 	@$(call print_cmd,switch,--verbose --show-trace)
 	@$(call nixos_cmd,switch,--verbose --show-trace) | tee $(DEBUG_LOG)
