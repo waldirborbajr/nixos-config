@@ -2,9 +2,9 @@
 { config, pkgs, lib, ... }:
 
 let
-  # Pega HOSTNAME do ambiente (não depende de config → sem recursão)
+  # Usa builtins.getEnv para evitar qualquer dependência de config
+  # (HOSTNAME geralmente está setado no shell; se não, fallback para "unknown")
   hostname = builtins.getEnv "HOSTNAME";
-  # Se HOSTNAME estiver vazio, considera como não-macbook (ou ajuste se quiser default)
   isMacbook = (hostname == "macbook-nixos") || (hostname == "macbook");
 in
 {
@@ -20,7 +20,7 @@ in
     ./modules/apps/go.nix
     ./modules/apps/rust.nix
 
-    # Niri só no macbook (com import condicional)
+    # Niri só no macbook (import condicional + avaliação correta)
     (lib.mkIf isMacbook (import ./modules/apps/niri.nix { inherit config pkgs lib; }))
   ];
 
