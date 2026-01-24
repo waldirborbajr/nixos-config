@@ -1,20 +1,20 @@
+# modules/apps/alacritty.nix
 { config, pkgs, lib, ... }:
 
 {
+  ############################################
+  # Packages
+  ############################################
   environment.systemPackages = with pkgs; [
     alacritty
     tmux
-    zsh
     nerd-fonts.jetbrains-mono
   ];
 
-  # Ensure tmux uses zsh as the default shell
-  programs.tmux = {
-    enable = true;
-    shell = pkgs.zsh;
-  };
-
-  # Canonical config in /etc/xdg (Nix-managed)
+  ############################################
+  # Alacritty config (Nix-managed)
+  # Canonical: /etc/xdg/alacritty/alacritty.toml
+  ############################################
   environment.etc."xdg/alacritty/alacritty.toml".text = ''
     # =========================
     # Ambiente
@@ -45,6 +45,7 @@
     # =========================
     # Shell
     # =========================
+    # Entramos no tmux e ele abre o shell padrão (vamos forçar zsh pelo tmux.conf).
     [terminal.shell]
     program = "tmux"
     args = ["new-session", "-A", "-D", "-s", "DevOps"]
@@ -64,15 +65,11 @@
     glyph_offset = { x = 0, y = 0 }
 
     # =========================
-    # Cursor (CORRIGIDO)
+    # Cursor
     # =========================
     [cursor]
     unfocused_hollow = true
-
-    # Estilo normal do cursor (ENUM)
     style = "Beam"
-
-    # Estilo do cursor no vi mode (ENUM)
     vi_mode_style = "Block"
 
     # =========================
@@ -140,9 +137,28 @@
     ]
   '';
 
-  # Symlink into ~/.config (no Home-Manager)
-  systemd.user.services."alacritty-xdg-links" = {
-    description = "Symlink Alacritty config from /etc/xdg to ~/.config/alacritty";
+  ############################################
+  # Force tmux to use zsh (Nix-managed)
+  # This is the correct place to "point to zsh"
+  ############################################
+  environment.etc."xdg/tmux/tmux.conf".text = ''
+    # Use zsh as default shell for tmux panes
+    set -g default-shell ${pkgs.zsh}/bin/zsh
+
+    # Ensure login-like environment (optional, but helpful)
+    set -g default-command ${pkgs.zsh}/bin/zsh
+
+    # Nice defaults
+    set -g mouse on
+    set -g history-limit 50000
+  '';
+
+  ############################################
+  # Symlinks into ~/.config (no Home-Manager)
+  # - Only creates links if the target does not exist
+  ############################################
+  systemd.user.services."xdg-config-links-alacritty" = {
+    description = "Symlink Alacritty/Tmux XDG configs from /etc/xdg to ~/.config";
     wantedBy = [ "default.target" ];
     serviceConfig = {
       Type = "oneshot";
@@ -150,8 +166,14 @@
     };
     script = ''
       set -euo pipefail
-      mkdir -p "$HOME/.config/alacritty"
-      ln -sf /etc/xdg/alacritty/alacritty.toml "$HOME/.config/alacritty/alacritty.toml"
+
+      mkdir -p "$HOME/.config/alacritty" "$HOME/.config/tmux"
+
+      # Alacritty
+      [ -e "$HOME/.config/alacritty/alacritty.toml" ] || ln -s /etc/xdg/alacritty/alacritty.toml "$HOME/.config/alacritty/alacritty.toml"
+
+      # Tmux
+      [ -e "$HOME/.config/tmux/tmux.conf" ] || ln -s /etc/xdg/tmux/tmux.conf "$HOME/.config/tmux/tmux.conf"
     '';
   };
 }
