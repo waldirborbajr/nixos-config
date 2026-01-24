@@ -284,7 +284,14 @@ build:
 
 switch:
 	@$(MAKE) preflight
-	@if [[ "$(AUTO_UPDATE_FLAKE)" == "1" ]]; then $(MAKE) update-flake; else echo "AUTO_UPDATE_FLAKE=0 -> skipping flake update."; fi
+
+ @if [[ "$(AUTO_UPDATE_FLAKE)" == "1" ]]; then \
+	 echo "AUTO_UPDATE_FLAKE=1 -> updating flake"; \
+  	$(MAKE) update-flake; \
+ else \
+	 echo "AUTO_UPDATE_FLAKE=0 -> skipping flake     update."; \
+ fi
+
 	@$(MAKE) check_git_status
 	@$(MAKE) flake-check
 	@echo "Before:"
