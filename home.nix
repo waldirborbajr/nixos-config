@@ -15,5 +15,8 @@
     ./modules/apps/go.nix
     ./modules/apps/rust.nix
     ./modules/apps/lua.nix
+
+    # NIRI
+    ./modules/desktops/niri/default.nix
   ];
 }
