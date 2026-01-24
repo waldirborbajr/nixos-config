@@ -82,19 +82,6 @@ in
         eval "$(zoxide init --cmd cd zsh)"
       fi
 
-      # FZF: integração manual + opções
-      if command -v fzf >/dev/null 2>&1; then
-        export FZF_DEFAULT_OPTS="--info=inline-right --ansi --layout=reverse --border=rounded --height=60%"
-
-        source ${pkgs.fzf}/share/fzf/key-bindings.zsh
-        source ${pkgs.fzf}/share/fzf/completion.zsh
-
-        export FZF_CTRL_T_COMMAND="fd --type f --hidden --follow --exclude .git || find . -type f"
-        export FZF_CTRL_T_OPTS="--preview 'bat --color=always --style=numbers --line-range=:500 {}'"
-
-        export FZF_ALT_C_OPTS="--preview 'tree -C {} | head -200'"
-      fi
-
       # Prompt customizado com git status
       git_seg() {
         local s
