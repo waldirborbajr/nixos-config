@@ -64,8 +64,8 @@
               inherit inputs devopsEnabled qemuEnabled;
             };
 
-            # Defina seu usuário aqui (substitua "waldir" pelo seu username real!)
-            home-manager.users.waldir = import ./home.nix;
+            # Correção: usuário correto é "borba" (não waldir)
+            home-manager.users.borba = import ./home.nix;
           }
         ];
       };
