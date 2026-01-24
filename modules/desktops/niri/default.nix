@@ -1,8 +1,14 @@
 # modules/desktops/niri/niri.nix
+#
+# Niri (Wayland compositor) for NixOS (no Home-Manager)
+# - Shows up in GDM session list (like GNOME/Hyprland)
+# - Configs are Nix-managed in /etc/xdg + optional ~/.config symlinks
+# - IMPORTANT: do NOT set XDG_RUNTIME_DIR manually (systemd/logind manages it)
+
 { config, pkgs, lib, ... }:
 
 let
-  # Catppuccin Mocha palette (hex without #)
+  # Catppuccin Mocha palette (hex WITHOUT '#')
   cat = {
     rosewater = "f5e0dc";
     flamingo  = "f2cdcd";
@@ -34,40 +40,45 @@ let
 
   hex = c: "#${c}";
 
-  # GDM session wrapper (Nix-managed, available on PATH)
-  niriSession = pkgs.writeShellScriptBin "niri-session" ''
-    set -euo pipefail
-
-    # Session identity (helps portals / apps)
-    export XDG_CURRENT_DESKTOP=niri
-    export XDG_SESSION_DESKTOP=niri
-
-    # Wayland-friendly defaults
-    export NIXOS_OZONE_WL=1
-    export MOZ_ENABLE_WAYLAND=1
-    export QT_QPA_PLATFORM=wayland
-
-    # Optional: ensure a user runtime exists (usually already true under GDM)
-    export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
-
-    # Start niri
-    exec ${pkgs.niri}/bin/niri
-  '';
+  term = "alacritty";
+  menu = "fuzzel";
 in
 {
-  ############################################
-  # Packages used by Niri session
-  ############################################
+  ##############################################################################
+  # Make Niri appear in GDM (session chooser)
+  ##############################################################################
+  # GDM itself is enabled in your GNOME module; this only adds the session.
+  services.displayManager.sessionPackages = [ pkgs.niri ];
+
+  # If your nixpkgs has the module, you can also enable it (safe either way):
+  # programs.niri.enable = true;
+
+  ##############################################################################
+  # Wayland essentials
+  ##############################################################################
+  services.dbus.enable = true;
+  security.polkit.enable = true;
+
+  # Useful for Wayland apps (don’t force XDG_SESSION_TYPE globally).
+  environment.sessionVariables = {
+    MOZ_ENABLE_WAYLAND = "1";
+    NIXOS_OZONE_WL = "1";
+    QT_QPA_PLATFORM = "wayland";
+  };
+
+  ##############################################################################
+  # Packages (keep it lean)
+  ##############################################################################
   environment.systemPackages = with pkgs; [
     niri
 
-    # Terminal / launcher / notifications
-    foot
-    fuzzel
-    mako
-
-    # Bar / tray
+    # UX
     waybar
+    mako
+    fuzzel
+
+    # Terminal (you already use it; keep explicit so binds work)
+    alacritty
 
     # Clipboard / screenshots
     wl-clipboard
@@ -75,27 +86,14 @@ in
     slurp
     swappy
 
-    # Media keys
+    # Optional: audio keys, media control
     playerctl
-
-    # GDM session wrapper
-    niriSession
   ];
 
-  ############################################
-  # Make Niri show up in GDM (gear menu)
-  ############################################
-  environment.etc."wayland-sessions/niri.desktop".text = ''
-    [Desktop Entry]
-    Name=Niri
-    Comment=Wayland compositor (niri)
-    Exec=/run/current-system/sw/bin/niri-session
-    Type=Application
-  '';
-
-  ############################################
-  # Portals (screen share, file pickers, etc)
-  ############################################
+  ##############################################################################
+  # Portals (screen share, file picker, etc.)
+  # - Since you also have GNOME installed, keep gtk portal.
+  ##############################################################################
   xdg.portal = {
     enable = true;
     extraPortals = with pkgs; [
@@ -104,23 +102,17 @@ in
     ];
   };
 
-  ############################################
-  # Base services for Wayland desktops
-  ############################################
-  security.polkit.enable = true;
-  services.dbus.enable = true;
-
-  ############################################
-  # Canonical configs (Nix-managed): /etc/xdg/*
-  ############################################
+  ##############################################################################
+  # Nix-managed configs under /etc/xdg
+  ##############################################################################
 
   # Niri main config (KDL)
   environment.etc."xdg/niri/config.kdl".text = ''
     input {
       keyboard {
         xkb {
-          layout "br"
-          variant "abnt2"
+          layout "us"
+          variant ""
         }
         repeat-delay 250
         repeat-rate 35
@@ -151,13 +143,14 @@ in
     # Autostart
     spawn-at-startup "mako"
     spawn-at-startup "waybar"
-    spawn-at-startup "foot" "--title" "terminal"
+    spawn-at-startup "${term}"
 
     binds {
       mod "Super"
 
-      bind "Super+Return" spawn "foot"
-      bind "Super+D"      spawn "fuzzel"
+      # Launcher / terminal
+      bind "Super+Return" spawn "${term}"
+      bind "Super+D"      spawn "${menu}"
       bind "Super+Shift+E" quit
 
       # Screenshots
@@ -209,11 +202,7 @@ in
     }
   '';
 
-  ############################################
-  # Catppuccin Mocha configs for common tools
-  ############################################
-
-  # Mako notifications
+  # Mako (notifications)
   environment.etc."xdg/mako/config".text = ''
     background-color=${hex cat.base}E6
     text-color=${hex cat.text}
@@ -226,36 +215,7 @@ in
     font=JetBrainsMono Nerd Font 10
   '';
 
-  # Foot terminal
-  environment.etc."xdg/foot/foot.ini".text = ''
-    [main]
-    font=JetBrainsMono Nerd Font:size=11
-    dpi-aware=yes
-
-    [colors]
-    background=${cat.base}
-    foreground=${cat.text}
-
-    regular0=${cat.crust}
-    regular1=${cat.red}
-    regular2=${cat.green}
-    regular3=${cat.yellow}
-    regular4=${cat.blue}
-    regular5=${cat.mauve}
-    regular6=${cat.teal}
-    regular7=${cat.subtext1}
-
-    bright0=${cat.surface2}
-    bright1=${cat.red}
-    bright2=${cat.green}
-    bright3=${cat.yellow}
-    bright4=${cat.blue}
-    bright5=${cat.mauve}
-    bright6=${cat.teal}
-    bright7=${cat.text}
-  '';
-
-  # Fuzzel launcher
+  # Fuzzel (launcher)
   environment.etc."xdg/fuzzel/fuzzel.ini".text = ''
     [main]
     font=JetBrainsMono Nerd Font:size=11
@@ -272,7 +232,7 @@ in
     border=${cat.mauve}ff
   '';
 
-  # Waybar config (JSONC)
+  # Waybar (minimal)
   environment.etc."xdg/waybar/config.jsonc".text = ''
     {
       "layer": "top",
@@ -284,35 +244,20 @@ in
       "modules-center": ["clock"],
       "modules-right": ["pulseaudio", "network", "battery", "tray"],
 
-      "niri/workspaces": {
-        "disable-scroll": false,
-        "format": "{name}"
-      },
-
       "clock": { "format": "{:%a %d/%m %H:%M}" },
 
       "pulseaudio": { "format": " {volume}%", "format-muted": "󰖁 muted" },
-      "network": {
-        "format-wifi": " {essid} ({signalStrength}%)",
-        "format-ethernet": "󰈀 {ipaddr}",
-        "format-disconnected": "󰖪 offline",
-        "tooltip": true
-      },
-      "battery": {
-        "format": "{icon} {capacity}%",
-        "format-charging": " {capacity}%",
-        "states": { "warning": 25, "critical": 12 },
-        "format-icons": ["","","","",""]
-      }
+      "network": { "format-wifi": " {signalStrength}%", "format-ethernet": "󰈀 {ipaddr}", "format-disconnected": "󰖪" },
+      "battery": { "format": "{capacity}% " }
     }
   '';
 
-  # Waybar style (Catppuccin-ish)
   environment.etc."xdg/waybar/style.css".text = ''
     * {
-      font-family: "JetBrainsMono Nerd Font", monospace;
+      font-family: "JetBrainsMono Nerd Font";
       font-size: 11px;
       border: none;
+      border-radius: 0;
       min-height: 0;
     }
 
@@ -321,14 +266,9 @@ in
       color: ${hex cat.text};
     }
 
-    #clock,
-    #pulseaudio,
-    #network,
-    #battery,
-    #tray,
-    #workspaces {
+    #clock, #pulseaudio, #network, #battery, #tray, #workspaces {
       padding: 0 10px;
-      margin: 6px 4px;
+      margin: 6px 6px;
       background: ${hex cat.surface0};
       border-radius: 10px;
     }
@@ -341,21 +281,40 @@ in
     }
 
     #workspaces button.active {
-      color: ${hex cat.mauve};
-      background: ${hex cat.surface1};
+      color: ${hex cat.base};
+      background: ${hex cat.mauve};
       border-radius: 8px;
     }
-
-    tooltip {
-      background: ${hex cat.base};
-      border: 1px solid ${hex cat.surface1};
-      border-radius: 10px;
-      color: ${hex cat.text};
-    }
-
-    tooltip label {
-      padding: 6px;
-    }
   '';
+
+  ##############################################################################
+  # Optional: symlink /etc/xdg configs into ~/.config (no Home-Manager)
+  # This helps apps that ONLY read ~/.config and ignore XDG_CONFIG_DIRS.
+  ##############################################################################
+  systemd.user.services."xdg-config-links-niri" = {
+    description = "Symlink Niri-related configs from /etc/xdg to ~/.config";
+    wantedBy = [ "default.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+    script = ''
+      set -euo pipefail
+
+      mkdir -p "$HOME/.config/niri" "$HOME/.config/waybar" "$HOME/.config/mako" "$HOME/.config/fuzzel"
+
+      # Niri
+      [ -e "$HOME/.config/niri/config.kdl" ] || ln -s /etc/xdg/niri/config.kdl "$HOME/.config/niri/config.kdl"
+
+      # Waybar
+      [ -e "$HOME/.config/waybar/config.jsonc" ] || ln -s /etc/xdg/waybar/config.jsonc "$HOME/.config/waybar/config.jsonc"
+      [ -e "$HOME/.config/waybar/style.css" ] || ln -s /etc/xdg/waybar/style.css "$HOME/.config/waybar/style.css"
+
+      # Mako
+      [ -e "$HOME/.config/mako/config" ] || ln -s /etc/xdg/mako/config "$HOME/.config/mako/config"
+
+      # Fuzzel
+      [ -e "$HOME/.config/fuzzel/fuzzel.ini" ] || ln -s /etc/xdg/fuzzel/fuzzel.ini "$HOME/.config/fuzzel/fuzzel.ini"
+    '';
+  };
 }
-```0
