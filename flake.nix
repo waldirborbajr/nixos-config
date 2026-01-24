@@ -48,7 +48,7 @@
             };
 
             # A mudança chave: lambda com imports explícitos
-            home-manager.users.borba = { config, pkgs, lib, ... }: {
+            home-manager.users.borba = { config, pkgs, lib, hostname, ... }: {
               imports = [
                 ./home.nix                     # seu home.nix mínimo (zsh, fzf etc.)
               ];
