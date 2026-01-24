@@ -58,7 +58,8 @@ in
       runfree = ''"$@" >/dev/null 2>&1 & disown'';
     };
 
-    initExtra = ''
+    # Correção: troque initExtra → initContent
+    initContent = ''
       # Vi mode
       bindkey -v
       bindkey "^[[A" history-beginning-search-backward
@@ -114,7 +115,6 @@ in
     '';
   };
 
-  # Pacotes necessários para o zsh + fzf + helpers
   home.packages = with pkgs; [
     git
     fzf
@@ -126,7 +126,6 @@ in
     tree
   ];
 
-  # Variáveis de sessão (user-level)
   home.sessionVariables = {
     EDITOR = "nvim";
     VISUAL = "nvim";
