@@ -31,22 +31,34 @@ in
   programs.zsh = {
     enable = true;
 
-    interactiveShellInit = ''
-      # Configurações de histórico
-      setopt appendhistory
-      setopt sharehistory
-      setopt hist_ignore_space
-      setopt hist_ignore_all_dups
-      setopt hist_save_no_dups
-      setopt hist_ignore_dups
-      setopt hist_find_no_dups
-      setopt extended_history
-      setopt hist_expire_dups_first
+    history = {
+      size = 10000;
+      save = 10000;
+      ignoreDups = true;
+      ignoreAllDups = true;
+      ignoreSpace = true;
+      share = true;
+      expireDuplicatesFirst = true;
+      extended = true;
+    };
 
-      HISTSIZE=10000
-      SAVEHIST=10000
-      HISTFILE=$HOME/.zsh_history
+    shellAliases = {
+      c = "clear";
+      q = "exit";
+      ll = "eza -lg --icons --group-directories-first";
+      la = "eza -lag --icons --group-directories-first";
+      rg = "rg --hidden --smart-case --glob='!.git/' --no-search-zip --trim";
+      gs = "git status --short";
+      ga = "git add";
+      gc = "git commit";
+      gp = "git push";
+      gu = "git pull";
+      gd = "git diff";
+      gds = "git diff --staged";
+      runfree = ''"$@" >/dev/null 2>&1 & disown'';
+    };
 
+    initExtra = ''
       # Vi mode
       bindkey -v
       bindkey "^[[A" history-beginning-search-backward
@@ -69,19 +81,16 @@ in
         eval "$(zoxide init --cmd cd zsh)"
       fi
 
-      # FZF: integração oficial + opções
+      # FZF: integração manual + opções
       if command -v fzf >/dev/null 2>&1; then
         export FZF_DEFAULT_OPTS="--info=inline-right --ansi --layout=reverse --border=rounded --height=60%"
 
-        # Key-bindings e completion (Ctrl+R histórico fuzzy, Ctrl+T arquivos, Alt+C cd)
         source ${pkgs.fzf}/share/fzf/key-bindings.zsh
         source ${pkgs.fzf}/share/fzf/completion.zsh
 
-        # Preview melhorado no Ctrl+T
         export FZF_CTRL_T_COMMAND="fd --type f --hidden --follow --exclude .git || find . -type f"
         export FZF_CTRL_T_OPTS="--preview 'bat --color=always --style=numbers --line-range=:500 {}'"
 
-        # Preview para Alt+C
         export FZF_ALT_C_OPTS="--preview 'tree -C {} | head -200'"
       fi
 
@@ -103,25 +112,10 @@ in
         PROMPT="%F{cyan}%~%f$(git_seg) $sym "
       }
     '';
-
-    shellAliases = {
-      c = "clear";
-      q = "exit";
-      ll = "eza -lg --icons --group-directories-first";
-      la = "eza -lag --icons --group-directories-first";
-      rg = "rg --hidden --smart-case --glob='!.git/' --no-search-zip --trim";
-      gs = "git status --short";
-      ga = "git add";
-      gc = "git commit";
-      gp = "git push";
-      gu = "git pull";
-      gd = "git diff";
-      gds = "git diff --staged";
-      runfree = ''"$@" >/dev/null 2>&1 & disown'';
-    };
   };
 
-  environment.systemPackages = with pkgs; [
+  # Pacotes necessários para o zsh + fzf + helpers
+  home.packages = with pkgs; [
     git
     fzf
     zoxide
@@ -132,7 +126,8 @@ in
     tree
   ];
 
-  environment.sessionVariables = {
+  # Variáveis de sessão (user-level)
+  home.sessionVariables = {
     EDITOR = "nvim";
     VISUAL = "nvim";
     SUDO_EDITOR = "nvim";
