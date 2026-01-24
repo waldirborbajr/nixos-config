@@ -2,14 +2,11 @@
 { config, pkgs, lib, ... }:
 
 let
-  # Script git prompt (igual antes)
   gitPrompt = pkgs.writeShellScriptBin "git-prompt" ''
     #!/usr/bin/env bash
     set -euo pipefail
 
-    if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-      exit 0
-    fi
+    if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then exit 0; fi
 
     branch="$(git symbolic-ref --quiet --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null || true)"
     [ -n "''${branch:-}" ] || exit 0
@@ -41,17 +38,13 @@ in
   programs.zsh = {
     enable = true;
 
-    history = {
-      size = 10000;
-      save = 10000;
-      ignoreDups = true;
-      ignoreSpace = true;
-      path = "${config.xdg.dataHome}/.zsh_history";
-    };
-
+    # Aqui definimos o comportamento do histórico via setopt (o que realmente funciona no NixOS)
     shellInit = ''
-      setopt autocd correct interactivecomments magicequalsubst nonomatch notify numericglobsort promptsubst
+      # Histórico: tamanho grande, ignore dups, share entre sessões, etc.
       setopt appendhistory sharehistory hist_ignore_space hist_ignore_all_dups hist_save_no_dups hist_ignore_dups hist_find_no_dups
+      HISTSIZE=10000
+      SAVEHIST=10000
+      HISTFILE=~/.zsh_history   # padrão, mas explícito
     '';
 
     shellAliases = {
@@ -75,8 +68,8 @@ in
     interactiveShellInit = ''
       # Vi mode
       bindkey -v
-      bindkey "^[[A" history-beginning-search-backward
-      bindkey "^[[B" history-beginning-search-forward
+      bindkey "^[[A" history-beginning-search-backward   # up
+      bindkey "^[[B" history-beginning-search-forward    # down
 
       # Completion
       autoload -Uz compinit && compinit -C
@@ -84,7 +77,7 @@ in
       zstyle ':completion:*' list-colors "''${(s.:.)LS_COLORS}"
       zstyle ':completion:*' menu no
 
-      # bat pager
+      # bat como pager/manpager
       if command -v bat >/dev/null 2>&1; then
         export MANPAGER="sh -c 'col -bx | bat -l man -p'"
         export PAGER=bat
@@ -100,7 +93,7 @@ in
         eval "$(zoxide init --cmd cd zsh)"
       fi
 
-      # Prompt + git
+      # Prompt minimalista + git
       git_seg() {
         local s
         s="$(${gitPrompt}/bin/git-prompt 2>/dev/null)"
@@ -117,14 +110,6 @@ in
         fi
         PROMPT="%F{cyan}%~%f$(git_seg)\n$sym "
       }
-
-      # Indicação de modo vi no prompt (RIGHT prompt)
-      function zle-line-init zle-keymap-select {
-        RPS1=''${''${KEYMAP/vicmd/-- NORMAL --}/(main|viins)/-- INSERT --}''
-        zle reset-prompt
-      }
-      zle -N zle-line-init
-      zle -N zle-keymap-select
     '';
   };
 
