@@ -24,7 +24,7 @@ GIT_PUSH ?=
 DEBUG_LOG ?= /tmp/nixos-build-debug.log
 
 .PHONY: help gen doctor hosts flake-show flake-check update-flake fmt current-system list-generations \
-        build switch dry-build dry-switch build-debug rollback gc gc-hard
+        build switch dry-build dry-switch build-debug rollback gc gc-hard clean
 
 help:
 | echo "NixOS Infra (flakes) — FINAL (NO-TABS Makefile)"
@@ -35,8 +35,10 @@ help:
 | echo "  make switch HOST=macbook [DEVOPS=1] [QEMU=1] [IMPURE=1]"
 | echo ""
 | echo "Options:"
+| echo "  NIXOS_CONFIG=/path/to/nixos-config (default: ./ if flake.nix exists else ~/nixos-config)"
 | echo "  AUTO_UPDATE_FLAKE=1 (default 0)"
 | echo "  AUTO_GIT_COMMIT=0  (default 1)"
+| echo "  GIT_PUSH=1         (default 0)"
 | echo ""
 
 gen:
@@ -62,17 +64,20 @@ NIX="nix --extra-experimental-features nix-command --extra-experimental-features
 
 die(){ echo "ERROR: $*" >&2; exit 1; }
 
-preflight(){
+preflight_base(){
   command -v nix >/dev/null 2>&1 || die "nix not found"
   command -v nixos-rebuild >/dev/null 2>&1 || die "nixos-rebuild not found"
   [[ -x "$SUDO" ]] || die "sudo wrapper not found at $SUDO"
   [[ -f "$NIXOS_CONFIG/flake.nix" ]] || die "flake.nix not found in: $NIXOS_CONFIG"
+}
+
+preflight_host(){
   [[ -n "$HOST" ]] || die "HOST is required. Example: make switch HOST=macbook"
 }
 
 show_flags(){
   echo "Repo:  $NIXOS_CONFIG"
-  echo "Flags: HOST=$HOST IMPURE=$IMPURE DEVOPS=$DEVOPS QEMU=$QEMU"
+  echo "Flags: HOST=${HOST:-<none>} IMPURE=$IMPURE DEVOPS=$DEVOPS QEMU=$QEMU"
 }
 
 require_flake_host(){
@@ -117,7 +122,7 @@ maybe_git_commit(){
 print_cmd(){
   local action="$1"; shift || true
   local extra="${*:-}"
-  echo ">>> ${DEVOPS:+DEVOPS=1 }${QEMU:+QEMU=1 }$SUDO nixos-rebuild $action --flake $NIXOS_CONFIG#$HOST ${IMPURE:+--impure }$extra"
+  echo ">>> ${DEVOPS:+DEVOPS=1 }${QEMU:+QEMU=1 }env $SUDO nixos-rebuild $action --flake $NIXOS_CONFIG#$HOST ${IMPURE:+--impure }$extra"
 }
 
 run_rebuild(){
@@ -128,9 +133,9 @@ run_rebuild(){
   [[ -n "$QEMU"  ]] && envs+=( "QEMU=1" )
 
   if [[ "${#extra[@]}" -gt 0 ]]; then
-    "${envs[@]}" $SUDO nixos-rebuild "$action" --flake "$NIXOS_CONFIG#$HOST" ${IMPURE:+--impure} "${extra[@]}"
+    env "${envs[@]}" $SUDO nixos-rebuild "$action" --flake "$NIXOS_CONFIG#$HOST" ${IMPURE:+--impure} "${extra[@]}"
   else
-    "${envs[@]}" $SUDO nixos-rebuild "$action" --flake "$NIXOS_CONFIG#$HOST" ${IMPURE:+--impure}
+    env "${envs[@]}" $SUDO nixos-rebuild "$action" --flake "$NIXOS_CONFIG#$HOST" ${IMPURE:+--impure}
   fi
 }
 
@@ -147,46 +152,47 @@ list_generations(){
 cmd="${1:-}"
 case "$cmd" in
   doctor)
-    preflight; show_flags; echo "OK: repo + tools present";;
+    preflight_base; show_flags; echo "OK: repo + tools present";;
   hosts)
-    preflight; $NIX flake show "$NIXOS_CONFIG" 2>/dev/null | sed -n '/nixosConfigurations/,$p' | sed -n '1,200p' || true;;
+    preflight_base
+    $NIX flake show "$NIXOS_CONFIG" 2>/dev/null | sed -n '/nixosConfigurations/,$p' | sed -n '1,220p' || true;;
   flake-show)
-    preflight; (cd "$NIXOS_CONFIG" && $NIX flake show);;
+    preflight_base; (cd "$NIXOS_CONFIG" && $NIX flake show);;
   flake-check)
-    preflight; (cd "$NIXOS_CONFIG" && $NIX flake check);;
+    preflight_base; (cd "$NIXOS_CONFIG" && $NIX flake check);;
   update-flake)
-    preflight; (cd "$NIXOS_CONFIG" && $NIX flake update);;
+    preflight_base; (cd "$NIXOS_CONFIG" && $NIX flake update);;
   fmt)
-    preflight; (cd "$NIXOS_CONFIG" && (nix fmt || nix run nixpkgs#nixpkgs-fmt -- .));;
+    preflight_base; (cd "$NIXOS_CONFIG" && (nix fmt || nix run nixpkgs#nixpkgs-fmt -- .));;
   current-system)
-    preflight; current_system;;
+    preflight_base; current_system;;
   list-generations)
-    preflight; list_generations;;
+    preflight_base; list_generations;;
   dry-build)
-    preflight; require_flake_host; print_cmd build --dry-run; run_rebuild build --dry-run;;
+    preflight_base; preflight_host; require_flake_host; print_cmd build --dry-run; run_rebuild build --dry-run;;
   dry-switch)
-    preflight; require_flake_host; print_cmd switch --dry-run; run_rebuild switch --dry-run;;
+    preflight_base; preflight_host; require_flake_host; print_cmd switch --dry-run; run_rebuild switch --dry-run;;
   build)
-    preflight; require_flake_host; maybe_update_flake; maybe_git_commit
+    preflight_base; preflight_host; require_flake_host; maybe_update_flake; maybe_git_commit
     echo "Before:"; current_system
     print_cmd build; run_rebuild build
     echo "After:"; current_system; list_generations;;
   switch)
-    preflight; require_flake_host; maybe_update_flake; maybe_git_commit
+    preflight_base; preflight_host; require_flake_host; maybe_update_flake; maybe_git_commit
     echo "Before:"; current_system
     print_cmd switch; run_rebuild switch
     echo "After:"; current_system; list_generations;;
   build-debug)
-    preflight; require_flake_host; maybe_update_flake; maybe_git_commit
+    preflight_base; preflight_host; require_flake_host; maybe_update_flake; maybe_git_commit
     print_cmd switch --verbose --show-trace
     run_rebuild switch --verbose --show-trace | tee "$DEBUG_LOG"
     echo "Saved log: $DEBUG_LOG";;
   rollback)
-    preflight; $SUDO nixos-rebuild switch --rollback; list_generations;;
+    preflight_base; $SUDO nixos-rebuild switch --rollback; list_generations;;
   gc)
-    preflight; $SUDO nix-collect-garbage;;
+    preflight_base; $SUDO nix-collect-garbage;;
   gc-hard)
-    preflight; $SUDO nix-collect-garbage -d --delete-older-than 1d;;
+    preflight_base; $SUDO nix-collect-garbage -d --delete-older-than 1d;;
   *)
     echo "Unknown command: $cmd" >&2
     exit 1;;
@@ -242,3 +248,7 @@ gc: gen
 
 gc-hard: gen
 | "$(BASH)" "$(SCRIPT)" gc-hard
+
+clean:
+| rm -f "$(SCRIPT)"
+| echo "Removed $(SCRIPT)"
