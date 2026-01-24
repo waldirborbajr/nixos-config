@@ -238,4 +238,25 @@ switch:
 build-debug:
 > @$(call preflight)
 > @if [[ "$(AUTO_UPDATE_FLAKE)" == "1" ]]; then $(MAKE) update-flake; else echo "AUTO_UPDATE_FLAKE=0 -> skipping flake update"; fi
-> @
+> @$(MAKE) check_git_status
+> @$(call print_cmd,switch,--verbose --show-trace)
+> @$(call nixos_cmd,switch,--verbose --show-trace) | tee "$(DEBUG_LOG)"
+> @echo "Saved log: $(DEBUG_LOG)"
+
+# ------------------------------------------
+# Maintenance
+# ------------------------------------------
+fmt:
+> @$(call require_repo)
+> @cd "$(NIXOS_CONFIG)"
+> @nix fmt || nix run nixpkgs#nixpkgs-fmt -- .
+
+rollback:
+> @sudo nixos-rebuild switch --rollback
+> @$(MAKE) list-generations
+
+gc:
+> @sudo nix-collect-garbage
+
+gc-hard:
+> @sudo nix-collect-garbage -d --delete-older-than 1d
