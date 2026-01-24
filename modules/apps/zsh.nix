@@ -38,13 +38,13 @@ in
   programs.zsh = {
     enable = true;
 
-    # Aqui definimos o comportamento do histórico via setopt (o que realmente funciona no NixOS)
+    # Histórico via setopt (opção válida no NixOS)
     shellInit = ''
-      # Histórico: tamanho grande, ignore dups, share entre sessões, etc.
+      # Histórico: tamanho grande, ignore dups, share entre sessões
       setopt appendhistory sharehistory hist_ignore_space hist_ignore_all_dups hist_save_no_dups hist_ignore_dups hist_find_no_dups
       HISTSIZE=10000
       SAVEHIST=10000
-      HISTFILE=~/.zsh_history   # padrão, mas explícito
+      HISTFILE=~/.zsh_history
     '';
 
     shellAliases = {
@@ -68,8 +68,8 @@ in
     interactiveShellInit = ''
       # Vi mode
       bindkey -v
-      bindkey "^[[A" history-beginning-search-backward   # up
-      bindkey "^[[B" history-beginning-search-forward    # down
+      bindkey "^[[A" history-beginning-search-backward
+      bindkey "^[[B" history-beginning-search-forward
 
       # Completion
       autoload -Uz compinit && compinit -C
@@ -93,7 +93,7 @@ in
         eval "$(zoxide init --cmd cd zsh)"
       fi
 
-      # Prompt minimalista + git
+      # Prompt + git status
       git_seg() {
         local s
         s="$(${gitPrompt}/bin/git-prompt 2>/dev/null)"
@@ -108,13 +108,19 @@ in
         else
           sym="%F{red}❯%f"
         fi
-        PROMPT="%F{cyan}%~%f$(git_seg)\n$sym "
+        # Sem \n explícito → caminho + git + símbolo na mesma linha
+        PROMPT="%F{cyan}%~%f$(git_seg) $sym "
       }
     '';
   };
 
   environment.systemPackages = with pkgs; [
-    git fzf zoxide eza bat ripgrep
+    git
+    fzf
+    zoxide
+    eza
+    bat
+    ripgrep
   ];
 
   environment.sessionVariables = {
