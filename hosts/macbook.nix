@@ -17,7 +17,7 @@
     # disabled to focus on Niri and avoid config conflict
     # ../modules/desktops/hyprland/default.nix
     ../modules/desktops/gnome.nix
-    ../modules/desktops/niri/default.nix
+    # ../modules/desktops/niri/default.nix
     ../modules/autologin.nix
 
     ../modules/apps/kitty.nix
