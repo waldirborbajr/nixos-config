@@ -31,11 +31,11 @@ in
   programs.zsh = {
     enable = true;
 
-    # Histórico (usando opções nativas do NixOS, mais idiomático)
+    # Histórico — remova ou use caminho fixo simples
     history = {
       size = 10000;
       save = 10000;
-      path = "${config.xdg.cacheHome}/.zsh_history";  # ou use ~/.zsh_history se preferir não usar xdg
+      # path = "~/.zsh_history";  # ← opcional: isso é o default anyway
       ignoreDups = true;
       ignoreAllDups = true;
       ignoreSpace = true;
@@ -59,7 +59,6 @@ in
       runfree = ''"$@" >/dev/null 2>&1 & disown'';
     };
 
-    # Código que roda em shells interativos
     initExtra = ''
       # Vi mode
       bindkey -v
@@ -83,23 +82,23 @@ in
         eval "$(zoxide init --cmd cd zsh)"
       fi
 
-      # FZF: integração oficial + suas opções
+      # FZF: integração oficial + opções
       if command -v fzf >/dev/null 2>&1; then
         export FZF_DEFAULT_OPTS="--info=inline-right --ansi --layout=reverse --border=rounded --height=60%"
 
-        # Integração key-bindings e completion do fzf (Ctrl+R, Ctrl+T, Alt+C)
+        # Key-bindings e completion (Ctrl+R histórico, Ctrl+T arquivos, Alt+C cd)
         source ${pkgs.fzf}/share/fzf/key-bindings.zsh
         source ${pkgs.fzf}/share/fzf/completion.zsh
 
-        # Opcional: melhore o preview do Ctrl+T com bat (se quiser ver conteúdo dos arquivos)
+        # Melhora preview no Ctrl+T (com bat se disponível)
         export FZF_CTRL_T_COMMAND="fd --type f --hidden --follow --exclude .git || find . -type f"
         export FZF_CTRL_T_OPTS="--preview 'bat --color=always --style=numbers --line-range=:500 {}'"
 
-        # Opcional: preview para Alt+C (diretórios)
+        # Preview para Alt+C (diretórios)
         export FZF_ALT_C_OPTS="--preview 'tree -C {} | head -200'"
       fi
 
-      # Prompt + git status
+      # Prompt customizado com git status
       git_seg() {
         local s
         s="$(${gitPrompt}/bin/git-prompt 2>/dev/null)"
@@ -119,19 +118,17 @@ in
     '';
   };
 
-  # Pacotes necessários (incluindo fzf agora)
   environment.systemPackages = with pkgs; [
     git
-    fzf         # ← adicionado aqui
+    fzf
     zoxide
     eza
     bat
     ripgrep
-    fd          # útil para FZF_CTRL_T_COMMAND (mais rápido que find)
-    tree        # opcional, para preview de diretórios no Alt+C
+    fd          # recomendado para FZF_CTRL_T_COMMAND mais rápido
+    tree        # para preview de dirs no Alt+C
   ];
 
-  # Suas variáveis de ambiente (mantidas)
   environment.sessionVariables = {
     EDITOR = "nvim";
     VISUAL = "nvim";
