@@ -31,7 +31,7 @@ in
   programs.zsh = {
     enable = true;
 
-    initExtra = ''
+    interactiveShellInit = ''
       # Configurações de histórico
       setopt appendhistory
       setopt sharehistory
@@ -45,7 +45,7 @@ in
 
       HISTSIZE=10000
       SAVEHIST=10000
-      HISTFILE=$HOME/.zsh_history       # ← corrigido: usa $HOME (expande no shell)
+      HISTFILE=$HOME/.zsh_history
 
       # Vi mode
       bindkey -v
@@ -73,7 +73,7 @@ in
       if command -v fzf >/dev/null 2>&1; then
         export FZF_DEFAULT_OPTS="--info=inline-right --ansi --layout=reverse --border=rounded --height=60%"
 
-        # Key-bindings e completion (Ctrl+R para histórico fuzzy!)
+        # Key-bindings e completion (Ctrl+R histórico fuzzy, Ctrl+T arquivos, Alt+C cd)
         source ${pkgs.fzf}/share/fzf/key-bindings.zsh
         source ${pkgs.fzf}/share/fzf/completion.zsh
 
