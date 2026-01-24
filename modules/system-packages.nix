@@ -72,10 +72,10 @@ in
       libgcc
       glibc
       libcxx
-      go
-      gopls
-      rustup
-      rust-analyzer
+      #go
+      #gopls
+      #rustup
+      #rust-analyzer
       lua
       lua-language-server
 
