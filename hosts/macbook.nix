@@ -25,7 +25,9 @@
     ../modules/apps/zsh.nix
     ../modules/apps/tmux.nix
     ../modules/apps/git.nix
-    ../modules/apps/gh.nix
+
+    #../modules/apps/uv.nix
+    #../modules/apps/poetry.nix
 
   ];
 
