@@ -99,6 +99,12 @@ in
         fi
         PROMPT="%F{cyan}%~%f$(git_seg) $sym "
       }
+
+      # Integração fzf (só se disponível – loose coupling)
+      if command -v fzf >/dev/null 2>&1; then
+        source ${pkgs.fzf}/share/fzf/key-bindings.zsh
+        source ${pkgs.fzf}/share/fzf/completion.zsh
+      fi
     '';
   };
 
