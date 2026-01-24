@@ -23,8 +23,8 @@ in
       ##########################################
       # Terminals
       ##########################################
-      alacritty
-      kitty
+      #alacritty
+      #kitty
       gnome-console
 
       ##########################################
@@ -32,7 +32,7 @@ in
       ##########################################
       zsh
       fish
-      tmux
+      #tmux
       tmuxifier
       zellij
 
@@ -45,8 +45,8 @@ in
       ##########################################
       # Git & Developer Workflow
       ##########################################
-      git
-      gh
+      #git
+      #gh
       lazygit
       commitizen
       devcontainer
