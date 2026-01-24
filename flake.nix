@@ -40,6 +40,30 @@
     # ==========================================
     mkHost = { hostname, system }:
       lib.nixosSystem {
+        # REMOVA ESTA LINHA:
+        # hostPlatform.system = system;
+
+        # Mantenha specialArgs
+        specialArgs = {
+          inherit inputs devopsEnabled qemuEnabled;
+        };
+
+        modules = [
+          # Aplique o system via módulo (recomendado em 25.11+)
+          ({ config, pkgs, lib, ... }: {
+            nixpkgs.hostPlatform = system;  # <-- Isso define o hostPlatform corretamente
+            nixpkgs.config.allowUnfree = true;
+            nixpkgs.overlays = [ unstableOverlay ];
+          })
+
+          ./core.nix
+          (./hosts + "/${hostname}.nix")
+        ];
+      };
+      
+/*
+    mkHost = { hostname, system }:
+      lib.nixosSystem {
         # NixOS 25.11+: prefer hostPlatform.system (system is deprecated here)
         hostPlatform.system = system;
 
@@ -56,7 +80,7 @@
           (./hosts + "/${hostname}.nix")
         ];
       };
-
+*/
     # Systems we care about (formatter + future machines)
     supportedSystems = [
       "x86_64-linux"   # Intel/AMD PCs, most VMs
