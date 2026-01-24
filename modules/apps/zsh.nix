@@ -84,10 +84,48 @@ in
 
       # Prompt customizado com git status
       git_seg() {
-        local s
-        s="$(${gitPrompt}/bin/git-prompt 2>/dev/null)"
-        [ -n "$s" ] && echo " %F{magenta}$s%f"
+        local s branch dirty staged untracked ahead behind color
+        
+        # Branch name
+        branch="$(git symbolic-ref --quiet --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null || true)"
+        [ -n "$branch" ] || return 0
+        
+        # Status
+        local st="$(git status --porcelain=v1 2>/dev/null || true)"
+        dirty=""
+        staged=""
+        untracked=""
+        if echo "$st" | grep -qE '^[ MARC?DU][MD] '; then staged="+"; fi
+        if echo "$st" | grep -qE '^[MDARC?DU][ MD] '; then dirty="*"; fi
+        if echo "$st" | grep -qE '^\?\? '; then untracked="?"; fi
+        
+        # Ahead / Behind (push / pull)
+        ahead=""
+        behind=""
+        if git rev-parse --abbrev-ref --symbolic-full-name @{u} >/dev/null 2>&1; then
+        counts="$(git rev-list --left-right --count HEAD...@{u} 2>/dev/null || true)"
+        left="${counts%% *}"
+        right="${counts##* }"
+        [ "${left:-0}" -gt 0 ] && ahead="⇡$left"
+        [ "${right:-0}" -gt 0 ] && behind="⇣$right"
+        fi
+        
+        # Cores rápidas e visuais
+        if [ -n "$ahead" ]; then
+        color="%F{green}"    # verde = tem para subir (push)
+        elif [ -n "$behind" ]; then
+        color="%F{red}"      # vermelho = tem para baixar (pull)
+        elif [ -n "$dirty$staged$untracked" ]; then
+        color="%F{yellow}"   # amarelo = dirty/staged/untracked
+        else
+        color="%F{magenta}"  # magenta = clean
+        fi
+        
+        # Monta o segmento
+        s="${color}${branch}${staged}${dirty}${untracked}${ahead}${behind}%f"
+        echo " $s"
       }
+
 
       precmd() {
         local code=$?
@@ -97,7 +135,7 @@ in
         else
           sym="%F{red}❯%f"
         fi
-        PROMPT="%F{cyan}%~%f$(git_seg) $sym "
+        PROMPT="%F{cyan}%~%f$(git_seg)$sym "
       }
 
       # Integração fzf (só se disponível – loose coupling)
