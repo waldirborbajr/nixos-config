@@ -157,7 +157,7 @@ preflight:
 	@$(call require_flakes)
 	@$(call require_sudo)
 	@$(call require_host)
-	# @$(call require_flake_host)
+	@$(call require_flake_host)
 	@$(call show_flags)
 flake-check:
 	@$(call require_repo)
