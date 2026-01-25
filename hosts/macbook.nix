@@ -21,7 +21,7 @@
     ../modules/autologin.nix
 
     ../modules/apps/kitty.nix
-    ../modules/apps/alacritty.nix
+    # ../modules/apps/alacritty.nix
     # ../modules/apps/zsh.nix
     ../modules/apps/tmux.nix
 
