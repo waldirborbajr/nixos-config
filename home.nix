@@ -37,7 +37,6 @@ in
       waybar
       mako
       fuzzel
-      alacritty
       wl-clipboard
       grim
       slurp
