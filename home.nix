@@ -20,6 +20,8 @@ in
     # Niri só no macbook
     ./modules/apps/niri.nix
 
+    ./modules/apps/alacritty.nix
+
   ];
 
   home.packages = with pkgs; [
