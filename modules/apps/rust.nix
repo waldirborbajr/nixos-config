@@ -2,36 +2,34 @@
 { config, pkgs, lib, ... }:
 
 {
-  # Rustup (recomendado) + rust-analyzer + ferramentas comuns
+  # Só rustup (remove rust-analyzer standalone para evitar conflito)
   home.packages = with pkgs; [
     rustup
-    rust-analyzer     # LSP (para Neovim / VSCode)
-    cargo-edit        # cargo add / rm / upgrade
-    cargo-watch       # watch + rebuild automático
-    cargo-make        # task runner (makefiles em Rust)
-    cargo-nextest     # test runner mais rápido
+    cargo-edit
+    cargo-watch
+    cargo-make
+    cargo-nextest
   ];
 
   # Opcional: aliases úteis para Rust/DevOps
   programs.zsh.shellAliases = lib.mkIf config.programs.zsh.enable {
-    ru      = "rustup update";                    # atualiza todas as toolchains
-    rc      = "cargo check";                     # checa sem compilar
-    rb      = "cargo build --release";            # build release
-    rt      = "cargo test -- --nocapture";        # testes com output
-    rtw     = "cargo watch -x 'test -- --nocapture'";  # watch + test
-    rr      = "cargo run --release";              # roda release
-    rf      = "cargo fmt";                        # formata
-    rl      = "cargo clippy --all-targets -- -D warnings";  # linter estrito
-    ra      = "cargo add";                        # cargo add (cargo-edit)
-    ruu     = "cargo upgrade";                    # atualiza Cargo.toml (cargo-edit)
-    rdoc    = "cargo doc --open";                 # abre doc local
+    ru      = "rustup update";                    # atualiza toolchains
+    rc      = "cargo check";
+    rb      = "cargo build --release";
+    rt      = "cargo test -- --nocapture";
+    rtw     = "cargo watch -x 'test -- --nocapture'";
+    rr      = "cargo run --release";
+    rf      = "cargo fmt";
+    rl      = "cargo clippy --all-targets -- -D warnings";
+    ra      = "cargo add";
+    ruu     = "cargo upgrade";
+    rdoc    = "cargo doc --open";
   };
 
-  # Opcional: ativação para instalar toolchain stable na primeira vez
-  # (rode manualmente na primeira ativação: rustup toolchain install stable)
+  # Lembrete para instalar componentes (rode manualmente na primeira vez)
   home.activation = {
     ensureRustup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      echo "Lembrete: rode manualmente na primeira vez:"
+      echo "Lembrete: rode manualmente na primeira ativação:"
       echo "  rustup toolchain install stable"
       echo "  rustup default stable"
       echo "  rustup component add rust-analyzer rls rust-src rustfmt clippy"
