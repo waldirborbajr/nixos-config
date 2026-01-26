@@ -1,0 +1,159 @@
+# project-flake.nix.example
+#
+# Exemplo de flake.nix para usar em PROJETOS INDIVIDUAIS
+# 
+# Para usar:
+# 1. Copie para o diretório do projeto: cp project-flake.nix.example /path/to/project/flake.nix
+# 2. Customize buildInputs com as deps do seu projeto
+# 3. Entre no ambiente: nix develop
+#
+# ==========================================
+
+# ==========================================
+# Exemplo 1: Projeto Rust puro
+# ==========================================
+{
+  description = "Meu projeto Rust";
+  
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    fenix = {
+      url = "github:nix-community/fenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
+  
+  outputs = { self, nixpkgs, fenix }:
+    let
+      system = "x86_64-linux";
+      pkgs = nixpkgs.legacyPackages.${system};
+      fenixPkgs = fenix.packages.${system};
+      
+      rustToolchain = fenixPkgs.stable.withComponents [
+        "rustc" "cargo" "clippy" "rustfmt" "rust-analyzer"
+      ];
+    in {
+      devShells.${system}.default = pkgs.mkShell {
+        buildInputs = with pkgs; [
+          rustToolchain
+          
+          # Deps específicas do projeto
+          postgresql  # Para sqlx/diesel
+          openssl
+          pkg-config
+          
+          # Tools extras
+          cargo-watch
+          cargo-edit
+        ];
+        
+        shellHook = ''
+          echo "🦀 Rust Project Environment"
+          rustc --version
+        '';
+      };
+    };
+}
+
+# ==========================================
+# Exemplo 2: Projeto Go com Postgres
+# ==========================================
+# {
+#   description = "Meu projeto Go";
+#   
+#   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+#   
+#   outputs = { self, nixpkgs }:
+#     let
+#       system = "x86_64-linux";
+#       pkgs = nixpkgs.legacyPackages.${system};
+#     in {
+#       devShells.${system}.default = pkgs.mkShell {
+#         buildInputs = with pkgs; [
+#           go_1_25
+#           gopls
+#           delve
+#           golangci-lint
+#           
+#           # Deps do projeto
+#           postgresql
+#           redis
+#         ];
+#         
+#         shellHook = ''
+#           echo "🐹 Go Project Environment"
+#           go version
+#           export GOPATH=$HOME/go
+#           export PATH=$GOPATH/bin:$PATH
+#         '';
+#       };
+#     };
+# }
+
+# ==========================================
+# Exemplo 3: Full Stack (Backend Rust + Frontend Node)
+# ==========================================
+# {
+#   description = "Full Stack Project";
+#   
+#   inputs = {
+#     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+#     fenix.url = "github:nix-community/fenix";
+#   };
+#   
+#   outputs = { self, nixpkgs, fenix }:
+#     let
+#       system = "x86_64-linux";
+#       pkgs = nixpkgs.legacyPackages.${system};
+#       rustToolchain = fenix.packages.${system}.stable.withComponents [
+#         "rustc" "cargo" "rust-analyzer"
+#       ];
+#     in {
+#       devShells.${system}.default = pkgs.mkShell {
+#         buildInputs = with pkgs; [
+#           # Backend (Rust)
+#           rustToolchain
+#           openssl
+#           pkg-config
+#           
+#           # Frontend (Node)
+#           nodejs_20
+#           nodePackages.pnpm
+#           
+#           # Database
+#           postgresql
+#           
+#           # Tools
+#           just  # command runner
+#           sqlx-cli  # migrations
+#         ];
+#         
+#         shellHook = ''
+#           echo "🚀 Full Stack Environment"
+#           echo "Backend: $(rustc --version)"
+#           echo "Frontend: $(node --version)"
+#         '';
+#       };
+#     };
+# }
+
+# ==========================================
+# Exemplo 4: Usar flake do nixos-config
+# ==========================================
+# Se você quer apenas referenciar os shells do seu nixos-config:
+# 
+# {
+#   description = "Projeto usando nixos-config shells";
+#   
+#   inputs = {
+#     nixos-config.url = "path:/home/borba/nixos-config";
+#   };
+#   
+#   outputs = { self, nixos-config }:
+#     let
+#       system = "x86_64-linux";
+#     in {
+#       # Reutiliza o shell do nixos-config
+#       devShells.${system}.default = nixos-config.devShells.${system}.rust;
+#     };
+# }

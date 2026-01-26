@@ -1,5 +1,6 @@
 # modules/apps/dev-tools.nix
-# Consolidado: git + gh + go + rust
+# Git + GitHub CLI (core development tools)
+# Language-specific tools moved to modules/languages/
 { config, pkgs, lib, ... }:
 
 {
@@ -133,7 +134,7 @@
   };
 
   # ========================================
-  # Go
+  # Core development packages
   # ========================================
   home.packages = with pkgs; [
     git
@@ -142,65 +143,5 @@
     tig
     gh
     gh-dash
-    go_1_25
-    gopls
-    delve
-    gotools
-    gofumpt
-    golangci-lint
-    rustup
-    cargo-edit
-    cargo-watch
-    cargo-make
-    cargo-nextest
   ];
-
-  home.sessionVariables = {
-    GOPATH = "${config.home.homeDirectory}/go";
-    GOBIN  = "${config.home.homeDirectory}/go/bin";
-  };
-
-  # ========================================
-  # Aliases consolidados
-  # ========================================
-  programs.zsh.shellAliases = lib.mkIf config.programs.zsh.enable {
-    # Go aliases
-    goi   = "go install ./...";
-    got   = "go test ./... -v";
-    gotc  = "go test -coverprofile=cover.out ./...";
-    goc   = "go clean -cache -modcache";
-    goup  = "go get -u ./...";
-    gom   = "go mod tidy";
-    gorf  = "gofumpt -w .";
-    gol   = "golangci-lint run";
-    
-    # Rust aliases
-    ru    = "rustup update";
-    rc    = "cargo check";
-    rb    = "cargo build --release";
-    rt    = "cargo test -- --nocapture";
-    rtw   = "cargo watch -x 'test -- --nocapture'";
-    rr    = "cargo run --release";
-    rf    = "cargo fmt";
-    rl    = "cargo clippy --all-targets -- -D warnings";
-    ra    = "cargo add";
-    ruu   = "cargo upgrade";
-    rdoc  = "cargo doc --open";
-  };
-
-  # ========================================
-  # Ativações
-  # ========================================
-  home.activation = {
-    ensureGoPath = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      mkdir -p $HOME/go/{bin,pkg,src}
-    '';
-    
-    ensureRustup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      echo "Lembrete: rode manualmente na primeira ativação:"
-      echo "  rustup toolchain install stable"
-      echo "  rustup default stable"
-      echo "  rustup component add rust-analyzer rls rust-src rustfmt clippy"
-    '';
-  };
 }

@@ -260,6 +260,52 @@ make help
 
 ---
 
+## 🛠️ Development Shells
+
+Este flake inclui **devShells** para ambientes de desenvolvimento isolados:
+
+```bash
+# Rust stable + ferramentas completas
+nix develop .#rust
+
+# Rust nightly via fenix
+nix develop .#rust-nightly
+
+# Go + gopls + delve + ferramentas
+nix develop .#go
+
+# Lua + LuaJIT + LSP
+nix develop .#lua
+
+# Nix development (formatters, LSPs, linters)
+nix develop .#nix-dev
+
+# Full stack (Rust + Go + Node)
+nix develop .#fullstack
+
+# Default (básico)
+nix develop
+```
+
+**Vantagens:**
+- ✅ Ambientes isolados por projeto
+- ✅ Versões específicas de ferramentas
+- ✅ Reproduzível entre máquinas
+- ✅ Não polui o sistema global
+
+**Linguagens disponíveis globalmente:**
+- Go (`modules/languages/go.nix`)
+- Rust (`modules/languages/rust.nix`)
+- Lua (`modules/languages/lua.nix` - toggle)
+- Nix (`modules/languages/nix-dev.nix`)
+- Python, Node.js
+
+**Documentação completa:** [DEVSHELLS.md](DEVSHELLS.md)
+
+**Integração com direnv:** Veja [.envrc.example](.envrc.example)
+
+---
+
 ## ⚡ Performance Strategy
 
 - schedutil CPU governor (MacBook)

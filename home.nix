@@ -13,7 +13,13 @@ in
     # Apps consolidados
     ./modules/apps/shell.nix       # zsh + fzf + bat
     ./modules/apps/terminals.nix   # alacritty + kitty
-    ./modules/apps/dev-tools.nix   # git + gh + go + rust
+    ./modules/apps/dev-tools.nix   # git + gh (core tools)
+
+    # Languages (development environments)
+    ./modules/languages/go.nix
+    ./modules/languages/rust.nix
+    ./modules/languages/lua.nix
+    ./modules/languages/nix-dev.nix
 
     # Niri no macbook (está em desktops agora)
   ] ++ lib.optionals isMacbook [
