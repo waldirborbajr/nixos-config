@@ -52,5 +52,5 @@ in
   '';
 
   # NOTE:
-  # xdg.portal é gerenciado pelos módulos de desktop (Hyprland/GNOME) para evitar duplicação
+  # xdg.portal is managed by desktop modules (GNOME, Niri) to avoid duplication
 }

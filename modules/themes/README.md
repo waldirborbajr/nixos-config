@@ -7,7 +7,7 @@ Centralized theme configuration for the entire NixOS system.
 This module provides a single source of truth for theming across:
 - **Terminal** (Alacritty)
 - **File Manager** (Yazi)
-- **Desktop Environments** (Hyprland, GNOME, i3, Niri)
+- **Desktop Environments** (Niri, GNOME, i3)
 - **CLI Tools** (bat, fzf, and more)
 
 ## Current Theme: Catppuccin
@@ -93,7 +93,7 @@ sudo nixos-rebuild switch --flake .#hostname
 | FZF         | ✅ | [`modules/apps/shell.nix`](../apps/shell.nix) |
 | Tmux        | ✅ | [`modules/apps/tmux.nix`](../apps/tmux.nix) |
 | Git Delta   | ✅ | [`modules/apps/dev-tools.nix`](../apps/dev-tools.nix) |
-| Waybar      | 🔄 Planned | [`modules/desktops/hyprland/`](../desktops/hyprland/) |
+| Niri        | ✅ | [`modules/desktops/niri.nix`](../desktops/niri.nix) |
 
 ## Resources
 

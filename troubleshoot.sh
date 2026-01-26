@@ -96,11 +96,10 @@ run 'systemctl --user --failed --no-pager || true'
 section "Important services status"
 run 'systemctl is-active docker libvirtd k3s NetworkManager 2>/dev/null || true'
 run 'systemctl --no-pager --type=service --state=running | egrep -i "docker|containerd|libvirtd|qemu|k3s|flatpak|xdg-desktop-portal|gdm|gnome|sddm|lightdm|NetworkManager" || true'
-run 'systemctl --user --no-pager --type=service --state=running | egrep -i "xdg-desktop-portal|hyprland|waybar|mako|swayidle|pipewire|wireplumber" || true'
+run 'systemctl --user --no-pager --type=service --state=running | egrep -i "xdg-desktop-portal|niri|waybar|mako|pipewire|wireplumber" || true'
 
 section "User services deep dive (portals + your xdg-config-links)"
 run 'systemctl --user status xdg-desktop-portal --no-pager | sed -n "1,200p" || true'
-run 'systemctl --user status xdg-desktop-portal-hyprland --no-pager | sed -n "1,200p" || true'
 run 'systemctl --user status xdg-config-links --no-pager | sed -n "1,200p" || true'
 run 'journalctl --user -u xdg-config-links --no-pager -n 200 || true'
 

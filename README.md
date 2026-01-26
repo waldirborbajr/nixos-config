@@ -37,7 +37,7 @@ This repository is the **single source of truth** for my personal Linux infrastr
 - RAM: 16 GB
 - Storage: 500 GB SSD
 - Role: main workstation
-- Desktop: Hyprland (Wayland) + GNOME (via GDM)
+- Desktop: Niri & GNOME (Wayland via GDM)
 - Optional features: DEVOPS / QEMU (on-demand)
 
 ### 💻 Dell Inspiron 1456
@@ -104,11 +104,6 @@ This repository is the **single source of truth** for my personal Linux infrastr
 │   │   └── tmux.nix
 │   │
 │   ├── desktops/         # ✨ Desktop environments
-│   │   ├── hyprland/
-│   │   │   ├── default.nix
-│   │   │   ├── hyprland.conf
-│   │   │   ├── waybar-config.json
-│   │   │   └── waybar-style.css
 │   │   ├── gnome.nix
 │   │   ├── i3.nix           # Extracted from host config
 │   │   └── niri.nix         # Moved from apps/
@@ -186,10 +181,9 @@ Flags are **independent** and can be combined freely.
 - `tmux.nix` - Terminal multiplexer
 
 **Desktops** (`modules/desktops/`)
-- `gnome.nix` - GNOME desktop environment
-- `hyprland/` - Hyprland Wayland compositor
-- `i3.nix` - i3 window manager
-- `niri.nix` - Niri scrollable-tiling compositor
+- `gnome.nix` - GNOME desktop environment (optimized for Wayland)
+- `i3.nix` - i3 window manager (X11 for low-resource machines)
+- `niri.nix` - Niri scrollable-tiling compositor (Wayland)
 
 **Languages** (`modules/languages/`)
 - `nodejs.nix` - Node.js + pnpm (toggle with `enableNode` flag)

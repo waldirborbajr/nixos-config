@@ -5,11 +5,9 @@
   xdg.portal = {
     enable = true;
 
-    # Backends comuns (gtk cobre a maioria dos casos; hyprland/wlr só quando necessário)
+    # GTK portal provides good compatibility for most applications
     extraPortals = with pkgs; [
-      xdg-desktop-portal-gtk     # fallback + GNOME/Hyprland compat
-      # xdg-desktop-portal-hyprland  # só se Hyprland for o compositor ativo
-      # xdg-desktop-portal-wlr       # para compositores wlroots genéricos
+      xdg-desktop-portal-gtk  # Fallback + GNOME/Niri compat
     ];
 
     # Configuração recomendada para evitar conflitos
