@@ -118,12 +118,18 @@
     '';
   };
 
-  # bat e fzf configurados
-  programs.bat.enable = true;
+  # bat e fzf configurados com tema Catppuccin
+  programs.bat = {
+    enable = true;
+    catppuccin.enable = true;  # Uses global theme config
+  };
+
+  programs.fzf = {
+    enable = true;
+    catppuccin.enable = true;  # Uses global theme config
+  };
 
   home.packages = with pkgs; [
-    fzf
-    bat
     fd
     tree
   ];

@@ -16,10 +16,6 @@
     # Desktop apenas no MacBook
     ../modules/desktops/gnome.nix
     ../modules/autologin.nix
-
-    # Apps system-level
-    ../modules/apps/kitty.nix
-    ../modules/apps/tmux.nix
   ];
 
   ############################################

@@ -35,11 +35,11 @@
   programs.delta = {
     enable = true;
     enableGitIntegration = true;
+    catppuccin.enable = true;  # Uses global theme config
     options = {
       side-by-side = true;
       line-numbers = true;
       navigate = true;
-      theme = "Monokai Extended";
     };
   };
 

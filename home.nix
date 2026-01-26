@@ -10,12 +10,16 @@ in
   home.homeDirectory = lib.mkForce "/home/borba";
 
   imports = [
+    # Theme (home-manager level)
+    ./modules/themes
+
     # Apps consolidados
     ./modules/apps/shell.nix       # zsh + fzf + bat
     ./modules/apps/terminals.nix   # alacritty + kitty
     ./modules/apps/dev-tools.nix   # git + gh (core tools)
     ./modules/apps/ripgrep.nix     # ripgrep with DevOps config
     ./modules/apps/yazi.nix        # yazi file manager with DevOps optimizations
+    ./modules/apps/tmux.nix        # tmux with Catppuccin theme
 
     # Languages (development environments)
     ./modules/languages/go.nix

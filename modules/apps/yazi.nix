@@ -34,6 +34,9 @@
       enableBashIntegration = true;
       enableFishIntegration = true;
 
+      # Enable Catppuccin theme
+      catppuccin.enable = true;  # Uses global theme config
+
       # Use 'y' as shell wrapper for directory changing
       shellWrapperName = "y";
 
@@ -283,57 +286,8 @@
         ];
       };
 
-      # Theme configuration (Catppuccin Mocha inspired)
-      theme = {
-        filetype = {
-          rules = [
-            # DevOps files
-            { mime = "application/x-yaml"; fg = "#f38ba8"; }  # YAML - red
-            { mime = "text/x-dockerfile"; fg = "#89dceb"; }   # Dockerfile - teal
-            { mime = "text/x-terraform"; fg = "#cba6f7"; }    # Terraform - purple
-            { name = "*.tf"; fg = "#cba6f7"; }
-            { name = "*.tfvars"; fg = "#cba6f7"; }
-            { name = "*.hcl"; fg = "#cba6f7"; }
-            
-            # Configuration files
-            { name = "*.toml"; fg = "#fab387"; }              # Orange
-            { name = "*.json"; fg = "#f9e2af"; }              # Yellow
-            { name = "*.xml"; fg = "#a6e3a1"; }               # Green
-            { name = "*.ini"; fg = "#89b4fa"; }               # Blue
-            { name = "*.conf"; fg = "#89b4fa"; }
-            
-            # Scripts
-            { name = "*.sh"; fg = "#a6e3a1"; }                # Green
-            { name = "*.bash"; fg = "#a6e3a1"; }
-            { name = "*.zsh"; fg = "#a6e3a1"; }
-            { name = "*.fish"; fg = "#a6e3a1"; }
-            { name = "*.py"; fg = "#89dceb"; }                # Teal
-            { name = "*.rb"; fg = "#f38ba8"; }                # Red
-            { name = "*.js"; fg = "#f9e2af"; }                # Yellow
-            { name = "*.ts"; fg = "#89b4fa"; }                # Blue
-            
-            # Build and package files
-            { name = "Makefile"; fg = "#fab387"; }
-            { name = "Dockerfile"; fg = "#89dceb"; }
-            { name = "docker-compose.yml"; fg = "#89dceb"; }
-            { name = "package.json"; fg = "#a6e3a1"; }
-            { name = "Cargo.toml"; fg = "#fab387"; }
-            { name = "go.mod"; fg = "#89dceb"; }
-            
-            # Git files
-            { name = ".gitignore"; fg = "#6c7086"; }
-            { name = ".gitconfig"; fg = "#6c7086"; }
-            { name = ".gitattributes"; fg = "#6c7086"; }
-            
-            # Compressed files
-            { mime = "application/zip"; fg = "#f38ba8"; }
-            { mime = "application/gzip"; fg = "#f38ba8"; }
-            { mime = "application/x-tar"; fg = "#f38ba8"; }
-            { mime = "application/x-bzip2"; fg = "#f38ba8"; }
-            { mime = "application/x-7z-compressed"; fg = "#f38ba8"; }
-          ];
-        };
-      };
+      # Theme configuration handled by Catppuccin module
+      # To change theme: modify modules/themes/default.nix
     };
 
     # Shell aliases for yazi

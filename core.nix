@@ -4,6 +4,9 @@
 { ... }:
 {
   imports = [
+    # Theme (centralized)
+    ./modules/themes
+
     # Sistema base (em modules/system/)
     ./modules/system/nixpkgs.nix
     ./modules/system/base.nix
