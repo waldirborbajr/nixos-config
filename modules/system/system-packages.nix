@@ -114,7 +114,6 @@ in
       eza
       
       fd
-      ripgrep
       yazi
       dust
       ncdu

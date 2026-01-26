@@ -14,6 +14,7 @@ in
     ./modules/apps/shell.nix       # zsh + fzf + bat
     ./modules/apps/terminals.nix   # alacritty + kitty
     ./modules/apps/dev-tools.nix   # git + gh (core tools)
+    ./modules/apps/ripgrep.nix     # ripgrep with DevOps config
 
     # Languages (development environments)
     ./modules/languages/go.nix
@@ -29,7 +30,6 @@ in
   home.packages = with pkgs; [
     zoxide
     eza
-    ripgrep
     fd
     tree
   ] ++ lib.optionals isMacbook (with pkgs; [
