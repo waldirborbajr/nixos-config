@@ -93,7 +93,7 @@ sudo nixos-rebuild switch --flake .#hostname
 | FZF         | ✅ | [`modules/apps/shell.nix`](../apps/shell.nix) |
 | Tmux        | ✅ | [`modules/apps/tmux.nix`](../apps/tmux.nix) |
 | Git Delta   | ✅ | [`modules/apps/dev-tools.nix`](../apps/dev-tools.nix) |
-| Niri        | ✅ | [`modules/desktops/niri.nix`](../desktops/niri.nix) |
+| Niri        | ✅ | [`modules/desktops/niri/`](../desktops/niri/) |
 
 ## Resources
 

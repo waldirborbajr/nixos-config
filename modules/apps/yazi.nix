@@ -20,7 +20,7 @@
       ffmpegthumbnailer  # Video thumbnails
       unar              # Archive preview
       jq                # JSON preview
-      poppler_utils     # PDF preview
+      poppler-utils     # PDF preview
       fd                # File searching
       ripgrep           # Content searching
       fzf               # Fuzzy finding
@@ -35,7 +35,7 @@
       enableFishIntegration = true;
 
       # Enable Catppuccin theme
-      catppuccin.enable = true;  # Uses global theme config
+      # catppuccin.enable = true;  # FIXME: Module not available in current catppuccin/nix version
 
       # Use 'y' as shell wrapper for directory changing
       shellWrapperName = "y";

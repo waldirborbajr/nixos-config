@@ -15,7 +15,7 @@
     enable = true;
     
     # Enable Catppuccin theme
-    catppuccin.enable = true;  # Uses global theme config
+    # catppuccin.enable = true;  # FIXME: Module not available in current catppuccin/nix version
     
     shell = "${pkgs.zsh}/bin/zsh";
     terminal = "tmux-256color";
@@ -49,7 +49,6 @@
     ];
     
     extraConfig = ''
-    extraConfig = ''
       #####################################################
       # TERMINAL / APPEARANCE
       #####################################################
@@ -60,7 +59,7 @@
       # PREFIX / RELOAD
       #####################################################
       bind C-a send-prefix
-      bind r source-file ~/.config/tmux/tmux.conf \; display-message "󰑓 tmux reloaded"
+      bind r source-file ''$HOME/.config/tmux/tmux.conf \; display-message "󰑓 tmux reloaded"
 
       #####################################################
       # INDEXES / WINDOWS

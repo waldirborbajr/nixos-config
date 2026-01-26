@@ -154,16 +154,21 @@ Configures:
 - XDG portals for screen-sharing/Flatpak
 - Performance optimizations (excluded bloat packages)
 
-### `modules/desktops/niri.nix`
+### `modules/desktops/niri/`
 
-Configures:
+Modular configuration for Niri compositor:
 
-- Niri scrollable-tiling Wayland compositor
-- Waybar status bar with system monitoring
-- Mako notification daemon
-- Fuzzel application launcher
-- Comprehensive keybindings (80+)
-- Spring-based smooth animations
+- `default.nix` - Main module importing all sub-modules
+- `config.nix` - Main config.kdl with include directives
+- `input.nix` - Keyboard, mouse, touchpad, tablet settings
+- `output.nix` - Monitor configuration
+- `layout.nix` - Gaps, borders, focus-ring, cursor, startup apps
+- `keybindings.nix` - All keyboard shortcuts (80+)
+- `window-rules.nix` - App-specific window rules
+- `animations.nix` - Spring-based smooth animations
+- `waybar.nix` - Status bar with system monitoring
+- `mako.nix` - Notification daemon
+- `fuzzel.nix` - Application launcher
 
 ### `modules/desktops/i3.nix`
 

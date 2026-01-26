@@ -35,7 +35,7 @@
   programs.delta = {
     enable = true;
     enableGitIntegration = true;
-    catppuccin.enable = true;  # Uses global theme config
+    # catppuccin.enable = true;  # FIXME: Module not available in current catppuccin/nix version
     options = {
       side-by-side = true;
       line-numbers = true;

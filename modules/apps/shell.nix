@@ -22,7 +22,7 @@
       q = "exit";
       ll = "eza -lg --icons --group-directories-first";
       la = "eza -lag --icons --group-directories-first";
-      rg = "rg --hidden --smart-case --glob='!.git/' --no-search-zip --trim";
+      # rg = "rg --hidden --smart-case --glob='!.git/' --no-search-zip --trim";  # Moved to ripgrep.nix
       gs = "git status --short";
       ga = "git add";
       gc = "git commit";
@@ -121,12 +121,12 @@
   # bat e fzf configurados com tema Catppuccin
   programs.bat = {
     enable = true;
-    catppuccin.enable = true;  # Uses global theme config
+    # catppuccin.enable = true;  # FIXME: Module not available in current catppuccin/nix version
   };
 
   programs.fzf = {
     enable = true;
-    catppuccin.enable = true;  # Uses global theme config
+    # catppuccin.enable = true;  # FIXME: Module not available in current catppuccin/nix version
   };
 
   home.packages = with pkgs; [
@@ -134,7 +134,7 @@
     tree
   ];
 
-  home.sessionVariables = {
+  home.sessionVariables = lib.mkForce {
     FZF_DEFAULT_OPTS = "--info=inline-right --ansi --layout=reverse --border=rounded --height=60%";
     FZF_CTRL_T_COMMAND = "fd --type f --hidden --follow --exclude .git || find . -type f";
     FZF_CTRL_T_OPTS = "--preview 'bat --color=always --style=numbers --line-range=:500 {}'";

@@ -91,6 +91,11 @@ flake-utils.lib.eachDefaultSystem (system:
       ];
 
       buildInputs = with pkgs; [
+        rustNightly
+        cargo-edit
+        cargo-watch
+        cargo-make
+        cargo-nextest
         
         # Database clients
         postgresql
@@ -109,17 +114,7 @@ flake-utils.lib.eachDefaultSystem (system:
         echo "Database clients available:"
         echo "  - psql (PostgreSQL)"
         echo "  - mysql (MariaDB)"
-        echo "  - sqlite3
-        zlib
-      ];
-
-      RUST_SRC_PATH = "${rustNightly}/lib/rustlib/src/rust/library";
-      LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
-      
-      shellHook = ''
-        echo "🦀 Rust Development Environment (nightly)"
-        echo "Rust version: $(rustc --version)"
-        echo "Cargo version: $(cargo --version)"
+        echo "  - sqlite3"
       '';
     };
 
@@ -251,7 +246,17 @@ flake-utils.lib.eachDefaultSystem (system:
         statix
         deadnix
       ];
-PostgreSQL
+
+      shellHook = ''
+        echo "❄️  Nix Development Environment"
+        echo "Tools: nixpkgs-fmt, alejandra, nil, nixd"
+        echo "  - nix-tree, nix-diff, nix-update, nix-init"
+        echo "  - statix (linter), deadnix (find dead code)"
+      '';
+    };
+
+    # ==========================================
+    # DevShell: PostgreSQL
     # ==========================================
     devShells.postgresql = pkgs.mkShell {
       name = "postgresql-dev";

@@ -29,7 +29,7 @@ in
 
     # Niri no macbook (está em desktops agora)
   ] ++ lib.optionals isMacbook [
-    ./modules/desktops/niri.nix
+    ./modules/desktops/niri
   ];
 
   home.packages = with pkgs; [
