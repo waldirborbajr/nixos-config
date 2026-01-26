@@ -15,6 +15,7 @@ in
     ./modules/apps/terminals.nix   # alacritty + kitty
     ./modules/apps/dev-tools.nix   # git + gh (core tools)
     ./modules/apps/ripgrep.nix     # ripgrep with DevOps config
+    ./modules/apps/yazi.nix        # yazi file manager with DevOps optimizations
 
     # Languages (development environments)
     ./modules/languages/go.nix

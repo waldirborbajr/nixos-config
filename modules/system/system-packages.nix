@@ -114,7 +114,6 @@ in
       eza
       
       fd
-      yazi
       dust
       ncdu
       zoxide
