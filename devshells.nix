@@ -49,11 +49,16 @@ flake-utils.lib.eachDefaultSystem (system:
         cargo-make
         cargo-nextest
         
-        # Build dependencies comuns
+        # Common build dependencies
         clang
         llvmPackages.bintools
         openssl
         zlib
+        
+        # Database clients
+        postgresql
+        mariadb-client
+        sqlite
       ];
 
       RUST_SRC_PATH = "${rustStable}/lib/rustlib/src/rust/library";
@@ -67,6 +72,11 @@ flake-utils.lib.eachDefaultSystem (system:
         echo "Available tools:"
         echo "  - cargo-edit, cargo-watch, cargo-make, cargo-nextest"
         echo "  - clippy, rustfmt, rust-analyzer"
+        echo ""
+        echo "Database clients available:"
+        echo "  - psql (PostgreSQL)"
+        echo "  - mysql (MariaDB)"
+        echo "  - sqlite3"
       '';
     };
 
@@ -81,15 +91,25 @@ flake-utils.lib.eachDefaultSystem (system:
       ];
 
       buildInputs = with pkgs; [
-        rustNightly
-        cargo-edit
-        cargo-watch
-        cargo-make
-        cargo-nextest
         
-        clang
-        llvmPackages.bintools
-        openssl
+        # Database clients
+        postgresql
+        mariadb-client
+        sqlite
+      ];
+
+      RUST_SRC_PATH = "${rustNightly}/lib/rustlib/src/rust/library";
+      LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
+      
+      shellHook = ''
+        echo "🦀 Rust Development Environment (nightly)"
+        echo "Rust version: $(rustc --version)"
+        echo "Cargo version: $(cargo --version)"
+        echo ""
+        echo "Database clients available:"
+        echo "  - psql (PostgreSQL)"
+        echo "  - mysql (MariaDB)"
+        echo "  - sqlite3
         zlib
       ];
 
@@ -118,6 +138,11 @@ flake-utils.lib.eachDefaultSystem (system:
         golangci-lint
         go-task
         air  # Hot reload
+        
+        # Database clients
+        postgresql
+        mariadb-client
+        sqlite
       ];
 
       shellHook = ''
@@ -131,6 +156,11 @@ flake-utils.lib.eachDefaultSystem (system:
         echo "Available tools:"
         echo "  - gopls, delve, gofumpt, golangci-lint"
         echo "  - go-task (task runner), air (hot reload)"
+        echo ""
+        echo "Database clients available:"
+        echo "  - psql (PostgreSQL)"
+        echo "  - mysql (MariaDB)"
+        echo "  - sqlite3"
       '';
 
       # Go environment
@@ -221,23 +251,125 @@ flake-utils.lib.eachDefaultSystem (system:
         statix
         deadnix
       ];
+PostgreSQL
+    # ==========================================
+    devShells.postgresql = pkgs.mkShell {
+      name = "postgresql-dev";
+      
+      buildInputs = with pkgs; [
+        postgresql
+        pgcli        # PostgreSQL CLI with autocomplete
+        pgFormatter  # SQL formatter
+      ];
 
       shellHook = ''
-        echo "❄️  Nix Development Environment"
+        echo "🐘 PostgreSQL Development Environment"
+        echo "PostgreSQL version: $(psql --version)"
         echo ""
         echo "Available tools:"
-        echo "  Formatters: nixpkgs-fmt, alejandra"
-        echo "  LSPs: nil, nixd"
-        echo "  Analysis: nix-tree, nix-diff, statix, deadnix"
-        echo "  Utilities: nix-update, nix-init"
+        echo "  - psql (client)"
+        echo "  - pgcli (interactive client)"
+        echo "  - pg_format (SQL formatter)"
         echo ""
-        echo "Quick commands:"
-        echo "  nixpkgs-fmt .     # Format all .nix files"
-        echo "  statix check .    # Lint for issues"
-        echo "  deadnix .         # Find dead code"
+        echo "Quick start local server:"
+        echo "  mkdir -p \$HOME/.postgres"
+        echo "  initdb -D \$HOME/.postgres/data"
+        echo "  pg_ctl -D \$HOME/.postgres/data -l logfile start"
+        echo "  createdb mydb"
+        echo "  psql mydb"
       '';
+    };
 
-      NIX_PATH = "nixpkgs=${pkgs.path}";
+    # ==========================================
+    # DevShell: MariaDB
+    # ==========================================
+    devShells.mariadb = pkgs.mkShell {
+      name = "mariadb-dev";
+      
+      buildInputs = with pkgs; [
+        mariadb
+        mycli  # MySQL/MariaDB CLI with autocomplete
+      ];
+
+      shellHook = ''
+        echo "🐬 MariaDB Development Environment"
+        echo "MariaDB version: $(mysql --version)"
+        echo ""
+        echo "Available tools:"
+        echo "  - mysql (client)"
+        echo "  - mycli (interactive client)"
+        echo "  - mysqldump, mysqlshow"
+        echo ""
+        echo "Quick start local server:"
+        echo "  mkdir -p \$HOME/.mariadb"
+        echo "  mysql_install_db --datadir=\$HOME/.mariadb/data"
+        echo "  mysqld --datadir=\$HOME/.mariadb/data --socket=/tmp/mysql.sock &"
+        echo "  mysql -u root"
+      '';
+    };
+
+    # ==========================================
+    # DevShell: SQLite
+    # ==========================================
+    devShells.sqlite = pkgs.mkShell {
+      name = "sqlite-dev";
+      
+      buildInputs = with pkgs; [
+        sqlite
+        sqlitebrowser  # GUI for SQLite
+        litecli        # SQLite CLI with autocomplete
+      ];
+
+      shellHook = ''
+        echo "💾 SQLite Development Environment"
+        echo "SQLite version: $(sqlite3 --version)"
+        echo ""
+        echo "Available tools:"
+        echo "  - sqlite3 (CLI)"
+        echo "  - litecli (interactive CLI)"
+        echo "  - sqlitebrowser (GUI)"
+        echo ""
+        echo "Quick start:"
+        echo "  sqlite3 mydb.db"
+        echo "  litecli mydb.db"
+      '';
+    };
+
+    # ==========================================
+    # DevShell: All Databases
+    # ==========================================
+    devShells.databases = pkgs.mkShell {
+      name = "databases-dev";
+      
+      buildInputs = with pkgs; [
+        # PostgreSQL
+        postgresql
+        pgcli
+        pgFormatter
+        
+        # MariaDB
+        mariadb
+        mycli
+        
+        # SQLite
+        sqlite
+        litecli
+        sqlitebrowser
+      ];
+
+      shellHook = ''
+        echo "🗄️  Databases Development Environment"
+        echo ""
+        echo "Available databases:"
+        echo "  PostgreSQL: $(psql --version | head -n1)"
+        echo "  MariaDB: $(mysql --version | head -n1)"
+        echo "  SQLite: $(sqlite3 --version)"
+        echo ""
+        echo "Available clients:"
+        echo "  - psql, pgcli (PostgreSQL)"
+        echo "  - mysql, mycli (MariaDB)"
+        echo "  - sqlite3, litecli (SQLite)"
+      '';
     };
 
     # ==========================================
@@ -254,13 +386,19 @@ flake-utils.lib.eachDefaultSystem (system:
 
       shellHook = ''
         echo "💻 Default Development Environment"
-        echo "Use shells específicos para mais ferramentas:"
+        echo "Use specific shells for more tools:"
         echo "  nix develop .#rust         → Rust stable"
         echo "  nix develop .#rust-nightly → Rust nightly"
-        echo "  nix develop .#go           → Go com extras"
+        echo "  nix develop .#go           → Go with extras"
         echo "  nix develop .#lua          → Lua + LuaJIT"
         echo "  nix develop .#nix-dev      → Nix development tools"
         echo "  nix develop .#fullstack    → Rust + Go + Node"
+        echo ""
+        echo "Databases:"
+        echo "  nix develop .#postgresql   → PostgreSQL + tools"
+        echo "  nix develop .#mariadb      → MariaDB + tools"
+        echo "  nix develop .#sqlite       → SQLite + tools"
+        echo "  nix develop .#databases    → All databases"
       '';
     };
   }

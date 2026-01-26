@@ -1,42 +1,42 @@
-# DevShells - Ambientes de Desenvolvimento
+# DevShells - Development Environments
 
-## 🎯 O que são DevShells?
+## 🎯 What are DevShells?
 
-DevShells são **ambientes de desenvolvimento isolados** definidos no `flake.nix`. Diferente das ferramentas instaladas globalmente no sistema, eles:
+DevShells are **isolated development environments** defined in `flake.nix`. Unlike globally installed system tools, they:
 
-- ✅ São ativados por demanda com `nix develop`
-- ✅ Não poluem o sistema global
-- ✅ Permitem versões diferentes por projeto
-- ✅ São reproduzíveis entre máquinas
-- ✅ Perfeitos para CI/CD
+- ✅ Are activated on demand with `nix develop`
+- ✅ Don't pollute the global system
+- ✅ Allow different versions per project
+- ✅ Are reproducible across machines
+- ✅ Perfect for CI/CD
 
-## � Estrutura Modular
+## 📦 Modular Structure
 
-As DevShells foram extraídas para um arquivo dedicado para manter o `flake.nix` limpo:
+DevShells were extracted to a dedicated file to keep `flake.nix` clean:
 
 ```
 /workspaces/nixos-config/
-├── flake.nix          # ~130 linhas (importa devshells.nix)
-├── devshells.nix      # ~280 linhas (definições completas)
+├── flake.nix          # ~130 lines (imports devshells.nix)
+├── devshells.nix      # ~280 lines (complete definitions)
 ├── core.nix
 └── home.nix
 ```
 
-**Benefícios:**
-- ✅ `flake.nix` 60% menor e mais legível
-- ✅ DevShells organizadas logicamente em um arquivo
-- ✅ Separação de responsabilidades
-- ✅ Manutenção simplificada
+**Benefits:**
+- ✅ `flake.nix` 60% smaller and more readable
+- ✅ DevShells logically organized in one file
+- ✅ Separation of concerns
+- ✅ Simplified maintenance
 
-## �🚀 Shells Disponíveis
+## 🚀 Available Shells
 
-### 1. **Default** (desenvolvimento geral)
+### 1. **Default** (general development)
 ```bash
 nix develop
-# ou
+# or
 nix develop .#default
 ```
-Inclui o básico: Rust stable + Go + Node.js
+Includes the basics: Rust stable + Go + Node.js
 
 ---
 
@@ -45,13 +45,14 @@ Inclui o básico: Rust stable + Go + Node.js
 nix develop .#rust
 ```
 
-**Inclui:**
+**Includes:**
 - Rust stable (rustc, cargo)
 - rust-analyzer, clippy, rustfmt
 - cargo-edit, cargo-watch, cargo-make, cargo-nextest
 - clang, openssl, zlib
+- Database clients (psql, mysql, sqlite3)
 
-**Ideal para:** Projetos Rust em produção
+**Ideal for:** Production Rust projects
 
 ---
 
@@ -60,12 +61,13 @@ nix develop .#rust
 nix develop .#rust-nightly
 ```
 
-**Inclui:**
+**Includes:**
 - Rust nightly via fenix
-- Mesmas ferramentas do stable
-- Recursos experimentais do Rust
+- Same tools as stable
+- Experimental Rust features
+- Database clients (psql, mysql, sqlite3)
 
-**Ideal para:** Testar features nightly, projetos que precisam nightly
+**Ideal for:** Testing nightly features, projects requiring nightly
 
 ---
 
@@ -74,14 +76,15 @@ nix develop .#rust-nightly
 nix develop .#go
 ```
 
-**Inclui:**
+**Includes:**
 - Go 1.25
 - gopls (LSP), delve (debugger)
 - gofumpt, golangci-lint
 - go-task (task runner)
 - air (hot reload)
+- Database clients (psql, mysql, sqlite3)
 
-**Ideal para:** Projetos Go com tooling completo
+**Ideal for:** Go projects with complete tooling
 
 ---
 
@@ -90,12 +93,12 @@ nix develop .#go
 nix develop .#fullstack
 ```
 
-**Inclui:**
+**Includes:**
 - Rust stable + Go + Node.js
-- Ferramentas essenciais de cada stack
+- Essential tools from each stack
 - git, gh (GitHub CLI)
 
-**Ideal para:** Projetos que usam múltiplas linguagens
+**Ideal for:** Projects using multiple languages
 
 ---
 
@@ -104,14 +107,14 @@ nix develop .#fullstack
 nix develop .#lua
 ```
 
-**Inclui:**
+**Includes:**
 - Lua 5.4 + LuaJIT
 - lua-language-server (LSP)
 - stylua (formatter)
 - selene (linter)
 - luarocks (package manager)
 
-**Ideal para:** Scripts Lua, Neovim plugins, game scripting
+**Ideal for:** Lua scripts, Neovim plugins, game scripting
 
 ---
 
@@ -120,51 +123,158 @@ nix develop .#lua
 nix develop .#nix-dev
 ```
 
-**Inclui:**
+**Includes:**
 - nixpkgs-fmt, alejandra (formatters)
 - nil, nixd (LSPs)
 - statix, deadnix (linters)
 - nix-tree, nix-diff (analysis)
 - nix-init, nix-update (utilities)
 
-**Ideal para:** Desenvolver módulos NixOS, flakes, derivations
+**Ideal for:** Developing NixOS modules, flakes, derivations
 
 ---
 
-## 📁 Uso por Projeto
+### 8. **PostgreSQL**
+```bash
+nix develop .#postgresql
+```
 
-### Opção 1: Ativar manualmente
+**Includes:**
+- PostgreSQL (server + client)
+- pgcli (interactive client with autocomplete)
+- pgFormatter (SQL formatter)
+
+**Ideal for:** Projects using PostgreSQL, schema development
+
+**Quick start:**
+```bash
+mkdir -p $HOME/.postgres
+initdb -D $HOME/.postgres/data
+pg_ctl -D $HOME/.postgres/data -l logfile start
+createdb mydb
+psql mydb
+```
+
+---
+
+### 9. **MariaDB**
+```bash
+nix develop .#mariadb
+```
+
+**Includes:**
+- MariaDB (server + client)
+- mycli (interactive client with autocomplete)
+- mysqldump, mysqlshow
+
+**Ideal for:** Projects using MySQL/MariaDB
+
+**Quick start:**
+```bash
+mkdir -p $HOME/.mariadb
+mysql_install_db --datadir=$HOME/.mariadb/data
+mysqld --datadir=$HOME/.mariadb/data --socket=/tmp/mysql.sock &
+mysql -u root
+```
+
+---
+
+### 10. **SQLite**
+```bash
+nix develop .#sqlite
+```
+
+**Includes:**
+- SQLite (CLI)
+- litecli (interactive client)
+- sqlitebrowser (GUI)
+
+**Ideal for:** Local development, prototypes, embedded applications
+
+**Quick start:**
+```bash
+sqlite3 mydb.db
+# or with enhanced interface
+litecli mydb.db
+```
+
+---
+
+### 11. **All Databases**
+```bash
+nix develop .#databases
+```
+
+**Includes:**
+- PostgreSQL + tools
+- MariaDB + tools
+- SQLite + tools
+
+**Ideal for:** Projects working with multiple databases
+
+---
+
+## 🔗 Database + Language Integration
+
+**Go and Rust shells already include database clients!**
+
+When activating `.#rust` or `.#go`, you have available:
+- ✅ `psql` (PostgreSQL client)
+- ✅ `mysql` (MariaDB client)
+- ✅ `sqlite3` (SQLite client)
+
+**Practical example:**
+```bash
+# Terminal 1: Activate Go shell
+nix develop .#go
+
+# Terminal 2: Start database in another shell
+nix develop .#postgresql
+initdb -D $HOME/.postgres/data
+pg_ctl -D $HOME/.postgres/data start
+createdb myapp
+
+# Terminal 1: Connect from Go shell
+psql myapp
+go run main.go  # Your Go app can connect to PostgreSQL
+```
+
+---
+
+## 📁 Project Usage
+
+### Option 1: Manual activation
 
 ```bash
-cd meu-projeto-rust
-nix develop /caminho/para/nixos-config#rust
+cd my-rust-project
+nix develop /path/to/nixos-config#rust
 
-# Agora tem Rust stable + ferramentas
+# Now you have Rust stable + tools
 cargo build
 ```
 
-### Opção 2: `.envrc` com direnv (recomendado)
+### Option 2: `.envrc` with direnv (recommended)
 
-Crie `.envrc` na raiz do projeto:
+Create `.envrc` in project root:
 
 ```bash
 # .envrc
-use flake /home/borba/nixos-config#rust
+use flake /home/user/nixos-config#rust
 ```
 
-Com `direnv` instalado:
+With `direnv` installed:
 ```bash
 direnv allow
-# Ambiente ativa automaticamente ao entrar no diretório!
+# Environment activates automatically when entering directory!
 ```
 
-### Opção 3: `flake.nix` no projeto
+### Option 3: `flake.nix` in project
 
-Crie `flake.nix` no projeto:
+Create `flake.nix` in project:
 
 ```nix
 {
-  description = "Meu projeto Rust";
+  description = "My Rust project";
   
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -179,111 +289,138 @@ Crie `flake.nix` no projeto:
         buildInputs = with pkgs; [
           rustc
           cargo
-          # deps específicas do projeto
+          # project-specific deps
         ];
       };
     };
 }
 ```
 
-Depois:
+Then:
 ```bash
-nix develop  # Usa o flake.nix local
+nix develop  # Uses local flake.nix
 ```
 
 ---
 
-## 🔄 Estratégia Híbrida (Recomendada)
+## 🔄 Hybrid Strategy (Recommended)
 
-### Ferramentas Globais (sempre disponíveis)
-Definidas em `modules/languages/`:
+### Global Tools (always available)
+Defined in `modules/languages/`:
 - **go.nix** → Go 1.25 + gopls + delve + tooling
 - **rust.nix** → Rustup (stable + nightly) + cargo extensions
 - **lua.nix** → Lua 5.4 + LuaJIT + LSP (toggle: `enableLua`)
-- **nix-dev.nix** → Formatters, LSPs, linters para Nix
-- **python.nix**, **nodejs.nix** → Outras linguagens
+- **nix-dev.nix** → Formatters, LSPs, linters for Nix
+- **python.nix**, **nodejs.nix** → Other languages
 
-Ferramentas core em `modules/apps/dev-tools.nix`:
+Core tools in `modules/apps/dev-tools.nix`:
 - Git, GitHub CLI
 
-### DevShells (por projeto)
-Definidos em `flake.nix`:
+### DevShells (per project)
+Defined in `devshells.nix`:
 - Rust stable/nightly via fenix
-- Go com tooling completo
-- Lua com LSP e ferramentas
-- Nix com análise e formatação
-- Combinações específicas
+- Go with complete tooling
+- Lua with LSP and tools
+- Nix with analysis and formatting
+- Specific combinations
 
-**Resultado:**
-- Terminal normal → ferramentas globais disponíveis
-- `nix develop` → ambiente isolado com versões específicas
+**Result:**
+- Normal terminal → global tools available
+- `nix develop` → isolated environment with specific versions
 
 ---
 
-## 💡 Exemplos Práticos
+## 💡 Practical Examples
 
-### Backend Rust com API
+### Rust Backend with API
 ```bash
-cd ~/projetos/api-rust
-nix develop /home/borba/nixos-config#rust
+cd ~/projects/rust-api
+nix develop /home/user/nixos-config#rust
 
-# Ambiente tem tudo para Rust
+# Environment has everything for Rust
 cargo init
 cargo add axum tokio
 cargo run
 ```
 
-### Service Go com gRPC
+### Go Service with gRPC
 ```bash
-cd ~/projetos/grpc-service
-nix develop /home/borba/nixos-config#go
+cd ~/projects/grpc-service
+nix develop /home/user/nixos-config#go
 
-# Ambiente Go completo
+# Complete Go environment
 go mod init github.com/user/grpc-service
 go get google.golang.org/grpc
 go run main.go
 ```
 
-### Projeto Full Stack
+### Full Stack Project
 ```bash
-cd ~/projetos/fullstack-app
-nix develop /home/borba/nixos-config#fullstack
+cd ~/projects/fullstack-app
+nix develop /home/user/nixos-config#fullstack
 
-# Backend em Go
+# Backend in Go
 cd backend && go run .
 
-# Frontend em Node.js
+# Frontend in Node.js
 cd ../frontend && pnpm dev
 
-# Worker em Rust
+# Worker in Rust
 cd ../worker && cargo run
+```
+
+### Rust API + PostgreSQL
+```bash
+cd ~/projects/rust-api
+nix develop /home/user/nixos-config#rust
+
+# Terminal 1: Start PostgreSQL
+nix develop /home/user/nixos-config#postgresql
+initdb -D $HOME/.postgres/data
+pg_ctl -D $HOME/.postgres/data start
+createdb myapi
+
+# Terminal 2: Develop the API
+cargo add sqlx tokio
+cargo sqlx migrate run
+cargo run
+```
+
+### Go Microservice + MariaDB
+```bash
+cd ~/projects/go-service
+nix develop /home/user/nixos-config#go
+
+# MySQL client already available
+mysql -h localhost -u root
+go run main.go
 ```
 
 ---
 
-## 🛠️ Customização
+## 🛠️ Customization
 
-### Adicionar dependências ao shell Rust
+### Add dependencies to Rust shell
 
-Edite `devshells.nix`:
+Edit `devshells.nix`:
 
 ```nix
 devShells.rust = pkgs.mkShell {
   buildInputs = with pkgs; [
     rustStable
-    # ... ferramentas existentes
+    # ... existing tools
     
-    # Adicione suas deps:
-    postgresql  # Para projetos com Postgres
-    redis       # Para cache
-    protobuf    # Para gRPC
+    # Add your deps:
+    postgresql  # For Postgres projects
+    redis       # For cache
+    protobuf    # For gRPC
   ];
 };
 ```
 
-### Criar shell para linguagem específica
+### Create shell for specific language
 
-Edite `devshells.nix` e adicione uma nova entrada:
+Edit `devshells.nix` and add a new entry:
 
 ```nix
 devShells.python = pkgs.mkShell {
@@ -291,6 +428,11 @@ devShells.python = pkgs.mkShell {
     python3
     poetry
     python3Packages.pip
+    
+    # Database clients (optional)
+    postgresql
+    mariadb-client
+    sqlite
   ];
   
   shellHook = ''
@@ -300,23 +442,40 @@ devShells.python = pkgs.mkShell {
 };
 ```
 
-**Nota:** Todas as definições de DevShells estão em `devshells.nix`, não no `flake.nix`.
+### Add specific database to a shell
+
+If you want only PostgreSQL in Rust shell:
+
+```nix
+devShells.rust-postgres = pkgs.mkShell {
+  buildInputs = with pkgs; [
+    rustStable
+    # ... other tools
+    
+    # Only PostgreSQL
+    postgresql
+    pgcli
+  ];
+};
+```
+
+**Note:** All DevShell definitions are in `devshells.nix`, not in `flake.nix`.
 
 ---
 
 ## 🆚 Global vs DevShell
 
-| Aspecto | Global (`dev-tools.nix`) | DevShell (`flake.nix`) |
+| Aspect | Global (`dev-tools.nix`) | DevShell (`devshells.nix`) |
 |---------|-------------------------|------------------------|
-| **Disponibilidade** | Sempre | Ao rodar `nix develop` |
-| **Versão** | Uma por linguagem | Múltiplas possíveis |
-| **Uso** | CLI geral, scripts | Projetos específicos |
-| **Isolamento** | Compartilhado | Isolado por shell |
-| **Reinstalação** | nixos-rebuild | Instantâneo |
+| **Availability** | Always | When running `nix develop` |
+| **Version** | One per language | Multiple possible |
+| **Usage** | General CLI, scripts | Specific projects |
+| **Isolation** | Shared | Isolated per shell |
+| **Reinstallation** | nixos-rebuild | Instant |
 
 ---
 
-## 📚 Recursos
+## 📚 Resources
 
 - [Nix DevShells](https://nixos.wiki/wiki/Development_environment_with_nix-shell)
 - [Fenix (Rust toolchains)](https://github.com/nix-community/fenix)
@@ -327,28 +486,34 @@ devShells.python = pkgs.mkShell {
 ## ⚡ Quick Reference
 
 ```bash
-# Listar shells disponíveis
+# List available shells
 nix flake show
 
-# Entrar em shell específico
-nix develop .#rust
-nix develop .#rust-nightly
-nix develop .#go
-nix develop .#lua
-nix develop .#nix-dev
-nix develop .#fullstack
+# Languages
+nix develop .#rust          # Rust stable + DB clients
+nix develop .#rust-nightly  # Rust nightly + DB clients
+nix develop .#go            # Go + DB clients
+nix develop .#lua           # Lua development
+nix develop .#nix-dev       # Nix tooling
+nix develop .#fullstack     # Rust + Go + Node
 
-# Com direnv (auto-ativa)
+# Databases
+nix develop .#postgresql    # PostgreSQL + tools
+nix develop .#mariadb       # MariaDB + tools
+nix develop .#sqlite        # SQLite + tools
+nix develop .#databases     # All databases
+
+# With direnv (auto-activate)
 echo "use flake .#rust" > .envrc
 direnv allow
 
-# Ver o que está no shell
+# See what's in the shell
 nix develop .#rust --command which rustc
 nix develop .#go --command go env
-nix develop .#lua --command lua5.4 -v
+nix develop .#postgresql --command psql --version
 
-# Rodar comando dentro do shell
+# Run command inside shell
 nix develop .#rust --command cargo build
 nix develop .#go --command go test ./...
-nix develop .#lua --command lua script.lua
+nix develop .#postgresql --command psql mydb
 ```
