@@ -12,6 +12,7 @@ in
   imports = [
     ./modules/apps/zsh.nix
     ./modules/apps/fzf.nix
+     ./modules/apps/bat.nix
     ./modules/apps/git.nix
     ./modules/apps/gh.nix
     ./modules/apps/go.nix
