@@ -30,7 +30,7 @@ in
     fzf
     zoxide
     eza
-    bat
+    
     ripgrep
     fd
     tree
