@@ -206,3 +206,6 @@ MIT
 BORBA JR W
 
 Declarative infrastructure. Pragmatic design. Zero waste.
+
+
+https://github.com/Awan/nix/blob/55e008f0fd0236575fa6674e7b7f90c0bbfdb94c/dots/zsh.nix
