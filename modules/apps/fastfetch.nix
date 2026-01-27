@@ -18,8 +18,7 @@
         }
       },
       "display": {
-        "separator": " → ",
-        "color": "blue"
+        "separator": " → "
       },
       "modules": [
         {
@@ -115,8 +114,7 @@
         },
         {
           "type": "colors",
-          "paddingLeft": 2,
-          "symbol": "circle"
+          "paddingLeft": 2
         }
       ]
     }
