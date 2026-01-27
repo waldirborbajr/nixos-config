@@ -151,7 +151,7 @@ Configures:
 - Display manager (GDM)
 - GNOME desktop
 - Optimized for Wayland
-- XDG portals for screen-sharing/Flatpak
+- XDG portals for screen-sharing
 - Performance optimizations (excluded bloat packages)
 
 ### `modules/desktops/niri/`

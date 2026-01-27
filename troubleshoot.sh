@@ -95,7 +95,7 @@ run 'systemctl --user --failed --no-pager || true'
 
 section "Important services status"
 run 'systemctl is-active docker libvirtd k3s NetworkManager 2>/dev/null || true'
-run 'systemctl --no-pager --type=service --state=running | egrep -i "docker|containerd|libvirtd|qemu|k3s|flatpak|xdg-desktop-portal|gdm|gnome|sddm|lightdm|NetworkManager" || true'
+run 'systemctl --no-pager --type=service --state=running | egrep -i "docker|containerd|libvirtd|qemu|k3s|xdg-desktop-portal|gdm|gnome|sddm|lightdm|NetworkManager" || true'
 run 'systemctl --user --no-pager --type=service --state=running | egrep -i "xdg-desktop-portal|niri|waybar|mako|pipewire|wireplumber" || true'
 
 section "User services deep dive (portals + your xdg-config-links)"

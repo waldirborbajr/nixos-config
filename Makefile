@@ -113,7 +113,7 @@ endef
 	dry-switch dry-build \
 	build-debug \
 	list-generations current-system why-no-new-generation \
-	fmt status gc gc-hard flatpak-setup flatpak-update flatpak-update-repo
+	fmt status gc gc-hard
 
 # ------------------------------------------
 # Help
@@ -351,15 +351,3 @@ gc-hard:
 
 status:
 	@systemctl --user list-jobs
-
-# ------------------------------------------
-# Flatpak
-# ------------------------------------------
-flatpak-setup:
-	@flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-
-flatpak-update:
-	@flatpak update -y
-
-flatpak-update-repo:
-	@flatpak update --appstream -y && flatpak update -y

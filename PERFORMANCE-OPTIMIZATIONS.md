@@ -100,20 +100,6 @@ boot.initrd.systemd.enable = true;
 
 ---
 
-### 6. **Flatpak: Disabled by Default** ✅
-**File:** `modules/apps/flatpak.nix`
-
-```nix
-services.flatpak.enable = lib.mkDefault false;  # Was: true
-```
-
-**Impact:**
-- ✅ Saves 100-200MB RAM
-- ✅ No fusefs overhead
-- ✅ Enable when needed: set to `true` in host config
-
----
-
 ### 7. **GNOME Core-Apps Disabled** ✅
 **File:** `modules/desktops/gnome.nix`
 
@@ -330,12 +316,6 @@ nix develop .#devops
 
 ## 🔧 How to Enable/Disable Features
 
-### Enable Flatpak
-In `hosts/macbook.nix`:
-```nix
-services.flatpak.enable = true;
-```
-
 ### Enable Docker at Boot
 In `hosts/macbook.nix`:
 ```nix
@@ -401,9 +381,7 @@ cat /sys/block/sda/queue/scheduler
 
 3. **Docker on-demand:** Start with `systemctl start docker` or `docker ps` will auto-start it.
 
-4. **Flatpak disabled:** Enable per-host if you use Flatpak apps regularly.
-
-5. **GNOME core-apps:** Essential apps (Files, Settings, Terminal) are still installed. Only extras removed.
+4. **GNOME core-apps:** Essential apps (Files, Settings, Terminal) are still installed. Only extras removed.
 
 ---
 

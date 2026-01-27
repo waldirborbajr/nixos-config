@@ -30,8 +30,7 @@
     ./modules/languages/python.nix
     ./modules/languages/nodejs.nix
 
-    # Flatpak + portal (system services)
-    ./modules/apps/flatpak.nix
+    # XDG portal (system services)
     ./modules/xdg-portal.nix
   ];
 }

@@ -100,7 +100,6 @@ This repository is the **single source of truth** for my personal Linux infrastr
 │   │
 │   ├── apps/             # ✨ Consolidated application modules
 │   │   ├── dev-tools.nix    # git + gh + go + rust
-│   │   ├── flatpak.nix      # flatpak enable + packages
 │   │   ├── shell.nix        # zsh + fzf + bat
 │   │   ├── terminals.nix    # alacritty
 │   │   └── tmux.nix
@@ -134,8 +133,7 @@ This repository is the **single source of truth** for my personal Linux infrastr
 └── scripts/
     ├── ci-build.sh
     ├── ci-checks.sh
-    ├── ci-eval.sh
-    └── flatpak-sync.sh
+    └── ci-eval.sh
 ```
 
 ### ✨ Recent Refactoring (REFACTORv2)
@@ -179,7 +177,6 @@ Flags are **independent** and can be combined freely.
 - `shell.nix` - ZSH + FZF + bat configuration
 - `terminals.nix` - Alacritty terminal emulator
 - `dev-tools.nix` - Git, GitHub CLI, Go, Rust toolchains
-- `flatpak.nix` - Flatpak service + application list
 - `tmux.nix` - Terminal multiplexer
 
 **Desktops** (`modules/desktops/`)

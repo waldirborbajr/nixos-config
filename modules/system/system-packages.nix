@@ -189,13 +189,48 @@ in
       llvm
       lld
       gdb
-
-      # Optional but useful for native debugging alongside gdb (ADD)
       lldb
 
-      # neovim
-      # vscode
-      # discord
-      # anydesk
+      ##########################################
+      # Browsers
+      ##########################################
+      firefox
+      brave
+
+      ##########################################
+      # Development & IDEs
+      ##########################################
+      vscode
+
+      ##########################################
+      # Communication
+      ##########################################
+      discord
+      # Note: Proton Mail desktop app not available in nixpkgs, use web version
+
+      ##########################################
+      # Knowledge Management
+      ##########################################
+      obsidian
+
+      ##########################################
+      # Remote Access
+      ##########################################
+      anydesk
+
+      ##########################################
+      # Media & Graphics
+      ##########################################
+      gimp
+      inkscape
+      audacity
+      handbrake
+      mpv
+      imagemagick
+
+      ##########################################
+      # Downloads
+      ##########################################
+      transmission_4-gtk
     ]);
 }
