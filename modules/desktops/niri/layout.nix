@@ -75,7 +75,6 @@ let
     // ENVIRONMENT VARIABLES
     // ============================================
     environment {
-      DISPLAY null
       QT_QPA_PLATFORM "wayland"
       MOZ_ENABLE_WAYLAND "1"
       NIXOS_OZONE_WL "1"
@@ -84,6 +83,7 @@ let
     // ============================================
     // STARTUP APPLICATIONS
     // ============================================
+    spawn-at-startup "swaybg" "-i" "$HOME/.config/niri/wallpaper.svg" "-m" "fill"
     spawn-at-startup "mako"
     spawn-at-startup "waybar"
     spawn-at-startup "wl-paste" "--watch" "cliphist" "store"

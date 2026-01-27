@@ -33,7 +33,11 @@ in
       pamixer
       pavucontrol
       networkmanagerapplet
+      swaybg
     ];
+
+    # Wallpaper
+    home.file.".config/niri/wallpaper.svg".source = ../../wallpapers/devops-dark.svg;
 
     # Wayland environment variables
     home.sessionVariables = {
