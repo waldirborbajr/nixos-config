@@ -5,7 +5,7 @@
 # - reproducible + debuggable
 # - auto-commit + push sempre para build/switch/switch-prod
 # ==========================================
-SHELL := /run/current-system/sw/bin/bash
+SHELL := bash
 .ONESHELL:
 .SHELLFLAGS := -euo pipefail -c
 
@@ -107,13 +107,13 @@ endef
 # Default target
 # ------------------------------------------
 .DEFAULT_GOAL := help
-.PHONY: help hosts flake-show doctor preflight flake-check eval-host \
+.PHONY: help hosts flake-show doctor preflight flake-check check eval-host \
 	update-flake check_git_status \
-	build switch switch-prod switch-off upgrade rollback \
+	build test-build switch switch-prod switch-off upgrade rollback \
 	dry-switch dry-build \
 	build-debug \
 	list-generations current-system why-no-new-generation \
-	fmt status gc gc-hard flatpak-setup flatpak-update flatpak-update-repo
+	fmt status gc gc-hard
 
 # ------------------------------------------
 # Help
@@ -124,6 +124,10 @@ help:
 	@echo "Start here:"
 	@echo "  make hosts"
 	@echo "  make doctor"
+	@echo ""
+	@echo "Validation (sem aplicar mudanças):"
+	@echo "  make check               # Verifica sintaxe do flake"
+	@echo "  make test-build HOST=macbook [DEVOPS=1] [QEMU=1]  # Test build"
 	@echo ""
 	@echo "Build/Switch (com auto-commit + push automático):"
 	@echo "  make build     HOST=macbook [DEVOPS=1] [QEMU=1] [IMPURE=1]"
@@ -183,6 +187,12 @@ flake-check:
 	@echo "Running flake check (fast sanity)..."
 	@cd $(NIXOS_CONFIG) && nix --extra-experimental-features "nix-command flakes" flake check
 
+check:
+	@$(call require_repo)
+	@echo "Verificando sintaxe do flake com --impure..."
+	@cd $(NIXOS_CONFIG) && nix --extra-experimental-features "nix-command flakes" flake check --impure
+	@echo "✓ Sintaxe OK!"
+
 eval-host:
 	@$(call require_repo)
 	@$(call require_host)
@@ -228,6 +238,14 @@ dry-build:
 	@$(MAKE) preflight
 	@$(call print_cmd,build,--dry-run)
 	@$(call nixos_cmd,build,--dry-run)
+
+test-build:
+	@$(MAKE) preflight
+	@echo "Test build (não aplica mudanças) para host: $(HOST)"
+	@$(call print_cmd,build,)
+	@$(call nixos_cmd,build,)
+	@echo "✓ Test build concluído! Nenhuma mudança foi aplicada."
+	@echo "Para aplicar mudanças: make switch HOST=$(HOST)"
 
 build:
 	@$(MAKE) preflight
@@ -333,15 +351,3 @@ gc-hard:
 
 status:
 	@systemctl --user list-jobs
-
-# ------------------------------------------
-# Flatpak
-# ------------------------------------------
-flatpak-setup:
-	@flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-
-flatpak-update:
-	@flatpak update -y
-
-flatpak-update-repo:
-	@flatpak update --appstream -y && flatpak update -y

@@ -1,182 +1,152 @@
 # modules/apps/tmux.nix
 #
-# tmux — NixOS managed (no autostart)
-# - Config declarativa em /etc/xdg/tmux/tmux.conf
-# - Plugins via TPM (auto-bootstrap)
-# - Compatível sem Home-Manager
+# tmux — Home Manager managed
+# - Config declarativa via programs.tmux
+# - Plugins via Nix (incluindo Catppuccin)
+# - Integração com tema centralizado
 
 { config, pkgs, lib, ... }:
 
 {
   ############################################
-  # Package
+  # Tmux via Home Manager
   ############################################
-  environment.systemPackages = with pkgs; [
-    tmux
-    git
-  ];
+  programs.tmux = {
+    enable = true;
+    
+    # Enable Catppuccin theme
+    # catppuccin.enable = true;  # FIXME: Module not available in current catppuccin/nix version
+    
+    shell = "${pkgs.zsh}/bin/zsh";
+    terminal = "tmux-256color";
+    historyLimit = 15000;
+    baseIndex = 1;
+    
+    # Key bindings
+    prefix = "C-a";
+    keyMode = "vi";
+    mouse = true;
+    
+    # Plugins
+    plugins = with pkgs.tmuxPlugins; [
+      sensible
+      vim-tmux-navigator
+      yank
+      resurrect
+      continuum
+      {
+        plugin = catppuccin;
+        extraConfig = ''
+          set -g @catppuccin_flavor 'mocha'
+          set -g @catppuccin_window_status_style "rounded"
+          set -g @catppuccin_window_default_text "#W"
+          set -g @catppuccin_window_current_text "#W"
+          set -g @catppuccin_status_modules_right "directory session"
+          set -g @catppuccin_status_left_separator "█"
+          set -g @catppuccin_status_right_separator "█"
+        '';
+      }
+    ];
+    
+    extraConfig = ''
+      #####################################################
+      # TERMINAL / APPEARANCE
+      #####################################################
+      set -as terminal-features ",xterm-256color:RGB"
+      set -g focus-events on
+      
+      #####################################################
+      # PREFIX / RELOAD
+      #####################################################
+      bind C-a send-prefix
+      bind r source-file ''$HOME/.config/tmux/tmux.conf \; display-message "󰑓 tmux reloaded"
 
-  ############################################
-  # tmux config (Nix-managed)
-  # Canonical: /etc/xdg/tmux/tmux.conf
-  ############################################
-  environment.etc."xdg/tmux/tmux.conf".text = ''
-    #####################################################
-    # CORE / TERMINAL
-    #####################################################
-    set -g default-terminal "tmux-256color"
-    set -as terminal-features ",xterm-256color:RGB"
-    set -g focus-events on
+      #####################################################
+      # INDEXES / WINDOWS
+      #####################################################
+      set -g pane-base-index 1
+      set -g renumber-windows on
 
-    #####################################################
-    # PREFIX / RELOAD
-    #####################################################
-    unbind C-b
-    set -g prefix C-a
-    bind C-a send-prefix
+      #####################################################
+      # GENERAL BEHAVIOR
+      #####################################################
+      set -g repeat-time 600
+      set -g status-position bottom
+      set -g status-interval 5
+      set -g display-time 800
 
-    bind r source-file ~/.config/tmux/tmux.conf \; display-message "󰑓 tmux reloaded"
+      #####################################################
+      # SMART WINDOW NAMES (DEVOPS FRIENDLY)
+      #####################################################
+      setw -g automatic-rename on
+      set -g automatic-rename-format '#{pane_current_command}'
 
-    #####################################################
-    # INDEXES / WINDOWS
-    #####################################################
-    set -g base-index 1
-    set -g pane-base-index 1
-    set -g renumber-windows on
+      #####################################################
+      # PANE NAVIGATION (VIM STYLE)
+      #####################################################
+      bind h select-pane -L
+      bind j select-pane -D
+      bind k select-pane -U
+      bind l select-pane -R
 
-    #####################################################
-    # GENERAL BEHAVIOR
-    #####################################################
-    set -g mouse on
-    set -g default-shell ${pkgs.zsh}/bin/zsh
-    set -g repeat-time 600
-    set -g history-limit 15000
-    set -g status-position bottom
-    set -g status-interval 5
-    set -g display-time 800
+      # No-prefix navigation (turbo mode)
+      bind -n C-h select-pane -L
+      bind -n C-j select-pane -D
+      bind -n C-k select-pane -U
+      bind -n C-l select-pane -R
 
-    #####################################################
-    # SMART WINDOW NAMES (DEVOPS FRIENDLY)
-    #####################################################
-    setw -g automatic-rename on
-    set -g automatic-rename-format '#{pane_current_command}'
+      #####################################################
+      # RESIZE PANES
+      #####################################################
+      bind -r Left  resize-pane -L 5
+      bind -r Right resize-pane -R 5
+      bind -r Up    resize-pane -U 3
+      bind -r Down  resize-pane -D 3
 
-    #####################################################
-    # PANE NAVIGATION (VIM STYLE)
-    #####################################################
-    bind h select-pane -L
-    bind j select-pane -D
-    bind k select-pane -U
-    bind l select-pane -R
+      # Vim-style resize
+      bind -r H resize-pane -L 5
+      bind -r J resize-pane -D 3
+      bind -r K resize-pane -U 3
+      bind -r L resize-pane -R 5
 
-    # No-prefix navigation (turbo mode)
-    bind -n C-h select-pane -L
-    bind -n C-j select-pane -D
-    bind -n C-k select-pane -U
-    bind -n C-l select-pane -R
+      #####################################################
+      # SPLITS / WINDOWS (PATH AWARE)
+      #####################################################
+      unbind %
+      unbind '"'
 
-    #####################################################
-    # RESIZE PANES
-    #####################################################
-    bind -r Left  resize-pane -L 5
-    bind -r Right resize-pane -R 5
-    bind -r Up    resize-pane -U 3
-    bind -r Down  resize-pane -D 3
+      bind | split-window -h -c "#{pane_current_path}"
+      bind _ split-window -v -c "#{pane_current_path}"
 
-    # Vim-style resize
-    bind -r H resize-pane -L 5
-    bind -r J resize-pane -D 3
-    bind -r K resize-pane -U 3
-    bind -r L resize-pane -R 5
+      bind c new-window -c "#{pane_current_path}"
+      bind m resize-pane -Z
 
-    #####################################################
-    # SPLITS / WINDOWS (PATH AWARE)
-    #####################################################
-    unbind %
-    unbind '"'
+      #####################################################
+      # WINDOW SWITCHING
+      #####################################################
+      bind -n S-Left  previous-window
+      bind -n S-Right next-window
+      bind -n M-H previous-window
+      bind -n M-L next-window
 
-    bind | split-window -h -c "#{pane_current_path}"
-    bind _ split-window -v -c "#{pane_current_path}"
+      #####################################################
+      # COPY MODE (VI)
+      #####################################################
+      bind -T copy-mode-vi v     send -X begin-selection
+      bind -T copy-mode-vi C-v   send -X rectangle-toggle
+      bind -T copy-mode-vi y     send -X copy-selection-and-cancel
+      bind -T copy-mode-vi Enter send -X copy-selection-and-cancel
 
-    bind c new-window -c "#{pane_current_path}"
-    bind m resize-pane -Z
+      #####################################################
+      # SESSION PERSISTENCE (DEVOPS GOLD)
+      #####################################################
+      set -g @resurrect-capture-pane-contents 'on'
+      set -g @resurrect-strategy-nvim 'session'
+      set -g @resurrect-strategy-vim 'session'
+      set -g @resurrect-processes 'ssh kubectl helm terraform nvim vim'
 
-    #####################################################
-    # WINDOW SWITCHING
-    #####################################################
-    bind -n S-Left  previous-window
-    bind -n S-Right next-window
-    bind -n M-H previous-window
-    bind -n M-L next-window
-
-    #####################################################
-    # COPY MODE (VI)
-    #####################################################
-    setw -g mode-keys vi
-
-    bind -T copy-mode-vi v     send -X begin-selection
-    bind -T copy-mode-vi C-v   send -X rectangle-toggle
-    bind -T copy-mode-vi y     send -X copy-selection-and-cancel
-    bind -T copy-mode-vi Enter send -X copy-selection-and-cancel
-
-    #####################################################
-    # THEME — TOKYO NIGHT
-    #####################################################
-    set -g @tokyo-night-tmux_show_datetime 0
-    set -g @tokyo-night-tmux_show_path 1
-    set -g @tokyo-night-tmux_path_format relative
-    set -g @tokyo-night-tmux_window_id_style dsquare
-    set -g @tokyo-night-tmux_show_git 0
-
-    #####################################################
-    # PLUGINS
-    #####################################################
-    set -g @plugin 'tmux-plugins/tpm'
-    set -g @plugin 'tmux-plugins/tmux-sensible'
-    set -g @plugin 'joshmedeski/vim-tmux-navigator'
-    set -g @plugin 'tmux-plugins/tmux-yank'
-    set -g @plugin 'janoamaral/tokyo-night-tmux'
-
-    #####################################################
-    # SESSION PERSISTENCE (DEVOPS GOLD)
-    #####################################################
-    set -g @plugin 'tmux-plugins/tmux-resurrect'
-    set -g @plugin 'tmux-plugins/tmux-continuum'
-
-    set -g @resurrect-capture-pane-contents 'on'
-    set -g @resurrect-strategy-nvim 'session'
-    set -g @resurrect-strategy-vim 'session'
-    set -g @resurrect-processes 'ssh kubectl helm terraform nvim vim'
-
-    set -g @continuum-restore 'on'
-    set -g @continuum-save-interval '10'
-
-    #####################################################
-    # TPM BOOTSTRAP (SEMPRE NO FINAL)
-    #####################################################
-    if "test ! -d ~/.config/tmux/plugins/tpm" \
-      "run '${pkgs.git}/bin/git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm && ~/.config/tmux/plugins/tpm/bin/install_plugins'"
-
-    run "$HOME/.config/tmux/plugins/tpm/tpm"
-  '';
-
-  ############################################
-  # Symlink into ~/.config (no Home-Manager)
-  ############################################
-  systemd.user.services."xdg-config-links-tmux" = {
-    description = "Symlink tmux XDG config from /etc/xdg to ~/.config";
-    wantedBy = [ "default.target" ];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-    };
-    script = ''
-      set -euo pipefail
-
-      mkdir -p "$HOME/.config/tmux"
-
-      [ -e "$HOME/.config/tmux/tmux.conf" ] || \
-        ln -s /etc/xdg/tmux/tmux.conf "$HOME/.config/tmux/tmux.conf"
+      set -g @continuum-restore 'on'
+      set -g @continuum-save-interval '10'
     '';
   };
 }

@@ -1,0 +1,57 @@
+# modules/desktops/niri/default.nix
+# Main Niri configuration module - Imports all sub-modules
+{ config, pkgs, lib, hostname, ... }:
+
+let
+  isMacbook = hostname == "macbook-nixos" || hostname == "macbook";
+in
+{
+  imports = [
+    ./config.nix
+    ./input.nix
+    ./output.nix
+    ./layout.nix
+    ./keybindings.nix
+    ./window-rules.nix
+    ./animations.nix
+    ./waybar.nix
+    ./mako.nix
+    ./fuzzel.nix
+  ];
+
+  config = lib.mkIf isMacbook {
+    # Core packages
+    home.packages = with pkgs; [
+      niri
+      wl-clipboard
+      cliphist
+      grim
+      slurp
+      swappy
+      playerctl
+      brightnessctl
+      pamixer
+      pavucontrol
+      networkmanagerapplet
+    ];
+
+    # Wayland environment variables
+    home.sessionVariables = {
+      # Wayland support
+      MOZ_ENABLE_WAYLAND = "1";
+      NIXOS_OZONE_WL = "1";
+      QT_QPA_PLATFORM = "wayland";
+      QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
+      SDL_VIDEODRIVER = "wayland";
+      CLUTTER_BACKEND = "wayland";
+      
+      # XDG
+      XDG_CURRENT_DESKTOP = "niri";
+      XDG_SESSION_TYPE = "wayland";
+      XDG_SESSION_DESKTOP = "niri";
+      
+      # Qt theming
+      QT_QPA_PLATFORMTHEME = "qt5ct";
+    };
+  };
+}

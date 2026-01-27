@@ -1,31 +1,98 @@
 # modules/desktops/gnome.nix
-# ---
-{ pkgs, ... }:
+# Optimized GNOME + Wayland configuration
+{ pkgs, lib, ... }:
 
 {
+  # ============================================
+  # Display Server & Session Manager
+  # ============================================
   services.xserver.enable = true;
 
   services.displayManager.gdm = {
     enable = true;
     wayland = true;
+    autoSuspend = false;  # Prevent auto-suspend at login screen
   };
 
   services.desktopManager.gnome.enable = true;
 
-  # GNOME services (keep minimal & useful even outside GNOME)
+  # ============================================
+  # GNOME Services (minimal but complete)
+  # ============================================
   services.gnome = {
-    core-apps.enable = true;
+    core-apps.enable = false;  # Disabled: Calendar, Contacts, Clock, etc. (~500MB)
     gnome-keyring.enable = true;
+    gnome-browser-connector.enable = true;  # For GNOME Shell extensions
   };
 
-  # Session variables (avoid forcing session type globally)
+  # ============================================
+  # Performance Optimizations
+  # ============================================
+  # Disable unnecessary GNOME services
+  services.gnome.games.enable = false;
+  
+  # Exclude bloat packages
+  environment.gnome.excludePackages = with pkgs; [
+    gnome-tour
+    epiphany      # GNOME Web browser
+    geary         # Email client
+    gnome-music
+    gnome-photos
+    totem         # Video player
+    cheese        # Webcam app
+    simple-scan
+    yelp          # Help viewer
+    gnome-maps
+    gnome-weather
+    gnome-contacts
+    gnome-calendar
+  ];
+
+  # ============================================
+  # Wayland Environment Variables
+  # ============================================
   environment.sessionVariables = {
-    QT_QPA_PLATFORM = "wayland";
+    # Wayland support
     MOZ_ENABLE_WAYLAND = "1";
     NIXOS_OZONE_WL = "1";
+    QT_QPA_PLATFORM = "wayland";
+    QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
+    SDL_VIDEODRIVER = "wayland";
+    CLUTTER_BACKEND = "wayland";
+    
+    # XDG
+    XDG_SESSION_TYPE = "wayland";
+    
+    # GNOME-specific
+    MUTTER_DEBUG_ENABLE_ATOMIC_KMS = "0";  # Better stability on some hardware
+    MUTTER_DEBUG_FORCE_KMS_MODE = "simple";
   };
 
-  # IMPORTANT:
-  # Do not force xdg.portal here. Hyprland module should own the portal setup for Hyprland sessions.
-  # GNOME works fine with its own integration when logging into GNOME via GDM.
+  # ============================================
+  # XDG Portal Configuration
+  # ============================================
+  # GNOME provides its own portal implementation
+  # xdg-desktop-portal-gnome is automatically enabled with GNOME
+  xdg.portal.extraPortals = with pkgs; [
+    xdg-desktop-portal-gtk  # Fallback for non-GNOME apps
+  ];
+
+  # ============================================
+  # Essential GNOME Packages
+  # ============================================
+  environment.systemPackages = with pkgs; [
+    gnome-tweaks
+    gnome-extension-manager
+    dconf-editor
+    
+    # File manager integration
+    nautilus
+    sushi  # File previewer for Nautilus
+    
+    # System utilities
+    gnome-system-monitor
+    
+    # Terminal (if not using Alacritty/others)
+    gnome-console
+  ];
 }

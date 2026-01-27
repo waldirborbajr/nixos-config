@@ -1,0 +1,46 @@
+# .envrc.example
+# 
+# Este é um exemplo de arquivo .envrc para usar com direnv
+# 
+# Para usar:
+# 1. Copie para o diretório do seu projeto: cp .envrc.example /path/to/project/.envrc
+# 2. Edite escolhendo o shell desejado
+# 3. Autorize: direnv allow
+#
+# Quando você entrar no diretório, o ambiente será ativado automaticamente!
+
+# ==========================================
+# Escolha UM dos shells abaixo:
+# ==========================================
+
+# Rust stable (recomendado para produção)
+# use flake ~/nixos-config#rust
+
+# Rust nightly (para features experimentais)
+# use flake ~/nixos-config#rust-nightly
+
+# Go com ferramentas completas
+# use flake ~/nixos-config#go
+
+# Lua + LuaJIT (scripts, Neovim plugins)
+# use flake ~/nixos-config#lua
+
+# Nix development (criar módulos, flakes)
+# use flake ~/nixos-config#nix-dev
+
+# Full stack (Rust + Go + Node)
+# use flake ~/nixos-config#fullstack
+
+# Default (básico)
+# use flake ~/nixos-config
+
+# ==========================================
+# Ou use flake local (se projeto tem flake.nix)
+# ==========================================
+# use flake
+
+# ==========================================
+# Exemplo: ativar + carregar .env
+# ==========================================
+# use flake ~/nixos-config#rust
+# dotenv_if_exists .env

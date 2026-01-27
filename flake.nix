@@ -6,13 +6,25 @@
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    # Novo: home-manager (seguindo sua nixpkgs-stable para compatibilidade)
+    # Home Manager (seguindo nixpkgs-stable para compatibilidade)
     home-manager = {
       url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs-stable";
     };
+
+    # Theme: Catppuccin (centralizado)
+    catppuccin.url = "github:catppuccin/nix";
+
+    # DevShells: Rust toolchains via fenix
+    fenix = {
+      url = "github:nix-community/fenix";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
+    };
+
+    # DevShells: Helper para múltiplos sistemas
+    flake-utils.url = "github:numtide/flake-utils";
   };
-  outputs = inputs@{ self, nixpkgs-stable, nixpkgs-unstable, home-manager, ... }:
+  outputs = inputs@{ self, nixpkgs-stable, nixpkgs-unstable, home-manager, catppuccin, fenix, flake-utils, ... }:
   let
     lib = nixpkgs-stable.lib;
     # ==========================================
@@ -53,6 +65,9 @@
           ./core.nix
           (./hosts + "/${hostname}.nix")
 
+          # Theme: Catppuccin NixOS module
+          catppuccin.nixosModules.catppuccin
+
           # Novo: importa o home-manager como módulo NixOS
           home-manager.nixosModules.home-manager
 
@@ -68,6 +83,8 @@
             home-manager.users.borba = { config, pkgs, lib, hostname, ... }: {  # ← recebe hostname
               imports = [
                 ./home.nix
+                # Theme: Catppuccin Home Manager module
+                catppuccin.homeModules.catppuccin
                 # Outros módulos podem usar hostname se necessário
               ];
             };
@@ -99,5 +116,5 @@
       macbook = mkHost { hostname = "macbook"; system = "x86_64-linux"; };
       dell = mkHost { hostname = "dell"; system = "x86_64-linux"; };
     };
-  };
+  } // (import ./devshells.nix { inherit nixpkgs-stable fenix flake-utils; });
 }

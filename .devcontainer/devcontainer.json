@@ -1,0 +1,50 @@
+{
+  "name": "NixOS Config DevContainer",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  
+  // Features to install
+  "features": {
+    "ghcr.io/devcontainers/features/nix:1": {
+      "version": "latest",
+      "multiUser": false,
+      "enableFlakes": true
+    },
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  
+  // Container environment variables
+  "remoteEnv": {
+    "NIX_CONFIG": "experimental-features = nix-command flakes"
+  },
+  
+  // Post-create command to setup Nix environment
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  
+  // VS Code customizations
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "jnoortheen.nix-ide",
+        "arrterian.nix-env-selector",
+        "bbenoist.Nix"
+      ],
+      "settings": {
+        "nix.enableLanguageServer": true,
+        "nix.serverPath": "nil",
+        "nix.formatterPath": "nixpkgs-fmt"
+      }
+    }
+  },
+  
+  // Forward ports if needed
+  "forwardPorts": [],
+  
+  // Use host's SSH keys
+  "mounts": [
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
+  ],
+  
+  // Run as non-root user
+  "remoteUser": "vscode"
+}

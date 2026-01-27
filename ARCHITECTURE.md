@@ -150,17 +150,32 @@ Configures:
 - X server
 - Display manager (GDM)
 - GNOME desktop
-- Required portals for Wayland
+- Optimized for Wayland
+- XDG portals for screen-sharing
+- Performance optimizations (excluded bloat packages)
 
-### `modules/desktops/hyprland/default.nix`
+### `modules/desktops/niri/`
+
+Modular configuration for Niri compositor:
+
+- `default.nix` - Main module importing all sub-modules
+- `config.nix` - Main config.kdl with include directives
+- `input.nix` - Keyboard, mouse, touchpad, tablet settings
+- `output.nix` - Monitor configuration
+- `layout.nix` - Gaps, borders, focus-ring, cursor, startup apps
+- `keybindings.nix` - All keyboard shortcuts (80+)
+- `window-rules.nix` - App-specific window rules
+- `animations.nix` - Spring-based smooth animations
+- `waybar.nix` - Status bar with system monitoring
+- `mako.nix` - Notification daemon
+- `fuzzel.nix` - Application launcher
+
+### `modules/desktops/i3.nix`
 
 Configures:
 
-- Hyprland Wayland compositor
-- Waybar and associated tools
-- XDG portals (correct setup for screen-sharing/Flatpak)
-- Canonical configs under `/etc/xdg`
-- Symlinks into `~/.config`
+- i3 tiling window manager (X11)
+- Suitable for low-resource machines
 
 ### `modules/autologin.nix`
 
