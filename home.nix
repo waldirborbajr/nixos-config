@@ -16,6 +16,7 @@ in
     # Apps consolidados
     ./modules/apps/shell.nix       # zsh + fzf + bat
     ./modules/apps/terminals.nix   # alacritty terminal
+    ./modules/apps/fastfetch.nix   # system info tool
     ./modules/apps/dev-tools.nix   # git + gh (core tools)
     ./modules/apps/ripgrep.nix     # ripgrep with DevOps config
     ./modules/apps/yazi.nix        # yazi file manager with DevOps optimizations
