@@ -100,6 +100,7 @@ This repository is the **single source of truth** for my personal Linux infrastr
 │   │
 │   ├── apps/             # ✨ Consolidated application modules
 │   │   ├── dev-tools.nix    # git + gh + go + rust
+│   │   ├── fastfetch.nix    # system info (auto on alacritty)
 │   │   ├── shell.nix        # zsh + fzf + bat
 │   │   ├── terminals.nix    # alacritty
 │   │   └── tmux.nix
@@ -176,6 +177,7 @@ Flags are **independent** and can be combined freely.
 **Applications** (`modules/apps/`)
 - `shell.nix` - ZSH + FZF + bat configuration
 - `terminals.nix` - Alacritty terminal emulator
+- `fastfetch.nix` - System info tool (auto-runs in Alacritty)
 - `dev-tools.nix` - Git, GitHub CLI, Go, Rust toolchains
 - `tmux.nix` - Terminal multiplexer
 
