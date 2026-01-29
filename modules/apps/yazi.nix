@@ -4,15 +4,7 @@
 { config, pkgs, lib, ... }:
 
 {
-  options = {
-    enableYazi = lib.mkOption {
-      type = lib.types.bool;
-      default = true;
-      description = "Enable yazi terminal file manager with DevOps optimizations";
-    };
-  };
-
-  config = lib.mkIf config.enableYazi {
+  config = lib.mkIf config.apps.yazi.enable {
     # Install yazi with plugins
     home.packages = with pkgs; [
       yazi

@@ -1,15 +1,12 @@
 # modules/languages/nodejs.nix
 # Consolidado: common + enable
-{ pkgs, lib, ... }:
+{ config, pkgs, lib, ... }:
 
-let
-  enableNode = false; # true | false
-in
 {
-  environment.systemPackages = lib.optionals enableNode (with pkgs; [
+  environment.systemPackages = with pkgs; [
     nodejs_20
     nodePackages.pnpm
-  ]);
+  ];
 
   environment.variables = {
     NPM_CONFIG_UPDATE_NOTIFIER = "false";
@@ -17,7 +14,7 @@ in
     NPM_CONFIG_AUDIT = "false";
   };
 
-  environment.shellAliases = lib.mkIf enableNode {
+  environment.shellAliases = {
     ni = "pnpm install";
     nr = "pnpm run";
     nx = "pnpm dlx nx";

@@ -13,25 +13,38 @@ in
     # Theme (home-manager level)
     ./modules/themes
 
-    # Apps consolidados
-    ./modules/apps/shell.nix       # zsh + fzf + bat
-    ./modules/apps/terminals.nix   # alacritty terminal
-    ./modules/apps/fastfetch.nix   # system info tool
-    ./modules/apps/dev-tools.nix   # git + gh (core tools)
-    ./modules/apps/ripgrep.nix     # ripgrep with DevOps config
-    ./modules/apps/yazi.nix        # yazi file manager with DevOps optimizations
-    ./modules/apps/tmux.nix        # tmux with Catppuccin theme
+    # Apps (all available, enable below)
+    ./modules/apps
 
-    # Languages (development environments)
-    ./modules/languages/go.nix
-    ./modules/languages/rust.nix
-    ./modules/languages/lua.nix
-    ./modules/languages/nix-dev.nix
-
-    # Niri no macbook (está em desktops agora)
+    # Languages (all available, enable below)
+    ./modules/languages
   ] ++ lib.optionals isMacbook [
     ./modules/desktops/niri
   ];
+
+  # ==========================================
+  # Enable apps via options
+  # ==========================================
+  apps = {
+    shell.enable = true;
+    terminals.enable = true;
+    fastfetch.enable = true;
+    dev-tools.enable = true;
+    ripgrep.enable = true;
+    yazi.enable = true;
+    tmux.enable = true;
+    chirp.enable = false;  # Only enable if needed
+  };
+
+  # ==========================================
+  # Enable languages via options (home-manager level only)
+  # ==========================================
+  languages = {
+    go.enable = false;        # Enable per-project
+    rust.enable = false;      # Enable per-project
+    lua.enable = false;       # Enable if using Neovim plugins
+    nix-dev.enable = true;    # Always useful for NixOS
+  };
 
   home.packages = with pkgs; [
     zoxide

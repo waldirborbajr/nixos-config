@@ -8,10 +8,11 @@
 { config, pkgs, lib, ... }:
 
 {
-  ############################################
-  # Tmux via Home Manager
-  ############################################
-  programs.tmux = {
+  config = lib.mkIf config.apps.tmux.enable {
+    ############################################
+    # Tmux via Home Manager
+    ############################################
+    programs.tmux = {
     enable = true;
     
     # Enable Catppuccin theme
@@ -148,5 +149,6 @@
       set -g @continuum-restore 'on'
       set -g @continuum-save-interval '10'
     '';
+    };
   };
 }

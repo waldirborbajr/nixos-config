@@ -3,8 +3,9 @@
 { config, pkgs, lib, ... }:
 
 {
-  # Instalar o fastfetch
-  home.packages = with pkgs; [ fastfetch ];
+  config = lib.mkIf config.apps.fastfetch.enable {
+    # Instalar o fastfetch
+    home.packages = with pkgs; [ fastfetch ];
 
   # Configuração customizada do fastfetch
   home.file.".config/fastfetch/config.jsonc".text = ''
@@ -119,4 +120,5 @@
       ]
     }
   '';
+  };
 }

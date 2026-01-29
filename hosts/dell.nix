@@ -6,20 +6,21 @@
   system.stateVersion = "25.11";
 
   ############################################
-  # Hardware & Performance
+  # Hardware & Performance & Profile
   ############################################
   imports = [
     ../hardware/dell.nix
     ../hardware/performance/dell.nix
     ../hardware/dell-hw-config.nix
+    ../profiles/desktop.nix
     ../modules/desktops/i3.nix
   ];
 
   ############################################
   # Hard-disable virtualization (slow machine)
-  # All virtualization services disabled by default
-  # in modules/virtualization/, no overrides needed
   ############################################
+  virtualisation.docker.enable = lib.mkForce false;
+  virtualisation.podman.enable = lib.mkForce false;
 
   ############################################
   # Host identity

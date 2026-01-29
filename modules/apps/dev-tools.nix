@@ -4,10 +4,11 @@
 { config, pkgs, lib, ... }:
 
 {
-  # ========================================
-  # Git
-  # ========================================
-  programs.git = {
+  config = lib.mkIf config.apps.dev-tools.enable {
+    # ========================================
+    # Git
+    # ========================================
+    programs.git = {
     enable = true;
 
     settings.user = {
@@ -144,4 +145,5 @@
     gh
     gh-dash
   ];
+  };
 }

@@ -1,6 +1,6 @@
 # modules/languages/python.nix
 # Consolidado: common + uv + poetry
-{ pkgs, lib, ... }:
+{ config, pkgs, lib, ... }:
 
 let
   pythonEnv = "uv"; # uv | poetry | none

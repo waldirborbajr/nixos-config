@@ -1,12 +1,13 @@
 # modules/system-packages.nix
 # ---
-{ pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 let
   unstablePkgs = pkgs.unstable or pkgs;
 in
 {
-  environment.systemPackages =
+  config = lib.mkIf config.system-config.systemPackages.enable {
+    environment.systemPackages =
     # ----------------------------
     # Stable packages (default)
     # ----------------------------
@@ -232,4 +233,5 @@ in
       ##########################################
       transmission_4-gtk
     ]);
+  };
 }

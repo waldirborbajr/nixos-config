@@ -20,16 +20,18 @@
 
 ## Aak for user and password
 
-{ ... }:
+{ config, lib, ... }:
 
 {
-  services.openssh = {
-    enable = true;
+  config = lib.mkIf config.system-config.ssh.enable {
+    services.openssh = {
+      enable = true;
 
-    settings = {
-      PasswordAuthentication = true;
-      KbdInteractiveAuthentication = true;
-      PermitRootLogin = "no";
+      settings = {
+        PasswordAuthentication = true;
+        KbdInteractiveAuthentication = true;
+        PermitRootLogin = "no";
+      };
     };
   };
 }

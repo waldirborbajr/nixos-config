@@ -2,14 +2,12 @@
 # Rust development environment
 { config, pkgs, lib, ... }:
 
-let
-  enableRust = true;  # true | false
-in
 {
-  # ========================================
-  # Rust packages (global via rustup)
-  # ========================================
-  home.packages = lib.optionals enableRust (with pkgs; [
+  config = lib.mkIf config.languages.rust.enable {
+    # ========================================
+    # Rust packages (global via rustup)
+    # ========================================
+    home.packages = with pkgs; [
     rustup           # Toolchain manager (stable + nightly)
     cargo-edit       # cargo add, cargo rm, cargo upgrade
     cargo-watch      # cargo watch -x test
@@ -17,12 +15,12 @@ in
     cargo-nextest    # Next-gen test runner
     cargo-expand     # Expand macros
     cargo-outdated   # Check outdated dependencies
-  ]);
+  ];
 
-  # ========================================
-  # Shell aliases
-  # ========================================
-  programs.zsh.shellAliases = lib.mkIf (enableRust && config.programs.zsh.enable) {
+    # ========================================
+    # Shell aliases
+    # ========================================
+    programs.zsh.shellAliases = lib.mkIf config.programs.zsh.enable {
     ru    = "rustup update";
     rc    = "cargo check";
     rb    = "cargo build --release";
@@ -40,10 +38,10 @@ in
     rinit = "cargo init";
   };
 
-  # ========================================
-  # Home activation (rustup setup reminder)
-  # ========================================
-  home.activation = lib.mkIf enableRust {
+    # ========================================
+    # Home activation (rustup setup reminder)
+    # ========================================
+    home.activation = {
     ensureRustup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       if [ ! -d "$HOME/.rustup" ]; then
         echo "========================================="
@@ -60,5 +58,6 @@ in
         echo "========================================="
       fi
     '';
+    };
   };
 }

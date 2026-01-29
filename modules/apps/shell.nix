@@ -3,7 +3,8 @@
 { config, pkgs, lib, ... }:
 
 {
-  programs.zsh = {
+  config = lib.mkIf config.apps.shell.enable {
+    programs.zsh = {
     enable = true;
 
     history = {
@@ -144,5 +145,6 @@
     FZF_CTRL_T_COMMAND = "fd --type f --hidden --follow --exclude .git || find . -type f";
     FZF_CTRL_T_OPTS = "--preview 'bat --color=always --style=numbers --line-range=:500 {}'";
     FZF_ALT_C_OPTS = "--preview 'tree -C {} | head -200'";
+  };
   };
 }

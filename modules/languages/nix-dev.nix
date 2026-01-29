@@ -2,14 +2,12 @@
 # Nix development tools
 { config, pkgs, lib, ... }:
 
-let
-  enableNixDev = true;  # true | false
-in
 {
-  # ========================================
-  # Nix development packages
-  # ========================================
-  home.packages = lib.optionals enableNixDev (with pkgs; [
+  config = lib.mkIf config.languages.nix-dev.enable {
+    # ========================================
+    # Nix development packages
+    # ========================================
+    home.packages = with pkgs; [
     nixpkgs-fmt      # Formatter (official)
     alejandra        # Alternative formatter (opinionated)
     nil              # Nix LSP
@@ -20,12 +18,12 @@ in
     nix-init         # Generate nix expressions
     statix           # Linter
     deadnix          # Dead code detection
-  ]);
+  ];
 
-  # ========================================
-  # Shell aliases
-  # ========================================
-  programs.zsh.shellAliases = lib.mkIf (enableNixDev && config.programs.zsh.enable) {
+    # ========================================
+    # Shell aliases
+    # ========================================
+    programs.zsh.shellAliases = lib.mkIf config.programs.zsh.enable {
     nxfmt   = "nixpkgs-fmt";
     nxfmta  = "alejandra";
     nxtree  = "nix-tree";
@@ -38,12 +36,13 @@ in
     nxdev   = "nix develop";
     nxshell = "nix-shell";
     nxflake = "nix flake";
-  };
+    };
 
-  # ========================================
-  # Environment variables
-  # ========================================
-  home.sessionVariables = lib.mkIf enableNixDev {
-    NIX_PATH = "nixpkgs=${pkgs.path}";
+    # ========================================
+    # Environment variables
+    # ========================================
+    home.sessionVariables = {
+      NIX_PATH = "nixpkgs=${pkgs.path}";
+    };
   };
 }
