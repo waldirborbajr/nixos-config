@@ -12,12 +12,18 @@
     ../hardware/macbook.nix
     ../hardware/performance/macbook.nix
     ../hardware/macbook-hw-config.nix
+    ../profiles/developer.nix
 
     # Desktops - Multiple sessions available at GDM
     ../modules/desktops/gnome.nix
     ../modules/desktops/niri/system.nix  # Niri as alternative session
     ../modules/autologin.nix
   ];
+
+  ############################################
+  # Enable specialized serial devices support
+  ############################################
+  system-config.serialDevices.enable = true;
 
   ############################################
   # Host identity
@@ -53,6 +59,8 @@
     "broadcom-sta-6.30.223.271-59-6.12.66"
   ];
 
+  # Wi-Fi driver packages (system-level, hardware requirement)
+  # Other packages moved to home-manager
   environment.systemPackages = with pkgs; [
     iw
     wirelesstools

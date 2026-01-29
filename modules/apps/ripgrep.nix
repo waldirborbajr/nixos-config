@@ -2,29 +2,27 @@
 # Advanced ripgrep configuration for DevOps workflows
 { config, pkgs, lib, ... }:
 
-let
-  enableRipgrep = true;  # true | false
-in
 {
-  # ========================================
-  # Ripgrep package
-  # ========================================
-  home.packages = lib.optionals enableRipgrep (with pkgs; [
-    ripgrep
-  ]);
+  config = lib.mkIf config.apps.ripgrep.enable {
+    # ========================================
+    # Ripgrep package
+    # ========================================
+    home.packages = with pkgs; [
+      ripgrep
+    ];
 
-  # ========================================
-  # Ripgrep configuration (via environment)
-  # ========================================
-  home.sessionVariables = lib.mkIf enableRipgrep {
+    # ========================================
+    # Ripgrep configuration (via environment)
+    # ========================================
+    home.sessionVariables = {
     # Default ripgrep flags
     RIPGREP_CONFIG_PATH = "${config.home.homeDirectory}/.ripgreprc";
   };
 
-  # ========================================
-  # Advanced ripgrep config file
-  # ========================================
-  home.file.".ripgreprc" = lib.mkIf enableRipgrep {
+    # ========================================
+    # Advanced ripgrep config file
+    # ========================================
+    home.file.".ripgreprc" = {
     text = ''
       # ==========================================
       # Ripgrep Config - DevOps Optimized
@@ -176,10 +174,10 @@ in
     '';
   };
 
-  # ========================================
-  # Shell aliases for common DevOps patterns
-  # ========================================
-  programs.zsh.shellAliases = lib.mkIf (enableRipgrep && config.programs.zsh.enable) {
+    # ========================================
+    # Shell aliases for common DevOps patterns
+    # ========================================
+    programs.zsh.shellAliases = lib.mkIf config.programs.zsh.enable {
     # Basic ripgrep aliases
     rg = "rg";  # Uses config from ~/.ripgreprc
     rgf = "rg --files";  # List files that would be searched
@@ -219,5 +217,6 @@ in
     # Search for IPs and URLs
     rgip = "rg '\\b(?:[0-9]{1,3}\\.){3}[0-9]{1,3}\\b'";
     rgurl = "rg 'https?://[^\\s]+'";
+    };
   };
 }

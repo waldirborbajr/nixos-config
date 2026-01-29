@@ -2,14 +2,12 @@
 # Go development environment
 { config, pkgs, lib, ... }:
 
-let
-  enableGo = true;  # true | false
-in
 {
-  # ========================================
-  # Go packages (global)
-  # ========================================
-  home.packages = lib.optionals enableGo (with pkgs; [
+  config = lib.mkIf config.languages.go.enable {
+    # ========================================
+    # Go packages (global)
+    # ========================================
+    home.packages = with pkgs; [
     go_1_25
     gopls            # LSP
     delve            # Debugger
@@ -18,20 +16,20 @@ in
     golangci-lint    # Linter
     go-task          # Task runner (alternative to Make)
     air              # Hot reload
-  ]);
+  ];
 
-  # ========================================
-  # Environment variables
-  # ========================================
-  home.sessionVariables = lib.mkIf enableGo {
+    # ========================================
+    # Environment variables
+    # ========================================
+    home.sessionVariables = {
     GOPATH = "${config.home.homeDirectory}/go";
     GOBIN  = "${config.home.homeDirectory}/go/bin";
   };
 
-  # ========================================
-  # Shell aliases
-  # ========================================
-  programs.zsh.shellAliases = lib.mkIf (enableGo && config.programs.zsh.enable) {
+    # ========================================
+    # Shell aliases
+    # ========================================
+    programs.zsh.shellAliases = lib.mkIf config.programs.zsh.enable {
     goi   = "go install ./...";
     got   = "go test ./... -v";
     gotc  = "go test -coverprofile=cover.out ./...";
@@ -44,12 +42,13 @@ in
     gob   = "go build -v ./...";
   };
 
-  # ========================================
-  # Home activation (ensure GOPATH)
-  # ========================================
-  home.activation = lib.mkIf enableGo {
+    # ========================================
+    # Home activation (ensure GOPATH)
+    # ========================================
+    home.activation = {
     ensureGoPath = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       mkdir -p $HOME/go/{bin,pkg,src}
     '';
+    };
   };
 }

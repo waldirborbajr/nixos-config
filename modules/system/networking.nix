@@ -1,8 +1,10 @@
 # modules/networking.nix
 # ---
-{ ... }:
+{ config, lib, ... }:
 {
-  networking.networkmanager.enable = true;
+  config = lib.mkIf config.system-config.networking.enable {
+    networking.networkmanager.enable = true;
 
-  systemd.services.NetworkManager-wait-online.enable = false;
+    systemd.services.NetworkManager-wait-online.enable = false;
+  };
 }

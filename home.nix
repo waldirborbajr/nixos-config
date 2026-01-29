@@ -13,32 +13,62 @@ in
     # Theme (home-manager level)
     ./modules/themes
 
-    # Apps consolidados
-    ./modules/apps/shell.nix       # zsh + fzf + bat
-    ./modules/apps/terminals.nix   # alacritty terminal
-    ./modules/apps/fastfetch.nix   # system info tool
-    ./modules/apps/dev-tools.nix   # git + gh (core tools)
-    ./modules/apps/ripgrep.nix     # ripgrep with DevOps config
-    ./modules/apps/yazi.nix        # yazi file manager with DevOps optimizations
-    ./modules/apps/tmux.nix        # tmux with Catppuccin theme
+    # Apps (all available, enable below)
+    ./modules/apps
 
-    # Languages (development environments)
-    ./modules/languages/go.nix
-    ./modules/languages/rust.nix
-    ./modules/languages/lua.nix
-    ./modules/languages/nix-dev.nix
-
-    # Niri no macbook (está em desktops agora)
+    # Languages (all available, enable below)
+    ./modules/languages
   ] ++ lib.optionals isMacbook [
     ./modules/desktops/niri
   ];
 
-  home.packages = with pkgs; [
-    zoxide
-    eza
-    fd
-    tree
-  ] ++ lib.optionals isMacbook (with pkgs; [
+  # ==========================================
+  # Enable apps via options
+  # ==========================================
+  apps = {
+    # Core apps
+    shell.enable = true;
+    terminals.enable = true;
+    fastfetch.enable = true;
+    dev-tools.enable = true;
+    ripgrep.enable = true;
+    yazi.enable = true;
+    tmux.enable = true;
+    chirp.enable = false;
+    
+    # User apps (migrated from system)
+    browsers.enable = true;
+    communication.enable = true;
+    editors.enable = true;
+    ides.enable = true;
+    knowledge.enable = true;
+    media.enable = true;
+    productivity.enable = true;
+    remote.enable = false;      # Enable if needed
+    clipboard.enable = true;
+    multiplexers.enable = true;
+    latex.enable = false;       # Enable for LaTeX documents
+  };
+
+  # ==========================================
+  # Enable languages via options
+  # ==========================================
+  languages = {
+    # Home-manager level (per-project/optional)
+    go.enable = false;
+    rust.enable = false;
+    lua.enable = false;
+    nix-dev.enable = true;
+    
+    # System-level toolchains (home-manager configs)
+    python.enable = true;
+    nodejs.enable = true;
+  };
+
+  # ==========================================
+  # Wayland/Desktop packages (conditional)
+  # ==========================================
+  home.packages = lib.optionals isMacbook (with pkgs; [
     waybar
     mako
     fuzzel
@@ -49,16 +79,11 @@ in
     playerctl
   ]);
 
+  # ==========================================
+  # Session variables (non-redundant)
+  # ==========================================
   home.sessionVariables = {
-    EDITOR = "nvim";
-    VISUAL = "nvim";
-    SUDO_EDITOR = "nvim";
-    BROWSER = "com.brave.Browser";
+    # Terminal preference
     TERMINAL = "alacritty";
-    NPM_CONFIG_UPDATE_NOTIFIER = "false";
-    NPM_CONFIG_FUND = "false";
-    NPM_CONFIG_AUDIT = "false";
-    PYTHONDONTWRITEBYTECODE = "1";
-    PIP_DISABLE_PIP_VERSION_CHECK = "1";
   };
 }

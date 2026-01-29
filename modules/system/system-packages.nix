@@ -1,19 +1,21 @@
-# modules/system-packages.nix
-# ---
-{ pkgs, ... }:
+# modules/system/system-packages.nix
+# System-level packages (infrastructure, build tools, core utilities)
+# User-level apps moved to home-manager (modules/apps/)
+{ config, pkgs, lib, ... }:
 
 let
   unstablePkgs = pkgs.unstable or pkgs;
 in
 {
-  environment.systemPackages =
+  config = lib.mkIf config.system-config.systemPackages.enable {
+    environment.systemPackages =
     # ----------------------------
     # Stable packages (default)
     # ----------------------------
     (with pkgs; [
 
       ##########################################
-      # Networking / Diagnostics (global)
+      # Networking / Diagnostics (system-level)
       ##########################################
       iw
       wirelesstools
@@ -21,55 +23,20 @@ in
       linuxPackages.broadcom_sta
 
       ##########################################
-      # Terminals
-      ##########################################
-      #alacritty
-      #kitty
-      gnome-console
-
-      ##########################################
-      # Shells & Multiplexers
+      # Shells (system-level requirement)
       ##########################################
       zsh
-      # NOTE: tmux configured via home-manager in modules/apps/tmux.nix
-      tmuxifier
-      zellij
 
       ##########################################
-      # Editors & Development UX
-      ##########################################
-      helix
-      neovim
-
-      ##########################################
-      # Git & Developer Workflow
-      ##########################################
-      #git
-      #gh
-      lazygit
-
-      ##########################################
-      # Virtualization / Kubernetes (non-runtime)
-      ##########################################
-      # NOTE: k9s, cri-tools, devcontainer moved to devshells
-      # QEMU/virt-manager moved to conditional qemu.nix module
-
-      ##########################################
-      # Languages / Toolchains
+      # Languages / Toolchains (system-level)
       ##########################################
       gcc
       libgcc
       glibc
       libcxx
-      #go
-      #gopls
-      #rustup
-      #rust-analyzer
-      #lua
-      #lua-language-server
 
       ##########################################
-      # Build essentials (ADD)
+      # Build essentials
       ##########################################
       gnumake
       binutils
@@ -83,13 +50,13 @@ in
       patchelf
 
       ##########################################
-      # Common native deps used in builds (ADD)
+      # Common native deps used in builds
       ##########################################
       openssl
       zlib
 
       ##########################################
-      # Nix Tooling (stable)
+      # Nix Tooling
       ##########################################
       nixd
       nil
@@ -98,36 +65,7 @@ in
       nixfmt-rfc-style
 
       ##########################################
-      # Modern CLI Utilities
-      ##########################################
-      eza
-      fd
-      dust
-      ncdu
-      zoxide
-      atuin
-      tldr
-      sd
-      jq
-      fx
-      # HTTP client (choose one: httpie is most user-friendly)
-      httpie
-      fzf
-      direnv
-      entr
-      procs
-      # System monitor (btop is most feature-complete)
-      btop
-
-      ##########################################
-      # Clipboard / Wayland
-      ##########################################
-      xclip
-      wl-clipboard
-      clipster
-
-      ##########################################
-      # Core UNIX
+      # Core UNIX utilities (system essential)
       ##########################################
       coreutils
       curl
@@ -139,7 +77,6 @@ in
       zip
       procps
       psmisc
-      util-linux
       tree
       stow
 
@@ -172,64 +109,20 @@ in
       # Certificates
       ##########################################
       cacert
-
-      ##########################################
-      # GUI
-      ##########################################
-      flameshot
-      chirp
     ])
 
     # ----------------------------
     # Unstable packages (explicit)
     # ----------------------------
     ++ (with unstablePkgs; [
+      ##########################################
+      # Compilers & Debuggers (system-level)
+      ##########################################
       clang
       llvm
       lld
       gdb
       lldb
-
-      ##########################################
-      # Browsers
-      ##########################################
-      firefox
-      brave
-
-      ##########################################
-      # Development & IDEs
-      ##########################################
-      vscode
-
-      ##########################################
-      # Communication
-      ##########################################
-      discord
-      # Note: Proton Mail desktop app not available in nixpkgs, use web version
-
-      ##########################################
-      # Knowledge Management
-      ##########################################
-      obsidian
-
-      ##########################################
-      # Remote Access
-      ##########################################
-      anydesk
-
-      ##########################################
-      # Media & Graphics
-      ##########################################
-      gimp
-      inkscape
-      audacity
-      handbrake
-      mpv
-      imagemagick
-
-      ##########################################
-      # Downloads
-      ##########################################
-      transmission_4-gtk
     ]);
+  };
 }

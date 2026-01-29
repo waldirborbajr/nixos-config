@@ -1,10 +1,11 @@
 # modules/base.nix
 # ---
-{ pkgs, ... }:
+{ config, pkgs, lib, ... }:
 {
-  nix.extraOptions = ''
-    experimental-features = nix-command flakes
-  '';
+  config = lib.mkIf config.system-config.base.enable {
+    nix.extraOptions = ''
+      experimental-features = nix-command flakes
+    '';
 
   programs.zsh.enable = true;
 
@@ -41,11 +42,12 @@
       && sudo systemctl isolate graphical.target";
   };
 
-  ############################################
-  # Avoid user unit reload stalls
-  ############################################
-  systemd.user.extraConfig = ''
-    DefaultTimeoutStartSec=30s
-    DefaultTimeoutStopSec=30s
-  '';
+    ############################################
+    # Avoid user unit reload stalls
+    ############################################
+    systemd.user.extraConfig = ''
+      DefaultTimeoutStartSec=30s
+      DefaultTimeoutStopSec=30s
+    '';
+  };
 }

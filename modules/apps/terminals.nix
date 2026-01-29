@@ -3,10 +3,11 @@
 { config, pkgs, lib, ... }:
 
 {
-  # ========================================
-  # Alacritty (Home Manager)
-  # ========================================
-  home.packages = with pkgs; [
+  config = lib.mkIf config.apps.terminals.enable {
+    # ========================================
+    # Alacritty (Home Manager)
+    # ========================================
+    home.packages = with pkgs; [
     nerd-fonts.jetbrains-mono
   ];
 
@@ -79,6 +80,7 @@
         { key = "End"; mods = "Shift"; mode = "~Alt"; action = "ScrollToBottom"; }
       ];
     };
+  };
   };
 }
 
