@@ -25,6 +25,7 @@
     ./remote.nix
     ./clipboard.nix
     ./multiplexers.nix
+    ./latex.nix
   ];
 
   options.apps = {
@@ -169,6 +170,14 @@ ides = {
         type = lib.types.bool;
         default = true;
         description = "Enable terminal multiplexers (tmuxifier, zellij)";
+      };
+    };
+
+    latex = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Enable LaTeX typesetting system and tools";
       };
     };
   };

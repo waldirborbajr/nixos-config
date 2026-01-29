@@ -47,6 +47,7 @@ in
     remote.enable = false;      # Enable if needed
     clipboard.enable = true;
     multiplexers.enable = true;
+    latex.enable = false;       # Enable for LaTeX documents
   };
 
   # ==========================================
