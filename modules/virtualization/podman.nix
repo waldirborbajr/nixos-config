@@ -14,6 +14,7 @@
   environment.systemPackages = lib.mkIf config.virtualisation.podman.enable [
     pkgs.podman
     pkgs.podman-compose
+    pkgs.podman-tui
     pkgs.buildah
     pkgs.skopeo
   ];
