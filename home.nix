@@ -41,6 +41,7 @@ in
     communication.enable = true;
     helix.enable = false;
     neovim.enable = true;
+    starship.enable = true;
     ides.enable = true;
     knowledge.enable = true;
     media.enable = true;

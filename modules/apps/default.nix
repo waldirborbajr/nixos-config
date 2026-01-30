@@ -19,6 +19,7 @@
     ./communication.nix
     ./helix.nix
     ./neovim.nix
+    ./starship.nix
     ./ides.nix
     ./knowledge.nix
     ./media.nix
@@ -122,6 +123,13 @@
         type = lib.types.bool;
         default = true;
         description = "Enable Neovim editor";
+      };
+    };
+    starship = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Enable Starship prompt";
       };
     };
 ides = {
