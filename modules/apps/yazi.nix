@@ -50,7 +50,7 @@
 
       # Main settings
       settings = {
-        manager = {
+        mgr = {
           show_hidden = true;           # Show hidden files by default
           sort_by = "natural";          # Natural sorting
           sort_sensitive = false;       # Case-insensitive sorting
@@ -112,7 +112,7 @@
 
       # Custom keybindings optimized for DevOps
       keymap = {
-        manager.prepend_keymap = [
+        mgr.prepend_keymap = [
           # Plugin keybindings
           {
             on = [ "c" "m" ];
