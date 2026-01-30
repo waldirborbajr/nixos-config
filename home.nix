@@ -48,7 +48,7 @@ in
     productivity.enable = true;
     remote.enable = false;      # Enable if needed
     clipboard.enable = true;
-    multiplexers.enable = true;
+    zellij.enable = false;      # Tmux alternative (disabled by default)
     latex.enable = false;       # Enable for LaTeX documents
     
     # Virtualization tools

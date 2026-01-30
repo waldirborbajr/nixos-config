@@ -26,7 +26,7 @@
     ./productivity.nix
     ./remote.nix
     ./clipboard.nix
-    ./multiplexers.nix
+    ./zellij.nix
     ./latex.nix
     ./fun-tools.nix
     
@@ -186,11 +186,18 @@ ides = {
       };
     };
 
-    multiplexers = {
+    multiplexers = lib.mkOption {
+      type = lib.types.attrs;
+      default = {};
+      description = "DEPRECATED: Use zellij.enable instead. This option remains for backwards compatibility.";
+      internal = true;
+    };
+
+    zellij = {
       enable = lib.mkOption {
         type = lib.types.bool;
-        default = true;
-        description = "Enable terminal multiplexers (tmuxifier, zellij)";
+        default = false;
+        description = "Enable Zellij terminal multiplexer (tmux alternative)";
       };
     };
 
