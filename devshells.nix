@@ -59,6 +59,10 @@ flake-utils.lib.eachDefaultSystem (system:
         postgresql
         mariadb.client
         sqlite
+        usql
+        pgcli
+        mycli
+        litecli
       ];
 
       RUST_SRC_PATH = "${rustStable}/lib/rustlib/src/rust/library";
@@ -74,9 +78,10 @@ flake-utils.lib.eachDefaultSystem (system:
         echo "  - clippy, rustfmt, rust-analyzer"
         echo ""
         echo "Database clients available:"
-        echo "  - psql (PostgreSQL)"
-        echo "  - mysql (MariaDB)"
-        echo "  - sqlite3"
+        echo "  - usql (universal SQL client)"
+        echo "  - pgcli (PostgreSQL)"
+        echo "  - mycli (MySQL/MariaDB)"
+        echo "  - litecli (SQLite)"
       '';
     };
 
@@ -101,6 +106,10 @@ flake-utils.lib.eachDefaultSystem (system:
         postgresql
         mariadb.client
         sqlite
+        usql
+        pgcli
+        mycli
+        litecli
       ];
 
       RUST_SRC_PATH = "${rustNightly}/lib/rustlib/src/rust/library";
@@ -112,9 +121,10 @@ flake-utils.lib.eachDefaultSystem (system:
         echo "Cargo version: $(cargo --version)"
         echo ""
         echo "Database clients available:"
-        echo "  - psql (PostgreSQL)"
-        echo "  - mysql (MariaDB)"
-        echo "  - sqlite3"
+        echo "  - usql (universal SQL client)"
+        echo "  - pgcli (PostgreSQL)"
+        echo "  - mycli (MySQL/MariaDB)"
+        echo "  - litecli (SQLite)"
       '';
     };
 
@@ -138,6 +148,10 @@ flake-utils.lib.eachDefaultSystem (system:
         postgresql
         mariadb.client
         sqlite
+        usql
+        pgcli
+        mycli
+        litecli
       ];
 
       shellHook = ''
@@ -153,9 +167,10 @@ flake-utils.lib.eachDefaultSystem (system:
         echo "  - go-task (task runner), air (hot reload)"
         echo ""
         echo "Database clients available:"
-        echo "  - psql (PostgreSQL)"
-        echo "  - mysql (MariaDB)"
-        echo "  - sqlite3"
+        echo "  - usql (universal SQL client)"
+        echo "  - pgcli (PostgreSQL)"
+        echo "  - mycli (MySQL/MariaDB)"
+        echo "  - litecli (SQLite)"
       '';
 
       # Go environment
@@ -265,6 +280,7 @@ flake-utils.lib.eachDefaultSystem (system:
         postgresql
         pgcli        # PostgreSQL CLI with autocomplete
         pgformatter  # SQL formatter (lowercase)
+        usql         # Universal SQL client
       ];
 
       shellHook = ''
@@ -274,6 +290,7 @@ flake-utils.lib.eachDefaultSystem (system:
         echo "Available tools:"
         echo "  - psql (client)"
         echo "  - pgcli (interactive client)"
+        echo "  - usql (universal SQL client)"
         echo "  - pg_format (SQL formatter)"
         echo ""
         echo "Quick start local server:"
@@ -294,6 +311,7 @@ flake-utils.lib.eachDefaultSystem (system:
       buildInputs = with pkgs; [
         mariadb
         mycli  # MySQL/MariaDB CLI with autocomplete
+        usql  # Universal SQL client
       ];
 
       shellHook = ''
@@ -303,6 +321,7 @@ flake-utils.lib.eachDefaultSystem (system:
         echo "Available tools:"
         echo "  - mysql (client)"
         echo "  - mycli (interactive client)"
+        echo "  - usql (universal SQL client)"
         echo "  - mysqldump, mysqlshow"
         echo ""
         echo "Quick start local server:"
@@ -323,6 +342,7 @@ flake-utils.lib.eachDefaultSystem (system:
         sqlite
         sqlitebrowser  # GUI for SQLite
         litecli        # SQLite CLI with autocomplete
+        usql           # Universal SQL client
       ];
 
       shellHook = ''
@@ -332,6 +352,7 @@ flake-utils.lib.eachDefaultSystem (system:
         echo "Available tools:"
         echo "  - sqlite3 (CLI)"
         echo "  - litecli (interactive CLI)"
+        echo "  - usql (universal SQL client)"
         echo "  - sqlitebrowser (GUI)"
         echo ""
         echo "Quick start:"
@@ -347,6 +368,9 @@ flake-utils.lib.eachDefaultSystem (system:
       name = "databases-dev";
       
       buildInputs = with pkgs; [
+        # Universal SQL client
+        usql
+        
         # PostgreSQL
         postgresql
         pgcli
@@ -371,6 +395,7 @@ flake-utils.lib.eachDefaultSystem (system:
         echo "  SQLite: $(sqlite3 --version)"
         echo ""
         echo "Available clients:"
+        echo "  - usql (universal SQL client)"
         echo "  - psql, pgcli (PostgreSQL)"
         echo "  - mysql, mycli (MariaDB)"
         echo "  - sqlite3, litecli (SQLite)"
