@@ -48,8 +48,8 @@
 
   services.xserver.enable = true;
   services.xserver.xkb = {
-    layout = "us";
-    variant = "";
+    layout = "us,us";
+    variant = ",intl";  # US puro (default), US-intl (com dead keys)
   };
 
   ############################################
