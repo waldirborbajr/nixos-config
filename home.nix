@@ -44,8 +44,27 @@ in
     starship.enable = true;
     ides.enable = true;
     knowledge.enable = true;
+    
+    # Media tools - granular options available (Dendritic Pattern)
+    # Use: apps.media.enable = true; for all, or enable individually:
+    #   apps.media.image.enable = true;    # GIMP, Inkscape, ImageMagick
+    #   apps.media.audio.enable = true;    # Audacity, MPV
+    #   apps.media.video.enable = true;    # Handbrake
+    #   apps.media.torrents.enable = true; # Transmission
     media.enable = true;
+    
+    # Productivity tools - granular options available (Dendritic Pattern)
+    # Use: apps.productivity.enable = true; for all, or enable individually:
+    #   apps.productivity.file-tools.enable = true;      # eza, fd, dust, ncdu, tree
+    #   apps.productivity.navigation.enable = true;      # zoxide
+    #   apps.productivity.shell-history.enable = true;   # atuin
+    #   apps.productivity.text-processing.enable = true; # sd, jq, fx, tldr
+    #   apps.productivity.http-clients.enable = true;    # httpie
+    #   apps.productivity.workflow.enable = true;        # direnv, entr
+    #   apps.productivity.monitoring.enable = true;      # procs, btop
+    #   apps.productivity.git-ui.enable = true;          # lazygit
     productivity.enable = true;
+    
     remote.enable = false;      # Enable if needed
     clipboard.enable = true;
     zellij.enable = false;      # Tmux alternative (disabled by default)

@@ -22,13 +22,15 @@
     ./starship.nix
     ./ides.nix
     ./knowledge.nix
-    ./media.nix
-    ./productivity.nix
     ./remote.nix
     ./clipboard.nix
     ./zellij.nix
     ./latex.nix
     ./fun-tools.nix
+    
+    # Modular apps (Dendritic Pattern)
+    ./media            # Aggregator with submodules
+    ./productivity     # Aggregator with submodules
     
     # Virtualization tools (Home Manager level)
     ../virtualization/virtualbox.nix
@@ -154,21 +156,15 @@ ides = {
       };
     };
 
-    media = {
-      enable = lib.mkOption {
-        type = lib.types.bool;
-        default = true;
-        description = "Enable media and graphics tools";
-      };
-    };
+    # Media tools - now with granular options
+    # Options defined in ./media/default.nix
+    # Use: apps.media.enable = true; (all)
+    # Or:  apps.media.image.enable = true; (specific)
 
-    productivity = {
-      enable = lib.mkOption {
-        type = lib.types.bool;
-        default = true;
-        description = "Enable modern CLI productivity tools";
-      };
-    };
+    # Productivity tools - now with granular options
+    # Options defined in ./productivity/default.nix
+    # Use: apps.productivity.enable = true; (all)
+    # Or:  apps.productivity.file-tools.enable = true; (specific)
 
     remote = {
       enable = lib.mkOption {
