@@ -23,6 +23,8 @@
       tmuxifier  # Tmux project/session manager
       fd         # Fast find alternative (used by sesh)
       zoxide     # Smart directory jumper (used by sesh)
+      jq         # JSON processor (used in tmux bindings)
+      yq-go      # YAML processor
     ];
 
     ############################################
