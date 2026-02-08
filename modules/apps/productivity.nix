@@ -44,6 +44,7 @@
 
             # Git UI
             lazygit
+            lazysql
         ];
 
         # Zoxide integration (if zsh is enabled)
