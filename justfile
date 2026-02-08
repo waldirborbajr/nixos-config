@@ -290,10 +290,10 @@ rollback CONFIRM="":
 [group: 'maintenance']
 fmt:
     @echo "Formatting Nix files..."
-    #@git ls-files '*.nix' | xargs nixpkgs-fmt
-    nixfmt $(fd '^[^.]*\\.nix$' .)
+    @git ls-files '*.nix' | xargs nixpkgs-fmt
+    #nixpkgs-fmt $(fd '^[^.]*\\.nix$' .)
     @echo "✓ Formatting complete!"
-    #@git status --short
+    @git status --short
 
 # Setup git hooks
 [group: 'maintenance']
