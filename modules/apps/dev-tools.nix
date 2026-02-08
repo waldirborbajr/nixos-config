@@ -128,8 +128,12 @@
         programs.gh = {
             enable = true;
 
-            extensions = [
-                pkgs.gh-notify
+            extensions = with pkgs; [
+                gh-notify
+                gh-poi
+                gh-f
+                gh-s
+                gh-markdown-preview
             ];
 
             settings = {
