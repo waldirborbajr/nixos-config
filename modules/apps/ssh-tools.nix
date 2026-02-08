@@ -8,12 +8,12 @@
       # Enhanced remote terminal tools
       mosh # Mobile shell - better than SSH for unstable connections
       eternal-terminal # Persistent SSH sessions
-      
+
       # SSH utilities
       sshfs # Mount remote filesystems over SSH
       ssh-copy-id # Copy SSH keys to remote servers
       sshpass # Non-interactive SSH password authentication
-      
+
       # SSH key management
       ssh-audit # SSH server security audit
       ssh-tools # Collection of SSH tools
@@ -22,21 +22,21 @@
     # SSH configuration (managed by home-manager)
     programs.ssh = {
       enable = true;
-      
+
       # Disable default config and set manually
       enableDefaultConfig = false;
-      
+
       # Global settings for all hosts
       matchBlocks."*" = {
         # Connection optimization
         controlMaster = "auto";
         controlPath = "~/.ssh/sockets/%r@%h:%p";
         controlPersist = "10m";
-        
+
         # Security settings
         hashKnownHosts = true;
       };
-      
+
       # Common settings
       extraConfig = ''
         # Keep connections alive
@@ -58,15 +58,15 @@
     programs.zsh.shellAliases = lib.mkIf config.programs.zsh.enable {
       # Mosh shortcuts
       m = "mosh";
-      
+
       # SSHFS mount helpers
       sshm = "sshfs -o reconnect,ServerAliveInterval=15,ServerAliveCountMax=3";
       sshu = "fusermount -u"; # Unmount SSHFS
-      
+
       # SSH key management
       sshkey = "ssh-keygen -t ed25519 -C";
       sshcopy = "ssh-copy-id";
-      
+
       # Quick SSH audit
       sshaudit = "ssh-audit";
     };

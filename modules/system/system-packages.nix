@@ -123,18 +123,18 @@ in
         ##########################################
         # Desktop Applications
         ##########################################
-        bottles              # Windows application runner
-        chromium            # Web browser
-        gimp-with-plugins   # Image editor
+        bottles # Windows application runner
+        chromium # Web browser
+        gimp-with-plugins # Image editor
         # libreoffice       # Office suite
-        nom                 # nom is a parser combinators library written in Rust
-        qownnotes           # Note-taking application
-        vlc                 # Media player
+        nom # nom is a parser combinators library written in Rust
+        qownnotes # Note-taking application
+        vlc # Media player
 
         ##########################################
         # Media Tools
         ##########################################
-        ffmpeg              # Video/audio converter and processor
+        ffmpeg # Video/audio converter and processor
       ])
 
       # ----------------------------

@@ -13,7 +13,7 @@
 
     programs.wezterm = {
       enable = true;
-      
+
       extraConfig = ''
         -- =============================================================================
         -- WezTerm Configuration - Optimized & Lightweight

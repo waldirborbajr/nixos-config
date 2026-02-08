@@ -7,9 +7,9 @@ let
 in
 lib.mkIf isMacbook {
   home.packages = with pkgs; [
-    pavucontrol  # PulseAudio Volume Control GUI
-    pamixer      # PulseAudio command-line mixer
-    playerctl    # Media player controller
-    helvum       # GTK patchbay for PipeWire
+    pavucontrol # PulseAudio Volume Control GUI
+    pamixer # PulseAudio command-line mixer
+    playerctl # Media player controller
+    helvum # GTK patchbay for PipeWire
   ];
 }

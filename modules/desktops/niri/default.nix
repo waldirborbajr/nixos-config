@@ -38,7 +38,7 @@ in
       niri
       brightnessctl
       networkmanagerapplet
-      blueman  # Bluetooth manager with system tray applet
+      blueman # Bluetooth manager with system tray applet
       swaybg
       waypaper
       swayidle

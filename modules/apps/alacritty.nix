@@ -21,21 +21,21 @@
 
         window = {
           padding = { x = 8; y = 8; };
-          opacity = 0.90;  # 75% opacidade (25% transparência) - ver wallpaper
-          blur = false;  # Desabilitar blur para ver wallpaper
+          opacity = 0.90; # 75% opacidade (25% transparência) - ver wallpaper
+          blur = false; # Desabilitar blur para ver wallpaper
           dynamic_title = true;
-          decorations = "none";  # Critical for Wayland transparency
+          decorations = "none"; # Critical for Wayland transparency
           resize_increments = true;
           startup_mode = "Windowed";
           # Janela com ~60% do tamanho da tela
           dimensions = {
-            columns = 105;  # ~60% da largura típica
-            lines = 30;     # ~60% da altura típica
+            columns = 105; # ~60% da largura típica
+            lines = 30; # ~60% da altura típica
           };
           # Centralizar a janela (depende do window manager)
           position = {
-            x = 0;  # 0 = centralizar horizontalmente
-            y = 0;  # 0 = centralizar verticalmente
+            x = 0; # 0 = centralizar horizontalmente
+            y = 0; # 0 = centralizar verticalmente
           };
         };
 

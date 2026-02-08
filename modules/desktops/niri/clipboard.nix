@@ -7,9 +7,9 @@ let
 in
 lib.mkIf isMacbook {
   home.packages = with pkgs; [
-    wl-clipboard     # Wayland clipboard utilities
-    cliphist         # Clipboard history manager for Wayland
-    wl-clip-persist  # Keep clipboard content after program closes
+    wl-clipboard # Wayland clipboard utilities
+    cliphist # Clipboard history manager for Wayland
+    wl-clip-persist # Keep clipboard content after program closes
   ];
 
   # Cliphist configuration for clipboard history

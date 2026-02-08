@@ -18,7 +18,7 @@
     ../modules/desktops/gnome.nix
     ../modules/desktops/niri/system.nix # Niri as alternative session
     ../modules/autologin.nix
-    
+
     # Secrets management
     ../modules/system/secrets.nix
   ];

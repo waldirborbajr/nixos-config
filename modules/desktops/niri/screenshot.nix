@@ -7,8 +7,8 @@ let
 in
 lib.mkIf isMacbook {
   home.packages = with pkgs; [
-    grim           # Screenshot utility for Wayland
-    slurp          # Region selector for Wayland
-    swappy         # Screenshot editor
+    grim # Screenshot utility for Wayland
+    slurp # Region selector for Wayland
+    swappy # Screenshot editor
   ];
 }

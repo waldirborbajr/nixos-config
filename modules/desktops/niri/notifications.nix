@@ -7,6 +7,6 @@ let
 in
 lib.mkIf isMacbook {
   home.packages = with pkgs; [
-    libnotify      # Notification library (provides notify-send)
+    libnotify # Notification library (provides notify-send)
   ];
 }

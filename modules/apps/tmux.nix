@@ -19,11 +19,11 @@
     # 📦 DEPENDENCIES
     #━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     home.packages = with pkgs; [
-      fd              # Fast find alternative
-      zoxide          # Smart directory jumper
-      jq              # JSON processor
-      yq-go           # YAML processor
-      fzf             # Fuzzy finder
+      fd # Fast find alternative
+      zoxide # Smart directory jumper
+      jq # JSON processor
+      yq-go # YAML processor
+      fzf # Fuzzy finder
     ];
 
     #━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -31,19 +31,19 @@
     #━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     programs.tmux = {
       enable = true;
-      
+
       # Core settings
       shell = "${pkgs.zsh}/bin/zsh";
       terminal = "screen-256color";
       historyLimit = 1000000;
       baseIndex = 1;
-      
+
       # Key bindings
       prefix = "C-a";
       keyMode = "vi";
       mouse = true;
       escapeTime = 0;
-      
+
       #━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
       # 🎨 EXTRA CONFIGURATION
       #━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -237,7 +237,7 @@
     #━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     # 📦 TPM (Tmux Plugin Manager) SETUP
     #━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    home.activation.installTPM = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    home.activation.installTPM = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       if [ ! -d "$HOME/.config/tmux/plugins/tpm" ]; then
         $DRY_RUN_CMD ${pkgs.git}/bin/git clone https://github.com/tmux-plugins/tpm "$HOME/.config/tmux/plugins/tpm"
         echo "✓ TPM installed. Run 'prefix + I' in tmux to install plugins."
