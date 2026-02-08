@@ -286,14 +286,14 @@ rollback CONFIRM="":
 # Maintenance
 # ==========================================
 
-# Format Nix files (only tracked by git)
+# Format Nix files (using treefmt via nix fmt, same as CI)
 [group: 'maintenance']
 fmt:
     @echo "Formatting Nix files..."
-    @git ls-files '*.nix' | xargs nixpkgs-fmt
-    #nixpkgs-fmt $(fd '^[^.]*\\.nix$' .)
+    #@git ls-files '*.nix' | xargs nixpkgs-fmt
+    nixfmt $(fd '^[^.]*\\.nix$' .)
     @echo "✓ Formatting complete!"
-    @git status --short
+    #@git status --short
 
 # Setup git hooks
 [group: 'maintenance']
@@ -308,13 +308,12 @@ fmt-path PATH:
     @nixpkgs-fmt {{PATH}}
     @echo "✓ Formatting of {{PATH}} complete!"
 
-# Format only tracked Nix files (explicit, safe)
+# Format all Nix files (explicit, safe, same as CI)
 [group: 'maintenance']
 fmt-tracked:
-    @echo "Formatting tracked .nix files..."
-    @git ls-files '*.nix' | xargs nixpkgs-fmt
+    @echo "Formatting Nix files (same as CI)..."
+    @nix fmt
     @echo "✓ Formatting complete!"
-    @git status --short
 
 # Check systemd user jobs
 [group: 'maintenance']
