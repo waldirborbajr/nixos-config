@@ -3,52 +3,52 @@
 { config, lib, ... }:
 
 {
-  imports = [
-    ./image.nix
-    ./audio.nix
-    ./video.nix
-    ./torrents.nix
-  ];
+    imports = [
+        ./image.nix
+        ./audio.nix
+        ./video.nix
+        ./torrents.nix
+    ];
 
-  options.apps.media = {
-    # Single enable for all media tools (backward compatibility)
-    enable = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Enable all media tools (image, audio, video, torrents)";
-    };
+    options.apps.media = {
+        # Single enable for all media tools (backward compatibility)
+        enable = lib.mkOption {
+            type = lib.types.bool;
+            default = false;
+            description = "Enable all media tools (image, audio, video, torrents)";
+        };
 
-    # Granular controls
-    image = {
-      enable = lib.mkOption {
-        type = lib.types.bool;
-        default = config.apps.media.enable;
-        description = "Enable image editing tools (GIMP, Inkscape, ImageMagick)";
-      };
-    };
+        # Granular controls
+        image = {
+            enable = lib.mkOption {
+                type = lib.types.bool;
+                default = config.apps.media.enable;
+                description = "Enable image editing tools (GIMP, Inkscape, ImageMagick)";
+            };
+        };
 
-    audio = {
-      enable = lib.mkOption {
-        type = lib.types.bool;
-        default = config.apps.media.enable;
-        description = "Enable audio editing and playback tools (Audacity, MPV)";
-      };
-    };
+        audio = {
+            enable = lib.mkOption {
+                type = lib.types.bool;
+                default = config.apps.media.enable;
+                description = "Enable audio editing and playback tools (Audacity, MPV)";
+            };
+        };
 
-    video = {
-      enable = lib.mkOption {
-        type = lib.types.bool;
-        default = config.apps.media.enable;
-        description = "Enable video editing and conversion tools (Handbrake)";
-      };
-    };
+        video = {
+            enable = lib.mkOption {
+                type = lib.types.bool;
+                default = config.apps.media.enable;
+                description = "Enable video editing and conversion tools (Handbrake)";
+            };
+        };
 
-    torrents = {
-      enable = lib.mkOption {
-        type = lib.types.bool;
-        default = config.apps.media.enable;
-        description = "Enable BitTorrent clients (Transmission)";
-      };
+        torrents = {
+            enable = lib.mkOption {
+                type = lib.types.bool;
+                default = config.apps.media.enable;
+                description = "Enable BitTorrent clients (Transmission)";
+            };
+        };
     };
-  };
 }
