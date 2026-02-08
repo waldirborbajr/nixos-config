@@ -128,6 +128,10 @@
         programs.gh = {
             enable = true;
 
+            extensions = [
+                pkgs.gh-notify
+            ];
+
             settings = {
                 git_protocol = "ssh";
                 editor = "";
