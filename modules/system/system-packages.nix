@@ -77,6 +77,12 @@ in
         nixfmt-rfc-style
 
         ##########################################
+        # Version control tools
+        ##########################################
+        gitbutler # Git client for simultaneous branches
+        jj # Jujutsu VCS
+
+        ##########################################
         # Core UNIX utilities (system essential)
         ##########################################
         coreutils
@@ -131,7 +137,6 @@ in
         bottles # Windows application runner
         chromium # Web browser
         gimp-with-plugins # Image editor
-        gitbutler # Git client for simultaneous branches
         # libreoffice       # Office suite
         nom # nom is a parser combinators library written in Rust
         qownnotes # Note-taking application
