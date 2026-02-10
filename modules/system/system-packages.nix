@@ -79,7 +79,7 @@ in
         ##########################################
         # Version control tools
         ##########################################
-        gitbutler # Git client for simultaneous branches
+        # gitbutler # Git client for simultaneous branches
         jj # Jujutsu VCS
 
         ##########################################
