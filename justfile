@@ -333,3 +333,13 @@ gc-hard CONFIRM="":
         exit 1
     fi
     sudo nix-collect-garbage -d --delete-older-than 1d
+
+# Delete all failed GitHub Actions runs
+[group: 'maintenance']
+gh-clean-failed:
+    #!/usr/bin/env bash
+    echo "Deleting failed GitHub Actions runs..."
+    gh run list --status failure --limit 100 --json databaseId \
+      -q '.[].databaseId' \
+    | xargs -n1 gh run delete
+    echo "✓ Failed runs cleaned up!"
