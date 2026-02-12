@@ -8,14 +8,6 @@
 }:
 
 {
-  options.apps.lazygit = {
-    enable = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Enable lazygit terminal UI for git";
-    };
-  };
-
   config = lib.mkIf config.apps.lazygit.enable {
     home.packages = with pkgs; [
       lazygit # Terminal UI for git
