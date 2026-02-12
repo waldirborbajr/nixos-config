@@ -83,7 +83,7 @@
       enable = lib.mkOption {
         type = lib.types.bool;
         default = config.apps.productivity.enable;
-        description = "Enable Git terminal UI (lazygit)";
+        description = "Enable Git terminal UI tools (lazyjj)";
       };
     };
   };

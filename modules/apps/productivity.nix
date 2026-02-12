@@ -42,8 +42,7 @@
       procs
       btop
 
-      # Git UI
-      lazygit
+      # Database UI
       lazysql
     ];
 
@@ -85,9 +84,6 @@
       # Modern replacements
       cat = "bat";
       find = "fd";
-
-      # Git UI
-      lg = "lazygit";
 
       # Disk usage
       du = "dust";

@@ -15,6 +15,7 @@
     ./yazi.nix
     ./tmux.nix
     ./chirp.nix
+    ./lazygit.nix
 
     # New apps (migrated from system)
     ./browsers.nix
@@ -237,6 +238,14 @@
         type = lib.types.bool;
         default = false;
         description = "Enable LaTeX typesetting system and tools";
+      };
+    };
+
+    lazygit = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Enable lazygit terminal UI for git";
       };
     };
 

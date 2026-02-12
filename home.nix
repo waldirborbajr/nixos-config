@@ -47,6 +47,7 @@ in
     yazi.enable = true;
     tmux.enable = true;
     chirp.enable = true;
+    lazygit.enable = true;
 
     # User apps (migrated from system)
     browsers.enable = true;
