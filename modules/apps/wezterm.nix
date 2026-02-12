@@ -20,204 +20,24 @@
       enable = true;
 
       extraConfig = ''
-        -- =============================================================================
-        -- WezTerm Configuration - Optimized & Lightweight
-        -- Based on PopOS config with performance improvements
-        -- =============================================================================
-
         local wezterm = require("wezterm")
-        local config = wezterm.config_builder and wezterm.config_builder() or {}
-
-        -- =============================================================================
-        -- Platform detection
-        -- =============================================================================
-
-        local is_linux = wezterm.target_triple:find("linux")
-
-        -- =============================================================================
-        -- Constants
-        -- =============================================================================
-
-        local window_background_opacity = 0.90  -- Same opacity as Alacritty
-
-        -- =============================================================================
-        -- Utility functions
-        -- =============================================================================
-
-        local function toggle_window_background_opacity(window)
-          local overrides = window:get_config_overrides() or {}
-          if overrides.window_background_opacity then
-            overrides.window_background_opacity = nil
-          else
-            overrides.window_background_opacity = 1.0
-          end
-          window:set_config_overrides(overrides)
-        end
-        wezterm.on("toggle-window-background-opacity", toggle_window_background_opacity)
-
-        local function toggle_ligatures(window)
-          local overrides = window:get_config_overrides() or {}
-          if overrides.harfbuzz_features then
-            overrides.harfbuzz_features = nil
-          else
-            overrides.harfbuzz_features = { "calt=0", "clig=0", "liga=0" }
-          end
-          window:set_config_overrides(overrides)
-        end
-        wezterm.on("toggle-ligatures", toggle_ligatures)
-
-        -- =============================================================================
-        -- Startup
-        -- =============================================================================
-
-        config.default_prog = { "${pkgs.zsh}/bin/zsh", "-l" }
-        config.skip_close_confirmation_for_processes_named = { "tmux", "zsh", "bash" }
-
-        -- =============================================================================
-        -- Appearance - Optimized for lightweight use
-        -- =============================================================================
-
-        -- Font: same as Alacritty
-        config.font = wezterm.font_with_fallback({
-          "JetBrainsMono Nerd Font",
-          "DepartureMono Nerd Font",
-        })
-        config.font_size = 10.0  -- Same size as Alacritty
-
-        -- Catppuccin Mocha theme (default dark theme)
-        config.color_scheme = "Catppuccin Mocha"
-
-        -- Transparency and blur (same values as Alacritty)
-        config.window_background_opacity = window_background_opacity
-        config.enable_wayland = true  -- Better performance on Wayland
-
-        -- Minimal decorations
-        config.window_decorations = "RESIZE"
-        config.hide_tab_bar_if_only_one_tab = true
-        config.use_fancy_tab_bar = false
-
-        -- =============================================================================
-        -- Performance - Optimized for speed and lightweight use
-        -- =============================================================================
-
-        -- FPS optimized for performance/battery balance
-        config.max_fps = 60  -- Reduced from 120 to save resources
-        config.animation_fps = 30  -- Reduced for lower GPU usage
-
-        -- Reduced scrollback for lower memory usage
-        config.scrollback_lines = 5000  -- Same as Alacritty
-
-        -- Disable unnecessary animations
-        config.cursor_blink_rate = 0  -- Cursor without blinking (less processing)
-
-        -- Cache de shaped glyphs para melhor performance
-        config.allow_square_glyphs_to_overflow_width = "Never"
-
-        -- =============================================================================
-        -- Layout & behavior
-        -- =============================================================================
-
-        config.window_padding = {
-          left = 8,
-          right = 8,
-          top = 8,
-          bottom = 8,
+        
+        return {
+          -- font = wezterm.font("JetBrainsMono Nerd Font"),
+        	font = wezterm.font("JetBrains Mono"),
+        	font_size = 18.0,
+        	enable_tab_bar = false,
+        	window_decorations = "RESIZE",
+        	color_scheme = "Catppuccin Mocha",
+        	window_close_confirmation = "NeverPrompt",
+        	keys = {
+        		{
+        			key = "w",
+        			mods = "CMD",
+        			action = wezterm.action.CloseCurrentTab({ confirm = false }),
+        		},
+        	},
         }
-
-        config.default_cwd = wezterm.home_dir
-        config.enable_scroll_bar = false
-        config.adjust_window_size_when_changing_font_size = false
-        config.window_close_confirmation = "NeverPrompt"
-
-        config.inactive_pane_hsb = {
-          saturation = 0.8,
-          brightness = 0.7,
-        }
-
-        -- Initial dimensions (similar to Alacritty)
-        config.initial_cols = 105
-        config.initial_rows = 30
-
-        -- =============================================================================
-        -- Keybindings - Compatible with Alacritty
-        -- =============================================================================
-
-        config.keys = {
-          -- Toggles
-          { 
-            key = "O", 
-            mods = "CTRL|SHIFT", 
-            action = wezterm.action.EmitEvent("toggle-window-background-opacity") 
-          },
-          { 
-            key = "E", 
-            mods = "CTRL|SHIFT", 
-            action = wezterm.action.EmitEvent("toggle-ligatures") 
-          },
-
-          -- Copy/Paste (compatible with Alacritty)
-          { 
-            key = "C", 
-            mods = "CTRL|SHIFT", 
-            action = wezterm.action.CopyTo("Clipboard") 
-          },
-          { 
-            key = "V", 
-            mods = "CTRL|SHIFT", 
-            action = wezterm.action.PasteFrom("Clipboard") 
-          },
-
-          -- Font size
-          { 
-            key = "0", 
-            mods = "CTRL", 
-            action = wezterm.action.ResetFontSize 
-          },
-          { 
-            key = "=", 
-            mods = "CTRL", 
-            action = wezterm.action.IncreaseFontSize 
-          },
-          { 
-            key = "-", 
-            mods = "CTRL", 
-            action = wezterm.action.DecreaseFontSize 
-          },
-
-          -- Fullscreen
-          { 
-            key = "F11", 
-            mods = "NONE", 
-            action = wezterm.action.ToggleFullScreen 
-          },
-
-          -- Spawn window without tmux
-          {
-            key = "N",
-            mods = "CTRL|SHIFT",
-            action = wezterm.action.SpawnWindow,
-          },
-
-          -- Edit config
-          {
-            key = ",",
-            mods = "CTRL",
-            action = wezterm.action.SpawnCommandInNewWindow({
-              args = { 
-                "${pkgs.zsh}/bin/zsh", 
-                "-l", 
-                "-c", 
-                "cd ~/.config/wezterm && $EDITOR wezterm.lua" 
-              },
-            }),
-          },
-        }
-
-        -- =============================================================================
-        -- Return config
-        -- =============================================================================
-
-        return config
       '';
     };
   };
