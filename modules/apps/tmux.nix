@@ -28,7 +28,8 @@
       zoxide # Smart directory jumper
       jq # JSON processor
       yq-go # YAML processor
-      fzf # Fuzzy finder
+      fzf # Fuzzy finder (includes fzf-tmux)
+      sesh # Smart session manager
     ];
 
     #━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -162,7 +163,6 @@
         setw -g mode-keys vi
 
         bind Escape copy-mode
-        bind p paste-buffer
         bind -T copy-mode-vi v send-keys -X begin-selection
         bind -T copy-mode-vi y send-keys -X copy-selection-and-cancel
         bind -T copy-mode-vi C-v send-keys -X rectangle-toggle
@@ -176,7 +176,24 @@
         bind-key -T copy-mode-vi C-l select-pane -R
 
         #━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        # 🚀 DEVOPS SHORTCUTS
+        # � SESH - SMART SESSION MANAGER
+        #━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        unbind p
+        bind-key "p" run-shell "sesh connect \"$(
+          sesh list --icons | fzf-tmux -p 55%,60% \
+            --no-sort --ansi --border-label ' sesh ' --prompt '⚡  ' \
+            --header '  ^a all ^t tmux ^g configs ^x zoxide ^d tmux kill ^f find' \
+            --bind 'tab:down,btab:up' \
+            --bind 'ctrl-a:change-prompt(⚡  )+reload(sesh list --icons)' \
+            --bind 'ctrl-t:change-prompt(🪟  )+reload(sesh list -t --icons)' \
+            --bind 'ctrl-g:change-prompt(⚙️  )+reload(sesh list -c --icons)' \
+            --bind 'ctrl-x:change-prompt(📁  )+reload(sesh list -z --icons)' \
+            --bind 'ctrl-f:change-prompt(🔎  )+reload(fd -H -d 2 -t d -E .Trash . ~)' \
+            --bind 'ctrl-d:execute(tmux kill-session -t {2..})+change-prompt(⚡  )+reload(sesh list --icons)' \
+        )\""
+
+        #━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        # �🚀 DEVOPS SHORTCUTS
         #━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
         # Git operations
