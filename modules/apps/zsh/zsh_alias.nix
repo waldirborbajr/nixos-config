@@ -18,7 +18,7 @@
         less = "bat";
         copy = "wl-copy";
         f = "superfile";
-        py = "python";
+        py = lib.mkDefault "python";
         ipy = "ipython";
         icat = "kitten icat";
         dsize = "du -hs";
