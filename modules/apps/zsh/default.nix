@@ -4,7 +4,7 @@
   ...
 }:
 {
-  config = lib.mkIf confg.apps.zsh.enable {
+  config = lib.mkIf config.apps.zsh.enable {
     imports = [
       ./zsh.nix
       ./zsh_alias.nix
