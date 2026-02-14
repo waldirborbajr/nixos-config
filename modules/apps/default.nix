@@ -5,7 +5,8 @@
 {
   imports = [
     # Core apps
-    ./zsh.nix
+    #./zsh.nix
+    ./zsh/default.nix
     ./alacritty.nix
     ./wezterm.nix
     ./fastfetch.nix
