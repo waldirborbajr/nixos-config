@@ -1,12 +1,18 @@
-{ pkgs, ... }:
 {
-  programs.zsh = {
-    enable = true;
-    # enableCompletion = true;
-    autosuggestion.enable = true;
-    syntaxHighlighting.enable = true;
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+{
+  config = lib.mkIf config.apps.zsh.enable {
+    programs.zsh = {
+      enable = true;
+      # enableCompletion = true;
+      autosuggestion.enable = true;
+      syntaxHighlighting.enable = true;
 
-    plugins = [
+      plugins = [
       {
         # Must be before plugins that wrap widgets, such as zsh-autosuggestions or fast-syntax-highlighting
         name = "fzf-tab";
@@ -181,4 +187,6 @@
     enable = true;
     enableZshIntegration = true;
   };
+  };
+}
 }

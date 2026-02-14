@@ -1,7 +1,12 @@
-{ ... }:
 {
-  programs.zsh = {
-    initContent = ''
+  config,
+  lib,
+  ...
+}:
+{
+  config = lib.mkIf config.apps.zsh.enable {
+    programs.zsh = {
+      initContent = ''
       # Use emacs key bindings
       bindkey -e
 
@@ -96,5 +101,6 @@
       # bind this new widget to `ctrl+w`
       bindkey '^W' my-backward-delete-word
     '';
+    };
   };
 }
