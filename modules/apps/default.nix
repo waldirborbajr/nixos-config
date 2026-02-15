@@ -9,6 +9,7 @@
     ./zsh/default.nix
     ./p10k/p10k.nix
     ./micro.nix
+    ./bat.nix
     ./alacritty.nix
     ./wezterm.nix
     ./fastfetch.nix
@@ -52,6 +53,14 @@
         type = lib.types.bool;
         default = true;
         description = "Enable zsh shell with fzf and bat";
+      };
+    };
+
+    bat = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Enable bat - cat clone with syntax highlighting";
       };
     };
 
