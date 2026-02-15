@@ -18,6 +18,7 @@
     ./tmux.nix
     ./chirp.nix
     ./lazygit.nix
+    ./nix.nix
 
     # New apps (migrated from system)
     ./browsers.nix
@@ -82,6 +83,14 @@
         type = lib.types.bool;
         default = true;
         description = "Enable development tools (git, gh)";
+      };
+    };
+
+    nix = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Enable Nix package manager configuration and tools";
       };
     };
 
