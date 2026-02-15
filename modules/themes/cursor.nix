@@ -1,17 +1,11 @@
 # modules/themes/cursor.nix
-# Cursor theme configuration for Wayland and X11
+# Cursor theme options - configuration is applied in home-manager context
 {
-  config,
   pkgs,
   lib,
-  options,
   ...
 }:
 
-let
-  isHomeManager = options ? home;
-  cfg = config.theme.cursor;
-in
 {
   options.theme.cursor = {
     enable = lib.mkOption {
@@ -39,24 +33,6 @@ in
     };
   };
 
-  # Only configure home-manager options when in home-manager context
-  config = lib.mkMerge [
-    (lib.mkIf (isHomeManager && cfg.enable) {
-      home.packages = [ cfg.package ];
-
-      home.pointerCursor = {
-        package = cfg.package;
-        name = cfg.name;
-        size = cfg.size;
-        gtk.enable = true;
-        x11.enable = true;
-      };
-
-      # Wayland environment variable
-      home.sessionVariables = {
-        XCURSOR_THEME = cfg.name;
-        XCURSOR_SIZE = toString cfg.size;
-      };
-    })
-  ];
+  # Note: This module only defines options.
+  # Actual home-manager configuration is applied in home.nix
 }

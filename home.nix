@@ -29,6 +29,26 @@ in
     ./modules/desktops/niri
   ];
 
+  # ==========================================
+  # Cursor theme (home-manager level)
+  # ==========================================
+  home.packages = lib.mkIf config.theme.cursor.enable [
+    config.theme.cursor.package
+  ];
+
+  home.pointerCursor = lib.mkIf config.theme.cursor.enable {
+    package = config.theme.cursor.package;
+    name = config.theme.cursor.name;
+    size = config.theme.cursor.size;
+    gtk.enable = true;
+    x11.enable = true;
+  };
+
+  home.sessionVariables = lib.mkIf config.theme.cursor.enable {
+    XCURSOR_THEME = config.theme.cursor.name;
+    XCURSOR_SIZE = toString config.theme.cursor.size;
+  };
+
   # no-sleep is a system module; enable via host/profile:
   # system-config.noSleep.enable = true;
 
