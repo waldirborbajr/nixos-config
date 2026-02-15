@@ -30,7 +30,7 @@
       nix-tree = "nix-tree";
       nix-diff = "nix-diff";
       nvd-diff = "nvd diff";
-      
+
       # Common nix operations
       nix-gc = "nix-collect-garbage -d";
       nix-optimize = "nix-store --optimize";
