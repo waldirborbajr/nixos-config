@@ -40,11 +40,6 @@ in
     x11.enable = true;
   };
 
-  home.sessionVariables = lib.mkIf config.theme.cursor.enable {
-    XCURSOR_THEME = config.theme.cursor.name;
-    XCURSOR_SIZE = toString config.theme.cursor.size;
-  };
-
   # no-sleep is a system module; enable via host/profile:
   # system-config.noSleep.enable = true;
 
@@ -175,5 +170,9 @@ in
   home.sessionVariables = {
     # Terminal preference
     TERMINAL = "alacritty";
+  }
+  // lib.optionalAttrs config.theme.cursor.enable {
+    XCURSOR_THEME = config.theme.cursor.name;
+    XCURSOR_SIZE = toString config.theme.cursor.size;
   };
 }
