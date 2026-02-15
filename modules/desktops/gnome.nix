@@ -89,7 +89,7 @@
       // lib.optionalAttrs config.theme.cursor.enable {
         "org/gnome/desktop/interface" = {
           cursor-theme = config.theme.cursor.name;
-          cursor-size = config.theme.cursor.size;
+          cursor-size = lib.gvariant.mkInt32 config.theme.cursor.size;
         };
       };
     }
