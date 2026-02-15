@@ -78,17 +78,18 @@
           auto-maximize = false; # Prevent windows from auto-maximizing
         };
 
-        # Cursor theme configuration
-        "org/gnome/desktop/interface" = lib.mkIf config.theme.cursor.enable {
-          cursor-theme = config.theme.cursor.name;
-          cursor-size = config.theme.cursor.size;
-        };
-
         # Wallpaper configuration
         "org/gnome/desktop/background" = {
           picture-uri = "file:///etc/nixos/wallpapers/devops-dark.svg";
           picture-uri-dark = "file:///etc/nixos/wallpapers/devops-dark.svg";
           picture-options = "zoom"; # Opções: "none", "wallpaper", "centered", "scaled", "stretched", "zoom", "spanned"
+        };
+      }
+      # Cursor theme configuration (conditionally added)
+      // lib.optionalAttrs config.theme.cursor.enable {
+        "org/gnome/desktop/interface" = {
+          cursor-theme = config.theme.cursor.name;
+          cursor-size = config.theme.cursor.size;
         };
       };
     }

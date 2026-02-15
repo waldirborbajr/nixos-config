@@ -7,6 +7,10 @@
   ...
 }:
 
+let
+  # Check if we're in a home-manager context
+  isHomeManager = config ? home;
+in
 {
   options.theme.cursor = {
     enable = lib.mkOption {
@@ -34,7 +38,7 @@
     };
   };
 
-  config = lib.mkIf config.theme.cursor.enable {
+  config = lib.mkIf (config.theme.cursor.enable && isHomeManager) {
     home.packages = [ config.theme.cursor.package ];
 
     home.pointerCursor = {
@@ -43,13 +47,6 @@
       size = config.theme.cursor.size;
       gtk.enable = true;
       x11.enable = true;
-    };
-
-    # GTK cursor theme
-    gtk.cursorTheme = {
-      package = config.theme.cursor.package;
-      name = config.theme.cursor.name;
-      size = config.theme.cursor.size;
     };
 
     # Wayland environment variable
