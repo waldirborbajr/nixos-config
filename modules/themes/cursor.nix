@@ -10,6 +10,7 @@
 
 let
   isHomeManager = options ? home;
+  cfg = config.theme.cursor;
 in
 {
   options.theme.cursor = {
@@ -39,21 +40,23 @@ in
   };
 
   # Only configure home-manager options when in home-manager context
-  config = lib.optionalAttrs (config.theme.cursor.enable && isHomeManager) {
-    home.packages = [ config.theme.cursor.package ];
+  config = lib.mkMerge [
+    (lib.mkIf (isHomeManager && cfg.enable) {
+      home.packages = [ cfg.package ];
 
-    home.pointerCursor = {
-      package = config.theme.cursor.package;
-      name = config.theme.cursor.name;
-      size = config.theme.cursor.size;
-      gtk.enable = true;
-      x11.enable = true;
-    };
+      home.pointerCursor = {
+        package = cfg.package;
+        name = cfg.name;
+        size = cfg.size;
+        gtk.enable = true;
+        x11.enable = true;
+      };
 
-    # Wayland environment variable
-    home.sessionVariables = {
-      XCURSOR_THEME = config.theme.cursor.name;
-      XCURSOR_SIZE = toString config.theme.cursor.size;
-    };
-  };
+      # Wayland environment variable
+      home.sessionVariables = {
+        XCURSOR_THEME = cfg.name;
+        XCURSOR_SIZE = toString cfg.size;
+      };
+    })
+  ];
 }
