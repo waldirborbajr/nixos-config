@@ -8,6 +8,7 @@
     #./zsh.nix
     ./zsh/default.nix
     ./p10k/p10k.nix
+    ./micro.nix
     ./alacritty.nix
     ./wezterm.nix
     ./fastfetch.nix
