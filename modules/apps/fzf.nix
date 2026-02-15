@@ -14,9 +14,9 @@
       enableZshIntegration = true;
 
       # Theme is managed by catppuccin module
-      
+
       defaultCommand = "fd --type f --hidden --follow --exclude .git || find . -type f";
-      
+
       defaultOptions = [
         "--height 60%"
         "--layout=reverse"

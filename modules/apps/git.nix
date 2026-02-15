@@ -25,24 +25,24 @@
 
         init.defaultBranch = "main";
         pull.rebase = true;
-        
+
         push = {
           default = "current";
           autoSetupRemote = true;
         };
-        
+
         fetch = {
           prune = true;
           pruneTags = true;
         };
-        
+
         rebase = {
           autoStash = true;
           autoSquash = true;
         };
-        
+
         merge.conflictStyle = "zdiff3";
-        
+
         url."git@github.com:waldirborbajr/".insteadOf = "fp:";
 
         alias = {
