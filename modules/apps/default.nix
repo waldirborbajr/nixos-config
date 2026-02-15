@@ -257,6 +257,22 @@
       };
     };
 
+    wl-clip-persist = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Enable wl-clip-persist to persist clipboard content after application closes (Wayland)";
+      };
+    };
+
+    hyprpicker = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Enable hyprpicker color picker for Hyprland/Wayland";
+      };
+    };
+
     multiplexers = lib.mkOption {
       type = lib.types.attrs;
       default = { };
