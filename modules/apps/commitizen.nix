@@ -47,15 +47,6 @@
       message = "Select the type of change you are committing"
     '';
 
-    # Git aliases for commitizen
-    programs.git = {
-      enable = true;
-      settings.alias = {
-        cz = "!cz commit";
-        czc = "!cz commit";
-      };
-    };
-
     # Shell aliases
     programs.zsh.shellAliases = lib.mkIf config.apps.zsh.enable {
       gcz = "cz commit";

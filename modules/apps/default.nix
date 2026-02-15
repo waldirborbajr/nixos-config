@@ -11,6 +11,7 @@
     ./micro.nix
     ./bat.nix
     ./fzf.nix
+    ./git.nix
     ./alacritty.nix
     ./wezterm.nix
     ./fastfetch.nix
@@ -70,6 +71,14 @@
         type = lib.types.bool;
         default = true;
         description = "Enable fzf - command-line fuzzy finder";
+      };
+    };
+
+    git = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Enable git version control system";
       };
     };
 
