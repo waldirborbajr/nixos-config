@@ -10,7 +10,8 @@
 {
   config = lib.mkIf config.apps.communication.enable {
     home.packages = with pkgs; [
-      discord
+      # discord
+      vesktop  # Discord client with improved Linux support
     ];
   };
 }

@@ -140,7 +140,7 @@ gestures {
 **Open Maximized:**
 - `audacity`
 - `brave-browser`
-- `discord`
+- `vesktop`
 - `gimp`
 - `kdenlive`
 - `qutebrowser`

@@ -32,7 +32,7 @@ let
     window-rule {
       match app-id=r#"audacity$"#
       match app-id=r#"brave-browser$"#
-      match app-id=r#"discord$"#
+      match app-id=r#"vesktop$"#
       match app-id=r#"gimp$"#
       match app-id=r#"kdenlive$"#
       match app-id=r#"qutebrowser$"#
