@@ -8,6 +8,9 @@
   ...
 }:
 
+let
+  isHomeManager = options ? home;
+in
 {
   options.theme.cursor = {
     enable = lib.mkOption {
@@ -36,7 +39,7 @@
   };
 
   # Only configure home-manager options when in home-manager context
-  config = lib.mkIf (config.theme.cursor.enable && options ? home) {
+  config = lib.optionalAttrs (config.theme.cursor.enable && isHomeManager) {
     home.packages = [ config.theme.cursor.package ];
 
     home.pointerCursor = {
