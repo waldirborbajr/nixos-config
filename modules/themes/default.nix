@@ -9,6 +9,10 @@
 }:
 
 {
+  imports = [
+    ./cursor.nix
+  ];
+
   options = {
     theme = {
       enable = lib.mkOption {

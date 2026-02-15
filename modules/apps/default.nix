@@ -36,6 +36,8 @@
     ./ssh-tools.nix
     ./termius.nix
     ./clipboard.nix
+    ./swaync.nix
+    ./network-manager.nix
     ./zellij.nix
     ./latex.nix
     ./fun-tools.nix
@@ -263,6 +265,22 @@
           default = true;
           description = "Enable grimblast - convenient wrapper for grim+slurp screenshot tool";
         };
+      };
+    };
+
+    swaync = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Enable SwayNC notification center for Wayland";
+      };
+    };
+
+    network-manager = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Enable NetworkManager applet (nm-applet) for system tray";
       };
     };
 

@@ -16,6 +16,14 @@ let
   browser = "firefox";
   fileManager = "yazi";
 
+  notificationClearCmd = if config.apps.swaync.enable
+    then ''"swaync-client" "-C"''
+    else ''"makoctl" "dismiss" "-a"'';
+
+  swayncAutostart = lib.optionalString config.apps.swaync.enable ''
+    spawn-at-startup "swaync"
+  '';
+
   mainConfigKdl = ''
      // This config is in the KDL format: https://kdl.dev
     // "/-" comments out the following node.
@@ -291,7 +299,7 @@ let
 
     // This line starts waybar, a commonly used bar for Wayland compositors.
     spawn-at-startup "waybar"
-    // spawn-sh-at-startup "swaybg -i ~/.config/wallpapers/bg.png --mode fill"
+${swayncAutostart}    // spawn-sh-at-startup "swaybg -i ~/.config/wallpapers/bg.png --mode fill"
     spawn-sh-at-startup "swaybg -i $(fd -t f . $HOME/.config/wallpapers | shuf -n 1) --mode fill"
     spawn-sh-at-startup "swayidle -w"
 
@@ -317,6 +325,12 @@ let
 
     // You can also set this to null to disable saving screenshots to disk.
     // screenshot-path null
+
+    // Cursor configuration
+    cursor {
+        xcursor-theme "${config.theme.cursor.name}"
+        xcursor-size ${toString config.theme.cursor.size}
+    }
 
     // Animation settings.
     // The wiki explains how to configure individual animations:
@@ -389,7 +403,7 @@ let
       
           // Launcher and utilities (Fuzzel + Mako replacements for DMS)
           Mod+Space hotkey-overlay-title="App launcher: fuzzel" { spawn "fuzzel"; }
-          Mod+N hotkey-overlay-title="Clear notifications" { spawn "makoctl" "dismiss" "-a"; }
+          Mod+N hotkey-overlay-title="Clear notifications" { spawn ${notificationClearCmd}; }
           Mod+V hotkey-overlay-title="Clipboard manager" { spawn "sh" "-c" "cliphist list | fuzzel -d | cliphist decode | wl-copy"; }
       
           // ========================================

@@ -11,7 +11,7 @@
 let
   isMacbook = hostname == "macbook-nixos" || hostname == "macbook";
 in
-lib.mkIf isMacbook {
+lib.mkIf (isMacbook && !config.apps.swaync.enable) {
   home.packages = with pkgs; [ mako ];
 
   xdg.configFile."mako/config".text = ''

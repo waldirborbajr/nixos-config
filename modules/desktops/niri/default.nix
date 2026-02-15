@@ -39,11 +39,13 @@ in
   ];
 
   config = lib.mkIf isMacbook {
+    # Enable NetworkManager applet for system tray networking
+    apps.network-manager.enable = lib.mkDefault true;
+
     # Core packages (specific packages moved to their respective modules)
     home.packages = with pkgs; [
       niri
       brightnessctl
-      networkmanagerapplet
       blueman # Bluetooth manager with system tray applet
       swaybg
       waypaper
