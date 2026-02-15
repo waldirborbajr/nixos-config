@@ -13,6 +13,7 @@
       gimp # GNU Image Manipulation Program
       inkscape # Vector graphics editor
       imagemagick # CLI image manipulation
+      imv # Lightweight image viewer
     ];
   };
 }

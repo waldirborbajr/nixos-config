@@ -61,15 +61,16 @@ in
 
     # Media tools - granular options available (Dendritic Pattern)
     # Use: apps.media.enable = true; for all, or enable individually:
-    #   apps.media.image.enable = true;    # GIMP, Inkscape, ImageMagick
-    #   apps.media.audio.enable = true;    # Audacity, MPV
-    #   apps.media.video.enable = true;    # Handbrake
-    #   apps.media.torrents.enable = true; # Transmission
+    #   apps.media.image.enable = true;      # GIMP, Inkscape, ImageMagick, imv
+    #   apps.media.audio.enable = true;      # Audacity, Audacious, MPV
+    #   apps.media.video.enable = true;      # Handbrake
+    #   apps.media.recording.enable = true;  # wf-recorder, OBS
+    #   apps.media.torrents.enable = true;   # Transmission
     media.enable = true;
 
     # Productivity tools - granular options available (Dendritic Pattern)
     # Use: apps.productivity.enable = true; for all, or enable individually:
-    #   apps.productivity.file-tools.enable = true;      # eza, fd, dust, ncdu, tree
+    #   apps.productivity.file-tools.enable = true;      # eza, fd, dust, ncdu, tree, superfile, nemo
     #   apps.productivity.navigation.enable = true;      # zoxide
     #   apps.productivity.shell-history.enable = true;   # atuin
     #   apps.productivity.text-processing.enable = true; # sd, jq, fx, tldr
@@ -83,8 +84,13 @@ in
     ssh-tools.enable = true;
     termius.enable = true;
     clipboard.enable = true;
+    wl-clip-persist.enable = true;
+    hyprpicker.enable = true;
     zellij.enable = false; # Tmux alternative (disabled by default)
     latex.enable = false; # Enable for LaTeX documents
+
+    # Screen management tools
+    screens.enable = false;
 
     # Virtualization tools
     virtualbox.enable = false;
@@ -96,6 +102,22 @@ in
     pipes.enable = false;
     tty-clock.enable = false;
   };
+
+  # ==========================================
+  # Media tools granular options
+  # ==========================================
+  apps.media.recording.enable = false; # wf-recorder, OBS (disabled by default)
+
+  # ==========================================
+  # Clipboard tools granular options
+  # ==========================================
+  apps.clipboard.grimblast.enable = true; # Grimblast screenshot tool
+
+  # ==========================================
+  # File tools granular options
+  # ==========================================
+  apps.productivity.file-tools.superfile.enable = false; # Superfile TUI file manager
+  apps.productivity.file-tools.nemo.enable = false;      # Nemo GUI file manager
 
   # ==========================================
   # Enable languages via options

@@ -39,6 +39,7 @@
     ./zellij.nix
     ./latex.nix
     ./fun-tools.nix
+    ./screens.nix
 
     # Modular apps (Dendritic Pattern)
     ./media # Aggregator with submodules
@@ -255,6 +256,14 @@
         default = true;
         description = "Enable clipboard and screenshot tools";
       };
+
+      grimblast = {
+        enable = lib.mkOption {
+          type = lib.types.bool;
+          default = true;
+          description = "Enable grimblast - convenient wrapper for grim+slurp screenshot tool";
+        };
+      };
     };
 
     wl-clip-persist = {
@@ -270,6 +279,30 @@
         type = lib.types.bool;
         default = true;
         description = "Enable hyprpicker color picker for Hyprland/Wayland";
+      };
+    };
+
+    screens = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Enable screen locking and display management tools";
+      };
+
+      hyprlock = {
+        enable = lib.mkOption {
+          type = lib.types.bool;
+          default = config.apps.screens.enable;
+          description = "Enable Hyprlock - screen locker for Hyprland";
+        };
+      };
+
+      swaylock-effects = {
+        enable = lib.mkOption {
+          type = lib.types.bool;
+          default = config.apps.screens.enable;
+          description = "Enable Swaylock-effects - screen locker with effects for Sway/Wayland";
+        };
       };
     };
 

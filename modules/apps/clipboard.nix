@@ -22,8 +22,8 @@
       grim # Screenshot utility for Wayland
       slurp # Screen area selector for Wayland
       swappy # Screenshot editor
-      grimblast # Convenient wrapper for grim+slurp
     ] ++ lib.optional config.apps.wl-clip-persist.enable wl-clip-persist
-      ++ lib.optional config.apps.hyprpicker.enable hyprpicker;
+      ++ lib.optional config.apps.hyprpicker.enable hyprpicker
+      ++ lib.optional config.apps.clipboard.grimblast.enable grimblast;
   };
 }

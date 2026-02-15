@@ -31,7 +31,7 @@
       enable = lib.mkOption {
         type = lib.types.bool;
         default = config.apps.media.enable;
-        description = "Enable audio editing and playback tools (Audacity, MPV)";
+        description = "Enable audio editing and playback tools (Audacity, Audacious, MPV)";
       };
     };
 
@@ -40,6 +40,14 @@
         type = lib.types.bool;
         default = config.apps.media.enable;
         description = "Enable video editing and conversion tools (Handbrake)";
+      };
+    };
+
+    recording = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Enable screen recording tools (wf-recorder, OBS)";
       };
     };
 
