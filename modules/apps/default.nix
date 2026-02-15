@@ -7,7 +7,7 @@
     # Core apps
     #./zsh.nix
     ./zsh/default.nix
-    ./p10k/p10k.nix
+    #./p10k/p10k.nix
     ./alacritty.nix
     ./wezterm.nix
     ./fastfetch.nix
