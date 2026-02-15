@@ -32,10 +32,6 @@ in
   # ==========================================
   # Cursor theme (home-manager level)
   # ==========================================
-  home.packages = lib.mkIf config.theme.cursor.enable [
-    config.theme.cursor.package
-  ];
-
   home.pointerCursor = lib.mkIf config.theme.cursor.enable {
     package = config.theme.cursor.package;
     name = config.theme.cursor.name;
@@ -157,19 +153,21 @@ in
   # ==========================================
   # Wayland/Desktop packages (conditional)
   # ==========================================
-  home.packages = lib.optionals isMacbook (
-    with pkgs;
-    [
-      waybar
-      mako
-      fuzzel
-      wl-clipboard
-      grim
-      slurp
-      swappy
-      playerctl
-    ]
-  );
+  home.packages = 
+    (lib.optionals isMacbook (
+      with pkgs;
+      [
+        waybar
+        mako
+        fuzzel
+        wl-clipboard
+        grim
+        slurp
+        swappy
+        playerctl
+      ]
+    ))
+    ++ (lib.optional config.theme.cursor.enable config.theme.cursor.package);
 
   # ==========================================
   # Session variables (non-redundant)
