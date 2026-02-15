@@ -4,13 +4,10 @@
   config,
   pkgs,
   lib,
+  options,
   ...
 }:
 
-let
-  # Check if we're in a home-manager context
-  isHomeManager = config ? home;
-in
 {
   options.theme.cursor = {
     enable = lib.mkOption {
@@ -38,7 +35,8 @@ in
     };
   };
 
-  config = lib.mkIf (config.theme.cursor.enable && isHomeManager) {
+  # Only configure home-manager options when in home-manager context
+  config = lib.mkIf (config.theme.cursor.enable && options ? home) {
     home.packages = [ config.theme.cursor.package ];
 
     home.pointerCursor = {
