@@ -10,6 +10,7 @@
     ./p10k/p10k.nix
     ./micro.nix
     ./bat.nix
+    ./fzf.nix
     ./alacritty.nix
     ./wezterm.nix
     ./fastfetch.nix
@@ -61,6 +62,14 @@
         type = lib.types.bool;
         default = true;
         description = "Enable bat - cat clone with syntax highlighting";
+      };
+    };
+
+    fzf = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Enable fzf - command-line fuzzy finder";
       };
     };
 

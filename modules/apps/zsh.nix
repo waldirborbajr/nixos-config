@@ -152,16 +152,5 @@
         fi
       '';
     };
-
-    programs.fzf = {
-      enable = true;
-    };
-
-    home.sessionVariables = lib.mkForce {
-      FZF_DEFAULT_OPTS = "--info=inline-right --ansi --layout=reverse --border=rounded --height=60%";
-      FZF_CTRL_T_COMMAND = "fd --type f --hidden --follow --exclude .git || find . -type f";
-      FZF_CTRL_T_OPTS = "--preview 'bat --color=always --style=numbers --line-range=:500 {}'";
-      FZF_ALT_C_OPTS = "--preview 'tree -C {} | head -200'";
-    };
   };
 }
