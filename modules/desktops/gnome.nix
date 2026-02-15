@@ -1,6 +1,6 @@
 # modules/desktops/gnome.nix
 # Optimized GNOME + Wayland configuration
-{ pkgs, lib, ... }:
+{ pkgs, lib, config, ... }:
 
 {
   # ============================================
@@ -76,6 +76,12 @@
       settings = {
         "org/gnome/desktop/wm/preferences" = {
           auto-maximize = false; # Prevent windows from auto-maximizing
+        };
+
+        # Cursor theme configuration
+        "org/gnome/desktop/interface" = lib.mkIf config.theme.cursor.enable {
+          cursor-theme = config.theme.cursor.name;
+          cursor-size = config.theme.cursor.size;
         };
 
         # Wallpaper configuration

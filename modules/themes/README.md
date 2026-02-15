@@ -9,11 +9,37 @@ This module provides a single source of truth for theming across:
 - **File Manager** (Yazi)
 - **Desktop Environments** (Niri, GNOME, i3)
 - **CLI Tools** (bat, fzf, and more)
+- **Cursor Theme** (Bibata-Modern-Ice)
 
 ## Current Theme: Catppuccin
 
 **Flavor:** `mocha` (dark theme)  
 **Accent:** `blue`
+
+## Cursor Theme: Bibata-Modern-Ice
+
+**Default Cursor:** `Bibata-Modern-Ice`  
+**Size:** `24` pixels
+
+### Changing Cursor Theme
+
+To use a different cursor theme, configure in your home configuration:
+
+```nix
+theme.cursor = {
+  enable = true;
+  package = pkgs.bibata-cursors;  # or pkgs.vanilla-dmz, pkgs.capitaine-cursors, etc.
+  name = "Bibata-Modern-Ice";     # Theme name
+  size = 24;                       # Cursor size in pixels
+};
+```
+
+Popular cursor themes available in nixpkgs:
+- `bibata-cursors` - Bibata-Modern-Ice (default), Bibata-Modern-Classic, etc.
+- `capitaine-cursors` - macOS-style cursor theme
+- `vanilla-dmz` - DMZ cursor theme
+- `nordzy-cursor-theme` - Nord-themed cursors
+- `phinger-cursors` - Phinger cursors
 
 ### Available Flavors
 
@@ -94,6 +120,8 @@ sudo nixos-rebuild switch --flake .#hostname
 | Tmux        | ✅ | [`modules/apps/tmux.nix`](../apps/tmux.nix) |
 | Git Delta   | ✅ | [`modules/apps/dev-tools.nix`](../apps/dev-tools.nix) |
 | Niri        | ✅ | [`modules/desktops/niri/`](../desktops/niri/) |
+| GNOME       | ✅ | [`modules/desktops/gnome.nix`](../desktops/gnome.nix) |
+| Cursor      | ✅ | [`modules/themes/cursor.nix`](cursor.nix) |
 
 ## Resources
 
