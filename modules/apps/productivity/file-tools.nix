@@ -9,15 +9,17 @@
 
 {
   config = lib.mkIf config.apps.productivity.file-tools.enable {
-    home.packages = with pkgs; [
-      eza # Modern ls replacement
-      fd # Modern find replacement
-      dust # Modern du replacement
-      ncdu # NCurses disk usage
-      tree # Directory tree viewer
-    ]
-    ++ lib.optional config.apps.productivity.file-tools.superfile.enable superfile
-    ++ lib.optional config.apps.productivity.file-tools.nemo.enable nemo;
+    home.packages =
+      with pkgs;
+      [
+        eza # Modern ls replacement
+        fd # Modern find replacement
+        dust # Modern du replacement
+        ncdu # NCurses disk usage
+        tree # Directory tree viewer
+      ]
+      ++ lib.optional config.apps.productivity.file-tools.superfile.enable superfile
+      ++ lib.optional config.apps.productivity.file-tools.nemo.enable nemo;
 
     # Shell aliases for file tools
     programs.zsh.shellAliases = lib.mkIf config.programs.zsh.enable {

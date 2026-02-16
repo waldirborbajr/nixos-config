@@ -9,10 +9,12 @@
 
 {
   config = lib.mkIf config.apps.media.video.enable {
-    home.packages = with pkgs; [
-      handbrake # Video transcoder
-    ]
-    ++ lib.optional config.apps.media.recording.enable wf-recorder
-    ++ lib.optional config.apps.media.recording.enable obs;
+    home.packages =
+      with pkgs;
+      [
+        handbrake # Video transcoder
+      ]
+      ++ lib.optional config.apps.media.recording.enable wf-recorder
+      ++ lib.optional config.apps.media.recording.enable obs;
   };
 }

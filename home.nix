@@ -128,7 +128,7 @@ in
   # File tools granular options
   # ==========================================
   apps.productivity.file-tools.superfile.enable = false; # Superfile TUI file manager
-  apps.productivity.file-tools.nemo.enable = false;      # Nemo GUI file manager
+  apps.productivity.file-tools.nemo.enable = false; # Nemo GUI file manager
 
   # ==========================================
   # Enable languages via options
@@ -148,7 +148,7 @@ in
   # ==========================================
   # Wayland/Desktop packages (conditional)
   # ==========================================
-  home.packages = 
+  home.packages =
     (lib.optionals isMacbook (
       with pkgs;
       [

@@ -1,6 +1,11 @@
 # modules/desktops/gnome.nix
 # Optimized GNOME + Wayland configuration
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 
 {
   # ============================================

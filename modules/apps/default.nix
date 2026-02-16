@@ -1,4 +1,4 @@
-g# modules/apps/default.nix
+# modules/apps/default.nix
 # Home-manager level applications with individual enable options
 { config, lib, ... }:
 
