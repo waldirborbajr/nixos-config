@@ -18,7 +18,7 @@
     ../hardware/performance/dell.nix
     ../hardware/dell-hw-config.nix
     ../profiles/desktop.nix
-    ../modules/desktops/i3.nix
+    ../modules/core/desktops/i3.nix
   ];
 
   ############################################

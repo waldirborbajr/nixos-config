@@ -20,9 +20,9 @@
     ../profiles/developer.nix
 
     # Desktops - Multiple sessions available at GDM
-    ../modules/desktops/gnome.nix
-    ../modules/desktops/niri/system.nix # Niri as alternative session
-    ../modules/autologin.nix
+    ../modules/core/desktops/gnome.nix
+    ../modules/core/desktops/niri/system.nix # Niri as alternative session
+    ../modules/core/autologin.nix
 
     # Secrets management
     ../modules/system/secrets.nix

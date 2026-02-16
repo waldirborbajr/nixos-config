@@ -10,7 +10,7 @@
 {
   imports = [
     ./minimal.nix
-    ../modules/xdg-portal.nix
+    ../modules/core/xdg-portal.nix
   ];
 
   # Desktop capabilities available

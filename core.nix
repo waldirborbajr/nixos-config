@@ -5,14 +5,14 @@
 {
   imports = [
     # Theme (centralized)
-    ./modules/themes
+    ./modules/home/themes
 
     # Features on-demand (devops tools, qemu, tailscale)
-    ./modules/features/devops.nix
-    ./modules/features/qemu.nix
-    ./modules/features/tailscale.nix
+    ./modules/core/features/devops.nix
+    ./modules/core/features/qemu.nix
+    ./modules/core/features/tailscale.nix
 
     # XDG portal (system services)
-    ./modules/xdg-portal.nix
+    ./modules/core/xdg-portal.nix
   ];
 }
