@@ -19,7 +19,11 @@
     # Enable Catppuccin theme for Alacritty
     programs.alacritty = {
       enable = true;
-      # catppuccin.enable = true;  # FIXME: Module not available in current catppuccin/nix version
+      catppuccin = {
+        enable = true;
+        flavor = config.theme.flavor;
+        accent = config.theme.accent;
+      };
 
       settings = {
         env.TERM = "xterm-256color";

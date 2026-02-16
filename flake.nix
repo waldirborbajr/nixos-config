@@ -96,8 +96,8 @@
             ./core.nix
             (./hosts + "/${hostname}.nix")
 
-            # Theme: Catppuccin NixOS module - DISABLED due to GTK conflict
-            # catppuccin.nixosModules.catppuccin
+            # Theme: Catppuccin NixOS module
+            catppuccin.nixosModules.catppuccin
 
             # Secrets: SOPS-nix module
             sops-nix.nixosModules.sops
@@ -131,8 +131,8 @@
                   # ← receives hostname
                   imports = [
                     ./home.nix
-                    # Theme: Catppuccin Home Manager module - DISABLED due to GTK conflict
-                    # catppuccin.homeModules.catppuccin
+                    # Theme: Catppuccin Home Manager module
+                    catppuccin.homeModules.catppuccin
                     # Other modules can use hostname if needed
                   ];
                 };
