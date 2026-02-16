@@ -31,7 +31,7 @@
   # Allow insecure broadcom-sta package
   # Required for b43 firmware to work on Broadcom WiFi cards
   nixpkgs.config.permittedInsecurePackages = [
-    "broadcom-sta-6.30.223.271-59-6.12.66"
+    "broadcom-sta-6.30.223.271-59-6.12.70"
   ];
 
   # Dell ACPI modules break Wi-Fi/Bluetooth on older models
