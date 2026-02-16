@@ -8,8 +8,8 @@
     ./rust.nix
     ./lua.nix
     ./nix-dev.nix
-    ./python-home.nix
-    ./nodejs-home.nix
+    ../../home/languages/python.nix
+    ../../home/languages/nodejs.nix
   ];
 
   options.languages = {
