@@ -85,8 +85,8 @@
 
         # Wallpaper configuration
         "org/gnome/desktop/background" = {
-          picture-uri = "file:///etc/nixos/wallpapers/devops-dark.svg";
-          picture-uri-dark = "file:///etc/nixos/wallpapers/devops-dark.svg";
+          picture-uri = "file:///etc/nixos/wallpapers/devops-wallpaper.jpg";
+          picture-uri-dark = "file:///etc/nixos/wallpapers/devops-wallpaper.jpg";
           picture-options = "zoom"; # Opções: "none", "wallpaper", "centered", "scaled", "stretched", "zoom", "spanned"
         };
       }
@@ -135,5 +135,5 @@
   # ============================================
   # Wallpaper
   # ============================================
-  environment.etc."nixos/wallpapers/devops-dark.svg".source = ../../../wallpapers/devops-dark.svg;
+  environment.etc."nixos/wallpapers/devops-wallpaper.jpg".source = ../../../wallpapers/devops-wallpaper.jpg;
 }

@@ -53,7 +53,7 @@ in
     ];
 
     # Wallpaper
-    home.file.".config/niri/wallpaper.svg".source = ../../../../wallpapers/devops-dark.svg;
+    home.file.".config/niri/wallpaper.jpg".source = ../../../../wallpapers/devops-wallpaper.jpg;
 
     # Waypaper configuration
     xdg.configFile."waypaper/config.ini".text = ''
@@ -66,7 +66,7 @@ in
       sort = name
       color = #1e1e2e
       subfolders = False
-      wallpaper = ${config.home.homeDirectory}/.config/niri/wallpaper.svg
+      wallpaper = ${config.home.homeDirectory}/.config/niri/wallpaper.jpg
     '';
 
     # Wayland environment variables
