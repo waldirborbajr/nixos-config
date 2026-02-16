@@ -99,6 +99,11 @@
             # Theme: Catppuccin NixOS module
             catppuccin.nixosModules.catppuccin
 
+            # Disable the problematic GTK module from Catppuccin
+            {
+              disabledModules = [ (catppuccin.outPath + "/modules/nixos/gtk.nix") ];
+            }
+
             # Secrets: SOPS-nix module
             sops-nix.nixosModules.sops
 
