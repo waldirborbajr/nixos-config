@@ -87,66 +87,89 @@ This repository is the **single source of truth** for my personal Linux infrastr
 │   └── macbook-hw-config.nix
 │
 ├── modules/              # 🧩 Modular components (all with options)
-│   ├── system/           # System-level modules
-│   │   ├── default.nix   # 🎛️  Aggregator with options
-│   │   ├── base.nix      # config.system-config.base.enable
-│   │   ├── networking.nix
-│   │   ├── audio.nix
-│   │   ├── fonts.nix
-│   │   ├── ssh.nix
-│   │   ├── system-packages.nix
-│   │   └── serial-devices.nix
+│   ├── core/             # System-level modules
+│   │   ├── autologin.nix
+│   │   ├── xdg-portal.nix
+│   │   ├── desktops/     # Desktop environments
+│   │   │   ├── gnome.nix
+│   │   │   ├── i3.nix
+│   │   │   └── niri/     # Modular Niri compositor
+│   │   ├── features/     # On-demand features
+│   │   │   ├── devops.nix
+│   │   │   ├── qemu.nix
+│   │   │   └── tailscale.nix
+│   │   ├── languages/    # System-level languages
+│   │   │   ├── default.nix   # 🎛️  Aggregator with options
+│   │   │   ├── go.nix        # config.languages.go.enable
+│   │   │   ├── rust.nix      # config.languages.rust.enable
+│   │   │   ├── lua.nix       # config.languages.lua.enable
+│   │   │   ├── nix-dev.nix   # config.languages.nix-dev.enable
+│   │   │   ├── python.nix
+│   │   │   └── nodejs.nix
+│   │   ├── system/       # Core system modules
+│   │   │   ├── default.nix   # 🎛️  Aggregator with options
+│   │   │   ├── base.nix      # config.system-config.base.enable
+│   │   │   ├── audio.nix
+│   │   │   ├── fonts.nix
+│   │   │   ├── hm-gtk-compat.nix
+│   │   │   ├── networking.nix
+│   │   │   ├── nixpkgs.nix
+│   │   │   ├── no-sleep.nix
+│   │   │   ├── secrets.nix
+│   │   │   ├── serial-devices.nix
+│   │   │   ├── ssh.nix
+│   │   │   └── system-packages.nix
+│   │   ├── users/        # User configurations
+│   │   │   └── borba.nix
+│   │   └── virtualization/  # Containers & VMs
+│   │       ├── default.nix
+│   │       ├── docker.nix
+│   │       ├── podman.nix
+│   │       ├── k3s.nix
+│   │       └── libvirt.nix
 │   │
-│   ├── apps/             # Home-manager apps
-│   │   ├── default.nix   # 🎛️  Aggregator with options
-│   │   ├── zsh.nix       # config.apps.zsh.enable
-│   │   ├── alacritty.nix # config.apps.alacritty.enable
-│   │   ├── dev-tools.nix # config.apps.dev-tools.enable
-│   │   ├── browsers.nix
-│   │   ├── clipboard.nix
-│   │   ├── fastfetch.nix
-│   │   ├── helix.nix
-│   │   ├── neovim.nix
-│   │   ├── ripgrep.nix
-│   │   ├── yazi.nix
-│   │   ├── tmux.nix
-│   │   ├── starship.nix
-│   │   ├── zellij.nix
-│   │   └── media/
-│   │       ├── audio.nix
-│   │       ├── image.nix
-│   │       └── video.nix
-│   │
-│   ├── languages/        # Home-manager languages
-│   │   ├── default.nix   # 🎛️  Aggregator with options
-│   │   ├── go.nix        # config.languages.go.enable
-│   │   ├── rust.nix      # config.languages.rust.enable
-│   │   ├── lua.nix       # config.languages.lua.enable
-│   │   ├── nix-dev.nix   # config.languages.nix-dev.enable
-│   │   ├── python.nix    # System-level (always on)
-│   │   └── nodejs.nix    # System-level (always on)
-│   │
-│   ├── desktops/         # Desktop environments
-│   │   ├── gnome.nix
-│   │   ├── i3.nix
-│   │   └── niri/         # Modular Niri compositor
-│   │
-│   ├── virtualization/   # Containers & VMs
-│   │   ├── default.nix
-│   │   ├── docker.nix
-│   │   ├── podman.nix
-│   │   ├── k3s.nix
-│   │   └── libvirt.nix
-│   │
-│   ├── features/         # On-demand features
-│   │   ├── devops.nix
-│   │   └── qemu.nix
-│   │
-│   ├── themes/           # Centralized theming
-│   │   └── default.nix
-│   │
-│   └── users/
-│       └── borba.nix
+│   └── home/             # Home-manager apps & tools
+│       ├── default.nix   # 🎛️  Aggregator with options
+│       ├── alacritty/
+│       ├── bat/
+│       ├── browsers/
+│       ├── chirp/
+│       ├── clipboard/
+│       ├── commitizen/
+│       ├── communication/
+│       ├── dev-tools/
+│       ├── distrobox/
+│       ├── fastfetch/
+│       ├── fun-tools/
+│       ├── fzf/
+│       ├── git/
+│       ├── helix/
+│       ├── ides/
+│       ├── knowledge/
+│       ├── languages/
+│       ├── latex/
+│       ├── lazygit/
+│       ├── media/
+│       ├── micro/
+│       ├── neovim/
+│       ├── network-manager/
+│       ├── nix/
+│       ├── p10k/
+│       ├── productivity/
+│       ├── remote/
+│       ├── ripgrep/
+│       ├── screens/
+│       ├── ssh-tools/
+│       ├── starship/
+│       ├── swaync/
+│       ├── termius/
+│       ├── themes/
+│       ├── tmux/
+│       ├── virtualbox/
+│       ├── wezterm/
+│       ├── yazi/
+│       ├── zellij/
+│       └── zsh/
 │
 ├── scripts/              # CI/CD and testing
 │   ├── ci-build.sh
@@ -221,31 +244,53 @@ Flags are **independent** and can be combined freely.
 
 ### Module Organization
 
-**System Level** (`modules/system/`)
-- Base system configuration, networking, audio, fonts, SSH
+**System Level** (`modules/core/system/`)
+- Base system configuration, networking, audio, fonts, SSH, serial devices
+- `default.nix` - 🎛️  Aggregator with options
+- `base.nix` - config.system-config.base.enable
+- `networking.nix`, `audio.nix`, `fonts.nix`
+- `ssh.nix`, `system-packages.nix`, `serial-devices.nix`
+- `nixpkgs.nix`, `no-sleep.nix`, `secrets.nix`
+- `hm-gtk-compat.nix` - Home Manager GTK integration
 
-**Applications** (`modules/apps/`)
-- `zsh.nix` - ZSH + FZF + bat configuration
-- `alacritty.nix` - Alacritty terminal emulator (90% transparency, Catppuccin)
-- `fastfetch.nix` - System info tool (auto-runs in Alacritty)
-- `dev-tools.nix` - Git, GitHub CLI, development toolchains
-- `tmux.nix` - Terminal multiplexer with custom keybindings
-- `clipboard.nix` - Screenshot tools (ksnip, gnome-screenshot, grim/slurp/swappy)
-- `browsers.nix` - Web browsers (Firefox, Chromium)
-- `helix.nix` / `neovim.nix` - Modern text editors
-- `media/` - Audio, image, and video tools
+**Home-Manager Applications** (`modules/home/`)
+- Individual tool/app directories with self-contained configurations
+- **Terminals & Shells:** `alacritty/`, `wezterm/`, `zsh/`, `tmux/`, `zellij/`
+- **Editors:** `neovim/`, `helix/`, `micro/`
+- **Development:** `git/`, `dev-tools/`, `lazygit/`, `commitizen/`
+- **Languages:** `languages/` (home manager language tools)
+- **Tools & Utilities:** `bat/`, `ripgrep/`, `fzf/`, `yazi/`, `fastfetch/`
+- **Theming:** `themes/`, `p10k/`, `starship/`, `swaync/`
+- **Media & Productivity:** `media/`, `browsers/`, `clipboard/`, `screens/`
+- **System Integration:** `network-manager/`, `distrobox/`, `virtualbox/`
+- **Other:** `chirp/`, `communication/`, `fun-tools/`, `ides/`, `knowledge/`, `latex/`, `nix/`, `productivity/`, `remote/`, `ssh-tools/`, `termius/`
 
-**Desktops** (`modules/desktops/`)
+**Desktops** (`modules/core/desktops/`)
 - `gnome.nix` - GNOME desktop environment (optimized for Wayland)
 - `i3.nix` - i3 window manager (X11 for low-resource machines)
-- `niri.nix` - Niri scrollable-tiling compositor (Wayland)
+- `niri/` - Niri scrollable-tiling compositor (Wayland)
 
-**Languages** (`modules/languages/`)
-- `nodejs.nix` - Node.js + pnpm (toggle with `enableNode` flag)
-- `python.nix` - Python + uv/poetry (configurable)
+**Languages** (`modules/core/languages/`)
+- `default.nix` - 🎛️  Aggregator with options
+- `nodejs.nix` - Node.js (system-level)
+- `python.nix` - Python (system-level)
+- `go.nix` - Go + gopls (toggleable)
+- `rust.nix` - Rust + rustup (toggleable)
+- `lua.nix` - Lua + LuaJIT (toggleable)
+- `nix-dev.nix` - Nix development tools (toggleable)
 
-**Virtualization** (`modules/virtualization/`)
+**Virtualization** (`modules/core/virtualization/`)
 - Docker, Podman, K3s, libvirt (activated by feature flags)
+- `default.nix` - Aggregator with options
+
+**Features** (`modules/core/features/`)
+- `devops.nix` - DevOps tooling, Docker, K3s
+- `qemu.nix` - QEMU virtualization
+- `tailscale.nix` - Tailscale VPN
+
+**Users** (`modules/core/users/`)
+- User-specific configurations
+- `borba.nix` - Primary user configuration
 
 ---
 
@@ -293,8 +338,8 @@ Flags are **independent** and can be combined freely.
 **Before (Direct imports):**
 ```nix
 imports = [
-  ./modules/system/base.nix
-  ./modules/apps/zsh.nix
+  ./modules/core/system/base.nix
+  ./modules/home/zsh
   # Always active, no control
 ];
 ```
@@ -305,7 +350,7 @@ imports = [ ./profiles/minimal.nix ];
 
 # Explicit activation
 system-config.base.enable = true;
-apps.zsh.enable = true;
+home.zsh.enable = true;
 ```
 
 ---
@@ -455,7 +500,7 @@ This configuration includes custom wallpapers optimized for development environm
    wallpapers/my-wallpaper.jpg
    ```
 
-2. **Update GNOME configuration** ([modules/desktops/gnome.nix](modules/desktops/gnome.nix)):
+2. **Update GNOME configuration** ([modules/core/desktops/gnome.nix](modules/core/desktops/gnome.nix)):
    ```nix
    # Line 82-83:
    picture-uri = "file:///etc/nixos/wallpapers/my-wallpaper.jpg";
@@ -466,7 +511,7 @@ This configuration includes custom wallpapers optimized for development environm
      ../../wallpapers/my-wallpaper.jpg;
    ```
 
-3. **For niri**, update ([modules/desktops/niri/default.nix](modules/desktops/niri/default.nix)):
+3. **For niri**, update ([modules/core/desktops/niri/default.nix](modules/core/desktops/niri/default.nix)):
    ```nix
    # Line 46:
    home.file.".config/niri/wallpaper.jpg".source = 
