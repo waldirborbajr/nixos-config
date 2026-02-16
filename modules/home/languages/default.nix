@@ -9,6 +9,6 @@
   # - go, rust, lua, nix-dev (full packages + configs)
   # - python, nodejs (home-manager aliases/configs, system packages in profiles)
   imports = [
-    ../core/languages/default.nix
+    ../../core/languages/default.nix
   ];
 }
