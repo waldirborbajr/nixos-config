@@ -26,12 +26,12 @@
     },
     {
       "type": "os",
-      "key": " Distro",
+      "key": " Distro",
       "keyColor": "yellow"
     },
     {
       "type": "kernel",
-      "key": "  ├─",
+      "key": "  ├─",
       "keyColor": "yellow"
     },
     {
@@ -41,13 +41,13 @@
     },
     {
       "type": "shell",
-      "key": "  └─",
+      "key": "  └─",
       "keyColor": "yellow"
     },
     "break",
     {
       "type": "wm",
-      "key": " DE/WM",
+      "key": " DE/WM",
       "keyColor": "blue"
     },
     {
@@ -72,18 +72,19 @@
     },
     {
       "type": "font",
-      "key": "  ├─",
+      "key": "  ├─",
       "format": "{2}",
       "keyColor": "blue"
     },
     {
       "type": "terminal",
-      "key": "  └─",
+      "key": "  └─",
       "keyColor": "blue"
     },
     "break",
     {
       "type": "host",
+      "format": "{1}",
       "key": "󰌢 System",
       "keyColor": "green"
     },
@@ -103,12 +104,12 @@
     },
     {
       "type": "cpu",
-      "key": "  ├─",
+      "key": "  ├─",
       "keyColor": "green"
     },
     {
       "type": "gpu",
-      "key": "  ├─",
+      "key": "  ├─",
       "format": "{2}",
       "keyColor": "green"
     },
