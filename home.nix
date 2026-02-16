@@ -90,7 +90,8 @@ in
     #   apps.productivity.git-ui.enable = true;          # lazygit
     productivity.enable = true;
 
-    remote.enable = false; # Enable if needed
+    # Remote access tools
+    remote.enable = true; # Enable/disable AnyDesk here (single source of truth)
     ssh-tools.enable = true;
     termius.enable = true;
     clipboard.enable = true;

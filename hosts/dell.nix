@@ -33,6 +33,11 @@
   features.tailscale.enable = true;
 
   ############################################
+  # Enable AnyDesk remote access
+  ############################################
+  services.anydesk.enable = true;
+
+  ############################################
   # Host identity
   ############################################
   networking.hostName = "dell-nixos";
