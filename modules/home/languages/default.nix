@@ -6,6 +6,11 @@
   imports = [
     ./nodejs.nix
     ./python.nix
+    # Import core language implementations
+    ../core/languages/go.nix
+    ../core/languages/rust.nix
+    ../core/languages/lua.nix
+    ../core/languages/nix-dev.nix
   ];
 
   # Define language options for home-manager
