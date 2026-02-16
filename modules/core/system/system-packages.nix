@@ -118,6 +118,8 @@ in
         traceroute
         dnsutils
         nmap
+        gping                             # ping with a graph
+        gtrash                            # rm replacement, put deleted files in system trash
 
         ##########################################
         # Storage
@@ -146,6 +148,15 @@ in
         # Media Tools
         ##########################################
         ffmpeg # Video/audio converter and processor
+          asciinema
+    asciinema-agg
+    tdf
+    caligula
+        hyperfine                         # benchmarking tool
+swappy                            # snapshot editing tool
+   onefetch                          # fetch utility for git repo
+    wavemon                           # monitoring for wireless network devices
+
       ])
 
       # ----------------------------
