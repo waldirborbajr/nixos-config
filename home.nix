@@ -39,16 +39,6 @@ in
     x11.enable = true;
   };
 
-  # GTK cursor configuration (separate from home.pointerCursor)
-  gtk = lib.mkIf config.theme.cursor.enable {
-    enable = true;
-    cursorTheme = {
-      package = config.theme.cursor.package;
-      name = config.theme.cursor.name;
-      size = config.theme.cursor.size;
-    };
-  };
-
   # no-sleep is a system module; enable via host/profile:
   # system-config.noSleep.enable = true;
 
