@@ -132,14 +132,14 @@ in
   # ==========================================
   languages = {
     # Home-manager level (per-project/optional)
-    go.enable = false;
-    rust.enable = false;
+    go.enable = true;
+    rust.enable = true;
     lua.enable = false;
     nix-dev.enable = true;
 
     # System-level toolchains (home-manager configs)
     python.enable = true;
-    nodejs.enable = true;
+    nodejs.enable = false;
   };
 
   # ==========================================

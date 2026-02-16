@@ -135,5 +135,6 @@
   # ============================================
   # Wallpaper
   # ============================================
-  environment.etc."nixos/wallpapers/devops-wallpaper.jpg".source = ../../../wallpapers/devops-wallpaper.jpg;
+  environment.etc."nixos/wallpapers/devops-wallpaper.jpg".source =
+    ../../../wallpapers/devops-wallpaper.jpg;
 }
