@@ -1,4 +1,4 @@
-# modules/apps/chirp.nix
+# modules/home/chirp/default.nix
 # Chirp - Tool for programming amateur radios
 {
   config,
@@ -15,7 +15,7 @@
     ];
 
     # Note: The following system-level configurations are needed:
-    # 1. User must be in dialout group (already configured in modules/users/borba.nix)
+    # 1. User must be in dialout group (already configured in modules/core/users/borba.nix)
     # 2. Exclude brltty if present (it can conflict with serial ports)
     # 3. Udev rules are automatically handled by NixOS when chirp is installed at system level
   };
