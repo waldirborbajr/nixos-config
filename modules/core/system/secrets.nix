@@ -29,7 +29,7 @@
     # Use SSH host keys for system-level secrets (automatically available)
     sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
     sops.age.keyFile = lib.mkForce null; # Disable default keyFile, use SSH keys only
-    sops.defaultSopsFile = ../../secrets/common/secrets.yaml;
+    sops.defaultSopsFile = ../../../secrets/common/secrets.yaml;
 
     # Define secrets
     sops.secrets = {
