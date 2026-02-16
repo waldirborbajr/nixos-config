@@ -9,12 +9,11 @@
 
 {
   imports = [
-    ../modules/system
-    ../modules/themes
-    ../modules/users/borba.nix
+    ../modules/core/system
+    ../modules/core/users/borba.nix
     # System-level languages (always enabled)
-    ../modules/languages/python.nix
-    ../modules/languages/nodejs.nix
+    ../modules/core/languages/python.nix
+    ../modules/core/languages/nodejs.nix
   ];
 
   # Enable minimal system components

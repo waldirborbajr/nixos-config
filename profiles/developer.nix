@@ -10,7 +10,7 @@
 {
   imports = [
     ./desktop.nix
-    ../modules/virtualization
+    ../modules/core/virtualization
   ];
 
   # Enable virtualization and containers by default

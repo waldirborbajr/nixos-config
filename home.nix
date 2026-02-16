@@ -17,16 +17,13 @@ in
 
   imports = [
     # Theme (home-manager level)
-    ./modules/themes
+    ./modules/home/themes
 
     # Apps (all available, enable below)
-    ./modules/apps
-
-    # Languages (all available, enable below)
-    ./modules/languages
+    ./modules/home
   ]
   ++ lib.optionals isMacbook [
-    ./modules/desktops/niri
+    ./modules/core/desktops/niri
   ];
 
   # ==========================================
