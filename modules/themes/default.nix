@@ -57,13 +57,15 @@
 
   config = lib.mkIf config.theme.enable {
     # ==========================================
-    # Catppuccin global configuration
+    # Catppuccin global configuration - DISABLED at NixOS level
+    # Due to GTK module conflict with NixOS 25.11
+    # Individual apps can still enable Catppuccin via their own modules
     # ==========================================
-    catppuccin = {
-      enable = true;
-      flavor = config.theme.flavor;
-      accent = config.theme.accent;
-    };
+    # catppuccin = {
+    #   enable = true;
+    #   flavor = config.theme.flavor;
+    #   accent = config.theme.accent;
+    # };
 
     # ==========================================
     # Export theme colors for custom configs
