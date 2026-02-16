@@ -1,4 +1,4 @@
-# modules/apps/default.nix
+g# modules/apps/default.nix
 # Home-manager level applications with individual enable options
 { config, lib, ... }:
 
@@ -231,7 +231,7 @@
     remote = {
       enable = lib.mkOption {
         type = lib.types.bool;
-        default = false;
+        default = true;
         description = "Enable remote access tools (AnyDesk)";
       };
     };
