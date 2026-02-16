@@ -7,9 +7,6 @@
     # Theme (centralized)
     ./modules/themes
 
-    # Compatibility fix for Home Manager GTK + NixOS 25.11
-    ./modules/system/hm-gtk-compat.nix
-
     # Features on-demand (devops tools, qemu, tailscale)
     ./modules/features/devops.nix
     ./modules/features/qemu.nix

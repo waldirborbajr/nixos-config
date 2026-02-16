@@ -131,8 +131,8 @@
                   # ← receives hostname
                   imports = [
                     ./home.nix
-                    # Theme: Catppuccin Home Manager module
-                    catppuccin.homeModules.catppuccin
+                    # Theme: Catppuccin Home Manager module - DISABLED due to GTK conflict
+                    # catppuccin.homeModules.catppuccin
                     # Other modules can use hostname if needed
                   ];
                 };
