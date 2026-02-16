@@ -53,7 +53,7 @@ in
     ];
 
     # Wallpaper
-    home.file.".config/niri/wallpaper.svg".source = ../../../wallpapers/devops-dark.svg;
+    home.file.".config/niri/wallpaper.svg".source = ../../../../wallpapers/devops-dark.svg;
 
     # Waypaper configuration
     xdg.configFile."waypaper/config.ini".text = ''
