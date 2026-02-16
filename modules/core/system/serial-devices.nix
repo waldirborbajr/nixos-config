@@ -17,6 +17,6 @@
     services.udev.packages = [ pkgs.chirp ];
 
     # Note: User needs to be in 'dialout' group for serial port access
-    # This is already configured in modules/users/borba.nix
+    # This is already configured in modules/core/users/borba.nix
   };
 }

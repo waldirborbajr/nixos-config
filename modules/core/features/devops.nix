@@ -1,6 +1,6 @@
 # modules/features/devops.nix
 # DevOps tooling (kubectl, helm, terraform, etc.)
-# Container runtime (Docker/Podman) is managed in modules/virtualization/
+# Container runtime (Docker/Podman) is managed in modules/core/virtualization/
 
 {
   config,

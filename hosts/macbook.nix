@@ -25,7 +25,7 @@
     ../modules/core/autologin.nix
 
     # Secrets management
-    ../modules/system/secrets.nix
+    ../modules/core/system/secrets.nix
   ];
 
   ############################################

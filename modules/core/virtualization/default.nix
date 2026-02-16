@@ -53,7 +53,7 @@
         message = ''
           ❌ ERROR: Docker and Podman cannot be enabled simultaneously!
 
-          Edit modules/virtualization/default.nix and:
+          Edit modules/core/virtualization/default.nix and:
             - Comment one of the imports (docker.nix or podman.nix)
             - Keep only one container runtime active
         '';
