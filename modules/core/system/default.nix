@@ -13,6 +13,7 @@
     ./system-packages.nix
     ./serial-devices.nix
     ./no-sleep.nix
+    ./hm-gtk-compat.nix
   ];
 
   options.system-config = {
