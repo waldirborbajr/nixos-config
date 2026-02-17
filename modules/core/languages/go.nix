@@ -21,6 +21,7 @@
       golangci-lint # Linter
       go-task # Task runner (alternative to Make)
       air # Hot reload
+      staticcheck
     ];
 
     # ========================================
