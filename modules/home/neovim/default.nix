@@ -12,7 +12,13 @@
   config = lib.mkIf config.apps.neovim.enable {
     home.packages = with pkgs; [
       neovim
+      # Tree-sitter CLI and grammars for neovim
+      tree-sitter
     ];
+
+    # Install tree-sitter grammars system-wide to avoid dynamic compilation
+    home.file.".local/share/nvim/nix-treesitter".source =
+      "${pkgs.vimPlugins.nvim-treesitter.withAllGrammars}/parser";
 
     home.sessionVariables = {
       EDITOR = "nvim";
