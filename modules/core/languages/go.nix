@@ -21,7 +21,7 @@
       golangci-lint # Linter
       go-task # Task runner (alternative to Make)
       air # Hot reload
-      go-staticcheck # Static analysis tool
+      go-tools # Static analysis (includes staticcheck from dominikh/go-tools)
     ];
 
     # ========================================
