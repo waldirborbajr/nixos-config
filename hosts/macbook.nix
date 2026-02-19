@@ -22,6 +22,7 @@
     # Desktops - Multiple sessions available at GDM
     ../modules/core/desktops/gnome.nix
     ../modules/core/desktops/niri/system.nix # Niri as alternative session
+    ../modules/core/desktops/cosmic/system.nix # COSMIC as alternative session
     ../modules/core/autologin.nix
 
     # Secrets management
