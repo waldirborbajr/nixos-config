@@ -60,7 +60,7 @@ in
     # User apps (migrated from system)
     browsers.enable = true;
     communication.enable = true;
-    helix.enable = false;
+    helix.enable = true;
     neovim.enable = true;
     starship.enable = true;
     ides.enable = true;
