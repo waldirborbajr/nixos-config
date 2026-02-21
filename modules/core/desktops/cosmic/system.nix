@@ -29,7 +29,6 @@
     cosmic-ext-ctl
     cosmic-ext-applet-caffeine
     cosmic-ext-applet-external-monitor-brightness
-    cosmic-ext-applet-emoji-selector
     cosmic-ext-applet-minimon
     cosmic-ext-applet-privacy-indicator
     cosmic-ext-applet-sysinfo
