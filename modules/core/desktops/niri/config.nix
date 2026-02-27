@@ -62,7 +62,7 @@ let
                 // dwtp
                 // drag false
                 // drag-lock
-                natural-scroll
+                // natural-scroll
                 // accel-speed 0.2
                 // accel-profile "flat"
                 // scroll-method "two-finger"
@@ -393,8 +393,8 @@ let
               // APPLICATIONS
               // ========================================
               Mod+Return hotkey-overlay-title="Open terminal: alacritty" { spawn "${term}"; }
-              Mod+Shift+Return hotkey-overlay-title="Run launcher: rofi" { spawn "rofi" "-show" "drun" "-show-icons"; }
-              Mod+D { spawn "${menu}"; }
+              Mod+D hotkey-overlay-title="Run launcher: rofi" { spawn "rofi" "-show" "drun" "-show-icons"; }
+              // Mod+D { spawn "${menu}"; }
               Mod+B { spawn "${browser}"; }
               Mod+E hotkey-overlay-title="Open emacs" { spawn "emacsclient" "-c" "-a" "emacs"; }
               Mod+W hotkey-overlay-title="Open browser: brave" { spawn "brave"; }
