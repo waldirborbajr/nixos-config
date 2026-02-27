@@ -139,7 +139,7 @@ let
         // https://yalter.github.io/niri/Configuration:-Layout
         layout {
             // Set gaps around windows in logical pixels.
-            gaps 8
+            gaps 5
 
             // When to center a column when changing focus, options are:
             // - "never", default behavior, focusing an off-screen column will keep at the left
@@ -157,7 +157,7 @@ let
                 proportion 0.33333
                 proportion 0.5
                 proportion 0.66667
-                proportion 0.9
+                // proportion 0.9
 
                 // Fixed sets the width in logical pixels exactly.
                 // fixed 1920
@@ -188,7 +188,7 @@ let
                 // off
 
                 // How many logical pixels the ring extends out from the windows.
-                width 2
+                width 1.5
 
                 // Colors can be set in a variety of ways:
                 // - CSS named colors: "red"
@@ -226,7 +226,7 @@ let
                 // If you enable the border, you probably want to disable the focus ring.
                 off
 
-                width 4
+                width 1.5
                 active-color "#5f8787"
                 inactive-color "#505050"
 
@@ -358,11 +358,9 @@ let
 
         // Open the Firefox picture-in-picture player as floating by default.
         window-rule {
-            // This app-id regular expression will work for both:
-            // - host Firefox (app-id is "firefox")
-            // - Flatpak Firefox (app-id is "org.mozilla.firefox")
-            match app-id=r#"firefox$"# title="^Picture-in-Picture$"
-            open-floating true
+            match title="Firefox"
+            open-on-workspace "c"
+            open-maximized true
         }
 
         // Example: block out two password managers from screen capture.
