@@ -50,6 +50,7 @@ in
       swaybg
       waypaper
       swayidle
+      quickshell
     ];
 
     # Wallpaper
