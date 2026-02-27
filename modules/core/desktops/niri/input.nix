@@ -25,7 +25,7 @@ let
           variant ",intl"
           model "apple"
         }
-        repeat-delay 250
+        repeat-delay 200
         repeat-rate 35
         track-layout "global"
         // Enable numlock on startup
