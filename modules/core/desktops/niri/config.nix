@@ -391,8 +391,8 @@ let
               // APPLICATIONS
               // ========================================
               Mod+Return hotkey-overlay-title="Open terminal: alacritty" { spawn "${term}"; }
-              Mod+D hotkey-overlay-title="Run launcher: rofi" { spawn "rofi" "-show" "drun" "-show-icons"; }
-              // Mod+D { spawn "${menu}"; }
+              // Mod+D hotkey-overlay-title="Run launcher: rofi" { spawn "rofi" "-show" "drun" "-show-icons"; }
+              Mod+D { spawn "${menu}"; }
               Mod+B { spawn "${browser}"; }
               Mod+E hotkey-overlay-title="Open emacs" { spawn "emacsclient" "-c" "-a" "emacs"; }
               Mod+W hotkey-overlay-title="Open browser: brave" { spawn "brave"; }
