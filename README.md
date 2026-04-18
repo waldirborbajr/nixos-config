@@ -628,3 +628,11 @@ Declarative infrastructure. Pragmatic design. Zero waste.
 Inspired by the NixOS community and various configuration examples.
 
 Special thanks to contributors and maintainers of NixOS, Home Manager, and related projects.
+
+---
+
+### REFs
+
+```
+https://github.com/Youthdreamer/nixos-config
+```
