@@ -5,6 +5,9 @@
 # - reproducible + debuggable
 # - auto-commit + push sempre para build/switch/switch-prod
 # ==========================================
+# NixOS flake task runner
+# Usage: just <recipe>
+# https://github.com/fbosch/nixos
 
 # Settings
 set shell := ["bash", "-euo", "pipefail", "-c"]
@@ -343,3 +346,4 @@ gh-clean-failed:
       -q '.[].databaseId' \
     | xargs -n1 gh run delete
     echo "✓ Failed runs cleaned up!"
+
