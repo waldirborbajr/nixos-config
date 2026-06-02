@@ -1,8 +1,11 @@
+<h1>
+❄️ NixOS - # BORBA JR, W - Configuration ❄️
+</h1>
+
 [![NixOS CI](https://github.com/waldirborbajr/nixos-config/workflows/NixOS%20Configuration%20CI/badge.svg?branch=REFACTORv2)](https://github.com/waldirborbajr/nixos-config/actions/workflows/ci.yml)
 [![Nix Flake](https://img.shields.io/badge/nix-flakes-blue?logo=nixos&logoColor=white)](https://nixos.org)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
 
-# BORBA JR, W – NixOS Configuration ❄️
 
 # 🧊 nixos-config
 
