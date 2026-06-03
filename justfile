@@ -206,3 +206,21 @@ switch-off HOST="macbook" DEVOPS="" QEMU="" IMPURE="":
     @just _require_host {{HOST}}
     sudo systemctl isolate multi-user.target
     @just
+
+# ==========================================
+# Maintenance
+# ==========================================
+[group: 'maintenance']
+gc:
+    @echo "Collecting Nix garbage..."
+    nix store gc --verbose \
+        --option keep-build-log false \
+        --option keep-derivations false \
+        --option keep-env-derivations false \
+        --option keep-failed false \
+        --option keep-going false \
+        --option keep-outputs false
+    nix-collect-garbage --delete-old
+    nix store optimise --verbose
+    @echo "Disk usage after GC:"
+    du -cksh /nix
