@@ -224,3 +224,11 @@ gc:
     nix store optimise --verbose
     @echo "Disk usage after GC:"
     du -cksh /nix
+
+gc3 KEEP_GENS="3":
+    @echo "Removing old generations (keeping last {{KEEP_GENS}})..."
+    nix-env --delete-generations +{{KEEP_GENS}} || true
+    nix-collect-garbage --delete-older-than 30d
+    nix store optimise --verbose
+    @echo "Disk usage after GC:"
+    du -cksh /nix
