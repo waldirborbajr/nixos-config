@@ -638,4 +638,5 @@ Special thanks to contributors and maintainers of NixOS, Home Manager, and relat
 
 ```
 https://github.com/Youthdreamer/nixos-config
+https://git.voidarc.co.uk/voidarc
 ```
