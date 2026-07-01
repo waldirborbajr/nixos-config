@@ -20,6 +20,7 @@
     AllowHibernation = "no";           # disable Hibernate
     AllowHybridSleep = "no";           # disable Hybrid Sleep
     AllowSuspendThenHibernate = "no";  # disable suspend-then-hibernate
+    MemorySleepMode = "s2idle";        # force s2idle instead of deep sleep
   };
 
   networking.hostName = "nixos"; # Define your hostname.
