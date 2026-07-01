@@ -15,6 +15,13 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
+  systemd.sleep.settings.Sleep = {
+    AllowSuspend = "yes";              # se quiser só desabilitar hibernação, mantenha Suspend habilitado
+    AllowHibernation = "no";           # desabilita hibernação (Hibernate)
+    AllowHybridSleep = "no";           # desabilita sleep híbrido (Hybrid Sleep)
+    AllowSuspendThenHibernate = "no";  # desabilita suspend-então-hibernate
+  };
+
   networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
