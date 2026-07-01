@@ -200,7 +200,12 @@ programs.i3lock.enable = true; # default i3 screen locker
     ripgrep
     zsh
     yazi
+    eza
+    bat
     lazygit
+    btop
+    htop
+    tmux
 #     discord
 #     brave
 #     chromium
@@ -217,7 +222,7 @@ programs.i3lock.enable = true; # default i3 screen locker
 #     lolcat
      xkill
     xclip
-#     coreutils
+    coreutils
 #     element-web
 #     zed-editor
 #     bluez
@@ -228,28 +233,24 @@ programs.i3lock.enable = true; # default i3 screen locker
 #     libvterm
 #     libtool
 
-# # C/C++ toolchain — commented out of the system-wide profile since Devbox
-# # (distrobox/podman) is meant to provide isolated per-project toolchains.
-# # Uncomment individually if you need one of these available system-wide
-# # regardless of any container/devShell.
-#     gcc
-#     glibc
-#     libcxx
-#     gdb
-#     cmake
-#     gnumake
-#     libgcc
+     gcc
+     glibc
+     libcxx
+     gdb
+     cmake
+     gnumake
+     libgcc
 
 #     pam_u2f
 #     ispell
-# # language servers
-#     gopls
+ # language servers
+     gopls
 #     haskell-language-server
-# # rust stuff
-#     jetbrains.rust-rover
-#     rustup
+ # rust stuff
+     jetbrains.rust-rover
+     rustup
 # # languages
-#     go
+     go
 # # yak shaving
 #     greetd
 #     tuigreet
