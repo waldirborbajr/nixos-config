@@ -141,6 +141,14 @@
 #     kdePackages.kdenlive
 #     obs-studio
 #     mesa # OpenCL for graphics x Davinci on Linux
+
+    # Catppuccin sddm theme
+    (pkgs.catppuccin-sddm.override {
+      flavor = "mocha";
+      font = "Fira Mono Nerd Font";
+      fontSize = "11";
+      background = null;
+    })
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
