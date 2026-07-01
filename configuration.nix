@@ -39,10 +39,10 @@
   services.blueman.enable = true;
 
   # GPU acceleration (video playback, terminal rendering, compositing, etc.)
-  hardware.graphics = {
-    enable = true;
-    enable32Bit = true;
-  };
+#  hardware.graphics = {
+#    enable = true;
+#    enable32Bit = true;
+#  };
 
   # Set your time zone.
   time.timeZone = "America/Sao_Paulo";
