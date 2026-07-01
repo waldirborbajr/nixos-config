@@ -32,7 +32,16 @@
   # Enable networking
   networking.networkmanager.enable = true;
 
+  # Bluetooth backend — required for blueman (tray/GUI) to find any adapter.
+  hardware.bluetooth.enable = true;
+  hardware.bluetooth.powerOnBoot = true;
   services.blueman.enable = true;
+
+  # GPU acceleration (video playback, terminal rendering, compositing, etc.)
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true;
+  };
 
   # Set your time zone.
   time.timeZone = "America/Sao_Paulo";
@@ -52,22 +61,24 @@
     LC_TIME = "pt_BR.UTF-8";
   };
 
-  fonts.packages = with pkgs; [
-    noto-fonts
-    noto-fonts-cjk-sans
-    noto-fonts-color-emoji
-
-    dejavu_fonts
-
-    jetbrains-mono
-
-    nerd-fonts.fira-code
-    nerd-fonts.fira-mono
-    nerd-fonts.jetbrains-mono
-  ];
-
+  # ----- Fonts (merged into a single block)
   fonts = {
     enableDefaultPackages = true;
+
+    packages = with pkgs; [
+      noto-fonts
+      noto-fonts-cjk-sans
+      noto-fonts-color-emoji
+
+      dejavu_fonts
+
+      jetbrains-mono
+
+      nerd-fonts.fira-code
+      nerd-fonts.fira-mono
+      nerd-fonts.jetbrains-mono
+    ];
+
     fontconfig = {
       enable = true;
       defaultFonts = {
@@ -77,6 +88,7 @@
       };
     };
   };
+  # ----- /Fonts
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -127,7 +139,10 @@
     };
   };
 
-  services.desktopManager.gnome.enable = true;
+  # Full GNOME desktop removed — only the pieces i3 actually needs to behave
+  # well (keyring for secrets/wifi passwords, polkit for privilege prompts).
+  services.gnome.gnome-keyring.enable = true;
+  security.polkit.enable = true;
 
   services.displayManager.defaultSession = "none+i3";
 
@@ -165,6 +180,14 @@ programs.i3lock.enable = true; # default i3 screen locker
     firefox.enable = true;
     fish.enable = true;
   };
+
+  # Keep the Nix store from growing unbounded across frequent rebuilds.
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 14d";
+  };
+  nix.optimise.automatic = true;
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
@@ -204,13 +227,19 @@ programs.i3lock.enable = true; # default i3 screen locker
 #     emacsPackages.vterm
 #     libvterm
 #     libtool
-     gcc
-     glibc
-     libcxx
-     gdb
-     cmake
-     gnumake
-     libgcc
+
+# # C/C++ toolchain — commented out of the system-wide profile since Devbox
+# # (distrobox/podman) is meant to provide isolated per-project toolchains.
+# # Uncomment individually if you need one of these available system-wide
+# # regardless of any container/devShell.
+#     gcc
+#     glibc
+#     libcxx
+#     gdb
+#     cmake
+#     gnumake
+#     libgcc
+
 #     pam_u2f
 #     ispell
 # # language servers
@@ -233,14 +262,6 @@ programs.i3lock.enable = true; # default i3 screen locker
 #     kdePackages.kdenlive
 #     obs-studio
 #     mesa # OpenCL for graphics x Davinci on Linux
-
-    # Catppuccin sddm theme
-    (pkgs.catppuccin-sddm.override {
-      flavor = "mocha";
-      font = "Fira Mono Nerd Font";
-      fontSize = "11";
-      background = null;
-    })
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
