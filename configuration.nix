@@ -18,6 +18,12 @@
   # systemd.sleep.extraConfig = ''
   #   MemorySleepMode=s2idle
   # '';
+  systemd.sleep.extraConfig = ''
+    AllowSuspend=yes         # 如果只想禁用休眠，可以保持 Suspend 启用
+    AllowHibernation=no      # 禁用休眠 (Hibernate)
+    AllowHybridSleep=no      # 禁用混合睡眠 (Hybrid Sleep)
+    AllowSuspendThenHibernate=no # 禁用先睡眠后休眠
+  '';
 
   networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
