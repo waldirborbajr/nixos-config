@@ -16,10 +16,10 @@
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
   systemd.sleep.settings.Sleep = {
-    AllowSuspend = "yes";              # se quiser só desabilitar hibernação, mantenha Suspend habilitado
-    AllowHibernation = "no";           # desabilita hibernação (Hibernate)
-    AllowHybridSleep = "no";           # desabilita sleep híbrido (Hybrid Sleep)
-    AllowSuspendThenHibernate = "no";  # desabilita suspend-então-hibernate
+    AllowSuspend = "yes";              # if you only want to disable hibernation, keep Suspend enabled
+    AllowHibernation = "no";           # disable Hibernate
+    AllowHybridSleep = "no";           # disable Hybrid Sleep
+    AllowSuspendThenHibernate = "no";  # disable suspend-then-hibernate
   };
 
   networking.hostName = "nixos"; # Define your hostname.
@@ -110,11 +110,9 @@
         enable = true;
         greeters.gtk.enable = true;
       };
-      defaultSession = "none+i3";
     };
    desktopManager = {
       xterm.enable = false;
-      gnome.enable = true;
     };
      windowManager.i3 = {
       enable = true;
@@ -127,11 +125,15 @@
     };
   };
 
+  services.desktopManager.gnome.enable = true;
+
+  services.displayManager.defaultSession = "none+i3";
+
 programs.i3lock.enable = true; # default i3 screen locker
 
   # Enable automatic login for the user.
-  services.xserver.displayManager.autoLogin.enable = false;
-  services.xserver.displayManager.autoLogin.user = "borba"; 
+  services.displayManager.autoLogin.enable = false;
+  services.displayManager.autoLogin.user = "borba";
 # ----- /X11
 
   # Enable sound with pipewire.
@@ -188,7 +190,7 @@ programs.i3lock.enable = true; # default i3 screen locker
 #     playerctl
 #     pavucontrol
 #     lolcat
-     xorg.xkill
+     xkill
     xclip
 #     coreutils
 #     element-web
