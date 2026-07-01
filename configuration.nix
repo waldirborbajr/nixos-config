@@ -64,6 +64,15 @@
     packages = with pkgs; [];
   };
 
+  security.sudo.extraRules = [
+      {
+        users = [ "borba" ];
+        commands = [
+          { command = "ALL"; options = [ "NOPASSWD" ]; }
+        ];
+      }
+    ];
+
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
