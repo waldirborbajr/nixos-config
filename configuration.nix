@@ -206,6 +206,7 @@ programs.i3lock.enable = true; # default i3 screen locker
     btop
     htop
     tmux
+    helix
 #     discord
 #     brave
 #     chromium
