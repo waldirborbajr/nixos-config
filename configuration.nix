@@ -69,14 +69,14 @@
       noto-fonts
       noto-fonts-cjk-sans
       noto-fonts-color-emoji
-
       dejavu_fonts
-
       jetbrains-mono
-
+    
       nerd-fonts.fira-code
       nerd-fonts.fira-mono
       nerd-fonts.jetbrains-mono
+      nerd-fonts.iosevka-term   # exemplo
+      nerd-fonts.caskaydia-cove # Cascadia Code Nerd Font
     ];
 
     fontconfig = {
