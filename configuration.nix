@@ -100,8 +100,67 @@
       }
     ];
 
+# ----- /X11
+
+  # Enable the X11 windowing system.
+  services.xserver = {
+    enable = true;
+    displayManager = {
+      lightdm = {
+        enable = true;
+        greeters.gtk.enable = true;
+      };
+      defaultSession = "none+i3";
+    };
+   desktopManager = {
+      xterm.enable = false;
+      gnome.enable = true;
+    };
+     windowManager.i3 = {
+      enable = true;
+      extraPackages = with pkgs; [
+        polybar
+        i3status
+        i3blocks
+        rofi
+      ];
+    };
+  };
+
+programs.i3lock.enable = true; # default i3 screen locker
+
+  # Enable automatic login for the user.
+  services.xserver.displayManager.autoLogin.enable = false;
+  services.xserver.displayManager.autoLogin.user = "borba"; 
+# ----- /X11
+
+  # Enable sound with pipewire.
+  services.pulseaudio.enable = false;
+  security.rtkit.enable = true;
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+    # If you want to use JACK applications, uncomment this
+    #jack.enable = true;
+
+    # use the example session manager (no others are packaged yet so this is enabled by default,
+    # no need to redefine it in your config for now)
+    #media-session.enable = true;
+  };
+
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
+#  nixpkgs.config.permittedInsecurePackages = [
+#    "broadcom-sta-6.30.223.271-57-6.12.41"
+#  ];
+
+  # Install firefox.
+  programs = {
+    firefox.enable = true;
+    fish.enable = true;
+  };
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
@@ -116,8 +175,7 @@
 #     brave
 #     chromium
 #     flameshot
-#     alacritty
-#     fish
+     alacritty
 #     emacs
 #     rofi
 #     yubikey-agent
@@ -127,8 +185,8 @@
 #     playerctl
 #     pavucontrol
 #     lolcat
-#     xorg.xkill
-#     xclip
+     xorg.xkill
+    xclip
 #     coreutils
 #     element-web
 #     zed-editor
@@ -139,13 +197,13 @@
 #     emacsPackages.vterm
 #     libvterm
 #     libtool
-#     gcc
-#     glibc
-#     libcxx
-#     gdb
-#     cmake
-#     gnumake
-#     libgcc
+     gcc
+     glibc
+     libcxx
+     gdb
+     cmake
+     gnumake
+     libgcc
 #     pam_u2f
 #     ispell
 # # language servers
