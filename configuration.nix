@@ -171,6 +171,9 @@ programs.i3lock.enable = true; # default i3 screen locker
     neovim
     stow
     ripgrep
+    zsh
+    yazi
+    lazygit
 #     discord
 #     brave
 #     chromium
