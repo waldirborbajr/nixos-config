@@ -84,7 +84,7 @@
       defaultFonts = {
         serif = ["Noto Sans" "Noto Sans CJK SC"];
         sansSerif = ["Noto Serif" "Noto Serif CJK SC"];
-        monospace = ["JetBrainsMono Nerd Font" "Fira Code"];
+        monospace = ["FiraCode Nerd Font" "JetBrainsMono Nerd Font"];
       };
     };
   };
