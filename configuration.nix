@@ -217,6 +217,8 @@
     options = "--delete-older-than 3d";
   };
   nix.optimise.automatic = true;
+  
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
