@@ -149,14 +149,7 @@
     enable = true;
     settings = {
       default_session = {
-        command = ''
-          ${pkgs.tuigreet}/bin/tuigreet \
-            --time \
-            --remember \
-            --remember-user-session \
-            --asterisks \
-            --sessions /run/current-system/sw/share/wayland-sessions,/run/current-system/sw/share/xsessions
-        '';
+        command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --remember-user-session --asterisks --sessions /run/current-system/sw/share/wayland-sessions,/run/current-system/sw/share/xsessions";
         user = "greeter";
       };
     };
