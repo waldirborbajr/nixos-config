@@ -118,39 +118,9 @@
 
   # ----- /X11
 
-  # Enable the X11 windowing system.
+  # Enable the X11 windowing system (still needed for i3, even with greetd as login manager).
   services.xserver = {
     enable = true;
-    displayManager = {
-      lightdm = {
-        enable = true;
-        greeters.gtk = {
-          enable = true;
-          theme = {
-            package = pkgs.catppuccin-gtk.override {
-              accents = ["mauve"];
-              size = "standard";
-              variant = "mocha";
-            };
-            name = "Catppuccin-Mocha-Standard-Mauve-Dark";
-          };
-          iconTheme = {
-            package = pkgs.papirus-icon-theme;
-            name = "Papirus-Dark";
-          };
-          cursorTheme = {
-            package = pkgs.catppuccin-cursors.mochaDark;
-            name = "catppuccin-mocha-dark-cursors";
-          };
-          extraConfig = ''
-            font-name = FiraCode Nerd Font 11
-            xft-antialias = true
-            xft-hintstyle = hintslight
-            indicators = ~host;~spacer;~clock;~spacer;~session;~language;~a11y;~power
-          '';
-        };
-      };
-    };
     desktopManager = {
       xterm.enable = false;
     };
@@ -165,18 +135,37 @@
     };
   };
 
-  # Full GNOME desktop removed — only the pieces i3 actually needs to behave
+  # Full GNOME desktop removed — only the pieces i3/Sway actually need to behave
   # well (keyring for secrets/wifi passwords, polkit for privilege prompts).
   services.gnome.gnome-keyring.enable = true;
   security.polkit.enable = true;
 
-  services.displayManager.defaultSession = "none+i3";
+  # ----- Login manager: greetd + tuigreet -----
+  # Replaces LightDM. greetd is a minimal, session-agnostic login daemon;
+  # tuigreet is a TUI greeter that autodiscovers both X11 (xsessions) and
+  # Wayland (wayland-sessions) entries — so i3 and Sway both show up as
+  # selectable sessions, and it remembers your last choice per user.
+  services.greetd = {
+    enable = true;
+    settings = {
+      default_session = {
+        command = ''
+          ${pkgs.greetd.tuigreet}/bin/tuigreet \
+            --time \
+            --remember \
+            --remember-user-session \
+            --asterisks \
+            --sessions /run/current-system/sw/share/wayland-sessions:/run/current-system/sw/share/xsessions
+        '';
+        user = "greeter";
+      };
+    };
+  };
+
+  # Lets gnome-keyring unlock automatically on greetd login (same as it did via LightDM's PAM).
+  security.pam.services.greetd.enableGnomeKeyring = true;
 
   programs.i3lock.enable = true; # default i3 screen locker
-
-  # Enable automatic login for the user.
-  services.displayManager.autoLogin.enable = false;
-  services.displayManager.autoLogin.user = "borba";
   # ----- /X11
 
   # Enable sound with pipewire.
@@ -283,10 +272,7 @@
       #     pam_u2f
       #     ispell
       # # yak shaving
-      greetd
-      tuigreet
       lxappearance # customize i3 without changing config
-      lightdm # display manager for login
       autorandr # auto select a display configuration based on connected devices.
       # # update bios as needed
       #     fwupd
