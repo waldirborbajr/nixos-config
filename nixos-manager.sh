@@ -11,7 +11,7 @@
 #   ./nixos-manager.sh <opcao> <host>      # roda direto num host específico: flake dell
 #   NIXOS_FLAKE_ATTR=dell ./nixos-manager.sh flake   # força o host via env var
 #
-# Requisitos: repo git em /etc/nixos com o flake configurado (branch m2config).
+# Requisitos: repo git em /etc/nixos com o flake configurado (branch main).
 #
 # Hosts conhecidos (definidos no flake.nix -> nixosConfigurations):
 #   m2utm       (macutm)    aarch64-linux
@@ -25,7 +25,7 @@
 set -euo pipefail
 
 NIXOS_DIR="/home/borba/nixos-config"
-GIT_BRANCH="m2config"
+GIT_BRANCH="main"
 
 # attr do flake -> nome real da máquina (usado pra auto-detecção via `hostname`)
 declare -A HOST_ATTR_TO_MACHINE=(
