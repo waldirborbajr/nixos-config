@@ -1,17 +1,26 @@
 {
-  description = "borba's NixOS configuration";
+  description = "Master Flake for Borba NixOS Config";
+
   inputs = {
-    #nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
   };
+
   outputs = {
     self,
     nixpkgs,
+    nixpkgs-unstable,
     ...
   } @ inputs: {
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
-      specialArgs = {inherit inputs;};
+      specialArgs = {
+        inherit inputs;
+        pkgs-unstable = import nixpkgs-unstable {
+          system = "x86_64-linux";
+          config.allowUnfree = true;
+        };
+      };
       modules = [
         ./configuration.nix
       ];
