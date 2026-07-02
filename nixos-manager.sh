@@ -31,7 +31,7 @@ GIT_BRANCH="m2config"
 declare -A HOST_ATTR_TO_MACHINE=(
   [MacBook M2 - UTM]="macutm"
   [Dell Inspiron 1456]="dell1456"
-  [MacBook Pro 13\" (2011)]="mac2011"
+  [MacBook Pro 13pol (2011)]="mac2011"
 )
 FLAKE_ATTRS=(m2utm dell macbook2011)
 
