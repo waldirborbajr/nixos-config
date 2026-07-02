@@ -5,11 +5,11 @@
   config,
   pkgs,
   pkgs-unstable,
+  hostname,
   ...
 }: {
   imports = [
-    # Include the results of the hardware scan.
-    ./hardware-configuration.nix
+    # hardware-configuration.nix is imported per-host via flake.nix
   ];
 
   # Bootloader.
@@ -25,7 +25,7 @@
     MemorySleepMode = "s2idle"; # force s2idle instead of deep sleep
   };
 
-  networking.hostName = "nixos"; # Define your hostname.
+  networking.hostName = hostname; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Configure network proxy if necessary
