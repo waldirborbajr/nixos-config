@@ -1,14 +1,15 @@
 # Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
-
-{ config, pkgs, ... }:
-
 {
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-    ];
+  config,
+  pkgs,
+  ...
+}: {
+  imports = [
+    # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+  ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -16,11 +17,11 @@
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
   systemd.sleep.settings.Sleep = {
-    AllowSuspend = "yes";              # if you only want to disable hibernation, keep Suspend enabled
-    AllowHibernation = "no";           # disable Hibernate
-    AllowHybridSleep = "no";           # disable Hybrid Sleep
-    AllowSuspendThenHibernate = "no";  # disable suspend-then-hibernate
-    MemorySleepMode = "s2idle";        # force s2idle instead of deep sleep
+    AllowSuspend = "yes"; # if you only want to disable hibernation, keep Suspend enabled
+    AllowHibernation = "no"; # disable Hibernate
+    AllowHybridSleep = "no"; # disable Hybrid Sleep
+    AllowSuspendThenHibernate = "no"; # disable suspend-then-hibernate
+    MemorySleepMode = "s2idle"; # force s2idle instead of deep sleep
   };
 
   networking.hostName = "nixos"; # Define your hostname.
@@ -39,10 +40,10 @@
   services.blueman.enable = true;
 
   # GPU acceleration (video playback, terminal rendering, compositing, etc.)
-#  hardware.graphics = {
-#    enable = true;
-#    enable32Bit = true;
-#  };
+  #  hardware.graphics = {
+  #    enable = true;
+  #    enable32Bit = true;
+  #  };
 
   # Set your time zone.
   time.timeZone = "America/Sao_Paulo";
@@ -72,11 +73,11 @@
       noto-fonts-color-emoji
       dejavu_fonts
       jetbrains-mono
-    
+
       nerd-fonts.fira-code
       nerd-fonts.fira-mono
       nerd-fonts.jetbrains-mono
-      nerd-fonts.iosevka-term   # exemplo
+      nerd-fonts.iosevka-term # exemplo
       nerd-fonts.caskaydia-cove # Cascadia Code Nerd Font
     ];
 
@@ -102,20 +103,23 @@
     isNormalUser = true;
     home = "/home/borba";
     description = "borba w jr";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = ["networkmanager" "wheel"];
     packages = with pkgs; [];
   };
 
   security.sudo.extraRules = [
-      {
-        users = [ "borba" ];
-        commands = [
-          { command = "ALL"; options = [ "NOPASSWD" ]; }
-        ];
-      }
-    ];
+    {
+      users = ["borba"];
+      commands = [
+        {
+          command = "ALL";
+          options = ["NOPASSWD"];
+        }
+      ];
+    }
+  ];
 
-# ----- /X11
+  # ----- /X11
 
   # Enable the X11 windowing system.
   services.xserver = {
@@ -126,10 +130,10 @@
         greeters.gtk.enable = true;
       };
     };
-   desktopManager = {
+    desktopManager = {
       xterm.enable = false;
     };
-     windowManager.i3 = {
+    windowManager.i3 = {
       enable = true;
       extraPackages = with pkgs; [
         polybar
@@ -147,12 +151,12 @@
 
   services.displayManager.defaultSession = "none+i3";
 
-programs.i3lock.enable = true; # default i3 screen locker
+  programs.i3lock.enable = true; # default i3 screen locker
 
   # Enable automatic login for the user.
   services.displayManager.autoLogin.enable = false;
   services.displayManager.autoLogin.user = "borba";
-# ----- /X11
+  # ----- /X11
 
   # Enable sound with pipewire.
   services.pulseaudio.enable = false;
@@ -172,9 +176,9 @@ programs.i3lock.enable = true; # default i3 screen locker
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
-#  nixpkgs.config.permittedInsecurePackages = [
-#    "broadcom-sta-6.30.223.271-57-6.12.41"
-#  ];
+  #  nixpkgs.config.permittedInsecurePackages = [
+  #    "broadcom-sta-6.30.223.271-57-6.12.41"
+  #  ];
 
   # Install firefox.
   programs = {
@@ -193,7 +197,7 @@ programs.i3lock.enable = true; # default i3 screen locker
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
     git
     neovim
@@ -208,104 +212,103 @@ programs.i3lock.enable = true; # default i3 screen locker
     htop
     tmux
     helix
-#     discord
-#     brave
-#     chromium
-#     flameshot
-     alacritty
-#     emacs
-#     rofi
-#     yubikey-agent
-#     keepassxc
-#     xss-lock
-#     pkgs.networkmanagerapplet
-#     playerctl
-#     pavucontrol
-#     lolcat
-     xkill
+    #     discord
+    #     brave
+    #     chromium
+    #     flameshot
+    alacritty
+    #     emacs
+    #     rofi
+    #     yubikey-agent
+    #     keepassxc
+    #     xss-lock
+    #     pkgs.networkmanagerapplet
+    #     playerctl
+    #     pavucontrol
+    #     lolcat
+    xkill
     xclip
     coreutils
-#     element-web
-#     zed-editor
-#     bluez
-# # emacs deps
-# # make packages available to emacsclient (see nixos wiki's emacs docs)
-#     emacsPackages.pbcopy
-#     emacsPackages.vterm
-#     libvterm
-#     libtool
+    #     element-web
+    #     zed-editor
+    #     bluez
+    # # emacs deps
+    # # make packages available to emacsclient (see nixos wiki's emacs docs)
+    #     emacsPackages.pbcopy
+    #     emacsPackages.vterm
+    #     libvterm
+    #     libtool
 
-     gcc
-     glibc
-     libcxx
-     gdb
-     cmake
-     gnumake
-     libgcc
+    gcc
+    glibc
+    libcxx
+    gdb
+    cmake
+    gnumake
+    libgcc
 
-#     pam_u2f
-#     ispell
-# # yak shaving
-#     greetd
-#     tuigreet
-#     lxappearance # customize i3 without changing config
-#     lightdm # display manager for login
-#     autorandr # auto select a display configuration based on connected devices.
-# # update bios as needed
-#     fwupd
-# # content
-#     kdePackages.kdenlive
-#     obs-studio
-#     mesa # OpenCL for graphics x Davinci on Linux
+    #     pam_u2f
+    #     ispell
+    # # yak shaving
+    #     greetd
+    #     tuigreet
+    #     lxappearance # customize i3 without changing config
+    #     lightdm # display manager for login
+    #     autorandr # auto select a display configuration based on connected devices.
+    # # update bios as needed
+    #     fwupd
+    # # content
+    #     kdePackages.kdenlive
+    #     obs-studio
+    #     mesa # OpenCL for graphics x Davinci on Linux
 
- # ===== Helix language servers / formatters =====
-  # Go (gopls já está na lista)
-  gotools                          # goimports
-  golangci-lint-langserver
+    # ===== Helix language servers / formatters =====
+    # Go (gopls já está na lista)
+    gotools # goimports
+    golangci-lint-langserver
 
-  # Rust (rust-analyzer/rustfmt via rustup ficam inconsistentes no PATH;
-  # prefira os pacotes nixpkgs abaixo em vez de depender do toolchain do rustup)
-  rust-analyzer
-  rustfmt
+    # Rust (rust-analyzer/rustfmt via rustup ficam inconsistentes no PATH;
+    # prefira os pacotes nixpkgs abaixo em vez de depender do toolchain do rustup)
+    rust-analyzer
+    rustfmt
 
-  # Lua
-  lua-language-server
-  stylua
+    # Lua
+    lua-language-server
+    stylua
 
-  # TypeScript / JavaScript
-  #nodePackages.typescript-language-server
-  #nodePackages.typescript          # dá suporte ao tsserver interno
-  #nodePackages.prettier
+    # TypeScript / JavaScript
+    #nodePackages.typescript-language-server
+    #nodePackages.typescript          # dá suporte ao tsserver interno
+    #nodePackages.prettier
 
-  # Python
-  python3Packages.python-lsp-server  # comando: pylsp
-  black
+    # Python
+    python3Packages.python-lsp-server # comando: pylsp
+    black
 
-  # TOML
-  taplo
+    # TOML
+    taplo
 
-  # JSON / JSONC
-  #nodePackages.vscode-langservers-extracted  # dá vscode-json-language-server
+    # JSON / JSONC
+    #nodePackages.vscode-langservers-extracted  # dá vscode-json-language-server
 
-  # YAML
-  #nodePackages.yaml-language-server
+    # YAML
+    #nodePackages.yaml-language-server
 
-  # XML
-  lemminx
+    # XML
+    lemminx
 
-  # Nix
-  nixd
-  alejandra
+    # Nix
+    nixd
+    alejandra
 
-  # Dockerfile
-  #nodePackages.dockerfile-language-server-nodejs  # comando: docker-langserver
+    # Dockerfile
+    #nodePackages.dockerfile-language-server-nodejs  # comando: docker-langserver
 
-  # Markdown
-  marksman
+    # Markdown
+    marksman
 
-  # Bash
-  #nodePackages.bash-language-server
-
+    # Bash
+    #nodePackages.bash-language-server
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -322,7 +325,7 @@ programs.i3lock.enable = true; # default i3 screen locker
   services.openssh.enable = true;
 
   # Open ports in the firewall.
-  networking.firewall.allowedTCPPorts = [ 22 ];
+  networking.firewall.allowedTCPPorts = [22];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
@@ -334,5 +337,4 @@ programs.i3lock.enable = true; # default i3 screen locker
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "26.05"; # Did you read the comment?
-
 }
