@@ -11,19 +11,41 @@
     nixpkgs,
     nixpkgs-unstable,
     ...
-  } @ inputs: {
-    nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      specialArgs = {
-        inherit inputs;
-        pkgs-unstable = import nixpkgs-unstable {
-          system = "x86_64-linux";
-          config.allowUnfree = true;
+  } @ inputs: let
+    mkHost = {
+      hostname,
+      system,
+    }:
+      nixpkgs.lib.nixosSystem {
+        inherit system;
+        specialArgs = {
+          inherit inputs hostname;
+          pkgs-unstable = import nixpkgs-unstable {
+            inherit system;
+            config.allowUnfree = true;
+          };
         };
+        modules = [
+          ./configuration.nix
+          ./hosts/${hostname}/hardware-configuration.nix
+        ];
       };
-      modules = [
-        ./configuration.nix
-      ];
+  in {
+    nixosConfigurations = {
+      m2utm = mkHost {
+        hostname = "m2utm";
+        system = "aarch64-linux";
+      };
+
+      dell = mkHost {
+        hostname = "dell";
+        system = "x86_64-linux";
+      };
+
+      macbook2011 = mkHost {
+        hostname = "macbook2011";
+        system = "x86_64-linux";
+      };
     };
   };
 }
