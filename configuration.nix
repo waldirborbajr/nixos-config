@@ -103,7 +103,7 @@
   users.users."borba" = {
     isNormalUser = true;
     home = "/home/borba";
-    description = "borba w jr";
+    description = "borba jr, w";
     extraGroups = ["networkmanager" "wheel"];
     packages = with pkgs; [];
   };
