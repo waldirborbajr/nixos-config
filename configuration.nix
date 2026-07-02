@@ -273,9 +273,9 @@ programs.i3lock.enable = true; # default i3 screen locker
   stylua
 
   # TypeScript / JavaScript
-  nodePackages.typescript-language-server
-  nodePackages.typescript          # dá suporte ao tsserver interno
-  nodePackages.prettier
+  #nodePackages.typescript-language-server
+  #nodePackages.typescript          # dá suporte ao tsserver interno
+  #nodePackages.prettier
 
   # Python
   python3Packages.python-lsp-server  # comando: pylsp
@@ -285,10 +285,10 @@ programs.i3lock.enable = true; # default i3 screen locker
   taplo
 
   # JSON / JSONC
-  nodePackages.vscode-langservers-extracted  # dá vscode-json-language-server
+  #nodePackages.vscode-langservers-extracted  # dá vscode-json-language-server
 
   # YAML
-  nodePackages.yaml-language-server
+  #nodePackages.yaml-language-server
 
   # XML
   lemminx
@@ -298,13 +298,13 @@ programs.i3lock.enable = true; # default i3 screen locker
   alejandra
 
   # Dockerfile
-  nodePackages.dockerfile-language-server-nodejs  # comando: docker-langserver
+  #nodePackages.dockerfile-language-server-nodejs  # comando: docker-langserver
 
   # Markdown
   marksman
 
   # Bash
-  nodePackages.bash-language-server
+  #nodePackages.bash-language-server
 
   ];
 
