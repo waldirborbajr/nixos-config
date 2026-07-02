@@ -1,19 +1,16 @@
 {
   description = "borba's NixOS configuration";
-
   inputs = {
-    #nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
- nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-26.05";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
   };
-
   outputs = {
     self,
-nixpkgs-stable.url,
-    nixpkgs-unstable.url,
+    nixpkgs-stable,
+    nixpkgs-unstable,
     ...
   } @ inputs: {
-    nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
+    nixosConfigurations.nixos = nixpkgs-stable.lib.nixosSystem {
       system = "x86_64-linux";
       specialArgs = {inherit inputs;};
       modules = [
