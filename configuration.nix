@@ -90,7 +90,6 @@
         monospace = ["FiraCode Nerd Font" "JetBrainsMono Nerd Font"];
       };
     };
-    enableDefaultFonts = true;
   };
   # ----- /Fonts
 
@@ -230,7 +229,7 @@
       duf
       fastfetch
       jq
-      just   
+      just
       gh
       git
       stow
@@ -252,13 +251,13 @@
       #     flameshot
       alacritty
       #     emacs
-          rofi
+      rofi
       #     yubikey-agent
       #     keepassxc
       #     xss-lock
-          pkgs.networkmanagerapplet
-          playerctl
-          pavucontrol
+      pkgs.networkmanagerapplet
+      playerctl
+      pavucontrol
       #     lolcat
       xkill
       xclip
@@ -284,11 +283,11 @@
       #     pam_u2f
       #     ispell
       # # yak shaving
-       greetd
-       tuigreet
-       lxappearance # customize i3 without changing config
-       lightdm # display manager for login
-       autorandr # auto select a display configuration based on connected devices.
+      greetd
+      tuigreet
+      lxappearance # customize i3 without changing config
+      lightdm # display manager for login
+      autorandr # auto select a display configuration based on connected devices.
       # # update bios as needed
       #     fwupd
       # # content
