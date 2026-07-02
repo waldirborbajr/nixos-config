@@ -4,6 +4,7 @@
 {
   config,
   pkgs,
+  pkgs-unstable,
   ...
 }: {
   imports = [
@@ -222,120 +223,126 @@
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs; [
-    #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-    wget
-    git
-    neovim
-    stow
-    ripgrep
-    zsh
-    yazi
-    eza
-    bat
-    lazygit
-    btop
-    htop
-    tmux
-    helix
-    #     discord
-    #     brave
-    #     chromium
-    #     flameshot
-    alacritty
-    #     emacs
-    #     rofi
-    #     yubikey-agent
-    #     keepassxc
-    #     xss-lock
-    #     pkgs.networkmanagerapplet
-    #     playerctl
-    #     pavucontrol
-    #     lolcat
-    xkill
-    xclip
-    coreutils
-    #     element-web
-    #     zed-editor
-    #     bluez
-    # # emacs deps
-    # # make packages available to emacsclient (see nixos wiki's emacs docs)
-    #     emacsPackages.pbcopy
-    #     emacsPackages.vterm
-    #     libvterm
-    #     libtool
+  environment.systemPackages =
+    (with pkgs; [
+      #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+      wget
+      git
+      stow
+      ripgrep
+      zsh
+      yazi
+      eza
+      bat
+      lazygit
+      btop
+      htop
+      tmux
+      helix
+      #     discord
+      #     brave
+      #     chromium
+      #     flameshot
+      alacritty
+      #     emacs
+      #     rofi
+      #     yubikey-agent
+      #     keepassxc
+      #     xss-lock
+      #     pkgs.networkmanagerapplet
+      #     playerctl
+      #     pavucontrol
+      #     lolcat
+      xkill
+      xclip
+      coreutils
+      #     element-web
+      #     zed-editor
+      #     bluez
+      # # emacs deps
+      # # make packages available to emacsclient (see nixos wiki's emacs docs)
+      #     emacsPackages.pbcopy
+      #     emacsPackages.vterm
+      #     libvterm
+      #     libtool
 
-    gcc
-    glibc
-    libcxx
-    gdb
-    cmake
-    gnumake
-    libgcc
+      gcc
+      glibc
+      libcxx
+      gdb
+      cmake
+      gnumake
+      libgcc
 
-    #     pam_u2f
-    #     ispell
-    # # yak shaving
-    #     greetd
-    #     tuigreet
-    #     lxappearance # customize i3 without changing config
-    #     lightdm # display manager for login
-    #     autorandr # auto select a display configuration based on connected devices.
-    # # update bios as needed
-    #     fwupd
-    # # content
-    #     kdePackages.kdenlive
-    #     obs-studio
-    #     mesa # OpenCL for graphics x Davinci on Linux
+      #     pam_u2f
+      #     ispell
+      # # yak shaving
+      #     greetd
+      #     tuigreet
+      #     lxappearance # customize i3 without changing config
+      #     lightdm # display manager for login
+      #     autorandr # auto select a display configuration based on connected devices.
+      # # update bios as needed
+      #     fwupd
+      # # content
+      #     kdePackages.kdenlive
+      #     obs-studio
+      #     mesa # OpenCL for graphics x Davinci on Linux
 
-    # ===== Helix language servers / formatters =====
-    # Go (gopls já está na lista)
-    gotools # goimports
-    golangci-lint-langserver
+      # ===== Helix language servers / formatters =====
+      # Go (gopls já está na lista)
+      gotools # goimports
+      golangci-lint-langserver
 
-    # Rust (rust-analyzer/rustfmt via rustup ficam inconsistentes no PATH;
-    # prefira os pacotes nixpkgs abaixo em vez de depender do toolchain do rustup)
-    rust-analyzer
-    rustfmt
+      # Rust (rust-analyzer/rustfmt via rustup ficam inconsistentes no PATH;
+      # prefira os pacotes nixpkgs abaixo em vez de depender do toolchain do rustup)
+      rust-analyzer
+      rustfmt
 
-    # Lua
-    lua-language-server
-    stylua
+      # Lua
+      lua-language-server
+      stylua
 
-    # TypeScript / JavaScript
-    #nodePackages.typescript-language-server
-    #nodePackages.typescript          # dá suporte ao tsserver interno
-    #nodePackages.prettier
+      # TypeScript / JavaScript
+      #nodePackages.typescript-language-server
+      #nodePackages.typescript          # dá suporte ao tsserver interno
+      #nodePackages.prettier
 
-    # Python
-    python3Packages.python-lsp-server # comando: pylsp
-    black
+      # Python
+      python3Packages.python-lsp-server # comando: pylsp
+      black
 
-    # TOML
-    taplo
+      # TOML
+      taplo
 
-    # JSON / JSONC
-    #nodePackages.vscode-langservers-extracted  # dá vscode-json-language-server
+      # JSON / JSONC
+      #nodePackages.vscode-langservers-extracted  # dá vscode-json-language-server
 
-    # YAML
-    #nodePackages.yaml-language-server
+      # YAML
+      #nodePackages.yaml-language-server
 
-    # XML
-    lemminx
+      # XML
+      lemminx
 
-    # Nix
-    nixd
-    alejandra
+      # Nix
+      nixd
+      alejandra
 
-    # Dockerfile
-    #nodePackages.dockerfile-language-server-nodejs  # comando: docker-langserver
+      # Dockerfile
+      #nodePackages.dockerfile-language-server-nodejs  # comando: docker-langserver
 
-    # Markdown
-    marksman
+      # Markdown
+      marksman
 
-    # Bash
-    #nodePackages.bash-language-server
-  ];
+      # Bash
+      #nodePackages.bash-language-server
+    ])
+    ++ (with pkgs-unstable; [
+      # ===== Pacotes explicitamente do nixpkgs-unstable =====
+      # Software que você quer sempre na versão mais recente disponível,
+      # independente da base estável (26.05) do resto do sistema.
+      neovim
+    ]);
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
