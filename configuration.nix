@@ -93,11 +93,7 @@
   };
   # ----- /Fonts
 
-  # Configure keymap in X11
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "mac";
-  };
+  # Keyboard layout is configured per-host in hosts/<hostname>/hardware-configuration.nix
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users."borba" = {

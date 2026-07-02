@@ -31,4 +31,11 @@
   swapDevices = [];
 
   nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
+
+  # Keyboard (Mac layout)
+  console.keyMap = "us";
+  services.xserver.xkb = {
+    layout = "us";
+    variant = "mac";
+  };
 }
