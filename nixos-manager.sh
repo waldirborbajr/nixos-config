@@ -113,7 +113,7 @@ prompt_flake_attr() {
   echo -e "${C_CYAN}Hosts disponíveis:${C_RESET}" >&2
   local i=1 attr
   for attr in "${FLAKE_ATTRS[@]}"; do
-    echo -e "  ${C_YELLOW}${i})${C_RESET} ${C_BOLD}${HOST_ATTR_TO_LABEL[$attr]}${C_RESET} ${C_GRAY}(${attr})${C_RESET}" >&2
+    echo -e "  ${C_YELLOW}${i})${C_RESET} ${C_BOLD}${HOST_ATTR_TO_LABEL[$attr]}${C_RESET} ${C_GRAY}(${HOST_ATTR_TO_MACHINE[$attr]})${C_RESET}" >&2
     i=$((i + 1))
   done
   local choice
