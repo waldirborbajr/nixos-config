@@ -1,4 +1,3 @@
-
 {
   description = "Master Flake for Borba NixOS Config";
   inputs = {
