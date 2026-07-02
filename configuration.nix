@@ -90,6 +90,7 @@
         monospace = ["FiraCode Nerd Font" "JetBrainsMono Nerd Font"];
       };
     };
+    enableDefaultFonts = true;
   };
   # ----- /Fonts
 
@@ -251,13 +252,13 @@
       #     flameshot
       alacritty
       #     emacs
-      #     rofi
+          rofi
       #     yubikey-agent
       #     keepassxc
       #     xss-lock
-      #     pkgs.networkmanagerapplet
-      #     playerctl
-      #     pavucontrol
+          pkgs.networkmanagerapplet
+          playerctl
+          pavucontrol
       #     lolcat
       xkill
       xclip
