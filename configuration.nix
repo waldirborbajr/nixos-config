@@ -155,7 +155,7 @@
             --remember \
             --remember-user-session \
             --asterisks \
-            --sessions /run/current-system/sw/share/wayland-sessions:/run/current-system/sw/share/xsessions
+            --sessions /run/current-system/sw/share/wayland-sessions,/run/current-system/sw/share/xsessions
         '';
         user = "greeter";
       };
