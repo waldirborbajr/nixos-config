@@ -227,10 +227,20 @@
     (with pkgs; [
       #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
       wget
+      asciinema
+      atuin
+      docker
+      duf
+      fastfetch
+      jq
+      just   
+      gh
       git
       stow
       ripgrep
       zsh
+      starship
+      zellij
       yazi
       eza
       bat
