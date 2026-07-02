@@ -186,7 +186,7 @@ programs.i3lock.enable = true; # default i3 screen locker
   nix.gc = {
     automatic = true;
     dates = "weekly";
-    options = "--delete-older-than 14d";
+    options = "--delete-older-than 3d";
   };
   nix.optimise.automatic = true;
 
