@@ -17,6 +17,10 @@
 #   m2utm       (macutm)    aarch64-linux
 #   dell        (dell1456)  x86_64-linux
 #   macbook2011 (mac2011)   x86_64-linux
+#
+# Fluxo de "flake"/"update": commit local (se houver algo pendente) → pull →
+# [flake update, se aplicável] → rebuild → push (se houver commits a enviar).
+# Tudo em sequência automática, sem voltar ao menu no meio do processo.
 
 set -euo pipefail
 
@@ -36,16 +40,24 @@ FLAKE_ATTR=""
 
 # ----- cores (desativa se não for terminal interativo) -----
 if [ -t 1 ]; then
-  C_RESET='\033[0m'; C_BOLD='\033[1m'
-  C_GREEN='\033[32m'; C_YELLOW='\033[33m'; C_RED='\033[31m'; C_BLUE='\033[34m'
+  C_RESET='\033[0m'; C_BOLD='\033[1m'; C_DIM='\033[2m'
+  C_GREEN='\033[32m'; C_YELLOW='\033[33m'; C_RED='\033[31m'
+  C_BLUE='\033[34m'; C_CYAN='\033[36m'; C_MAGENTA='\033[35m'; C_GRAY='\033[90m'
 else
-  C_RESET=''; C_BOLD=''; C_GREEN=''; C_YELLOW=''; C_RED=''; C_BLUE=''
+  C_RESET=''; C_BOLD=''; C_DIM=''
+  C_GREEN=''; C_YELLOW=''; C_RED=''
+  C_BLUE=''; C_CYAN=''; C_MAGENTA=''; C_GRAY=''
 fi
 
 log()  { echo -e "${C_BLUE}${C_BOLD}==>${C_RESET} $*"; }
 ok()   { echo -e "${C_GREEN}✓${C_RESET} $*"; }
 warn() { echo -e "${C_YELLOW}⚠${C_RESET} $*"; }
 err()  { echo -e "${C_RED}✗${C_RESET} $*" >&2; }
+step() {
+  # step <atual> <total> <descrição>
+  echo
+  echo -e "${C_MAGENTA}${C_BOLD}[$1/$2]${C_RESET} ${C_BOLD}$3${C_RESET}"
+}
 
 require_dir() {
   if [ ! -d "$NIXOS_DIR" ]; then
@@ -67,7 +79,7 @@ check_etc_symlink() {
 confirm() {
   # confirm "pergunta" -> retorna 0 se sim
   local prompt="$1"
-  read -r -p "$prompt [s/N] " reply
+  read -r -p "$(echo -e "${C_CYAN}?${C_RESET} ${prompt} ${C_DIM}[s/N]${C_RESET} ")" reply
   [[ "$reply" =~ ^[SsYy]$ ]]
 }
 
@@ -90,14 +102,14 @@ detect_flake_attr() {
 }
 
 prompt_flake_attr() {
-  echo "Hosts disponíveis:" >&2
+  echo -e "${C_CYAN}Hosts disponíveis:${C_RESET}" >&2
   local i=1 attr
   for attr in "${FLAKE_ATTRS[@]}"; do
-    echo "  $i) $attr (${HOST_ATTR_TO_MACHINE[$attr]})" >&2
+    echo -e "  ${C_YELLOW}${i})${C_RESET} ${C_BOLD}${attr}${C_RESET} ${C_GRAY}(${HOST_ATTR_TO_MACHINE[$attr]})${C_RESET}" >&2
     i=$((i + 1))
   done
   local choice
-  read -r -p "Escolha o host [1-${#FLAKE_ATTRS[@]}]: " choice
+  read -r -p "$(echo -e "${C_CYAN}?${C_RESET} Escolha o host [1-${#FLAKE_ATTRS[@]}]: ")" choice
   if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le "${#FLAKE_ATTRS[@]}" ]; then
     echo "${FLAKE_ATTRS[$((choice - 1))]}"
     return 0
@@ -132,7 +144,7 @@ select_flake_attr() {
   local detected
   if detected="$(detect_flake_attr)"; then
     FLAKE_ATTR="$detected"
-    ok "Host detectado automaticamente: $FLAKE_ATTR (${HOST_ATTR_TO_MACHINE[$FLAKE_ATTR]})"
+    ok "Host detectado automaticamente: ${C_BOLD}${FLAKE_ATTR}${C_RESET} ${C_GRAY}(${HOST_ATTR_TO_MACHINE[$FLAKE_ATTR]})${C_RESET}"
     return 0
   fi
 
@@ -146,32 +158,60 @@ select_flake_attr() {
 }
 
 # ----- git helpers -----
+#
+# O fluxo de git foi dividido em 3 passos independentes, chamados em sequência
+# pelas ações principais (build_flake / update_system), SEM voltar ao menu
+# entre um passo e outro:
+#   1) git_commit_if_dirty  -> commita alterações locais pendentes (se houver)
+#   2) git_sync_pull        -> traz o que tiver de novo no remoto
+#   3) git_push_if_ahead    -> envia commits locais que ainda não foram (no fim)
 
-git_sync_pull() {
-  cd "$NIXOS_DIR"
-  log "Puxando alterações do branch $GIT_BRANCH..."
-  git pull origin "$GIT_BRANCH"
-}
-
-git_sync_push() {
+git_commit_if_dirty() {
   cd "$NIXOS_DIR"
   if [ -z "$(git status --porcelain)" ]; then
-    ok "Nada para commitar — árvore de trabalho limpa."
+    ok "Árvore de trabalho limpa — nada para commitar."
     return 0
   fi
 
-  git status --short
-  if ! confirm "Commitar e enviar essas alterações para $GIT_BRANCH?"; then
-    warn "Push cancelado pelo usuário. Alterações locais permanecem sem versionar."
+  warn "Alterações locais não commitadas:"
+  git -c color.status=always status --short
+  if ! confirm "Commitar essas alterações agora e continuar com o build?"; then
+    warn "Continuando com alterações NÃO commitadas (build usará o estado atual do diretório)."
     return 0
   fi
 
   git add -A
-  read -r -p "Mensagem do commit [lock: update]: " msg
+  read -r -p "$(echo -e "${C_CYAN}?${C_RESET} Mensagem do commit ${C_DIM}[lock: update]${C_RESET}: ")" msg
   msg="${msg:-lock: update}"
   git commit -m "$msg"
-  git push origin "$GIT_BRANCH"
-  ok "Push concluído."
+  ok "Commit criado localmente."
+}
+
+git_sync_pull() {
+  cd "$NIXOS_DIR"
+  log "Puxando alterações do branch ${C_BOLD}${GIT_BRANCH}${C_RESET}..."
+  git pull origin "$GIT_BRANCH"
+}
+
+git_push_if_ahead() {
+  cd "$NIXOS_DIR"
+  git fetch origin "$GIT_BRANCH" --quiet 2>/dev/null || true
+
+  local ahead
+  ahead="$(git rev-list --count "origin/${GIT_BRANCH}..HEAD" 2>/dev/null || echo 0)"
+
+  if [ "$ahead" -eq 0 ]; then
+    ok "Nada para enviar — já sincronizado com origin/${GIT_BRANCH}."
+    return 0
+  fi
+
+  log "$ahead commit(s) local(is) à frente de origin/${GIT_BRANCH}."
+  if confirm "Enviar (push) para ${GIT_BRANCH}?"; then
+    git push origin "$GIT_BRANCH"
+    ok "Push concluído."
+  else
+    warn "Push cancelado pelo usuário — alterações continuam só locais."
+  fi
 }
 
 # ----- ações principais -----
@@ -194,19 +234,32 @@ build_flake() {
   local host_arg="${1:-}"
   require_dir
   select_flake_attr "$host_arg"
+  cd "$NIXOS_DIR"
+
+  step 1 4 "Verificando alterações locais"
+  git_commit_if_dirty
+
+  step 2 4 "Sincronizando com origin/${GIT_BRANCH}"
   git_sync_pull
-  log "Build COM flake (${NIXOS_DIR}#${FLAKE_ATTR})..."
+
+  step 3 4 "Aplicando rebuild — ${C_CYAN}${FLAKE_ATTR}${C_RESET}"
   sudo nixos-rebuild switch --flake "${NIXOS_DIR}#${FLAKE_ATTR}"
-  ok "Rebuild (flake) concluído em ${FLAKE_ATTR}."
-  git_sync_push
+  ok "Rebuild concluído em ${FLAKE_ATTR}."
+
+  step 4 4 "Enviando alterações pendentes"
+  git_push_if_ahead
 }
 
 build_flake_dry() {
   local host_arg="${1:-}"
   require_dir
   select_flake_attr "$host_arg"
+  cd "$NIXOS_DIR"
+
+  step 1 2 "Sincronizando com origin/${GIT_BRANCH}"
   git_sync_pull
-  log "Build de teste (sem aplicar) para ${NIXOS_DIR}#${FLAKE_ATTR}..."
+
+  step 2 2 "Build de teste (não ativa) — ${C_CYAN}${FLAKE_ATTR}${C_RESET}"
   sudo nixos-rebuild build --flake "${NIXOS_DIR}#${FLAKE_ATTR}"
   ok "Build de teste concluído — nada foi ativado. Resultado em ./result"
 }
@@ -216,13 +269,25 @@ update_system() {
   require_dir
   select_flake_attr "$host_arg"
   cd "$NIXOS_DIR"
+
+  step 1 6 "Verificando alterações locais"
+  git_commit_if_dirty
+
+  step 2 6 "Sincronizando com origin/${GIT_BRANCH}"
   git_sync_pull
-  log "Atualizando flake.lock (nix flake update)..."
+
+  step 3 6 "Atualizando flake.lock (nix flake update)"
   sudo nix flake update
-  log "Aplicando update via rebuild switch --flake (${FLAKE_ATTR})..."
+
+  step 4 6 "Commitando flake.lock atualizado (se mudou)"
+  git_commit_if_dirty
+
+  step 5 6 "Aplicando rebuild — ${C_CYAN}${FLAKE_ATTR}${C_RESET}"
   sudo nixos-rebuild switch --flake "${NIXOS_DIR}#${FLAKE_ATTR}"
   ok "Sistema atualizado em ${FLAKE_ATTR}."
-  git_sync_push
+
+  step 6 6 "Enviando alterações pendentes"
+  git_push_if_ahead
 }
 
 rollback_system() {
@@ -238,9 +303,9 @@ rollback_system() {
 
 clean_cache() {
   log "Limpando gerações antigas e coletando lixo do Nix store..."
-  echo "  1) Rápido   — remove gerações com mais de 14 dias"
-  echo "  2) Agressivo — remove TODAS as gerações antigas (nix-collect-garbage -d)"
-  read -r -p "Escolha [1/2]: " mode
+  echo -e "  ${C_YELLOW}1)${C_RESET} Rápido    — remove gerações com mais de 14 dias"
+  echo -e "  ${C_RED}2)${C_RESET} Agressivo — remove TODAS as gerações antigas (nix-collect-garbage -d)"
+  read -r -p "$(echo -e "${C_CYAN}?${C_RESET} Escolha [1/2]: ")" mode
 
   case "$mode" in
     1)
@@ -277,35 +342,44 @@ check_flake() {
 }
 
 list_hosts() {
-  echo -e "${C_BOLD}Hosts configurados no flake:${C_RESET}"
+  echo -e "${C_BOLD}${C_CYAN}Hosts configurados no flake:${C_RESET}"
   local attr
   for attr in "${FLAKE_ATTRS[@]}"; do
-    echo "  - $attr  (hostname: ${HOST_ATTR_TO_MACHINE[$attr]})"
+    echo -e "  ${C_GREEN}●${C_RESET} ${C_BOLD}${attr}${C_RESET}  ${C_GRAY}(hostname: ${HOST_ATTR_TO_MACHINE[$attr]})${C_RESET}"
   done
   local detected
+  echo
   if detected="$(detect_flake_attr)"; then
-    echo
-    ok "Esta máquina corresponde a: $detected"
+    ok "Esta máquina corresponde a: ${C_BOLD}${detected}${C_RESET}"
   else
-    echo
     warn "Esta máquina ($(hostname -s 2>/dev/null || echo '?')) não corresponde a nenhum host conhecido."
   fi
 }
 
 # ----- menu -----
 
-show_menu() {
+print_banner() {
+  local detected
+  detected="$(detect_flake_attr 2>/dev/null || echo '?')"
   echo
-  echo -e "${C_BOLD}NixOS Manager${C_RESET}"
-  echo "  1) Build sem flake     (nixos-rebuild switch)"
-  echo "  2) Build com flake     (pull → rebuild --flake → commit/push)"
-  echo "  3) Limpar cache        (nix-collect-garbage + optimise)"
-  echo "  4) Atualizar sistema   (flake update → rebuild → commit/push)"
-  echo "  5) Build de teste      (nixos-rebuild build, não ativa nada)"
-  echo "  6) Rollback            (voltar para geração anterior)"
-  echo "  7) Verificar flake     (nix flake check)"
-  echo "  8) Listar hosts        (mostra hosts do flake e detecção atual)"
-  echo "  0) Sair"
+  echo -e "${C_CYAN}╭──────────────────────────────────────╮${C_RESET}"
+  printf "${C_CYAN}│${C_RESET}  ${C_BOLD}NixOS Manager${C_RESET}%*s${C_CYAN}│${C_RESET}\n" 24 ""
+  echo -e "${C_CYAN}│${C_RESET}  ${C_GRAY}host: ${C_RESET}${C_GREEN}${detected}${C_RESET}$(printf '%*s' $((32 - ${#detected})) '')${C_CYAN}│${C_RESET}"
+  echo -e "${C_CYAN}╰──────────────────────────────────────╯${C_RESET}"
+}
+
+show_menu() {
+  print_banner
+  echo
+  echo -e "  ${C_YELLOW}${C_BOLD}1)${C_RESET} Build sem flake     ${C_GRAY}(nixos-rebuild switch)${C_RESET}"
+  echo -e "  ${C_YELLOW}${C_BOLD}2)${C_RESET} Build com flake     ${C_GRAY}(commit → pull → rebuild → push)${C_RESET}"
+  echo -e "  ${C_YELLOW}${C_BOLD}3)${C_RESET} Limpar cache        ${C_GRAY}(nix-collect-garbage + optimise)${C_RESET}"
+  echo -e "  ${C_YELLOW}${C_BOLD}4)${C_RESET} Atualizar sistema   ${C_GRAY}(commit → pull → flake update → rebuild → push)${C_RESET}"
+  echo -e "  ${C_YELLOW}${C_BOLD}5)${C_RESET} Build de teste      ${C_GRAY}(nixos-rebuild build, não ativa nada)${C_RESET}"
+  echo -e "  ${C_RED}${C_BOLD}6)${C_RESET} Rollback            ${C_GRAY}(voltar para geração anterior)${C_RESET}"
+  echo -e "  ${C_YELLOW}${C_BOLD}7)${C_RESET} Verificar flake     ${C_GRAY}(nix flake check)${C_RESET}"
+  echo -e "  ${C_BLUE}${C_BOLD}8)${C_RESET} Listar hosts        ${C_GRAY}(mostra hosts do flake e detecção atual)${C_RESET}"
+  echo -e "  ${C_BOLD}0)${C_RESET} Sair"
   echo
 }
 
@@ -334,7 +408,7 @@ main() {
 
   while true; do
     show_menu
-    read -r -p "Escolha uma opção: " choice
+    read -r -p "$(echo -e "${C_CYAN}?${C_RESET} Escolha uma opção: ")" choice
     run_choice "$choice" || true
   done
 }
