@@ -2,6 +2,9 @@
 #
 # nixos-manager.sh — gerencia rebuilds, cache e updates do NixOS
 #
+# sudo mv /etc/nixos /etc/nixos.bak   # backup 
+# sudo ln -s /home/borba/nixos-config /etc/nixos
+# 
 # Uso:
 #   ./nixos-manager.sh            # abre o menu interativo
 #   ./nixos-manager.sh <opcao>    # roda direto: legacy | flake | clean | update
