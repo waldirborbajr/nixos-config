@@ -29,9 +29,9 @@ GIT_BRANCH="m2config"
 
 # attr do flake -> nome real da máquina (usado pra auto-detecção via `hostname`)
 declare -A HOST_ATTR_TO_MACHINE=(
-  [m2utm]="macutm"
-  [dell]="dell1456"
-  [macbook2011]="mac2011"
+  [MacBook M2 - UTM]="macutm"
+  [Dell Inspiron 1456]="dell1456"
+  [MacBook Pro 13\" (2011)]="mac2011"
 )
 FLAKE_ATTRS=(m2utm dell macbook2011)
 
