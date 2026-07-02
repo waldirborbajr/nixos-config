@@ -245,14 +245,6 @@ programs.i3lock.enable = true; # default i3 screen locker
 
 #     pam_u2f
 #     ispell
- # language servers
-     gopls
-#     haskell-language-server
- # rust stuff
-     jetbrains.rust-rover
-     rustup
-# # languages
-     go
 # # yak shaving
 #     greetd
 #     tuigreet
@@ -265,6 +257,55 @@ programs.i3lock.enable = true; # default i3 screen locker
 #     kdePackages.kdenlive
 #     obs-studio
 #     mesa # OpenCL for graphics x Davinci on Linux
+
+ # ===== Helix language servers / formatters =====
+  # Go (gopls já está na lista)
+  gotools                          # goimports
+  golangci-lint-langserver
+
+  # Rust (rust-analyzer/rustfmt via rustup ficam inconsistentes no PATH;
+  # prefira os pacotes nixpkgs abaixo em vez de depender do toolchain do rustup)
+  rust-analyzer
+  rustfmt
+
+  # Lua
+  lua-language-server
+  stylua
+
+  # TypeScript / JavaScript
+  nodePackages.typescript-language-server
+  nodePackages.typescript          # dá suporte ao tsserver interno
+  nodePackages.prettier
+
+  # Python
+  python3Packages.python-lsp-server  # comando: pylsp
+  black
+
+  # TOML
+  taplo
+
+  # JSON / JSONC
+  nodePackages.vscode-langservers-extracted  # dá vscode-json-language-server
+
+  # YAML
+  nodePackages.yaml-language-server
+
+  # XML
+  lemminx
+
+  # Nix
+  nixd
+  alejandra
+
+  # Dockerfile
+  nodePackages.dockerfile-language-server-nodejs  # comando: docker-langserver
+
+  # Markdown
+  marksman
+
+  # Bash
+  nodePackages.bash-language-server
+
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
