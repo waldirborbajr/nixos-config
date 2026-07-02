@@ -122,12 +122,36 @@
   # ----- /X11
 
   # Enable the X11 windowing system.
-  services.xserver = {
+services.xserver = {
     enable = true;
     displayManager = {
       lightdm = {
         enable = true;
-        greeters.gtk.enable = true;
+       greeters.gtk = {
+         enable = true;
+         theme = {
+           package = pkgs.catppuccin-gtk.override {
+             accents = [ "mauve" ];
+             size = "standard";
+             variant = "mocha";
+           };
+           name = "Catppuccin-Mocha-Standard-Mauve-Dark";
+         };
+         iconTheme = {
+           package = pkgs.papirus-icon-theme;
+           name = "Papirus-Dark";
+         };
+         cursorTheme = {
+           package = pkgs.catppuccin-cursors.mochaDark;
+           name = "catppuccin-mocha-dark-cursors";
+         };
+         extraConfig = ''
+           font-name = FiraCode Nerd Font 11
+           xft-antialias = true
+           xft-hintstyle = hintslight
+           indicators = ~host;~spacer;~clock;~spacer;~session;~language;~a11y;~power
+         '';
+       };
       };
     };
     desktopManager = {
