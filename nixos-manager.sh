@@ -29,10 +29,18 @@ GIT_BRANCH="m2config"
 
 # attr do flake -> nome real da máquina (usado pra auto-detecção via `hostname`)
 declare -A HOST_ATTR_TO_MACHINE=(
-  [MacBook M2 - UTM]="macutm"
-  [Dell Inspiron 1456]="dell1456"
-  [MacBook Pro 13pol (2011)]="mac2011"
+  [m2utm]="macutm"
+  [dell]="dell1456"
+  [macbook2011]="mac2011"
 )
+
+# attr do flake -> nome amigável (só pra exibição no menu)
+declare -A HOST_ATTR_TO_LABEL=(
+  [m2utm]="MacBook M2 - UTM"
+  [dell]="Dell Inspiron 1456"
+  [macbook2011]="MacBook Pro 13pol (2011)"
+)
+
 FLAKE_ATTRS=(m2utm dell macbook2011)
 
 # selecionado em runtime por select_flake_attr()
@@ -105,7 +113,7 @@ prompt_flake_attr() {
   echo -e "${C_CYAN}Hosts disponíveis:${C_RESET}" >&2
   local i=1 attr
   for attr in "${FLAKE_ATTRS[@]}"; do
-    echo -e "  ${C_YELLOW}${i})${C_RESET} ${C_BOLD}${attr}${C_RESET} ${C_GRAY}(${HOST_ATTR_TO_MACHINE[$attr]})${C_RESET}" >&2
+    echo -e "  ${C_YELLOW}${i})${C_RESET} ${C_BOLD}${HOST_ATTR_TO_LABEL[$attr]}${C_RESET} ${C_GRAY}(${attr})${C_RESET}" >&2
     i=$((i + 1))
   done
   local choice
@@ -239,9 +247,9 @@ build_flake() {
   step 2 4 "Sincronizando com origin/${GIT_BRANCH}"
   git_sync_pull
 
-  step 3 4 "Aplicando rebuild — ${C_CYAN}${FLAKE_ATTR}${C_RESET}"
+  step 3 4 "Aplicando rebuild — ${C_CYAN}${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]}${C_RESET} ${C_GRAY}(${FLAKE_ATTR})${C_RESET}"
   sudo nixos-rebuild switch --flake "${NIXOS_DIR}#${FLAKE_ATTR}"
-  ok "Rebuild concluído em ${FLAKE_ATTR}."
+  ok "Rebuild concluído em ${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]} (${FLAKE_ATTR})."
 
   step 4 4 "Enviando alterações pendentes"
   git_push_if_ahead
@@ -256,7 +264,7 @@ build_flake_dry() {
   step 1 2 "Sincronizando com origin/${GIT_BRANCH}"
   git_sync_pull
 
-  step 2 2 "Build de teste (não ativa) — ${C_CYAN}${FLAKE_ATTR}${C_RESET}"
+  step 2 2 "Build de teste (não ativa) — ${C_CYAN}${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]}${C_RESET} ${C_GRAY}(${FLAKE_ATTR})${C_RESET}"
   sudo nixos-rebuild build --flake "${NIXOS_DIR}#${FLAKE_ATTR}"
   ok "Build de teste concluído — nada foi ativado. Resultado em ./result"
 }
@@ -279,9 +287,9 @@ update_system() {
   step 4 6 "Commitando flake.lock atualizado (se mudou)"
   git_commit_if_dirty
 
-  step 5 6 "Aplicando rebuild — ${C_CYAN}${FLAKE_ATTR}${C_RESET}"
+  step 5 6 "Aplicando rebuild — ${C_CYAN}${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]}${C_RESET} ${C_GRAY}(${FLAKE_ATTR})${C_RESET}"
   sudo nixos-rebuild switch --flake "${NIXOS_DIR}#${FLAKE_ATTR}"
-  ok "Sistema atualizado em ${FLAKE_ATTR}."
+  ok "Sistema atualizado em ${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]} (${FLAKE_ATTR})."
 
   step 6 6 "Enviando alterações pendentes"
   git_push_if_ahead
@@ -342,7 +350,7 @@ list_hosts() {
   echo -e "${C_BOLD}${C_CYAN}Hosts configurados no flake:${C_RESET}"
   local attr
   for attr in "${FLAKE_ATTRS[@]}"; do
-    echo -e "  ${C_GREEN}●${C_RESET} ${C_BOLD}${attr}${C_RESET}  ${C_GRAY}(hostname: ${HOST_ATTR_TO_MACHINE[$attr]})${C_RESET}"
+    echo -e "  ${C_GREEN}●${C_RESET} ${C_BOLD}${HOST_ATTR_TO_LABEL[$attr]}${C_RESET}  ${C_GRAY}(attr: ${attr}, hostname: ${HOST_ATTR_TO_MACHINE[$attr]})${C_RESET}"
   done
   local detected
   echo
