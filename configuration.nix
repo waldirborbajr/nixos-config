@@ -283,17 +283,22 @@
       #     pam_u2f
       #     ispell
       # # yak shaving
-      #     greetd
-      #     tuigreet
-      #     lxappearance # customize i3 without changing config
-      #     lightdm # display manager for login
-      #     autorandr # auto select a display configuration based on connected devices.
+       greetd
+       tuigreet
+       lxappearance # customize i3 without changing config
+       lightdm # display manager for login
+       autorandr # auto select a display configuration based on connected devices.
       # # update bios as needed
       #     fwupd
       # # content
       #     kdePackages.kdenlive
       #     obs-studio
       #     mesa # OpenCL for graphics x Davinci on Linux
+
+      # emacs
+      emacs
+      emacsPackages.pbcopy
+      emacsPackages.vterm
 
       # ===== Helix language servers / formatters =====
       # Go (gopls já está na lista)
