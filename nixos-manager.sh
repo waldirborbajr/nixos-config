@@ -118,7 +118,8 @@ prompt_flake_attr() {
 }
 
 # select_flake_attr [host_arg]
-# prioridade: arg explícito > env NIXOS_FLAKE_ATTR > auto-detecção via hostname > prompt interativo
+# prioridade: arg explícito > env NIXOS_FLAKE_ATTR > pergunta interativa
+# (não assume nenhum host por padrão — sempre pergunta se não vier explícito)
 select_flake_attr() {
   local host_arg="${1:-}"
 
@@ -141,14 +142,10 @@ select_flake_attr() {
     fi
   fi
 
-  local detected
-  if detected="$(detect_flake_attr)"; then
-    FLAKE_ATTR="$detected"
-    ok "Host detectado automaticamente: ${C_BOLD}${FLAKE_ATTR}${C_RESET} ${C_GRAY}(${HOST_ATTR_TO_MACHINE[$FLAKE_ATTR]})${C_RESET}"
-    return 0
-  fi
-
-  warn "Não foi possível detectar o host automaticamente (hostname atual: $(hostname -s 2>/dev/null || echo '?'))."
+  # Sem argumento explícito e sem env var: SEMPRE pergunta.
+  # (Antes tentava auto-detectar pelo hostname, mas isso pode acertar o host
+  # errado quando o comando é disparado de outra máquina/sessão — melhor
+  # perguntar toda vez do que assumir um host padrão.)
   if FLAKE_ATTR="$(prompt_flake_attr)"; then
     return 0
   fi
@@ -360,12 +357,13 @@ list_hosts() {
 
 print_banner() {
   local detected
-  detected="$(detect_flake_attr 2>/dev/null || echo '?')"
+  detected="$(detect_flake_attr 2>/dev/null || echo 'não identificado')"
   echo
   echo -e "${C_CYAN}╭──────────────────────────────────────╮${C_RESET}"
   printf "${C_CYAN}│${C_RESET}  ${C_BOLD}NixOS Manager${C_RESET}%*s${C_CYAN}│${C_RESET}\n" 24 ""
-  echo -e "${C_CYAN}│${C_RESET}  ${C_GRAY}host: ${C_RESET}${C_GREEN}${detected}${C_RESET}$(printf '%*s' $((32 - ${#detected})) '')${C_CYAN}│${C_RESET}"
+  echo -e "${C_CYAN}│${C_RESET}  ${C_GRAY}esta máquina: ${C_RESET}${C_GREEN}${detected}${C_RESET}$(printf '%*s' $((25 - ${#detected})) '')${C_CYAN}│${C_RESET}"
   echo -e "${C_CYAN}╰──────────────────────────────────────╯${C_RESET}"
+  echo -e "  ${C_GRAY}${C_DIM}(build/update sempre perguntam o host — nada é assumido)${C_RESET}"
 }
 
 show_menu() {
