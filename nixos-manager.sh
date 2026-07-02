@@ -2,20 +2,37 @@
 #
 # nixos-manager.sh — gerencia rebuilds, cache e updates do NixOS
 #
-# sudo mv /etc/nixos /etc/nixos.bak   # backup 
+# sudo mv /etc/nixos /etc/nixos.bak   # backup
 # sudo ln -s /home/borba/nixos-config /etc/nixos
-# 
+#
 # Uso:
-#   ./nixos-manager.sh            # abre o menu interativo
-#   ./nixos-manager.sh <opcao>    # roda direto: legacy | flake | clean | update
+#   ./nixos-manager.sh                    # abre o menu interativo
+#   ./nixos-manager.sh <opcao>             # roda direto: legacy | flake | clean | update
+#   ./nixos-manager.sh <opcao> <host>      # roda direto num host específico: flake dell
+#   NIXOS_FLAKE_ATTR=dell ./nixos-manager.sh flake   # força o host via env var
 #
 # Requisitos: repo git em /etc/nixos com o flake configurado (branch m2config).
+#
+# Hosts conhecidos (definidos no flake.nix -> nixosConfigurations):
+#   m2utm       (macutm)    aarch64-linux
+#   dell        (dell1456)  x86_64-linux
+#   macbook2011 (mac2011)   x86_64-linux
 
 set -euo pipefail
 
 NIXOS_DIR="/home/borba/nixos-config"
-FLAKE_ATTR="nixos"
 GIT_BRANCH="m2config"
+
+# attr do flake -> nome real da máquina (usado pra auto-detecção via `hostname`)
+declare -A HOST_ATTR_TO_MACHINE=(
+  [m2utm]="macutm"
+  [dell]="dell1456"
+  [macbook2011]="mac2011"
+)
+FLAKE_ATTRS=(m2utm dell macbook2011)
+
+# selecionado em runtime por select_flake_attr()
+FLAKE_ATTR=""
 
 # ----- cores (desativa se não for terminal interativo) -----
 if [ -t 1 ]; then
@@ -52,6 +69,80 @@ confirm() {
   local prompt="$1"
   read -r -p "$prompt [s/N] " reply
   [[ "$reply" =~ ^[SsYy]$ ]]
+}
+
+# ----- seleção de host/máquina -----
+
+detect_flake_attr() {
+  # tenta casar o hostname real da máquina com um attr do flake
+  local machine
+  machine="$(hostname -s 2>/dev/null || cat /etc/hostname 2>/dev/null || true)"
+  [ -z "$machine" ] && return 1
+
+  local attr
+  for attr in "${FLAKE_ATTRS[@]}"; do
+    if [ "${HOST_ATTR_TO_MACHINE[$attr]}" = "$machine" ]; then
+      echo "$attr"
+      return 0
+    fi
+  done
+  return 1
+}
+
+prompt_flake_attr() {
+  echo "Hosts disponíveis:" >&2
+  local i=1 attr
+  for attr in "${FLAKE_ATTRS[@]}"; do
+    echo "  $i) $attr (${HOST_ATTR_TO_MACHINE[$attr]})" >&2
+    i=$((i + 1))
+  done
+  local choice
+  read -r -p "Escolha o host [1-${#FLAKE_ATTRS[@]}]: " choice
+  if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le "${#FLAKE_ATTRS[@]}" ]; then
+    echo "${FLAKE_ATTRS[$((choice - 1))]}"
+    return 0
+  fi
+  return 1
+}
+
+# select_flake_attr [host_arg]
+# prioridade: arg explícito > env NIXOS_FLAKE_ATTR > auto-detecção via hostname > prompt interativo
+select_flake_attr() {
+  local host_arg="${1:-}"
+
+  if [ -n "$host_arg" ]; then
+    if [[ " ${FLAKE_ATTRS[*]} " == *" $host_arg "* ]]; then
+      FLAKE_ATTR="$host_arg"
+      return 0
+    else
+      err "Host desconhecido: $host_arg (opções: ${FLAKE_ATTRS[*]})"
+      exit 1
+    fi
+  fi
+
+  if [ -n "${NIXOS_FLAKE_ATTR:-}" ]; then
+    if [[ " ${FLAKE_ATTRS[*]} " == *" $NIXOS_FLAKE_ATTR "* ]]; then
+      FLAKE_ATTR="$NIXOS_FLAKE_ATTR"
+      return 0
+    else
+      warn "NIXOS_FLAKE_ATTR='$NIXOS_FLAKE_ATTR' inválido, ignorando."
+    fi
+  fi
+
+  local detected
+  if detected="$(detect_flake_attr)"; then
+    FLAKE_ATTR="$detected"
+    ok "Host detectado automaticamente: $FLAKE_ATTR (${HOST_ATTR_TO_MACHINE[$FLAKE_ATTR]})"
+    return 0
+  fi
+
+  warn "Não foi possível detectar o host automaticamente (hostname atual: $(hostname -s 2>/dev/null || echo '?'))."
+  if FLAKE_ATTR="$(prompt_flake_attr)"; then
+    return 0
+  fi
+
+  err "Nenhum host selecionado."
+  exit 1
 }
 
 # ----- git helpers -----
@@ -100,24 +191,49 @@ build_legacy() {
 }
 
 build_flake() {
+  local host_arg="${1:-}"
   require_dir
+  select_flake_attr "$host_arg"
   git_sync_pull
   log "Build COM flake (${NIXOS_DIR}#${FLAKE_ATTR})..."
   sudo nixos-rebuild switch --flake "${NIXOS_DIR}#${FLAKE_ATTR}"
-  ok "Rebuild (flake) concluído."
+  ok "Rebuild (flake) concluído em ${FLAKE_ATTR}."
   git_sync_push
 }
 
-update_system() {
+build_flake_dry() {
+  local host_arg="${1:-}"
   require_dir
+  select_flake_attr "$host_arg"
+  git_sync_pull
+  log "Build de teste (sem aplicar) para ${NIXOS_DIR}#${FLAKE_ATTR}..."
+  sudo nixos-rebuild build --flake "${NIXOS_DIR}#${FLAKE_ATTR}"
+  ok "Build de teste concluído — nada foi ativado. Resultado em ./result"
+}
+
+update_system() {
+  local host_arg="${1:-}"
+  require_dir
+  select_flake_attr "$host_arg"
   cd "$NIXOS_DIR"
   git_sync_pull
   log "Atualizando flake.lock (nix flake update)..."
   sudo nix flake update
-  log "Aplicando update via rebuild switch --flake..."
+  log "Aplicando update via rebuild switch --flake (${FLAKE_ATTR})..."
   sudo nixos-rebuild switch --flake "${NIXOS_DIR}#${FLAKE_ATTR}"
-  ok "Sistema atualizado."
+  ok "Sistema atualizado em ${FLAKE_ATTR}."
   git_sync_push
+}
+
+rollback_system() {
+  log "Gerações disponíveis:"
+  sudo nix-env --list-generations -p /nix/var/nix/profiles/system
+  if confirm "Fazer rollback para a geração anterior?"; then
+    sudo nixos-rebuild switch --rollback
+    ok "Rollback concluído."
+  else
+    warn "Cancelado."
+  fi
 }
 
 clean_cache() {
@@ -152,33 +268,67 @@ clean_cache() {
   df -h /nix/store 2>/dev/null || df -h /
 }
 
+check_flake() {
+  require_dir
+  cd "$NIXOS_DIR"
+  log "Verificando flake (nix flake check)..."
+  nix flake check
+  ok "Flake válido."
+}
+
+list_hosts() {
+  echo -e "${C_BOLD}Hosts configurados no flake:${C_RESET}"
+  local attr
+  for attr in "${FLAKE_ATTRS[@]}"; do
+    echo "  - $attr  (hostname: ${HOST_ATTR_TO_MACHINE[$attr]})"
+  done
+  local detected
+  if detected="$(detect_flake_attr)"; then
+    echo
+    ok "Esta máquina corresponde a: $detected"
+  else
+    echo
+    warn "Esta máquina ($(hostname -s 2>/dev/null || echo '?')) não corresponde a nenhum host conhecido."
+  fi
+}
+
 # ----- menu -----
 
 show_menu() {
   echo
   echo -e "${C_BOLD}NixOS Manager${C_RESET}"
-  echo "  1) Build sem flake   (nixos-rebuild switch)"
-  echo "  2) Build com flake   (pull → rebuild --flake → commit/push)"
-  echo "  3) Limpar cache      (nix-collect-garbage + optimise)"
-  echo "  4) Atualizar sistema (flake update → rebuild → commit/push)"
+  echo "  1) Build sem flake     (nixos-rebuild switch)"
+  echo "  2) Build com flake     (pull → rebuild --flake → commit/push)"
+  echo "  3) Limpar cache        (nix-collect-garbage + optimise)"
+  echo "  4) Atualizar sistema   (flake update → rebuild → commit/push)"
+  echo "  5) Build de teste      (nixos-rebuild build, não ativa nada)"
+  echo "  6) Rollback            (voltar para geração anterior)"
+  echo "  7) Verificar flake     (nix flake check)"
+  echo "  8) Listar hosts        (mostra hosts do flake e detecção atual)"
   echo "  0) Sair"
   echo
 }
 
 run_choice() {
-  case "$1" in
-    1|legacy) build_legacy ;;
-    2|flake)  build_flake ;;
-    3|clean)  clean_cache ;;
-    4|update) update_system ;;
+  local choice="$1"
+  local host_arg="${2:-}"
+  case "$choice" in
+    1|legacy)  build_legacy ;;
+    2|flake)   build_flake "$host_arg" ;;
+    3|clean)   clean_cache ;;
+    4|update)  update_system "$host_arg" ;;
+    5|dry)     build_flake_dry "$host_arg" ;;
+    6|rollback) rollback_system ;;
+    7|check)   check_flake ;;
+    8|hosts)   list_hosts ;;
     0|exit|quit) exit 0 ;;
-    *) err "Opção inválida: $1"; return 1 ;;
+    *) err "Opção inválida: $choice"; return 1 ;;
   esac
 }
 
 main() {
   if [ $# -ge 1 ]; then
-    run_choice "$1"
+    run_choice "$1" "${2:-}"
     exit $?
   fi
 
