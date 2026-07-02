@@ -32,18 +32,18 @@
       };
   in {
     nixosConfigurations = {
-      m2utm = mkHost {
-        hostname = "m2utm";
+      macutm = mkHost {
+        hostname = "macutm";
         system = "aarch64-linux";
       };
 
-      dell = mkHost {
-        hostname = "dell";
+      dell1456 = mkHost {
+        hostname = "dell1456";
         system = "x86_64-linux";
       };
 
-      macbook2011 = mkHost {
-        hostname = "macbook2011";
+      mac2011 = mkHost {
+        hostname = "mac2011";
         system = "x86_64-linux";
       };
     };
