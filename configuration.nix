@@ -293,7 +293,6 @@
       xkill
       xclip
       coreutils
-      xorg.xinit # fornece o binário `startx`, usado pelo wrapper padrão do tuigreet nas sessões X11 (i3)
       #     element-web
       #     zed-editor
       #     bluez
