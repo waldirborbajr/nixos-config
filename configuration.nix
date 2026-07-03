@@ -263,6 +263,7 @@
       just
       gh
       git
+      chirp
       stow
       ripgrep
       zsh
