@@ -307,17 +307,22 @@ rollback_system() {
 }
 
 clean_cache() {
+  local mode_arg="${1:-}"
   log "Limpando gerações antigas e coletando lixo do Nix store..."
-  echo -e "  ${C_YELLOW}1)${C_RESET} Rápido    — remove gerações com mais de 14 dias"
-  echo -e "  ${C_RED}2)${C_RESET} Agressivo — remove TODAS as gerações antigas (nix-collect-garbage -d)"
-  read -r -p "$(echo -e "${C_CYAN}?${C_RESET} Escolha [1/2]: ")" mode
+
+  local mode="$mode_arg"
+  if [ -z "$mode" ]; then
+    echo -e "  ${C_YELLOW}1)${C_RESET} Rápido    — remove gerações com mais de 14 dias"
+    echo -e "  ${C_RED}2)${C_RESET} Agressivo — remove TODAS as gerações antigas (nix-collect-garbage -d)"
+    read -r -p "$(echo -e "${C_CYAN}?${C_RESET} Escolha [1/2]: ")" mode
+  fi
 
   case "$mode" in
     1)
       sudo nix-collect-garbage --delete-older-than 14d
       ;;
     2)
-      if confirm "Isso remove TODAS as gerações antigas, inclusive rollback. Confirma?"; then
+      if [ -n "$mode_arg" ] || confirm "Isso remove TODAS as gerações antigas, inclusive rollback. Confirma?"; then
         sudo nix-collect-garbage -d
       else
         warn "Cancelado."
@@ -332,7 +337,19 @@ clean_cache() {
 
   log "Otimizando store (deduplicação de hardlinks)..."
   sudo nix-store --optimise
-  ok "Limpeza concluída."
+  ok "Limpeza do store concluída."
+
+  # A limpeza acima remove gerações do profile/store, mas NÃO atualiza o
+  # bootloader. Sem esse passo, entradas de gerações já removidas continuam
+  # aparecendo no menu de boot (systemd-boot/GRUB), apontando pra algo que
+  # não existe mais — pior que inútil, é risco de boot quebrado.
+  log "Sincronizando bootloader com as gerações restantes..."
+  if confirm "Rodar 'nixos-rebuild boot' para atualizar o menu de boot agora?"; then
+    sudo nixos-rebuild boot
+    ok "Bootloader atualizado — menu de boot reflete só as gerações que ainda existem."
+  else
+    warn "Bootloader NÃO atualizado — o menu de boot pode continuar mostrando gerações já removidas até você rodar 'sudo nixos-rebuild boot' manualmente."
+  fi
 
   log "Espaço em disco atual:"
   df -h /nix/store 2>/dev/null || df -h /
@@ -379,7 +396,7 @@ show_menu() {
   echo
   echo -e "  ${C_YELLOW}${C_BOLD}1)${C_RESET} Build sem flake     ${C_GRAY}(nixos-rebuild switch)${C_RESET}"
   echo -e "  ${C_YELLOW}${C_BOLD}2)${C_RESET} Build com flake     ${C_GRAY}(commit → pull → rebuild → push)${C_RESET}"
-  echo -e "  ${C_YELLOW}${C_BOLD}3)${C_RESET} Limpar cache        ${C_GRAY}(nix-collect-garbage + optimise)${C_RESET}"
+  echo -e "  ${C_YELLOW}${C_BOLD}3)${C_RESET} Limpar cache        ${C_GRAY}(nix-collect-garbage + optimise + boot)${C_RESET}"
   echo -e "  ${C_YELLOW}${C_BOLD}4)${C_RESET} Atualizar sistema   ${C_GRAY}(commit → pull → flake update → rebuild → push)${C_RESET}"
   echo -e "  ${C_YELLOW}${C_BOLD}5)${C_RESET} Build de teste      ${C_GRAY}(nixos-rebuild build, não ativa nada)${C_RESET}"
   echo -e "  ${C_RED}${C_BOLD}6)${C_RESET} Rollback            ${C_GRAY}(voltar para geração anterior)${C_RESET}"
@@ -391,13 +408,13 @@ show_menu() {
 
 run_choice() {
   local choice="$1"
-  local host_arg="${2:-}"
+  local extra_arg="${2:-}"
   case "$choice" in
     1|legacy)  build_legacy ;;
-    2|flake)   build_flake "$host_arg" ;;
-    3|clean)   clean_cache ;;
-    4|update)  update_system "$host_arg" ;;
-    5|dry)     build_flake_dry "$host_arg" ;;
+    2|flake)   build_flake "$extra_arg" ;;
+    3|clean)   clean_cache "$extra_arg" ;;
+    4|update)  update_system "$extra_arg" ;;
+    5|dry)     build_flake_dry "$extra_arg" ;;
     6|rollback) rollback_system ;;
     7|check)   check_flake ;;
     8|hosts)   list_hosts ;;
