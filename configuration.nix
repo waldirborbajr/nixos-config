@@ -296,7 +296,11 @@
       coreutils
       #     element-web
       #     zed-editor
-      #     bluez
+      bluez
+      ffmpeg
+      pulseaudio
+      pciutils
+      curl
       # # emacs deps
       # # make packages available to emacsclient (see nixos wiki's emacs docs)
       #     emacsPackages.pbcopy
