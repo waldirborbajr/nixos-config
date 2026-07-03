@@ -150,55 +150,55 @@
   # com "No command configured" e travou o login. O bloco do greetd fica
   # comentado abaixo pra retomar depois de testar o comando manualmente
   # (rodando o binário direto num shell, sem trocar o display manager).
-  # services.xserver.displayManager.lightdm = {
-  #   enable = true;
-  #   greeters.gtk = {
-  #     enable = true;
-  #     theme = {
-  #       package = pkgs.catppuccin-gtk.override {
-  #         accents = ["mauve"];
-  #         size = "standard";
-  #         variant = "mocha";
-  #       };
-  #       name = "Catppuccin-Mocha-Standard-Mauve-Dark";
-  #     };
-  #     iconTheme = {
-  #       package = pkgs.papirus-icon-theme;
-  #       name = "Papirus-Dark";
-  #     };
-  #     cursorTheme = {
-  #       package = pkgs.catppuccin-cursors.mochaDark;
-  #       name = "catppuccin-mocha-dark-cursors";
-  #     };
-  #     extraConfig = ''
-  #       font-name = FiraCode Nerd Font 11
-  #       xft-antialias = true
-  #       xft-hintstyle = hintslight
-  #       indicators = ~host;~spacer;~clock;~spacer;~session;~language;~a11y;~power
-  #     '';
-  #   };
-  # };
-  # services.displayManager.defaultSession = "none+i3";
-
-  services.greetd = {
+  services.xserver.displayManager.lightdm = {
     enable = true;
-    settings = {
-      default_session = {
-        # IMPORTANTE:
-        # - tuigreet separa sessões Wayland (--sessions) de X11 (--xsessions),
-        #   cada uma com sua própria flag, separadas por ":" (dois-pontos).
-        # - No NixOS os .desktop de sessão não ficam em /usr/share nem em
-        #   /run/current-system/sw/share a menos que um display manager
-        #   (lightdm/sddm/gdm) esteja habilitado. Como só o greetd está
-        #   ativo aqui, apontamos direto pra derivação que o NixOS já monta
-        #   com essas sessões, independente de display manager:
-        #   config.services.displayManager.sessionData.desktops
-        command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --remember-user-session --asterisks --sessions ${config.services.displayManager.sessionData.desktops}/share/wayland-sessions --xsessions ${config.services.displayManager.sessionData.desktops}/share/xsessions";
-        user = "greeter";
+    greeters.gtk = {
+      enable = true;
+      theme = {
+        package = pkgs.catppuccin-gtk.override {
+          accents = ["mauve"];
+          size = "standard";
+          variant = "mocha";
+        };
+        name = "Catppuccin-Mocha-Standard-Mauve-Dark";
       };
+      iconTheme = {
+        package = pkgs.papirus-icon-theme;
+        name = "Papirus-Dark";
+      };
+      cursorTheme = {
+        package = pkgs.catppuccin-cursors.mochaDark;
+        name = "catppuccin-mocha-dark-cursors";
+      };
+      extraConfig = ''
+        font-name = FiraCode Nerd Font 11
+        xft-antialias = true
+        xft-hintstyle = hintslight
+        indicators = ~host;~spacer;~clock;~spacer;~session;~language;~a11y;~power
+      '';
     };
   };
-  security.pam.services.greetd.enableGnomeKeyring = true;
+  services.displayManager.defaultSession = "none+i3";
+
+  # services.greetd = {
+  #   enable = true;
+  #   settings = {
+  #     default_session = {
+  #       # IMPORTANTE:
+  #       # - tuigreet separa sessões Wayland (--sessions) de X11 (--xsessions),
+  #       #   cada uma com sua própria flag, separadas por ":" (dois-pontos).
+  #       # - No NixOS os .desktop de sessão não ficam em /usr/share nem em
+  #       #   /run/current-system/sw/share a menos que um display manager
+  #       #   (lightdm/sddm/gdm) esteja habilitado. Como só o greetd está
+  #       #   ativo aqui, apontamos direto pra derivação que o NixOS já monta
+  #       #   com essas sessões, independente de display manager:
+  #       #   config.services.displayManager.sessionData.desktops
+  #       command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --remember-user-session --asterisks --sessions ${config.services.displayManager.sessionData.desktops}/share/wayland-sessions --xsessions ${config.services.displayManager.sessionData.desktops}/share/xsessions";
+  #       user = "greeter";
+  #     };
+  #   };
+  # };
+  # security.pam.services.greetd.enableGnomeKeyring = true;
   #
   # ANTES de trocar pro greetd de verdade (comentar o bloco lightdm acima e
   # descomentar este), rode primeiro a opção "5) Build de teste" do
