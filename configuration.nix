@@ -272,6 +272,10 @@
       tmux
       helix
       feh
+     dex
+     picom
+     brightnessctl
+     lxsession       # fornece lxpolkit
       #     discord
       #     brave
       #     chromium
