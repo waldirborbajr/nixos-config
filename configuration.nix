@@ -160,7 +160,7 @@
           size = "standard";
           variant = "mocha";
         };
-        name = "Catppuccin-Mocha-Standard-Mauve-Dark";
+        name = "catppuccin-mocha-mauve-standard";
       };
       iconTheme = {
         package = pkgs.papirus-icon-theme;
@@ -193,7 +193,7 @@
   #       #   ativo aqui, apontamos direto pra derivação que o NixOS já monta
   #       #   com essas sessões, independente de display manager:
   #       #   config.services.displayManager.sessionData.desktops
-  #       command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --remember-user-session --asterisks --sessions ${config.services.displayManager.sessionData.desktops}/share/wayland-sessions --xsessions ${config.services.displayManager.sessionData.desktops}/share/xsessions";
+  #       command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --remember-user-session --asterisks --theme 'border=magenta;text=white;prompt=cyan;time=yellow;action=blue;button=magenta;container=black;input=green' --xsession-wrapper 'dbus-run-session -- startx /usr/bin/env' --sessions ${config.services.displayManager.sessionData.desktops}/share/wayland-sessions --xsessions ${config.services.displayManager.sessionData.desktops}/share/xsessions";
   #       user = "greeter";
   #     };
   #   };
@@ -293,7 +293,7 @@
       xkill
       xclip
       coreutils
-      xinit # fornece o binário `startx`, usado pelo wrapper padrão do tuigreet nas sessões X11 (i3)
+      xorg.xinit # fornece o binário `startx`, usado pelo wrapper padrão do tuigreet nas sessões X11 (i3)
       #     element-web
       #     zed-editor
       #     bluez
