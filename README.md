@@ -59,3 +59,11 @@ nix develop
 - Lua (`modules/languages/lua.nix` - toggle)
 - Nix (`modules/languages/nix-dev.nix`)
 - Python, Node.js
+
+
+
+```
+https://git.voidarc.co.uk/voidarc/nixos
+```
+
+
