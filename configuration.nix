@@ -276,6 +276,7 @@
       htop
       tmux
       helix
+      feh
       #     discord
       #     brave
       #     chromium
