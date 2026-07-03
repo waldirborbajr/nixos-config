@@ -69,24 +69,18 @@
     enableDefaultPackages = true;
 
     packages = with pkgs; [
-      noto-fonts
-      noto-fonts-cjk-sans
-      noto-fonts-color-emoji
-      dejavu_fonts
-      jetbrains-mono
-
-      nerd-fonts.fira-code
+      fira-code
       nerd-fonts.fira-mono
+      nerd-fonts.fira-code
+      nerd-fonts.droid-sans-mono
       nerd-fonts.jetbrains-mono
-      nerd-fonts.iosevka-term # exemplo
-      nerd-fonts.caskaydia-cove # Cascadia Code Nerd Font
+      libertine # Linux Libertine fonts
+      noto-fonts-color-emoji # Color emoji for headless browser screenshots
     ];
 
     fontconfig = {
       enable = true;
       defaultFonts = {
-        serif = ["Noto Sans" "Noto Sans CJK SC"];
-        sansSerif = ["Noto Serif" "Noto Serif CJK SC"];
         monospace = ["FiraCode Nerd Font" "JetBrainsMono Nerd Font"];
       };
     };
