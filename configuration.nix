@@ -96,7 +96,7 @@
     home = "/home/borba";
     description = "borba jr, w";
     extraGroups = ["networkmanager" "wheel"];
-    packages = with pkgs; [];
+    # packages = with pkgs; [];
   };
 
   security.sudo.extraRules = [
@@ -247,33 +247,33 @@
   # $ nix search wget
   environment.systemPackages =
     (with pkgs; [
-# === Essenciais básicos ===
-    wget
-    curl
-    git
-    helix
-    tmux
-    bat
-    ripgrep
-    eza
-    btop
-    htop
-    fastfetch
+      # === Essenciais básicos ===
+      wget
+      curl
+      git
+      helix
+      tmux
+      bat
+      ripgrep
+      eza
+      btop
+      htop
+      fastfetch
 
-    # === Terminal & Shell ===
-    alacritty
-    zsh
+      # === Terminal & Shell ===
+      alacritty
+      zsh
 
-    # === Nix tools ===
-    nixd
-    alejandra
+      # === Nix tools ===
+      nixd
+      alejandra
 
-    # === Básicos de desktop (i3) ===
-    rofi
-    feh
-    picom
-    xclip
-    lxappearance
+      # === Básicos de desktop (i3) ===
+      rofi
+      feh
+      picom
+      xclip
+      lxappearance
     ])
     ++ (with pkgs-unstable; [
       # ===== Explicit nixpkgs-unstable packages =====
