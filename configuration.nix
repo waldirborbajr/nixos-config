@@ -257,6 +257,7 @@
       just
       gh
       git
+      psmisc # fornece killall
       chirp
       stow
       ripgrep
@@ -272,10 +273,10 @@
       tmux
       helix
       feh
-     dex
-     picom
-     brightnessctl
-     lxsession       # fornece lxpolkit
+      dex
+      picom
+      brightnessctl
+      lxsession # fornece lxpolkit
       #     discord
       #     brave
       #     chromium
