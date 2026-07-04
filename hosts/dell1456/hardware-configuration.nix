@@ -41,7 +41,7 @@
       "nodiratime"
       "commit=60"
     ];
-  };
+  };    
 
   swapDevices = [ ];
 
