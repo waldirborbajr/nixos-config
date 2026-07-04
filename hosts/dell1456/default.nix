@@ -1,5 +1,5 @@
 # hosts/dell/default.nix
-{ lib, ... }:
+{ lib, pkgs, pkgs-unstable, ... }:
 
 {
   # Sobrescreve bootloader para BIOS legacy (Dell antigo)
