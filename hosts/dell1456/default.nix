@@ -5,3 +5,10 @@ boot.loader.grub = {
   enable = true;
   device = "/dev/sda"; # ajuste pro disco real do Dell — confirme com `lsblk`
 };
+
+  # Keyboard (pt_BR ABNT2)
+  console.keyMap = "br-abnt2";
+  services.xserver.xkb = {
+    layout = "br";
+    variant = "abnt2";
+  };
