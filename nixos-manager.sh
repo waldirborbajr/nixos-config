@@ -411,11 +411,25 @@ clean_cache() {
 }
 
 check_flake() {
+  local host_arg="${1:-}"
   require_dir
   cd "$NIXOS_DIR"
-  log "Checking flake (nix flake check)..."
-  nix flake check
-  ok "Flake is valid."
+
+  if [ -n "$host_arg" ]; then
+    select_flake_attr "$host_arg"
+    log "Checking flake for host ${C_BOLD}${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]}${C_RESET} (${FLAKE_ATTR})..."
+    nix flake check --print-build-logs
+  else
+    log "Checking flake (all hosts)..."
+    nix flake check --print-build-logs
+  fi
+
+  if [ $? -eq 0 ]; then
+    ok "✅ Flake check passed successfully."
+  else
+    err "❌ Flake check failed. See output above."
+    exit 1
+  fi
 }
 
 list_hosts() {
@@ -449,16 +463,16 @@ print_banner() {
 show_menu() {
   print_banner
   echo
-  echo -e "  ${C_GREEN}${C_BOLD}0)${C_RESET} Initial setup       ${C_GRAY}(fresh machine — clone repo + symlink /etc/nixos)${C_RESET}"
-  echo -e "  ${C_YELLOW}${C_BOLD}1)${C_RESET} Build without flake ${C_GRAY}(nixos-rebuild switch)${C_RESET}"
-  echo -e "  ${C_YELLOW}${C_BOLD}2)${C_RESET} Build with flake    ${C_GRAY}(commit -> pull -> rebuild -> push)${C_RESET}"
-  echo -e "  ${C_YELLOW}${C_BOLD}3)${C_RESET} Clean cache         ${C_GRAY}(nix-collect-garbage + optimise + boot)${C_RESET}"
-  echo -e "  ${C_YELLOW}${C_BOLD}4)${C_RESET} Update system       ${C_GRAY}(commit -> pull -> flake update -> rebuild -> push)${C_RESET}"
-  echo -e "  ${C_YELLOW}${C_BOLD}5)${C_RESET} Test build          ${C_GRAY}(nixos-rebuild build, activates nothing)${C_RESET}"
-  echo -e "  ${C_RED}${C_BOLD}6)${C_RESET} Rollback            ${C_GRAY}(go back to the previous generation)${C_RESET}"
-  echo -e "  ${C_YELLOW}${C_BOLD}7)${C_RESET} Check flake         ${C_GRAY}(nix flake check)${C_RESET}"
-  echo -e "  ${C_BLUE}${C_BOLD}8)${C_RESET} List hosts          ${C_GRAY}(show flake hosts and current detection)${C_RESET}"
-  echo -e "  ${C_BOLD}q)${C_RESET} Quit"
+  echo -e " ${C_GREEN}${C_BOLD}0)${C_RESET} Initial setup"
+  echo -e " ${C_YELLOW}${C_BOLD}1)${C_RESET} Build without flake"
+  echo -e " ${C_YELLOW}${C_BOLD}2)${C_RESET} Build with flake"
+  echo -e " ${C_YELLOW}${C_BOLD}3)${C_RESET} Clean cache"
+  echo -e " ${C_YELLOW}${C_BOLD}4)${C_RESET} Update system"
+  echo -e " ${C_YELLOW}${C_BOLD}5)${C_RESET} Test build (dry)"
+  echo -e " ${C_RED}${C_BOLD}6)${C_RESET} Rollback"
+  echo -e " ${C_YELLOW}${C_BOLD}7)${C_RESET} Check flake ${C_GRAY}(nix flake check)${C_RESET}"
+  echo -e " ${C_BLUE}${C_BOLD}8)${C_RESET} List hosts"
+  echo -e " ${C_BOLD}q)${C_RESET} Quit"
   echo
 }
 
@@ -466,15 +480,15 @@ run_choice() {
   local choice="$1"
   local extra_arg="${2:-}"
   case "$choice" in
-    0|setup)    setup_machine ;;
-    1|legacy)   build_legacy ;;
-    2|flake)    build_flake "$extra_arg" ;;
-    3|clean)    clean_cache "$extra_arg" ;;
-    4|update)   update_system "$extra_arg" ;;
-    5|dry)      build_flake_dry "$extra_arg" ;;
+    0|setup) setup_machine ;;
+    1|legacy) build_legacy ;;
+    2|flake) build_flake "$extra_arg" ;;
+    3|clean) clean_cache "$extra_arg" ;;
+    4|update) update_system "$extra_arg" ;;
+    5|dry) build_flake_dry "$extra_arg" ;;
     6|rollback) rollback_system ;;
-    7|check)    check_flake ;;
-    8|hosts)    list_hosts ;;
+    7|check) check_flake "$extra_arg" ;;          # ← melhorado
+    8|hosts) list_hosts ;;
     q|quit|exit) exit 0 ;;
     *) err "Invalid option: $choice"; return 1 ;;
   esac
