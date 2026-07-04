@@ -24,4 +24,36 @@
   fileSystems."/" = {
     options = [ "noatime" "nodiratime" "commit=60" ];
   };
+
+  # ==================== PACOTES PARA ESTA MÁQUINA ====================
+  environment.systemPackages = with pkgs; [
+# Pacotes extras (não presentes no configuration.nix base)
+    yazi
+    jq
+    just
+    duf
+    psmisc
+    asciinema
+    stow
+    lazygit
+    jujutsu
+    lazyjj
+    dex
+    lxsession
+    autorandr
+    xkill
+    brightnessctl
+    playerctl
+    pciutils
+    pavucontrol
+    gdb
+    glibc
+    libcxx
+    libgcc
+  ]
+  ++ (with pkgs-unstable; [
+    # Pacotes unstable específicos desta máquina
+    neovim
+  ]);
+
 }
