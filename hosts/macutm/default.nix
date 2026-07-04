@@ -21,67 +21,31 @@
 
   # ==================== PACOTES PARA ESTA MÁQUINA ====================
   environment.systemPackages = with pkgs; [
-    # ===== Shell & CLI utilities =====
-    wget
-    curl
-    zsh
-    oh-my-posh
+# Pacotes extras (não presentes no configuration.nix base)
     zellij
-    tmux
     yazi
-    eza
-    bat
-    ripgrep
     jq
     just
     duf
     psmisc
-    coreutils
-    fastfetch
     asciinema
     stow
-
-    # ===== System monitoring =====
-    btop
-    htop
-
-    # ===== Git & version control =====
-    git
-    gh
     lazygit
     jujutsu
     lazyjj
-
-    # ===== Editors =====
-    helix
     emacs
     emacsPackages.pbcopy
     emacsPackages.vterm
-
-    # ===== Terminal & WM =====
-    alacritty
-    feh
     dex
-    picom
-    rofi
-    lxappearance
     lxsession
     autorandr
     xkill
-    xclip
-
-    # ===== Hardware & Multimedia =====
     brightnessctl
     playerctl
     pciutils
-    pulseaudio
     pavucontrol
     ffmpeg
-
-    # ===== Virtualization =====
     docker
-
-    # ===== Compilers & tools =====
     gcc
     gnumake
     cmake
@@ -89,8 +53,9 @@
     glibc
     libcxx
     libgcc
+    chirp
 
-    # ===== Language servers & formatters =====
+    # Language servers e ferramentas de dev
     rust-analyzer
     rustfmt
     lua-language-server
@@ -101,12 +66,7 @@
     black
     taplo
     lemminx
-    nixd
-    alejandra
     marksman
-
-    # Hardware specific
-    chirp
   ]
   ++ (with pkgs-unstable; [
     # Pacotes unstable específicos desta máquina
