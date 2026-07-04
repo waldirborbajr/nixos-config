@@ -253,7 +253,7 @@
       wget
       curl
       zsh
-      fish
+      # fish
       # starship
       # atuin
       oh-my-posh
