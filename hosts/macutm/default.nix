@@ -8,183 +8,111 @@
 
   # Keyboard - US/Mac (para Mac M2 + UTM)
   console.keyMap = "us";
-
   services.xserver.xkb = {
     layout = "us";
     variant = "mac";
   };
 
   # Otimizações leves para VM
-  boot.kernelParams = [ "mitigations=off" ]; # melhora performance em VMs
+  boot.kernelParams = [ "mitigations=off" ];
 
   # Melhor suporte a QEMU/UTM
   services.qemuGuest.enable = true;
 
-  # ==================== PACOTES ESPECÍFICOS PARA ESTA MÁQUINA ====================
+  # ==================== PACOTES PARA ESTA MÁQUINA ====================
   environment.systemPackages = with pkgs; [
-      # ===== Shell & CLI utilities =====
-      wget
-      curl
-      zsh
-      # fish
-      # starship
-      # atuin
-      oh-my-posh
-      zellij
-      tmux
-      yazi
-      eza
-      bat
-      ripgrep
-      jq
-      just
-      duf
-      psmisc # provides killall
-      coreutils
-      fastfetch
-      asciinema
-      stow
+    # ===== Shell & CLI utilities =====
+    wget
+    curl
+    zsh
+    oh-my-posh
+    zellij
+    tmux
+    yazi
+    eza
+    bat
+    ripgrep
+    jq
+    just
+    duf
+    psmisc
+    coreutils
+    fastfetch
+    asciinema
+    stow
 
-      # ===== System monitoring & process management =====
-      btop
-      htop
+    # ===== System monitoring =====
+    btop
+    htop
 
-      # ===== Git & version control =====
-      git
-      gh
-      lazygit
-      jujutsu
-      lazyjj
+    # ===== Git & version control =====
+    git
+    gh
+    lazygit
+    jujutsu
+    lazyjj
 
-      # ===== Editors =====
-      helix
-      emacs
-      emacsPackages.pbcopy
-      emacsPackages.vterm
+    # ===== Editors =====
+    helix
+    emacs
+    emacsPackages.pbcopy
+    emacsPackages.vterm
 
-      # ===== Terminal emulator =====
-      alacritty
+    # ===== Terminal & WM =====
+    alacritty
+    feh
+    dex
+    picom
+    rofi
+    lxappearance
+    lxsession
+    autorandr
+    xkill
+    xclip
 
-      # ===== Window manager / desktop utilities (i3) =====
-      feh
-      dex
-      picom
-      rofi
-      lxappearance # customize i3 without changing config
-      lxsession # provides lxpolkit
-      autorandr # auto select a display configuration based on connected devices
-      xkill
-      xclip
+    # ===== Hardware & Multimedia =====
+    brightnessctl
+    playerctl
+    pciutils
+    pulseaudio
+    pavucontrol
+    ffmpeg
 
-      # ===== Hardware control =====
-      brightnessctl
-      playerctl
-      pciutils
+    # ===== Virtualization =====
+    docker
 
-      # ===== Networking =====
-      pkgs.networkmanagerapplet
-      bluez
+    # ===== Compilers & tools =====
+    gcc
+    gnumake
+    cmake
+    gdb
+    glibc
+    libcxx
+    libgcc
 
-      # ===== Audio =====
-      pulseaudio
-      pavucontrol
+    # ===== Language servers & formatters =====
+    rust-analyzer
+    rustfmt
+    lua-language-server
+    stylua
+    gotools
+    golangci-lint-langserver
+    python3Packages.python-lsp-server
+    black
+    taplo
+    lemminx
+    nixd
+    alejandra
+    marksman
 
-      # ===== Media / video =====
-      ffmpeg
+    # Hardware specific
+    chirp
+  ]
+  ++ (with pkgs-unstable; [
+    # Pacotes unstable específicos desta máquina
+    neovim
+  ]);
 
-      # ===== Virtualization / containers =====
-      docker
-
-      # ===== Hardware-specific tools =====
-      chirp
-
-      # ===== Compilers & build tools =====
-      gcc
-      glibc
-      libcxx
-      libgcc
-      gdb
-      cmake
-      gnumake
-
-      #     discord
-      #     brave
-      #     chromium
-      #     flameshot
-      #     yubikey-agent
-      #     keepassxc
-      #     xss-lock
-      #     lolcat
-      #     element-web
-      #     zed-editor
-      # # emacs deps
-      # # make packages available to emacsclient (see nixos wiki's emacs docs)
-      #     libvterm
-      #     libtool
-      #     pam_u2f
-      #     ispell
-      # # yak shaving
-      # # update bios as needed
-      #     fwupd
-      # # content
-      #     kdePackages.kdenlive
-      #     obs-studio
-      #     mesa # OpenCL for graphics x Davinci on Linux
-
-      # ===== Helix language servers / formatters =====
-      # Go (gopls already in the list)
-      gotools # goimports
-      golangci-lint-langserver
-
-      # Rust (rust-analyzer/rustfmt via rustup are inconsistent in PATH;
-      # prefer the nixpkgs packages below instead of relying on the rustup toolchain)
-      rust-analyzer
-      rustfmt
-
-      # Lua
-      lua-language-server
-      stylua
-
-      # TypeScript / JavaScript
-      #nodePackages.typescript-language-server
-      #nodePackages.typescript          # provides support for the internal tsserver
-      #nodePackages.prettier
-
-      # Python
-      python3Packages.python-lsp-server # command: pylsp
-      black
-
-      # TOML
-      taplo
-
-      # JSON / JSONC
-      #nodePackages.vscode-langservers-extracted  # provides vscode-json-language-server
-
-      # YAML
-      #nodePackages.yaml-language-server
-
-      # XML
-      lemminx
-
-      # Nix
-      nixd
-      alejandra
-
-      # Dockerfile
-      #nodePackages.dockerfile-language-server-nodejs  # command: docker-langserver
-
-      # Markdown
-      marksman
-
-      # Bash
-      #nodePackages.bash-language-server
-  ];
-
-  # Programas opcionais (usando mkDefault por segurança)
+  # Programas opcionais
   programs.firefox.enable = lib.mkDefault true;
-
-  # Se quiser pacotes do unstable específicos desta máquina:
-   environment.systemPackages = with pkgs-unstable; [
-     neovim
-   ];
 }
