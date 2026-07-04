@@ -76,6 +76,7 @@
       nerd-fonts.jetbrains-mono
       libertine # Linux Libertine fonts
       noto-fonts-color-emoji # Color emoji for headless browser screenshots
+      nerd-fonts.symbols-only # fallback para ícones fora do subset embutido nas fontes de código (v3+)
     ];
 
     fontconfig = {
