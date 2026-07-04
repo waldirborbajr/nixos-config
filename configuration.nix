@@ -245,85 +245,109 @@
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages =
+environment.systemPackages =
     (with pkgs; [
       #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+
+      # ===== Shell & CLI utilities =====
       wget
-      asciinema
-      atuin
-      docker
-      duf
-      fastfetch
-      jq
-      just
-      gh
-      git
-      psmisc # fornece killall
-      chirp
-      stow
-      ripgrep
+      curl
       zsh
+      fish
       starship
+      atuin
       zellij
+      tmux
       yazi
       eza
       bat
-      lazygit
+      ripgrep
+      jq
+      just
+      duf
+      psmisc # provides killall
+      coreutils
+      fastfetch
+      asciinema
+      stow
+
+      # ===== System monitoring & process management =====
       btop
       htop
-lazyjj
-jujutsu
-      tmux
+
+      # ===== Git & version control =====
+      git
+      gh
+      lazygit
+
+      # ===== Editors =====
       helix
+      emacs
+      emacsPackages.pbcopy
+      emacsPackages.vterm
+
+      # ===== Terminal emulator =====
+      alacritty
+
+      # ===== Window manager / desktop utilities (i3) =====
       feh
       dex
       picom
+      rofi
+      lxappearance # customize i3 without changing config
+      lxsession # provides lxpolkit
+      autorandr # auto select a display configuration based on connected devices
+      xkill
+      xclip
+
+      # ===== Hardware control =====
       brightnessctl
-      lxsession # fornece lxpolkit
+      playerctl
+      pciutils
+
+      # ===== Networking =====
+      pkgs.networkmanagerapplet
+      bluez
+
+      # ===== Audio =====
+      pulseaudio
+      pavucontrol
+
+      # ===== Media / video =====
+      ffmpeg
+
+      # ===== Virtualization / containers =====
+      docker
+
+      # ===== Hardware-specific tools =====
+      chirp
+
+      # ===== Compilers & build tools =====
+      gcc
+      glibc
+      libcxx
+      libgcc
+      gdb
+      cmake
+      gnumake
+
       #     discord
       #     brave
       #     chromium
       #     flameshot
-      alacritty
-      #     emacs
-      rofi
       #     yubikey-agent
       #     keepassxc
       #     xss-lock
-      pkgs.networkmanagerapplet
-      playerctl
-      pavucontrol
       #     lolcat
-      xkill
-      xclip
-      coreutils
       #     element-web
       #     zed-editor
-      bluez
-      ffmpeg
-      pulseaudio
-      pciutils
-      curl
       # # emacs deps
       # # make packages available to emacsclient (see nixos wiki's emacs docs)
-      #     emacsPackages.pbcopy
-      #     emacsPackages.vterm
       #     libvterm
       #     libtool
-
-      gcc
-      glibc
-      libcxx
-      gdb
-      cmake
-      gnumake
-      libgcc
-
       #     pam_u2f
       #     ispell
       # # yak shaving
-      lxappearance # customize i3 without changing config
-      autorandr # auto select a display configuration based on connected devices.
       # # update bios as needed
       #     fwupd
       # # content
@@ -331,18 +355,13 @@ jujutsu
       #     obs-studio
       #     mesa # OpenCL for graphics x Davinci on Linux
 
-      # emacs
-      emacs
-      emacsPackages.pbcopy
-      emacsPackages.vterm
-
       # ===== Helix language servers / formatters =====
-      # Go (gopls já está na lista)
+      # Go (gopls already in the list)
       gotools # goimports
       golangci-lint-langserver
 
-      # Rust (rust-analyzer/rustfmt via rustup ficam inconsistentes no PATH;
-      # prefira os pacotes nixpkgs abaixo em vez de depender do toolchain do rustup)
+      # Rust (rust-analyzer/rustfmt via rustup are inconsistent in PATH;
+      # prefer the nixpkgs packages below instead of relying on the rustup toolchain)
       rust-analyzer
       rustfmt
 
@@ -352,18 +371,18 @@ jujutsu
 
       # TypeScript / JavaScript
       #nodePackages.typescript-language-server
-      #nodePackages.typescript          # dá suporte ao tsserver interno
+      #nodePackages.typescript          # provides support for the internal tsserver
       #nodePackages.prettier
 
       # Python
-      python3Packages.python-lsp-server # comando: pylsp
+      python3Packages.python-lsp-server # command: pylsp
       black
 
       # TOML
       taplo
 
       # JSON / JSONC
-      #nodePackages.vscode-langservers-extracted  # dá vscode-json-language-server
+      #nodePackages.vscode-langservers-extracted  # provides vscode-json-language-server
 
       # YAML
       #nodePackages.yaml-language-server
@@ -376,7 +395,7 @@ jujutsu
       alejandra
 
       # Dockerfile
-      #nodePackages.dockerfile-language-server-nodejs  # comando: docker-langserver
+      #nodePackages.dockerfile-language-server-nodejs  # command: docker-langserver
 
       # Markdown
       marksman
@@ -385,9 +404,9 @@ jujutsu
       #nodePackages.bash-language-server
     ])
     ++ (with pkgs-unstable; [
-      # ===== Pacotes explicitamente do nixpkgs-unstable =====
-      # Software que você quer sempre na versão mais recente disponível,
-      # independente da base estável (26.05) do resto do sistema.
+      # ===== Explicit nixpkgs-unstable packages =====
+      # Software you always want at the latest version available,
+      # regardless of the stable base (26.05) of the rest of the system.
       neovim
     ]);
 
