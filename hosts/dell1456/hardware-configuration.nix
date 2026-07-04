@@ -48,10 +48,5 @@
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 
-  # Keyboard (pt_BR ABNT2)
-  console.keyMap = "br-abnt2";
-  services.xserver.xkb = {
-    layout = "br";
-    variant = "abnt2";
-  };
+
 }
