@@ -254,8 +254,9 @@
       curl
       zsh
       fish
-      starship
-      atuin
+      # starship
+      # atuin
+      oh-my-posh
       zellij
       tmux
       yazi
