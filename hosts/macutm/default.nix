@@ -12,12 +12,11 @@
     # useOSProber = true;       # descomente se tiver Windows dual boot
   };
 
-  # Teclado ABNT2 (pt-BR)
-  console.keyMap = "br-abnt2";
-
+  # Keyboard (Mac layout)
+  console.keyMap = "us";
   services.xserver.xkb = {
-    layout = "br";
-    variant = "abnt2";
+    layout = "us";
+    variant = "mac";
   };
 
   # Opcional: otimizações de performance para HDD (se for o caso)
