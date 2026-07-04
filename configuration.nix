@@ -271,6 +271,8 @@
       lazygit
       btop
       htop
+lazyjj
+jujutsu
       tmux
       helix
       feh
