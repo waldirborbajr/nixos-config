@@ -1,6 +1,6 @@
 # configuration.nix
 # Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
+# your system. Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 {
   config,
@@ -9,16 +9,20 @@
   hostname,
   ...
 }: let
-# ==================== VARIÁVEIS GLOBAIS ====================
-  username = "borba";                    # ← mude aqui se necessário
-common = {
-    inherit username;
-    dotfilesDir = "/home/${username}/dotfiles";
-    dotfileConfigDir = "/home/${username}/.config";
+  # ==================== GLOBAL VARIABLES ====================
+  username = "borba"; # Change this if you ever change the main username
+
+  # Common paths used across modules
+  dotfilesDir = "/home/${username}/dotfiles";
+  dotfileConfigDir = "/home/${username}/.config";
+
+  # Make variables available to all host-specific modules (hosts/*/default.nix)
+  common = {
+    inherit username dotfilesDir dotfileConfigDir;
   };
 
-  # Convenção: dotfiles/<name>/.config/<name>  ->  ~/.config/<name>
-  # Basta adicionar o nome aqui quando quiser que o Nix mapeie o pacote.
+  # List of programs whose dotfiles should be symlinked automatically
+  # (following the convention: dotfiles/<name>/.config/<name>)
   dotfilePrograms = [
     "tmux"
     "alacritty"
@@ -26,77 +30,54 @@ common = {
     "i3status"
     "rofi"
     "oh-my-posh"
-    # adicione outros conforme for precisando
+    # Add more common dotfiles here when needed
   ];
 
+  # Helper function to create symlink rules
   mkDotfileLink = name: "L+ ${dotfileConfigDir}/${name} - - - - ${dotfilesDir}/${name}/.config/${name}";
 in {
-# Expõe as variáveis para todos os módulos (incluindo hosts/*)
+  # Pass common variables to all modules (including host-specific files)
   _module.args.common = common;
 
   imports = [
-    # hardware-configuration.nix is imported per-host via flake.nix
+    # hardware-configuration.nix and host-specific configs are imported via flake.nix
   ];
 
-  # Bootloader.
-  # NOTA: comentado aqui de propósito — boot.loader é host-specific.
-  # A VM m2utm (UEFI) usa systemd-boot; se o Dell for legacy BIOS,
-  # ele precisa de boot.loader.grub no arquivo próprio do host, com
-  # lib.mkForce para sobrescrever qualquer valor default daqui.
-  # boot.loader.systemd-boot.enable = true;
-  # boot.loader.efi.canTouchEfiVariables = true;
+  # ==================== BOOT ====================
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  # ----- Dotfiles: symlink automático, sem Stow -----
-  # Substitui o fluxo antigo baseado em `stow <pacote>` manual. Toda vez que
-  # um host novo for inicializado (via nixos-manager.sh opção 0), esses links
-  # já nascem corretos no primeiro `nixos-rebuild switch` — não depende de
-  # lembrar de rodar stow depois.
+  # ==================== DOTFILES: Automatic symlinks (no Stow needed) ====================
+  # This replaces manual `stow` usage. Symlinks are created on every rebuild.
   systemd.tmpfiles.rules =
     (map mkDotfileLink dotfilePrograms)
     ++ [
-      # zsh é caso especial: .zshenv precisa ficar na raiz do $HOME,
-      # não em .config/zsh — o zsh só lê .zshenv nesse local fixo, antes
-      # de saber que ZDOTDIR existe (ver discussão sobre bootstrap do ZDOTDIR).
-"L+ /home/${username}/.zshenv - - - - ${dotfilesDir}/zsh/.zshenv"
+      # Special cases for zsh
+      "L+ /home/${username}/.zshenv - - - - ${dotfilesDir}/zsh/.zshenv"
       "L+ /home/${username}/.config/zsh - - - - ${dotfilesDir}/zsh/.config/zsh"
     ];
 
+  # ==================== POWER MANAGEMENT ====================
   systemd.sleep.settings.Sleep = {
-    AllowSuspend = "yes"; # if you only want to disable hibernation, keep Suspend enabled
-    AllowHibernation = "no"; # disable Hibernate
-    AllowHybridSleep = "no"; # disable Hybrid Sleep
-    AllowSuspendThenHibernate = "no"; # disable suspend-then-hibernate
-    MemorySleepMode = "s2idle"; # force s2idle instead of deep sleep
+    AllowSuspend = "yes";
+    AllowHibernation = "no";
+    AllowHybridSleep = "no";
+    AllowSuspendThenHibernate = "no";
+    MemorySleepMode = "s2idle";
   };
 
-  networking.hostName = hostname; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
-  # Enable networking
+  # ==================== NETWORKING ====================
+  networking.hostName = hostname;
   networking.networkmanager.enable = true;
 
-  # Bluetooth backend — required for blueman (tray/GUI) to find any adapter.
+  # Bluetooth
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true;
   services.blueman.enable = true;
 
-  # GPU acceleration (video playback, terminal rendering, compositing, etc.)
-  #  hardware.graphics = {
-  #    enable = true;
-  #    enable32Bit = true;
-  #  };
-
-  # Set your time zone.
+  # ==================== LOCALISATION ====================
   time.timeZone = "America/Sao_Paulo";
 
-  # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
-
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "pt_BR.UTF-8";
     LC_IDENTIFICATION = "pt_BR.UTF-8";
@@ -109,21 +90,19 @@ in {
     LC_TIME = "pt_BR.UTF-8";
   };
 
-  # ----- Fonts (merged into a single block)
+  # ==================== FONTS ====================
   fonts = {
     enableDefaultPackages = true;
-
     packages = with pkgs; [
       fira-code
       nerd-fonts.fira-mono
       nerd-fonts.fira-code
       nerd-fonts.droid-sans-mono
       nerd-fonts.jetbrains-mono
-      libertine # Linux Libertine fonts
-      noto-fonts-color-emoji # Color emoji for headless browser screenshots
-      nerd-fonts.symbols-only # fallback para ícones fora do subset embutido nas fontes de código (v3+)
+      libertine
+      noto-fonts-color-emoji
+      nerd-fonts.symbols-only
     ];
-
     fontconfig = {
       enable = true;
       defaultFonts = {
@@ -131,22 +110,18 @@ in {
       };
     };
   };
-  # ----- /Fonts
 
-  # Keyboard layout is configured per-host in hosts/<hostname>/hardware-configuration.nix
-
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users."borba" = {
+  # ==================== USER ACCOUNT ====================
+  users.users.${username} = {
     isNormalUser = true;
-   home = "/home/${username}";
-    description = "borba jr, w";
-    extraGroups = ["networkmanager" "wheel"];
-    # packages = with pkgs; [];
+    home = "/home/${username}";
+    description = "borba jr";
+    extraGroups = ["networkmanager" "wheel" "docker"];
   };
 
   security.sudo.extraRules = [
     {
-      users = [ username ];
+      users = [username];
       commands = [
         {
           command = "ALL";
@@ -156,14 +131,10 @@ in {
     }
   ];
 
-  # ----- /X11
-
-  # Enable the X11 windowing system (still needed for i3, even with greetd as login manager).
+  # ==================== X11 / i3 ====================
   services.xserver = {
     enable = true;
-    desktopManager = {
-      xterm.enable = false;
-    };
+    desktopManager.xterm.enable = false;
     windowManager.i3 = {
       enable = true;
       extraPackages = with pkgs; [
@@ -173,84 +144,15 @@ in {
         rofi
       ];
     };
+    displayManager.lightdm.enable = true;
+    displayManager.defaultSession = "none+i3";
   };
 
-  # Full GNOME desktop removed — only the pieces i3/Sway actually need to behave
-  # well (keyring for secrets/wifi passwords, polkit for privilege prompts).
   services.gnome.gnome-keyring.enable = true;
   security.polkit.enable = true;
+  programs.i3lock.enable = true;
 
-  # ----- Login manager: greetd + tuigreet -----
-  # Replaces LightDM. greetd is a minimal, session-agnostic login daemon;
-  # tuigreet is a TUI greeter that autodiscovers both X11 (xsessions) and
-  # Wayland (wayland-sessions) entries — so i3 and Sway both show up as
-  # selectable sessions, and it remembers your last choice per user.
-  # ----- Login manager -----
-  # NOTA: voltamos pro LightDM temporariamente porque o greetd+tuigreet ficou
-  # com "No command configured" e travou o login. O bloco do greetd fica
-  # comentado abaixo pra retomar depois de testar o comando manualmente
-  # (rodando o binário direto num shell, sem trocar o display manager).
-  services.xserver.displayManager.lightdm = {
-    enable = true;
-    greeters.gtk = {
-      enable = true;
-      theme = {
-        package = pkgs.catppuccin-gtk.override {
-          accents = ["mauve"];
-          size = "standard";
-          variant = "mocha";
-        };
-        name = "catppuccin-mocha-mauve-standard";
-      };
-      iconTheme = {
-        package = pkgs.papirus-icon-theme;
-        name = "Papirus-Dark";
-      };
-      cursorTheme = {
-        package = pkgs.catppuccin-cursors.mochaDark;
-        name = "catppuccin-mocha-dark-cursors";
-      };
-      extraConfig = ''
-        font-name = FiraCode Nerd Font 11
-        xft-antialias = true
-        xft-hintstyle = hintslight
-        indicators = ~host;~spacer;~clock;~spacer;~session;~language;~a11y;~power
-      '';
-    };
-  };
-  services.displayManager.defaultSession = "none+i3";
-
-  # services.greetd = {
-  #   enable = true;
-  #   settings = {
-  #     default_session = {
-  #       # IMPORTANTE:
-  #       # - tuigreet separa sessões Wayland (--sessions) de X11 (--xsessions),
-  #       #   cada uma com sua própria flag, separadas por ":" (dois-pontos).
-  #       # - No NixOS os .desktop de sessão não ficam em /usr/share nem em
-  #       #   /run/current-system/sw/share a menos que um display manager
-  #       #   (lightdm/sddm/gdm) esteja habilitado. Como só o greetd está
-  #       #   ativo aqui, apontamos direto pra derivação que o NixOS já monta
-  #       #   com essas sessões, independente de display manager:
-  #       #   config.services.displayManager.sessionData.desktops
-  #       command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --remember-user-session --asterisks --theme 'border=magenta;text=white;prompt=cyan;time=yellow;action=blue;button=magenta;container=black;input=green' --xsession-wrapper 'dbus-run-session -- startx /usr/bin/env' --sessions ${config.services.displayManager.sessionData.desktops}/share/wayland-sessions --xsessions ${config.services.displayManager.sessionData.desktops}/share/xsessions";
-  #       user = "greeter";
-  #     };
-  #   };
-  # };
-  # security.pam.services.greetd.enableGnomeKeyring = true;
-  #
-  # ANTES de trocar pro greetd de verdade (comentar o bloco lightdm acima e
-  # descomentar este), rode primeiro a opção "5) Build de teste" do
-  # nixos-manager.sh — ela roda `nixos-rebuild build` sem ativar nada, então
-  # pega erro de avaliação (ex: nome de opção errado) sem arriscar travar o
-  # login de novo. Mesmo assim, mantenha uma sessão SSH separada aberta
-  # enquanto testa o `switch` de verdade, caso precise reverter na hora.
-
-  programs.i3lock.enable = true; # default i3 screen locker
-  # ----- /X11
-
-  # Enable sound with pipewire.
+  # ==================== SOUND (PipeWire) ====================
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
@@ -258,27 +160,18 @@ in {
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
-    # If you want to use JACK applications, uncomment this
-    #jack.enable = true;
-
-    # use the example session manager (no others are packaged yet so this is enabled by default,
-    # no need to redefine it in your config for now)
-    #media-session.enable = true;
   };
 
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
-  #  nixpkgs.config.permittedInsecurePackages = [
-  #    "broadcom-sta-6.30.223.271-57-6.12.41"
-  #  ];
-
-  # Install firefox.
+  # ==================== PROGRAMS ====================
   programs = {
     firefox.enable = true;
     fish.enable = true;
   };
 
-  # Keep the Nix store from growing unbounded across frequent rebuilds.
+  # ==================== NIX SETTINGS ====================
+  nixpkgs.config.allowUnfree = true;
+  nix.settings.experimental-features = ["nix-command" "flakes"];
+
   nix.gc = {
     automatic = true;
     dates = "weekly";
@@ -286,72 +179,10 @@ in {
   };
   nix.optimise.automatic = true;
 
-  nix.settings.experimental-features = ["nix-command" "flakes"];
-
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
-  environment.systemPackages =
-    (with pkgs; [
-      # === Essenciais básicos ===
-      wget
-      curl
-      git
-      helix
-      tmux
-      bat
-      ripgrep
-      eza
-      btop
-      htop
-      fastfetch
-      oh-my-posh
-
-      # === Terminal & Shell ===
-      alacritty
-      zsh
-
-      # === Nix tools ===
-      nixd
-      alejandra
-
-      # === Básicos de desktop (i3) ===
-      rofi
-      feh
-      picom
-      xclip
-      lxappearance
-    ])
-    ++ (with pkgs-unstable; [
-      # ===== Explicit nixpkgs-unstable packages =====
-      # Software you always want at the latest version available,
-      # regardless of the stable base (26.05) of the rest of the system.
-      neovim
-    ]);
-
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
-
-  # List services that you want to enable:
-
-  # Enable the OpenSSH daemon.
+  # ==================== SERVICES ====================
   services.openssh.enable = true;
-
-  # Open ports in the firewall.
   networking.firewall.allowedTCPPorts = [22];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
 
-  # This value determines the NixOS release from which the default
-  # settings for stateful data, like file locations and database versions
-  # on your system were taken. It‘s perfectly fine and recommended to leave
-  # this value at the release version of the first install of this system.
-  # Before changing this value read the documentation for this option
-  # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "26.05"; # Did you read the comment?
+  # ==================== SYSTEM VERSION ====================
+  system.stateVersion = "26.05";
 }
