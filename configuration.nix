@@ -11,8 +11,11 @@
 }: let
 # ==================== VARIÁVEIS GLOBAIS ====================
   username = "borba";                    # ← mude aqui se necessário
-  dotfilesDir = "/home/${username}/dotfiles";
-  dotfileConfigDir = "/home/${username}/.config";
+common = {
+    inherit username;
+    dotfilesDir = "/home/${username}/dotfiles";
+    dotfileConfigDir = "/home/${username}/.config";
+  };
 
   # Convenção: dotfiles/<name>/.config/<name>  ->  ~/.config/<name>
   # Basta adicionar o nome aqui quando quiser que o Nix mapeie o pacote.
@@ -28,6 +31,9 @@
 
   mkDotfileLink = name: "L+ ${dotfileConfigDir}/${name} - - - - ${dotfilesDir}/${name}/.config/${name}";
 in {
+# Expõe as variáveis para todos os módulos (incluindo hosts/*)
+  _module.args.common = common;
+
   imports = [
     # hardware-configuration.nix is imported per-host via flake.nix
   ];
