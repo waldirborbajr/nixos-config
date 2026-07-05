@@ -7,15 +7,51 @@
   pkgs-unstable,
   hostname,
   ...
-}: {
+}: let
+  dotfilesDir = "/home/borba/dotfiles";
+  dotfileConfigDir = "/home/borba/.config";
+
+  # Convenção: dotfiles/<name>/.config/<name>  ->  ~/.config/<name>
+  # Basta adicionar o nome aqui quando quiser que o Nix mapeie o pacote.
+  dotfilePrograms = [
+    "tmux"
+    "alacritty"
+    "i3"
+    "i3status"
+    "rofi"
+    # adicione outros conforme for precisando
+  ];
+
+  mkDotfileLink = name:
+    "L+ ${dotfileConfigDir}/${name} - - - - ${dotfilesDir}/${name}/.config/${name}";
+in {
   imports = [
     # hardware-configuration.nix is imported per-host via flake.nix
   ];
 
   # Bootloader.
+  # NOTA: comentado aqui de propósito — boot.loader é host-specific.
+  # A VM m2utm (UEFI) usa systemd-boot; se o Dell for legacy BIOS,
+  # ele precisa de boot.loader.grub no arquivo próprio do host, com
+  # lib.mkForce para sobrescrever qualquer valor default daqui.
   # boot.loader.systemd-boot.enable = true;
   # boot.loader.efi.canTouchEfiVariables = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
+
+  # ----- Dotfiles: symlink automático, sem Stow -----
+  # Substitui o fluxo antigo baseado em `stow <pacote>` manual. Toda vez que
+  # um host novo for inicializado (via nixos-manager.sh opção 0), esses links
+  # já nascem corretos no primeiro `nixos-rebuild switch` — não depende de
+  # lembrar de rodar stow depois.
+  systemd.tmpfiles.rules =
+    (map mkDotfileLink dotfilePrograms)
+    ++ [
+      # zsh é caso especial: .zshenv precisa ficar na raiz do $HOME,
+      # não em .config/zsh — o zsh só lê .zshenv nesse local fixo, antes
+      # de saber que ZDOTDIR existe (ver discussão sobre bootstrap do ZDOTDIR).
+      "L+ /home/borba/.zshenv - - - - ${dotfilesDir}/zsh/.zshenv"
+      "L+ /home/borba/.config/zsh - - - - ${dotfilesDir}/zsh/.config/zsh"
+    ];
 
   systemd.sleep.settings.Sleep = {
     AllowSuspend = "yes"; # if you only want to disable hibernation, keep Suspend enabled
