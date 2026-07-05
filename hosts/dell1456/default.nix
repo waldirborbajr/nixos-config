@@ -10,7 +10,7 @@ let
   # Keep this list minimal — only add what this machine actually needs
   dotfilePrograms = [
     # Example: add host-specific dotfiles here if needed
-    lazygit
+    "lazygit"
   ];
 
   mkDotfileLink = name: "L+ ${dotfileConfigDir}/${name} - - - - ${dotfilesDir}/${name}/.config/${name}";
