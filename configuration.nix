@@ -155,7 +155,8 @@ in {
     };
   };
 
-  displayManager.defaultSession = "none+i3";
+  # Corrected option (was in the wrong place)
+  services.displayManager.defaultSession = "none+i3";
 
   services.gnome.gnome-keyring.enable = true;
   security.polkit.enable = true;
