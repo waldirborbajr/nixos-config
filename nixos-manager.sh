@@ -239,9 +239,9 @@ list_git_branches() {
   git fetch --all --prune --quiet 2>/dev/null || true
 
   {
-    git branch --format='%(refname:short)' 2>/dev/null
-    git branch -r --format='%(refname:short)' 2>/dev/null | sed -E 's#^[^/]+/##'
-  } | grep -v '^HEAD$' | sort -u
+    git for-each-ref --format='%(refname:short)' refs/heads/ 2>/dev/null
+    git for-each-ref --format='%(refname:strip=3)' refs/remotes/origin/ 2>/dev/null
+  } | grep -v -E '^(HEAD|origin)$' | grep -v '^$' | sort -u
 }
 
 select_git_branch() {
