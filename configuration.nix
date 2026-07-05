@@ -15,15 +15,14 @@
   # Basta adicionar o nome aqui quando quiser que o Nix mapeie o pacote.
   dotfilePrograms = [
     "tmux"
-    "alacritty"
-    "i3"
-    "i3status"
-    "rofi"
+    # "alacritty"
+    # "i3"
+    # "i3status"
+    # "rofi"
     # adicione outros conforme for precisando
   ];
 
-  mkDotfileLink = name:
-    "L+ ${dotfileConfigDir}/${name} - - - - ${dotfilesDir}/${name}/.config/${name}";
+  mkDotfileLink = name: "L+ ${dotfileConfigDir}/${name} - - - - ${dotfilesDir}/${name}/.config/${name}";
 in {
   imports = [
     # hardware-configuration.nix is imported per-host via flake.nix
