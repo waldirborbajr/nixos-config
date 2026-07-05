@@ -1,6 +1,20 @@
 # hosts/dell/default.nix
 { lib, pkgs, pkgs-unstable, ... }:
 
+let
+  dotfilesDir = "/home/borba/dotfiles";
+  dotfileConfigDir = "/home/borba/.config";
+
+  # Dotfiles específicos deste host (UTM)
+  dotfilePrograms = [
+    "lazygit"
+    "yazi"
+    # adicione aqui outros dotfiles específicos do UTM no futuro
+  ];
+
+  mkDotfileLink = name: "L+ ${dotfileConfigDir}/${name} - - - - ${dotfilesDir}/${name}/.config/${name}";
+in
+
 {
   # Sobrescreve bootloader para BIOS legacy (Dell antigo)
   boot.loader.systemd-boot.enable = lib.mkForce false;
@@ -55,5 +69,8 @@
     # Pacotes unstable específicos desta máquina
     neovim
   ]);
+
+# ==================== DOTFILES ESPECÍFICOS DESTE HOST ====================
+  systemd.tmpfiles.rules = map mkDotfileLink dotfilePrograms;
 
 }
