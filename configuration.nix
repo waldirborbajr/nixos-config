@@ -168,6 +168,38 @@ in {
     fish.enable = true;
   };
 
+  environment.systemPackages =
+    (with pkgs; [
+      # === Essenciais básicos ===
+      wget
+      curl
+      git
+      helix
+      tmux
+      bat
+      ripgrep
+      eza
+      btop
+      htop
+      fastfetch
+      oh-my-posh
+      # === Terminal & Shell ===
+      alacritty
+      zsh
+      # === Nix tools ===
+      nixd
+      alejandra
+      # === Básicos de desktop (i3) ===
+      rofi
+      feh
+      picom
+      xclip
+      lxappearance
+    ])
+    ++ (with pkgs-unstable; [
+      neovim
+    ]);
+
   # ==================== NIX SETTINGS ====================
   nixpkgs.config.allowUnfree = true;
   nix.settings.experimental-features = ["nix-command" "flakes"];
