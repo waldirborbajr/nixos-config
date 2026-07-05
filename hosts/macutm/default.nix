@@ -27,7 +27,7 @@
     [
       # Pacotes extras (não presentes no configuration.nix base)
       zellij
-      oh-my-posh
+      
       yazi
       jq
       just
