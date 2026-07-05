@@ -9,8 +9,10 @@
   hostname,
   ...
 }: let
-  dotfilesDir = "/home/borba/dotfiles";
-  dotfileConfigDir = "/home/borba/.config";
+# ==================== VARIÁVEIS GLOBAIS ====================
+  username = "borba";                    # ← mude aqui se necessário
+  dotfilesDir = "/home/${username}/dotfiles";
+  dotfileConfigDir = "/home/${username}/.config";
 
   # Convenção: dotfiles/<name>/.config/<name>  ->  ~/.config/<name>
   # Basta adicionar o nome aqui quando quiser que o Nix mapeie o pacote.
@@ -50,8 +52,8 @@ in {
       # zsh é caso especial: .zshenv precisa ficar na raiz do $HOME,
       # não em .config/zsh — o zsh só lê .zshenv nesse local fixo, antes
       # de saber que ZDOTDIR existe (ver discussão sobre bootstrap do ZDOTDIR).
-      "L+ /home/borba/.zshenv - - - - ${dotfilesDir}/zsh/.zshenv"
-      "L+ /home/borba/.config/zsh - - - - ${dotfilesDir}/zsh/.config/zsh"
+"L+ /home/${username}/.zshenv - - - - ${dotfilesDir}/zsh/.zshenv"
+      "L+ /home/${username}/.config/zsh - - - - ${dotfilesDir}/zsh/.config/zsh"
     ];
 
   systemd.sleep.settings.Sleep = {
@@ -130,7 +132,7 @@ in {
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users."borba" = {
     isNormalUser = true;
-    home = "/home/borba";
+   home = "/home/${username}";
     description = "borba jr, w";
     extraGroups = ["networkmanager" "wheel"];
     # packages = with pkgs; [];
@@ -138,7 +140,7 @@ in {
 
   security.sudo.extraRules = [
     {
-      users = ["borba"];
+      users = [ username ];
       commands = [
         {
           command = "ALL";
