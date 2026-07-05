@@ -4,8 +4,7 @@
   pkgs,
   pkgs-unstable,
   ...
-}: 
-let
+}: let
   dotfilesDir = "/home/borba/dotfiles";
   dotfileConfigDir = "/home/borba/.config";
 
@@ -17,8 +16,7 @@ let
   ];
 
   mkDotfileLink = name: "L+ ${dotfileConfigDir}/${name} - - - - ${dotfilesDir}/${name}/.config/${name}";
-in
-{
+in {
   # Bootloader - EFI (correto para VM no UTM)
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -41,7 +39,7 @@ in
     [
       # Pacotes extras (não presentes no configuration.nix base)
       zellij
-      
+
       yazi
       jq
       just
@@ -95,7 +93,6 @@ in
   # Programas opcionais
   programs.firefox.enable = lib.mkDefault true;
 
-# ==================== DOTFILES ESPECÍFICOS DESTE HOST ====================
+  # ==================== DOTFILES ESPECÍFICOS DESTE HOST ====================
   systemd.tmpfiles.rules = map mkDotfileLink dotfilePrograms;
-
 }
