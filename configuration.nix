@@ -23,6 +23,7 @@
     "rofi"
     "oh-my-posh"
     "helix"
+    "git"
     # adicione outros conforme for precisando
   ];
 
