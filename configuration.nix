@@ -145,7 +145,7 @@ in {
       ];
     };
     displayManager.lightdm.enable = true;
-    services.displayManager.defaultSession = "none+i3";
+    displayManager.defaultSession = "none+i3";
   };
 
   services.gnome.gnome-keyring.enable = true;
