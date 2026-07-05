@@ -259,6 +259,7 @@
       btop
       htop
       fastfetch
+      oh-my-posh
 
       # === Terminal & Shell ===
       alacritty
