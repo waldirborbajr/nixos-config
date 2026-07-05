@@ -13,22 +13,32 @@
 #   ./nixos-manager.sh <option> <host>     # runs directly on a specific host: flake dell
 #   NIXOS_FLAKE_ATTR=dell ./nixos-manager.sh flake   # force the host via env var
 #
-# Requirements: git repo at /etc/nixos with the flake configured (branch main).
+# Requirements: git repo at /etc/nixos with the flake configured.
 #
 # Known hosts (defined in flake.nix -> nixosConfigurations):
 #   m2utm       (macutm)    aarch64-linux
 #   dell        (dell1456)  x86_64-linux
 #   macbook2011 (mac2011)   x86_64-linux
 #
-# "flake"/"update" flow: local commit (if pending) -> pull ->
-# [flake update, if applicable] -> rebuild -> push (if there are commits to send).
-# Everything runs in sequence, without returning to the menu mid-process.
+# Branch selection: build/update actions detect all local + remote branches.
+# If only the default branch exists, it's used automatically without asking.
+# If other branches exist (e.g. a feature branch you're testing), you're
+# asked which one to check out, pull from, and push to — every time,
+# never assumed — before any rebuild happens.
+#
+# "flake"/"update" flow: select branch -> checkout -> local commit (if
+# pending) -> pull -> [flake update, if applicable] -> rebuild -> push
+# (if there are commits to send). Everything runs in sequence, without
+# returning to the menu mid-process.
 
 set -euo pipefail
 
 NIXOS_DIR="/home/borba/nixos-config"
-GIT_BRANCH="main"
+GIT_DEFAULT_BRANCH="main"
 GIT_REPO_URL="git@github.com:waldirborbajr/nixos-config.git"
+
+# Set at runtime by select_git_branch(). Never assume a value beforehand.
+GIT_BRANCH=""
 
 # flake attr -> real machine name (used for auto-detection via `hostname`)
 declare -A HOST_ATTR_TO_MACHINE=(
@@ -105,8 +115,8 @@ setup_machine() {
     ok "Config repo already present at $NIXOS_DIR"
   else
     warn "Config repo not found at $NIXOS_DIR"
-    if confirm "Clone it now from $GIT_REPO_URL (branch $GIT_BRANCH)?"; then
-      git clone --branch "$GIT_BRANCH" "$GIT_REPO_URL" "$NIXOS_DIR"
+    if confirm "Clone it now from $GIT_REPO_URL (branch $GIT_DEFAULT_BRANCH)?"; then
+      git clone --branch "$GIT_DEFAULT_BRANCH" "$GIT_REPO_URL" "$NIXOS_DIR"
       ok "Repo cloned to $NIXOS_DIR"
     else
       err "Cannot continue setup without the config repo. Aborting."
@@ -216,14 +226,104 @@ select_flake_attr() {
   exit 1
 }
 
+# ----- git branch selection -----
+#
+# Detects all local + remote branches (deduplicated). If only the default
+# branch exists, it's selected automatically without prompting — no point
+# asking when there's nothing to choose between. If other branches exist
+# (e.g. a feature branch under test), the user is always asked, every time,
+# never assumed.
+
+list_git_branches() {
+  cd "$NIXOS_DIR"
+  git fetch --all --prune --quiet 2>/dev/null || true
+
+  {
+    git branch --format='%(refname:short)' 2>/dev/null
+    git branch -r --format='%(refname:short)' 2>/dev/null | sed -E 's#^[^/]+/##'
+  } | grep -v '^HEAD$' | sort -u
+}
+
+select_git_branch() {
+  cd "$NIXOS_DIR"
+
+  local branches=()
+  local b
+  while IFS= read -r b; do
+    [ -n "$b" ] && branches+=("$b")
+  done < <(list_git_branches)
+
+  # Fallback: repo with no commits/branches yet, or git command failed.
+  if [ "${#branches[@]}" -eq 0 ]; then
+    GIT_BRANCH="$GIT_DEFAULT_BRANCH"
+    return 0
+  fi
+
+  # Only the default branch exists — nothing to choose, skip the prompt.
+  if [ "${#branches[@]}" -eq 1 ] && [ "${branches[0]}" = "$GIT_DEFAULT_BRANCH" ]; then
+    GIT_BRANCH="$GIT_DEFAULT_BRANCH"
+    return 0
+  fi
+
+  echo -e "${C_CYAN}Branches found:${C_RESET}" >&2
+  local i=1
+  for b in "${branches[@]}"; do
+    if [ "$b" = "$GIT_DEFAULT_BRANCH" ]; then
+      echo -e "  ${C_YELLOW}${i})${C_RESET} ${C_BOLD}${b}${C_RESET} ${C_GRAY}(default)${C_RESET}" >&2
+    else
+      echo -e "  ${C_YELLOW}${i})${C_RESET} ${b}" >&2
+    fi
+    i=$((i + 1))
+  done
+
+  local choice
+  read -r -p "$(echo -e "${C_CYAN}?${C_RESET} Which branch? ${C_DIM}[1-${#branches[@]}, Enter = ${GIT_DEFAULT_BRANCH}]${C_RESET}: ")" choice
+
+  if [ -z "$choice" ]; then
+    GIT_BRANCH="$GIT_DEFAULT_BRANCH"
+    return 0
+  fi
+
+  if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le "${#branches[@]}" ]; then
+    GIT_BRANCH="${branches[$((choice - 1))]}"
+    return 0
+  fi
+
+  warn "Invalid choice — falling back to '${GIT_DEFAULT_BRANCH}'."
+  GIT_BRANCH="$GIT_DEFAULT_BRANCH"
+}
+
+git_checkout_branch() {
+  cd "$NIXOS_DIR"
+  local current
+  current="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo '')"
+
+  if [ "$current" = "$GIT_BRANCH" ]; then
+    ok "Already on branch ${C_BOLD}${GIT_BRANCH}${C_RESET}."
+    return 0
+  fi
+
+  if git show-ref --verify --quiet "refs/heads/${GIT_BRANCH}"; then
+    git checkout "$GIT_BRANCH"
+  elif git ls-remote --exit-code --heads origin "$GIT_BRANCH" >/dev/null 2>&1; then
+    git checkout -b "$GIT_BRANCH" "origin/${GIT_BRANCH}"
+  else
+    err "Branch '${GIT_BRANCH}' not found locally or on origin."
+    return 1
+  fi
+  ok "Switched to branch ${C_BOLD}${GIT_BRANCH}${C_RESET}."
+}
+
 # ----- git helpers -----
 #
-# The git flow is split into 3 independent steps, called in sequence by
+# The git flow is split into independent steps, called in sequence by
 # the main actions (build_flake / update_system), WITHOUT returning to
 # the menu between steps:
-#   1) git_commit_if_dirty  -> commits pending local changes (if any)
-#   2) git_sync_pull        -> pulls in whatever is new on the remote
-#   3) git_push_if_ahead    -> pushes local commits not yet sent (at the end)
+#   1) select_git_branch    -> detects branches, asks if more than one exists
+#   2) git_commit_if_dirty  -> commits pending local changes (if any)
+#   3) git_checkout_branch  -> switches to the chosen branch
+#   4) git_sync_pull        -> pulls in whatever is new on the remote
+#   5) git_push_if_ahead    -> pushes local commits not yet sent (at the end)
 
 git_commit_if_dirty() {
   cd "$NIXOS_DIR"
@@ -248,6 +348,12 @@ git_commit_if_dirty() {
 
 git_sync_pull() {
   cd "$NIXOS_DIR"
+
+  if ! git ls-remote --exit-code --heads origin "$GIT_BRANCH" >/dev/null 2>&1; then
+    warn "Branch '${GIT_BRANCH}' doesn't exist on origin yet — skipping pull (local-only branch)."
+    return 0
+  fi
+
   log "Pulling changes from branch ${C_BOLD}${GIT_BRANCH}${C_RESET}..."
   git pull origin "$GIT_BRANCH"
 }
@@ -295,17 +401,21 @@ build_flake() {
   select_flake_attr "$host_arg"
   cd "$NIXOS_DIR"
 
-  step 1 4 "Checking for local changes"
+  step 1 5 "Selecting git branch"
+  select_git_branch
+
+  step 2 5 "Checking for local changes"
   git_commit_if_dirty
 
-  step 2 4 "Syncing with origin/${GIT_BRANCH}"
+  step 3 5 "Switching to ${C_CYAN}${GIT_BRANCH}${C_RESET} and syncing"
+  git_checkout_branch
   git_sync_pull
 
-  step 3 4 "Applying rebuild — ${C_CYAN}${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]}${C_RESET} ${C_GRAY}(${FLAKE_ATTR})${C_RESET}"
+  step 4 5 "Applying rebuild — ${C_CYAN}${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]}${C_RESET} ${C_GRAY}(${FLAKE_ATTR})${C_RESET}"
   sudo nixos-rebuild switch --flake "${NIXOS_DIR}#${FLAKE_ATTR}"
   ok "Rebuild complete on ${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]} (${FLAKE_ATTR})."
 
-  step 4 4 "Pushing pending changes"
+  step 5 5 "Pushing pending changes"
   git_push_if_ahead
 }
 
@@ -315,10 +425,14 @@ build_flake_dry() {
   select_flake_attr "$host_arg"
   cd "$NIXOS_DIR"
 
-  step 1 2 "Syncing with origin/${GIT_BRANCH}"
+  step 1 3 "Selecting git branch"
+  select_git_branch
+
+  step 2 3 "Switching to ${C_CYAN}${GIT_BRANCH}${C_RESET} and syncing"
+  git_checkout_branch
   git_sync_pull
 
-  step 2 2 "Test build (not activated) — ${C_CYAN}${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]}${C_RESET} ${C_GRAY}(${FLAKE_ATTR})${C_RESET}"
+  step 3 3 "Test build (not activated) — ${C_CYAN}${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]}${C_RESET} ${C_GRAY}(${FLAKE_ATTR})${C_RESET}"
   sudo nixos-rebuild build --flake "${NIXOS_DIR}#${FLAKE_ATTR}"
   ok "Test build complete — nothing was activated. Result in ./result"
 }
@@ -329,23 +443,27 @@ update_system() {
   select_flake_attr "$host_arg"
   cd "$NIXOS_DIR"
 
-  step 1 6 "Checking for local changes"
+  step 1 7 "Selecting git branch"
+  select_git_branch
+
+  step 2 7 "Checking for local changes"
   git_commit_if_dirty
 
-  step 2 6 "Syncing with origin/${GIT_BRANCH}"
+  step 3 7 "Switching to ${C_CYAN}${GIT_BRANCH}${C_RESET} and syncing"
+  git_checkout_branch
   git_sync_pull
 
-  step 3 6 "Updating flake.lock (nix flake update)"
+  step 4 7 "Updating flake.lock (nix flake update)"
   sudo nix flake update
 
-  step 4 6 "Committing updated flake.lock (if changed)"
+  step 5 7 "Committing updated flake.lock (if changed)"
   git_commit_if_dirty
 
-  step 5 6 "Applying rebuild — ${C_CYAN}${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]}${C_RESET} ${C_GRAY}(${FLAKE_ATTR})${C_RESET}"
+  step 6 7 "Applying rebuild — ${C_CYAN}${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]}${C_RESET} ${C_GRAY}(${FLAKE_ATTR})${C_RESET}"
   sudo nixos-rebuild switch --flake "${NIXOS_DIR}#${FLAKE_ATTR}"
   ok "System updated on ${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]} (${FLAKE_ATTR})."
 
-  step 6 6 "Pushing pending changes"
+  step 7 7 "Pushing pending changes"
   git_push_if_ahead
 }
 
@@ -418,16 +536,14 @@ check_flake() {
   if [ -n "$host_arg" ]; then
     select_flake_attr "$host_arg"
     log "Checking flake for host ${C_BOLD}${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]}${C_RESET} (${FLAKE_ATTR})..."
-    nix flake check --print-build-logs
   else
     log "Checking flake (all hosts)..."
-    nix flake check --print-build-logs
   fi
 
-  if [ $? -eq 0 ]; then
-    ok "✅ Flake check passed successfully."
+  if nix flake check --print-build-logs; then
+    ok "Flake check passed successfully."
   else
-    err "❌ Flake check failed. See output above."
+    err "Flake check failed. See output above."
     exit 1
   fi
 }
@@ -447,6 +563,23 @@ list_hosts() {
   fi
 }
 
+list_branches_cmd() {
+  require_dir
+  cd "$NIXOS_DIR"
+  local current
+  current="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo '?')"
+  echo -e "${C_BOLD}${C_CYAN}Branches (local + remote, deduplicated):${C_RESET}"
+  local b
+  while IFS= read -r b; do
+    [ -z "$b" ] && continue
+    if [ "$b" = "$current" ]; then
+      echo -e "  ${C_GREEN}●${C_RESET} ${C_BOLD}${b}${C_RESET} ${C_GRAY}(current)${C_RESET}"
+    else
+      echo -e "  ${C_GRAY}○${C_RESET} ${b}"
+    fi
+  done < <(list_git_branches)
+}
+
 # ----- menu -----
 
 print_banner() {
@@ -457,7 +590,7 @@ print_banner() {
   printf "${C_CYAN}│${C_RESET}  ${C_BOLD}NixOS Manager${C_RESET}%*s${C_CYAN}│${C_RESET}\n" 24 ""
   echo -e "${C_CYAN}│${C_RESET}  ${C_GRAY}this machine: ${C_RESET}${C_GREEN}${detected}${C_RESET}$(printf '%*s' $((25 - ${#detected})) '')${C_CYAN}│${C_RESET}"
   echo -e "${C_CYAN}╰──────────────────────────────────────╯${C_RESET}"
-  echo -e "  ${C_GRAY}${C_DIM}(build/update always ask for the host — nothing is assumed)${C_RESET}"
+  echo -e "  ${C_GRAY}${C_DIM}(host and git branch are always asked — nothing is assumed)${C_RESET}"
 }
 
 show_menu() {
@@ -472,6 +605,7 @@ show_menu() {
   echo -e " ${C_RED}${C_BOLD}6)${C_RESET} Rollback"
   echo -e " ${C_YELLOW}${C_BOLD}7)${C_RESET} Check flake ${C_GRAY}(nix flake check)${C_RESET}"
   echo -e " ${C_BLUE}${C_BOLD}8)${C_RESET} List hosts"
+  echo -e " ${C_BLUE}${C_BOLD}9)${C_RESET} List branches"
   echo -e " ${C_BOLD}q)${C_RESET} Quit"
   echo
 }
@@ -487,8 +621,9 @@ run_choice() {
     4|update) update_system "$extra_arg" ;;
     5|dry) build_flake_dry "$extra_arg" ;;
     6|rollback) rollback_system ;;
-    7|check) check_flake "$extra_arg" ;;          # ← melhorado
+    7|check) check_flake "$extra_arg" ;;
     8|hosts) list_hosts ;;
+    9|branches) list_branches_cmd ;;
     q|quit|exit) exit 0 ;;
     *) err "Invalid option: $choice"; return 1 ;;
   esac
