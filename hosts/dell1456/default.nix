@@ -3,10 +3,11 @@
   lib,
   pkgs,
   pkgs-unstable,
+  common,
   ...
 }: let
-  dotfilesDir = "/home/borba/dotfiles";
-  dotfileConfigDir = "/home/borba/.config";
+# Herda do configuration.nix
+  inherit (common) dotfilesDir dotfileConfigDir;
 
   # Dotfiles específicos deste host (UTM)
   dotfilePrograms = [
