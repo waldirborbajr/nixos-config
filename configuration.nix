@@ -22,6 +22,7 @@
     "i3status"
     "rofi"
     "oh-my-posh"
+    "helix"
     # adicione outros conforme for precisando
   ];
 
