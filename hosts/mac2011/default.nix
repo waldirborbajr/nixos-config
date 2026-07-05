@@ -30,12 +30,26 @@ in {
     variant = "mac";
   };
 
-  # ==================== HARDWARE ====================
-  # 2011-era Intel Mac: microcode updates are already handled via
-  # hardware.cpu.intel.updateMicrocode in hardware-configuration.nix.
-  # TODO: if Wi-Fi/Bluetooth/trackpad need out-of-tree drivers (Broadcom
-  # wireless is common on this model), add the relevant kernel modules/
-  # packages here once confirmed on the actual machine.
+  # ==================== BROADCOM WIRELESS ====================
+  # This MacBook uses a Broadcom chip that needs the proprietary wl driver.
+  # Recovered from a backup of the machine's previous config.
+  hardware.enableRedistributableFirmware = true;
+
+  # Blacklist open-source drivers that conflict with the proprietary Broadcom driver
+  boot.blacklistedKernelModules = [
+    "b43"
+    "brcmsmac"
+    "bcma"
+    "ssb"
+  ];
+
+  # Proprietary Broadcom driver
+  boot.kernelModules = [ "wl" ];
+
+  # Driver package built against the active kernel
+  boot.extraModulePackages = with config.boot.kernelPackages; [
+    broadcom_sta
+  ];
 
   # ==================== PACKAGES SPECIFIC TO THIS HOST ====================
   # Keep this list light — old spinning-rust-era hardware, similar tier to Dell
@@ -64,6 +78,10 @@ in {
     playerctl
     pciutils
     pavucontrol
+
+    # Broadcom wireless debug/config tools
+    iw
+    wirelesstools
 
     # Basic build tools
     gdb
