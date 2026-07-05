@@ -1,98 +1,107 @@
 # hosts/m2utm/default.nix
-{
-  lib,
-  pkgs,
-  pkgs-unstable,
-  ...
-}: let
-  dotfilesDir = "/home/borba/dotfiles";
-  dotfileConfigDir = "/home/borba/.config";
+# Specific configuration for the UTM virtual machine on Mac M2 (aarch64)
+{ lib, pkgs, pkgs-unstable, common, ... }:
 
-  # Dotfiles específicos deste host (UTM)
+let
+  # Inherit common variables from configuration.nix
+  inherit (common) dotfilesDir dotfileConfigDir;
+
+  # Dotfiles specific to this host (UTM only)
   dotfilePrograms = [
     "lazygit"
     "yazi"
-    # adicione aqui outros dotfiles específicos do UTM no futuro
+    # Add more UTM-specific dotfiles here in the future
   ];
 
   mkDotfileLink = name: "L+ ${dotfileConfigDir}/${name} - - - - ${dotfilesDir}/${name}/.config/${name}";
 in {
-  # Bootloader - EFI (correto para VM no UTM)
+  # ==================== BOOTLOADER ====================
+  # EFI bootloader (correct for UTM VM)
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  # Keyboard - US/Mac (para Mac M2 + UTM)
+  # ==================== KEYBOARD ====================
+  # US/Mac layout (best for Mac M2 + UTM)
   console.keyMap = "us";
+
   services.xserver.xkb = {
     layout = "us";
     variant = "mac";
   };
 
-  # Otimizações leves para VM
-  boot.kernelParams = ["mitigations=off"];
+  # ==================== VM OPTIMIZATIONS ====================
+  # Performance improvements for virtual machine
+  boot.kernelParams = [ "mitigations=off" ];
 
-  # Melhor suporte a QEMU/UTM
+  # Better QEMU/UTM guest support
   services.qemuGuest.enable = true;
 
-  # ==================== PACOTES PARA ESTA MÁQUINA ====================
-  environment.systemPackages = with pkgs;
-    [
-      # Pacotes extras (não presentes no configuration.nix base)
-      zellij
+  # ==================== PACKAGES SPECIFIC TO UTM ====================
+  environment.systemPackages = with pkgs; [
+    # Extra tools not present in the base configuration.nix
+    zellij
+    yazi
+    jq
+    just
+    duf
+    psmisc
+    asciinema
+    stow
+    lazygit
+    jujutsu
+    lazyjj
 
-      yazi
-      jq
-      just
-      duf
-      psmisc
-      asciinema
-      stow
-      lazygit
-      jujutsu
-      lazyjj
-      emacs
-      emacsPackages.pbcopy
-      emacsPackages.vterm
-      dex
-      lxsession
-      autorandr
-      xkill
-      brightnessctl
-      playerctl
-      pciutils
-      pavucontrol
-      ffmpeg
-      docker
-      gcc
-      gnumake
-      cmake
-      gdb
-      glibc
-      libcxx
-      libgcc
-      chirp
+    # Editors and development
+    emacs
+    emacsPackages.pbcopy
+    emacsPackages.vterm
 
-      # Language servers e ferramentas de dev
-      rust-analyzer
-      rustfmt
-      lua-language-server
-      stylua
-      gotools
-      golangci-lint-langserver
-      python3Packages.python-lsp-server
-      black
-      taplo
-      lemminx
-      marksman
-    ]
-    ++ (with pkgs-unstable; [
-      # Pacotes unstable específicos desta máquina
-      neovim
-    ]);
+    # Desktop utilities
+    dex
+    lxsession
+    autorandr
+    xkill
 
-  # Programas opcionais
+    # Hardware & multimedia
+    brightnessctl
+    playerctl
+    pciutils
+    pavucontrol
+    ffmpeg
+
+    # Virtualization & development tools
+    docker
+    gcc
+    gnumake
+    cmake
+    gdb
+    glibc
+    libcxx
+    libgcc
+    chirp
+
+    # Language servers and formatters
+    rust-analyzer
+    rustfmt
+    lua-language-server
+    stylua
+    gotools
+    golangci-lint-langserver
+    python3Packages.python-lsp-server
+    black
+    taplo
+    lemminx
+    marksman
+  ]
+  ++ (with pkgs-unstable; [
+    # Unstable packages specific to this host
+    neovim
+  ]);
+
+  # Optional programs
   programs.firefox.enable = lib.mkDefault true;
 
-  # ==================== DOTFILES ESPECÍFICOS DESTE HOST ====================
+  # ==================== DOTFILES SPECIFIC TO THIS HOST ====================
+  # Only symlink dotfiles that are specific to the UTM VM
   systemd.tmpfiles.rules = map mkDotfileLink dotfilePrograms;
 }
