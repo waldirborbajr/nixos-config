@@ -1,18 +1,17 @@
 # hosts/m2utm/default.nix
 # Specific configuration for the UTM virtual machine on Mac M2 (aarch64)
+# This is the primary development environment: most powerful host, so it
+# carries the heaviest toolchain (compilers, LSPs, dev CLIs).
 { lib, pkgs, pkgs-unstable, common, ... }:
-
 let
   # Inherit common variables from configuration.nix
   inherit (common) dotfilesDir dotfileConfigDir;
-
   # Dotfiles specific to this host (UTM only)
   dotfilePrograms = [
     "lazygit"
     "yazi"
     # Add more UTM-specific dotfiles here in the future
   ];
-
   mkDotfileLink = name: "L+ ${dotfileConfigDir}/${name} - - - - ${dotfilesDir}/${name}/.config/${name}";
 in {
   # ==================== BOOTLOADER ====================
@@ -23,22 +22,22 @@ in {
   # ==================== KEYBOARD ====================
   # US/Mac layout (best for Mac M2 + UTM)
   console.keyMap = "us";
-
   services.xserver.xkb = {
     layout = "us";
     variant = "mac";
   };
 
   # ==================== VM OPTIMIZATIONS ====================
-  # Performance improvements for virtual machine
+  # Trade-off: disables CPU vulnerability mitigations (Spectre/Meltdown etc.)
+  # for better performance. Acceptable here since this is an isolated UTM VM,
+  # not exposed directly to untrusted workloads.
   boot.kernelParams = [ "mitigations=off" ];
-
   # Better QEMU/UTM guest support
   services.qemuGuest.enable = true;
 
-  # ==================== PACKAGES SPECIFIC TO UTM ====================
+  # ==================== PACKAGES SPECIFIC TO THIS HOST ====================
   environment.systemPackages = with pkgs; [
-    # Extra tools not present in the base configuration.nix
+    # Terminal & shell utilities
     zellij
     yazi
     jq
@@ -46,7 +45,8 @@ in {
     duf
     psmisc
     asciinema
-    stow
+
+    # Version control
     lazygit
     jujutsu
     lazyjj
@@ -69,7 +69,7 @@ in {
     pavucontrol
     ffmpeg
 
-    # Virtualization & development tools
+    # Virtualization & native toolchain
     docker
     gcc
     gnumake
@@ -92,16 +92,14 @@ in {
     taplo
     lemminx
     marksman
-  ]
-  ++ (with pkgs-unstable; [
-    # Unstable packages specific to this host
-    neovim
-  ]);
+  ];
+  # NOTE: pkgs-unstable.neovim already comes from configuration.nix.
+  # Not repeated here to avoid duplicate entries in systemPackages.
 
   # Optional programs
   programs.firefox.enable = lib.mkDefault true;
 
-  # ==================== DOTFILES SPECIFIC TO THIS HOST ====================
-  # Only symlink dotfiles that are specific to the UTM VM
+  # ==================== HOST-SPECIFIC DOTFILES ====================
+  # Only symlink dotfiles specific to the UTM VM
   systemd.tmpfiles.rules = map mkDotfileLink dotfilePrograms;
 }
