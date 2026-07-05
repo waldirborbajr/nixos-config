@@ -4,7 +4,21 @@
   pkgs,
   pkgs-unstable,
   ...
-}: {
+}: 
+let
+  dotfilesDir = "/home/borba/dotfiles";
+  dotfileConfigDir = "/home/borba/.config";
+
+  # Dotfiles específicos deste host (UTM)
+  dotfilePrograms = [
+    "lazygit"
+    "yazi"
+    # adicione aqui outros dotfiles específicos do UTM no futuro
+  ];
+
+  mkDotfileLink = name: "L+ ${dotfileConfigDir}/${name} - - - - ${dotfilesDir}/${name}/.config/${name}";
+in
+{
   # Bootloader - EFI (correto para VM no UTM)
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -80,4 +94,8 @@
 
   # Programas opcionais
   programs.firefox.enable = lib.mkDefault true;
+
+# ==================== DOTFILES ESPECÍFICOS DESTE HOST ====================
+  systemd.tmpfiles.rules = map mkDotfileLink dotfilePrograms;
+
 }
