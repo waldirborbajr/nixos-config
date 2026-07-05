@@ -4,6 +4,7 @@
   pkgs,
   pkgs-unstable,
   hostname,
+  lib,
   ...
 }: let
   username = "borba";
@@ -24,7 +25,7 @@
     "oh-my-posh"
     "helix"
     "git"
-    # adicione outros conforme for precisando
+    # add more as needed
   ];
 
   mkDotfileLink = name: "L+ ${dotfileConfigDir}/${name} - - - - ${dotfilesDir}/${name}/.config/${name}";
@@ -37,7 +38,7 @@ in {
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  # ==================== DOTFILES AUTOMÁTICOS ====================
+  # ==================== AUTOMATIC DOTFILES ====================
   systemd.tmpfiles.rules =
     (map mkDotfileLink dotfilePrograms)
     ++ [
@@ -178,7 +179,8 @@ in {
   nixpkgs.config.allowUnfree = true;
 
   programs = {
-    firefox.enable = true;
+    # mkDefault: allow a future headless/minimal host to override this
+    firefox.enable = lib.mkDefault true;
     fish.enable = true;
   };
 
