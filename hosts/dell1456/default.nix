@@ -1,34 +1,33 @@
 # hosts/dell/default.nix
-{
-  lib,
-  pkgs,
-  pkgs-unstable,
-  common,
-  ...
-}: let
-# Herda do configuration.nix
+# Dell-specific configuration (legacy BIOS machine)
+{ lib, pkgs, pkgs-unstable, common, ... }:
+
+let
+  # Inherit common variables from configuration.nix
   inherit (common) dotfilesDir dotfileConfigDir;
 
-  # Dotfiles específicos deste host (UTM)
+  # Dotfiles specific to this host (Dell)
+  # Keep this list minimal — only add what this machine actually needs
   dotfilePrograms = [
-    "lazygit"
-    "yazi"
-    # adicione aqui outros dotfiles específicos do UTM no futuro
+    # Example: add host-specific dotfiles here if needed
+    lazygit
   ];
 
   mkDotfileLink = name: "L+ ${dotfileConfigDir}/${name} - - - - ${dotfilesDir}/${name}/.config/${name}";
 in {
-  # Sobrescreve bootloader para BIOS legacy (Dell antigo)
+  # ==================== BOOTLOADER ====================
+  # Override to use legacy BIOS + GRUB (Dell old hardware)
   boot.loader.systemd-boot.enable = lib.mkForce false;
   boot.loader.efi.canTouchEfiVariables = lib.mkForce false;
 
   boot.loader.grub = {
     enable = true;
-    device = "/dev/sda"; # ← CONFIRME com `lsblk -f` no Dell
-    # useOSProber = true;       # descomente se tiver Windows dual boot
+    device = "/dev/sda";        # ← Confirm with `lsblk -f` on the Dell
+    # useOSProber = true;       # Uncomment if you have Windows dual boot
   };
 
-  # Teclado ABNT2 (pt-BR)
+  # ==================== KEYBOARD ====================
+  # Brazilian ABNT2 layout
   console.keyMap = "br-abnt2";
 
   services.xserver.xkb = {
@@ -36,43 +35,51 @@ in {
     variant = "abnt2";
   };
 
-  # Opcional: otimizações de performance para HDD (se for o caso)
+  # ==================== FILESYSTEM OPTIMIZATIONS ====================
+  # Good for older HDDs
   fileSystems."/" = {
-    options = ["noatime" "nodiratime" "commit=60"];
+    options = [ "noatime" "nodiratime" "commit=60" ];
   };
 
-  # ==================== PACOTES PARA ESTA MÁQUINA ====================
-  environment.systemPackages = with pkgs;
-    [
-      # Pacotes extras (não presentes no configuration.nix base)
-      yazi
-      jq
-      just
-      duf
-      psmisc
-      asciinema
-      stow
-      lazygit
-      jujutsu
-      lazyjj
-      dex
-      lxsession
-      autorandr
-      xkill
-      brightnessctl
-      playerctl
-      pciutils
-      pavucontrol
-      gdb
-      glibc
-      libcxx
-      libgcc
-    ]
-    ++ (with pkgs-unstable; [
-      # Pacotes unstable específicos desta máquina
-      neovim
-    ]);
+  # ==================== PACKAGES SPECIFIC TO DELL ====================
+  # Keep this list light — Dell is the oldest/slowest machine
+  environment.systemPackages = with pkgs; [
+    # Core utilities
+    yazi
+    jq
+    just
+    duf
+    psmisc
+    asciinema
+    stow
 
-  # ==================== DOTFILES ESPECÍFICOS DESTE HOST ====================
+    # Development & tools
+    lazygit
+    jujutsu
+    lazyjj
+
+    # Desktop utilities
+    dex
+    lxsession
+    autorandr
+    xkill
+    brightnessctl
+    playerctl
+    pciutils
+    pavucontrol
+
+    # Basic build tools
+    gdb
+    glibc
+    libcxx
+    libgcc
+  ]
+  ++ (with pkgs-unstable; [
+    # Unstable packages specific to this host
+    neovim
+  ]);
+
+  # ==================== HOST-SPECIFIC DOTFILES ====================
+  # Only symlink dotfiles that are specific to this Dell machine
   systemd.tmpfiles.rules = map mkDotfileLink dotfilePrograms;
 }
