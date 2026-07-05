@@ -1,7 +1,4 @@
 # configuration.nix
-# Edit this configuration file to define what should be installed on
-# your system. Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
 {
   config,
   pkgs,
@@ -9,20 +6,15 @@
   hostname,
   ...
 }: let
-  # ==================== GLOBAL VARIABLES ====================
-  username = "borba"; # Change this if you ever change the main username
+  username = "borba";
 
-  # Common paths used across modules
   dotfilesDir = "/home/${username}/dotfiles";
   dotfileConfigDir = "/home/${username}/.config";
 
-  # Make variables available to all host-specific modules (hosts/*/default.nix)
   common = {
     inherit username dotfilesDir dotfileConfigDir;
   };
 
-  # List of programs whose dotfiles should be symlinked automatically
-  # (following the convention: dotfiles/<name>/.config/<name>)
   dotfilePrograms = [
     "tmux"
     "alacritty"
@@ -30,33 +22,27 @@
     "i3status"
     "rofi"
     "oh-my-posh"
-    # Add more common dotfiles here when needed
+    # adicione outros conforme for precisando
   ];
 
-  # Helper function to create symlink rules
   mkDotfileLink = name: "L+ ${dotfileConfigDir}/${name} - - - - ${dotfilesDir}/${name}/.config/${name}";
 in {
-  # Pass common variables to all modules (including host-specific files)
   _module.args.common = common;
 
   imports = [
-    # hardware-configuration.nix and host-specific configs are imported via flake.nix
+    # hardware-configuration.nix is imported per-host via flake.nix
   ];
 
-  # ==================== BOOT ====================
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  # ==================== DOTFILES: Automatic symlinks (no Stow needed) ====================
-  # This replaces manual `stow` usage. Symlinks are created on every rebuild.
+  # ==================== DOTFILES AUTOMÁTICOS ====================
   systemd.tmpfiles.rules =
     (map mkDotfileLink dotfilePrograms)
     ++ [
-      # Special cases for zsh
       "L+ /home/${username}/.zshenv - - - - ${dotfilesDir}/zsh/.zshenv"
       "L+ /home/${username}/.config/zsh - - - - ${dotfilesDir}/zsh/.config/zsh"
     ];
 
-  # ==================== POWER MANAGEMENT ====================
   systemd.sleep.settings.Sleep = {
     AllowSuspend = "yes";
     AllowHibernation = "no";
@@ -65,16 +51,13 @@ in {
     MemorySleepMode = "s2idle";
   };
 
-  # ==================== NETWORKING ====================
   networking.hostName = hostname;
   networking.networkmanager.enable = true;
 
-  # Bluetooth
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true;
   services.blueman.enable = true;
 
-  # ==================== LOCALISATION ====================
   time.timeZone = "America/Sao_Paulo";
 
   i18n.defaultLocale = "en_US.UTF-8";
@@ -90,7 +73,6 @@ in {
     LC_TIME = "pt_BR.UTF-8";
   };
 
-  # ==================== FONTS ====================
   fonts = {
     enableDefaultPackages = true;
     packages = with pkgs; [
@@ -111,12 +93,11 @@ in {
     };
   };
 
-  # ==================== USER ACCOUNT ====================
   users.users.${username} = {
     isNormalUser = true;
     home = "/home/${username}";
-    description = "borba jr";
-    extraGroups = ["networkmanager" "wheel" "docker"];
+    description = "borba jr, w";
+    extraGroups = ["networkmanager" "wheel"];
   };
 
   security.sudo.extraRules = [
@@ -131,7 +112,7 @@ in {
     }
   ];
 
-  # ==================== X11 / i3 ====================
+  # ==================== X11 + i3 + LightDM ====================
   services.xserver = {
     enable = true;
     desktopManager.xterm.enable = false;
@@ -144,15 +125,43 @@ in {
         rofi
       ];
     };
-    displayManager.lightdm.enable = true;
-    displayManager.defaultSession = "none+i3";
+    displayManager.lightdm = {
+      enable = true;
+      greeters.gtk = {
+        enable = true;
+        theme = {
+          package = pkgs.catppuccin-gtk.override {
+            accents = ["mauve"];
+            size = "standard";
+            variant = "mocha";
+          };
+          name = "catppuccin-mocha-mauve-standard";
+        };
+        iconTheme = {
+          package = pkgs.papirus-icon-theme;
+          name = "Papirus-Dark";
+        };
+        cursorTheme = {
+          package = pkgs.catppuccin-cursors.mochaDark;
+          name = "catppuccin-mocha-dark-cursors";
+        };
+        extraConfig = ''
+          font-name = FiraCode Nerd Font 11
+          xft-antialias = true
+          xft-hintstyle = hintslight
+          indicators = ~host;~spacer;~clock;~spacer;~session;~language;~a11y;~power
+        '';
+      };
+    };
   };
+
+  services.displayManager.defaultSession = "none+i3";
 
   services.gnome.gnome-keyring.enable = true;
   security.polkit.enable = true;
   programs.i3lock.enable = true;
 
-  # ==================== SOUND (PipeWire) ====================
+  # ==================== SOUND ====================
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
@@ -162,7 +171,9 @@ in {
     pulse.enable = true;
   };
 
-  # ==================== PROGRAMS ====================
+  # ==================== PROGRAMS & PACKAGES ====================
+  nixpkgs.config.allowUnfree = true;
+
   programs = {
     firefox.enable = true;
     fish.enable = true;
@@ -170,7 +181,6 @@ in {
 
   environment.systemPackages =
     (with pkgs; [
-      # === Essenciais básicos ===
       wget
       curl
       git
@@ -183,13 +193,10 @@ in {
       htop
       fastfetch
       oh-my-posh
-      # === Terminal & Shell ===
       alacritty
       zsh
-      # === Nix tools ===
       nixd
       alejandra
-      # === Básicos de desktop (i3) ===
       rofi
       feh
       picom
@@ -201,20 +208,16 @@ in {
     ]);
 
   # ==================== NIX SETTINGS ====================
-  nixpkgs.config.allowUnfree = true;
-  nix.settings.experimental-features = ["nix-command" "flakes"];
-
   nix.gc = {
     automatic = true;
     dates = "weekly";
     options = "--delete-older-than 3d";
   };
   nix.optimise.automatic = true;
+  nix.settings.experimental-features = ["nix-command" "flakes"];
 
-  # ==================== SERVICES ====================
   services.openssh.enable = true;
   networking.firewall.allowedTCPPorts = [22];
 
-  # ==================== SYSTEM VERSION ====================
   system.stateVersion = "26.05";
 }
