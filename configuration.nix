@@ -15,10 +15,11 @@
   # Basta adicionar o nome aqui quando quiser que o Nix mapeie o pacote.
   dotfilePrograms = [
     "tmux"
-    # "alacritty"
-    # "i3"
-    # "i3status"
-    # "rofi"
+    "alacritty"
+    "i3"
+    "i3status"
+    "rofi"
+    "oh-my-posh"
     # adicione outros conforme for precisando
   ];
 
