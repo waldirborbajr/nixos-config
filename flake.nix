@@ -4,23 +4,32 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+
+    # 🔐 secrets management
+    sops-nix.url = "github:Mic92/sops-nix";
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, ... } @ inputs:
+  outputs = { self, nixpkgs, nixpkgs-unstable, sops-nix, ... } @ inputs:
     let
       mkHost = { hostname, system }:
         nixpkgs.lib.nixosSystem {
           inherit system;
+
           specialArgs = {
             inherit inputs hostname;
+
             pkgs-unstable = import nixpkgs-unstable {
               inherit system;
               config.allowUnfree = true;
             };
           };
+
           modules = [
+            # 🔐 SOPS module (global)
+            sops-nix.nixosModules.sops
+
             ./configuration.nix
-            ./hosts/${hostname}/default.nix      # ← Adicionado
+            ./hosts/${hostname}/default.nix
             ./hosts/${hostname}/hardware-configuration.nix
           ];
         };
