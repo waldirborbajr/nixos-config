@@ -92,6 +92,11 @@ in {
     taplo
     lemminx
     marksman
+
+    # Only for LLM
+    # llm-suggest-lsp
+    # uwu-colors
+    # simple-completion-language-server
   ];
   # NOTE: pkgs-unstable.neovim already comes from configuration.nix.
   # Not repeated here to avoid duplicate entries in systemPackages.
