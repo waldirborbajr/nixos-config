@@ -60,9 +60,23 @@ nix develop
 - Nix (`modules/languages/nix-dev.nix`)
 - Python, Node.js
 
+## 🔐 SSH keys via SOPS
 
+Este repositório agora prepara automaticamente duas identidades SSH para o usuário `borba`:
 
+- `id_ed25519_infra`: usada para acesso SSH entre servidores e relação de confiança
+- `id_ed25519_github`: usada para GitHub, GitLab, Forgejo e outros repositórios remotos
+
+Fluxo simples:
+
+```bash
+./scripts/manage-ssh-sops.sh dell1456
+sudo nixos-rebuild switch --flake .#dell1456
 ```
+
+O script gera as chaves se necessário, cria uma chave Age local quando ainda não existir e cifra as chaves no arquivo de secrets do host correspondente em `hosts/<host>/secrets/<host>.yaml`.
+
+```text
 https://git.voidarc.co.uk/voidarc/nixos
 ```
 

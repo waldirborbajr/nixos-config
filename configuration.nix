@@ -3,10 +3,11 @@
   pkgs,
   pkgs-unstable,
   hostname,
-  lib,
   ...
 }: let
   username = "borba";
+  sshKeysDir = "/home/${username}/.ssh";
+  sshClientConfigPath = "/etc/ssh/ssh_config.d/50-borba.conf";
 
   dotfilesDir = "/home/${username}/dotfiles";
   dotfileConfigDir = "/home/${username}/.config";
@@ -43,6 +44,7 @@ in {
   systemd.tmpfiles.rules =
     (map mkDotfileLink dotfilePrograms)
     ++ [
+      "d ${sshKeysDir} 0700 ${username} users -"
       "L+ /home/${username}/.zshenv - - - - ${dotfilesDir}/zsh/.zshenv"
       "L+ /home/${username}/.config/zsh - - - - ${dotfilesDir}/zsh/.config/zsh"
     ];
@@ -61,11 +63,6 @@ in {
   networking.networkmanager.enable = true;
 
   networking.firewall.allowedTCPPorts = [22];
-
-  # ==================== BLUETOOTH ====================
-  hardware.bluetooth.enable = true;
-  hardware.bluetooth.powerOnBoot = true;
-  services.blueman.enable = true;
 
   # ==================== TIME / LOCALE ====================
   time.timeZone = "America/Sao_Paulo";
@@ -177,12 +174,10 @@ in {
   };
 
   services.displayManager.defaultSession = "none+i3";
-
   services.gnome.gnome-keyring.enable = true;
   security.polkit.enable = true;
   programs.i3lock.enable = true;
 
-  # ==================== AUDIO ====================
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
 
@@ -197,8 +192,33 @@ in {
   nixpkgs.config.allowUnfree = true;
 
   programs = {
-    firefox.enable = lib.mkDefault true;
-    fish.enable = true;
+    ssh = {
+      enable = true;
+      matchBlocks = {
+        "*.infra" = {
+          hostname = "%h";
+          user = username;
+          identityFile = "${sshKeysDir}/id_ed25519_infra";
+          identitiesOnly = true;
+        };
+        "github.com" = {
+          user = "git";
+          identityFile = "${sshKeysDir}/id_ed25519_github";
+          identitiesOnly = true;
+        };
+        "gitlab.com" = {
+          user = "git";
+          identityFile = "${sshKeysDir}/id_ed25519_github";
+          identitiesOnly = true;
+        };
+        "forgejo.local" = {
+          hostname = "forgejo.local";
+          user = "git";
+          identityFile = "${sshKeysDir}/id_ed25519_github";
+          identitiesOnly = true;
+        };
+      };
+    };
   };
 
   # ==================== PACKAGES ====================
@@ -220,6 +240,8 @@ in {
       zsh
       nixd
       alejandra
+      age
+      sops
       rofi
       feh
       picom
@@ -255,7 +277,7 @@ in {
   };
 
   sops = {
-    defaultSopsFile = ./secrets/${hostname}.yaml;
+    defaultSopsFile = ./hosts/${hostname}/secrets/${hostname}.yaml;
 
     age.keyFile = "/home/${username}/.config/sops/age/keys.txt";
 
@@ -268,12 +290,71 @@ in {
     mode = "0600";
   };
 
+  sops.secrets."borba_ssh_infra_private_key" = {
+    path = "${sshKeysDir}/id_ed25519_infra";
+    owner = username;
+    group = "users";
+    mode = "0600";
+  };
+
+  sops.secrets."borba_ssh_infra_public_key" = {
+    path = "${sshKeysDir}/id_ed25519_infra.pub";
+    owner = username;
+    group = "users";
+    mode = "0644";
+  };
+
+  sops.secrets."borba_ssh_github_private_key" = {
+    path = "${sshKeysDir}/id_ed25519_github";
+    owner = username;
+    group = "users";
+    mode = "0600";
+  };
+
+  sops.secrets."borba_ssh_github_public_key" = {
+    path = "${sshKeysDir}/id_ed25519_github.pub";
+    owner = username;
+    group = "users";
+    mode = "0644";
+  };
+
+  system.activationScripts.setupBorbaSshKeys = ''
+    install -d -o ${username} -g users -m 700 ${sshKeysDir}
+    install -d -o root -g root -m 755 /etc/ssh/ssh_config.d
+
+    cat > ${sshClientConfigPath} <<EOF
+    Host *.infra
+      HostName %h
+      User ${username}
+      IdentityFile ${sshKeysDir}/id_ed25519_infra
+      IdentitiesOnly yes
+
+    Host github.com gitlab.com
+      User git
+      IdentityFile ${sshKeysDir}/id_ed25519_github
+      IdentitiesOnly yes
+
+    Host forgejo.local
+      HostName forgejo.local
+      User git
+      IdentityFile ${sshKeysDir}/id_ed25519_github
+      IdentitiesOnly yes
+    EOF
+
+    chown ${username}:users ${sshKeysDir}
+    chmod 700 ${sshKeysDir}
+    chown root:root ${sshClientConfigPath}
+    chmod 644 ${sshClientConfigPath}
+  '';
+
 # ==================== ZERO-TOUCH SSH HOST KEY BOOTSTRAP ====================
 
 systemd.services.ssh-hostkey-bootstrap = {
   description = "Bootstrap SSH host key into SOPS on first boot";
 
   wantedBy = ["multi-user.target"];
+  wants = ["sshd.service"];
+  before = ["sshd.service"];
   after = ["network.target"];
 
   serviceConfig = {
