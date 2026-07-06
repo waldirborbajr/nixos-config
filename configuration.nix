@@ -193,8 +193,13 @@ in {
 
   programs = {
     ssh = {
-      enable = true;
       matchBlocks = {
+        "192.168.*" = {
+          hostname = "%h";
+          user = username;
+          identityFile = "${sshKeysDir}/id_ed25519_infra";
+          identitiesOnly = true;
+        };
         "*.infra" = {
           hostname = "%h";
           user = username;
@@ -323,7 +328,7 @@ in {
     install -d -o root -g root -m 755 /etc/ssh/ssh_config.d
 
     cat > ${sshClientConfigPath} <<EOF
-    Host *.infra
+    Host 192.168.* *.infra
       HostName %h
       User ${username}
       IdentityFile ${sshKeysDir}/id_ed25519_infra
