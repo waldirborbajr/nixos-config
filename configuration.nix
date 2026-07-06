@@ -191,40 +191,9 @@ in {
   # ==================== PROGRAMS ====================
   nixpkgs.config.allowUnfree = true;
 
-  programs = {
-    ssh = {
-      matchBlocks = {
-        "192.168.*" = {
-          hostname = "%h";
-          user = username;
-          identityFile = "${sshKeysDir}/id_ed25519_infra";
-          identitiesOnly = true;
-        };
-        "*.infra" = {
-          hostname = "%h";
-          user = username;
-          identityFile = "${sshKeysDir}/id_ed25519_infra";
-          identitiesOnly = true;
-        };
-        "github.com" = {
-          user = "git";
-          identityFile = "${sshKeysDir}/id_ed25519_github";
-          identitiesOnly = true;
-        };
-        "gitlab.com" = {
-          user = "git";
-          identityFile = "${sshKeysDir}/id_ed25519_github";
-          identitiesOnly = true;
-        };
-        "forgejo.local" = {
-          hostname = "forgejo.local";
-          user = "git";
-          identityFile = "${sshKeysDir}/id_ed25519_github";
-          identitiesOnly = true;
-        };
-      };
-    };
-  };
+  # SSH client host-specific identity selection is handled by the activation
+  # script below, which writes /etc/ssh/ssh_config.d/50-borba.conf for this
+  # NixOS release.
 
   # ==================== PACKAGES ====================
   environment.systemPackages =
