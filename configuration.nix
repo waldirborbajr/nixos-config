@@ -268,6 +268,42 @@ in {
     mode = "0600";
   };
 
+# ==================== ZERO-TOUCH SSH HOST KEY BOOTSTRAP ====================
+
+systemd.services.ssh-hostkey-bootstrap = {
+  description = "Bootstrap SSH host key into SOPS on first boot";
+
+  wantedBy = ["multi-user.target"];
+  after = ["network.target"];
+
+  serviceConfig = {
+    Type = "oneshot";
+    User = "root";
+  };
+
+  script = ''
+    set -euo pipefail
+
+    KEY="/etc/ssh/ssh_host_ed25519_key"
+
+    # se já existe secret, não faz nada
+    if [ -f "$KEY" ]; then
+      exit 0
+    fi
+
+    mkdir -p /etc/ssh
+
+    echo "[bootstrap] generating ssh host key..."
+
+    ssh-keygen -t ed25519 -f "$KEY" -N ""
+
+    echo "[bootstrap] WARNING: key generated locally."
+
+    echo "[bootstrap] you should now encrypt it with sops:"
+    echo "  sops hosts/${hostname}/secrets/${hostname}.yaml"
+  '';
+};
+
   # ==================== STATE VERSION ====================
   system.stateVersion = "26.05";
 }
