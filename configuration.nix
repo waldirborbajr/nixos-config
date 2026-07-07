@@ -191,6 +191,17 @@ in {
   # ==================== PROGRAMS ====================
   nixpkgs.config.allowUnfree = true;
 
+  environment.variables = {
+    EDITOR = "hx";
+    VISUAL = "hx";
+  };
+
+  environment.shellAliases = {
+    vi = "hx";
+    vim = "hx";
+    nvim = "hx";
+  };
+
   # SSH client host-specific identity selection is handled by the activation
   # script below, which writes /etc/ssh/ssh_config.d/50-borba.conf for this
   # NixOS release.
@@ -201,7 +212,6 @@ in {
       wget
       curl
       git
-      helix
       tmux
       bat
       ripgrep
@@ -224,6 +234,7 @@ in {
     ])
     ++ (with pkgs-unstable; [
       neovim
+      helix
     ]);
 
   # ==================== NIX ====================
