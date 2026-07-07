@@ -160,33 +160,7 @@ nix develop
 
 ---
 
-## 🔐 SSH keys via SOPS
-
-This repository automatically prepares two SSH identities for the `borba` user:
-
-- `id_ed25519_infra`: used for server-to-server SSH access and trust relationships
-- `id_ed25519_github`: used for GitHub, GitLab, Forgejo, and other remote repositories
-
-Plus the machine's own `ssh_host_ed25519_key`, used by `sshd` itself.
-
-**See the "Recreating a host from scratch" section above for the full
-ordered setup.** Short version, for a host that's already been through
-initial setup once:
-
-```bash
-./scripts/manage-ssh-sops.sh dell1456
-sudo nixos-rebuild switch --flake .#dell1456
-```
-
-The script generates the SSH keys if needed, creates a local age key when
-one doesn't exist yet, and encrypts everything into the corresponding
-host's secrets file at `hosts/<host>/secrets/<host>.yaml`.
-
-Use `--clean` only when setting up a host for the first time, or to fully
-rebuild a secrets file that got into a bad state — it wipes local keys and
-the secrets file before regenerating everything from scratch. See the
-script's header comments for details.
-
 ```text
 https://git.voidarc.co.uk/voidarc/nixos
 ```
+
