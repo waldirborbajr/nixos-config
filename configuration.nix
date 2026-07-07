@@ -1,4 +1,3 @@
-# configuration.nix
 {
   config,
   pkgs,
@@ -7,6 +6,8 @@
   ...
 }: let
   username = "borba";
+  sshKeysDir = "/home/${username}/.ssh";
+  sshClientConfigPath = "/etc/ssh/ssh_config.d/50-borba.conf";
 
   dotfilesDir = "/home/${username}/dotfiles";
   dotfileConfigDir = "/home/${username}/.config";
@@ -24,10 +25,11 @@
     "oh-my-posh"
     "helix"
     "git"
-    # adicione outros conforme for precisando
+    # add more as needed
   ];
 
-  mkDotfileLink = name: "L+ ${dotfileConfigDir}/${name} - - - - ${dotfilesDir}/${name}/.config/${name}";
+  mkDotfileLink = name:
+    "L+ ${dotfileConfigDir}/${name} - - - - ${dotfilesDir}/${name}/.config/${name}";
 in {
   _module.args.common = common;
 
@@ -35,16 +37,19 @@ in {
     # hardware-configuration.nix is imported per-host via flake.nix
   ];
 
+  # ==================== KERNEL ====================
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  # ==================== DOTFILES AUTOMÁTICOS ====================
+  # ==================== AUTOMATIC DOTFILES ====================
   systemd.tmpfiles.rules =
     (map mkDotfileLink dotfilePrograms)
     ++ [
+      "d ${sshKeysDir} 0700 ${username} users -"
       "L+ /home/${username}/.zshenv - - - - ${dotfilesDir}/zsh/.zshenv"
       "L+ /home/${username}/.config/zsh - - - - ${dotfilesDir}/zsh/.config/zsh"
     ];
 
+  # ==================== SLEEP POLICY ====================
   systemd.sleep.settings.Sleep = {
     AllowSuspend = "yes";
     AllowHibernation = "no";
@@ -53,13 +58,13 @@ in {
     MemorySleepMode = "s2idle";
   };
 
+  # ==================== NETWORK ====================
   networking.hostName = hostname;
   networking.networkmanager.enable = true;
 
-  hardware.bluetooth.enable = true;
-  hardware.bluetooth.powerOnBoot = true;
-  services.blueman.enable = true;
+  networking.firewall.allowedTCPPorts = [22];
 
+  # ==================== TIME / LOCALE ====================
   time.timeZone = "America/Sao_Paulo";
 
   i18n.defaultLocale = "en_US.UTF-8";
@@ -75,6 +80,7 @@ in {
     LC_TIME = "pt_BR.UTF-8";
   };
 
+  # ==================== FONTS ====================
   fonts = {
     enableDefaultPackages = true;
     packages = with pkgs; [
@@ -87,6 +93,7 @@ in {
       noto-fonts-color-emoji
       nerd-fonts.symbols-only
     ];
+
     fontconfig = {
       enable = true;
       defaultFonts = {
@@ -95,6 +102,7 @@ in {
     };
   };
 
+  # ==================== USERS ====================
   users.users.${username} = {
     isNormalUser = true;
     home = "/home/${username}";
@@ -114,10 +122,12 @@ in {
     }
   ];
 
-  # ==================== X11 + i3 + LightDM ====================
+  # ==================== X11 + i3 + LIGHTDM ====================
   services.xserver = {
     enable = true;
+
     desktopManager.xterm.enable = false;
+
     windowManager.i3 = {
       enable = true;
       extraPackages = with pkgs; [
@@ -127,10 +137,13 @@ in {
         rofi
       ];
     };
+
     displayManager.lightdm = {
       enable = true;
+
       greeters.gtk = {
         enable = true;
+
         theme = {
           package = pkgs.catppuccin-gtk.override {
             accents = ["mauve"];
@@ -139,14 +152,17 @@ in {
           };
           name = "catppuccin-mocha-mauve-standard";
         };
+
         iconTheme = {
           package = pkgs.papirus-icon-theme;
           name = "Papirus-Dark";
         };
+
         cursorTheme = {
           package = pkgs.catppuccin-cursors.mochaDark;
           name = "catppuccin-mocha-dark-cursors";
         };
+
         extraConfig = ''
           font-name = FiraCode Nerd Font 11
           xft-antialias = true
@@ -157,16 +173,14 @@ in {
     };
   };
 
-  # Corrected option (was in the wrong place)
   services.displayManager.defaultSession = "none+i3";
-
   services.gnome.gnome-keyring.enable = true;
   security.polkit.enable = true;
   programs.i3lock.enable = true;
 
-  # ==================== SOUND ====================
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
+
   services.pipewire = {
     enable = true;
     alsa.enable = true;
@@ -174,14 +188,14 @@ in {
     pulse.enable = true;
   };
 
-  # ==================== PROGRAMS & PACKAGES ====================
+  # ==================== PROGRAMS ====================
   nixpkgs.config.allowUnfree = true;
 
-  programs = {
-    firefox.enable = true;
-    fish.enable = true;
-  };
+  # SSH client host-specific identity selection is handled by the activation
+  # script below, which writes /etc/ssh/ssh_config.d/50-borba.conf for this
+  # NixOS release.
 
+  # ==================== PACKAGES ====================
   environment.systemPackages =
     (with pkgs; [
       wget
@@ -200,6 +214,8 @@ in {
       zsh
       nixd
       alejandra
+      age
+      sops
       rofi
       feh
       picom
@@ -210,17 +226,139 @@ in {
       neovim
     ]);
 
-  # ==================== NIX SETTINGS ====================
+  # ==================== NIX ====================
   nix.gc = {
     automatic = true;
     dates = "weekly";
     options = "--delete-older-than 3d";
   };
+
   nix.optimise.automatic = true;
+
   nix.settings.experimental-features = ["nix-command" "flakes"];
 
-  services.openssh.enable = true;
-  networking.firewall.allowedTCPPorts = [22];
+  # ==================== SSH ====================
 
+  services.openssh = {
+    enable = true;
+
+    hostKeys = [
+      {
+        path = "/etc/ssh/ssh_host_ed25519_key";
+        type = "ed25519";
+      }
+    ];
+  };
+
+  sops = {
+    defaultSopsFile = ./hosts/${hostname}/secrets/${hostname}.yaml;
+
+    age.keyFile = "/home/${username}/.config/sops/age/keys.txt";
+
+    validateSopsFiles = false;
+  };
+
+  sops.secrets."ssh_host_ed25519_key" = {
+    path = "/etc/ssh/ssh_host_ed25519_key";
+    owner = "root";
+    mode = "0600";
+  };
+
+  sops.secrets."borba_ssh_infra_private_key" = {
+    path = "${sshKeysDir}/id_ed25519_infra";
+    owner = username;
+    group = "users";
+    mode = "0600";
+  };
+
+  sops.secrets."borba_ssh_infra_public_key" = {
+    path = "${sshKeysDir}/id_ed25519_infra.pub";
+    owner = username;
+    group = "users";
+    mode = "0644";
+  };
+
+  sops.secrets."borba_ssh_github_private_key" = {
+    path = "${sshKeysDir}/id_ed25519_github";
+    owner = username;
+    group = "users";
+    mode = "0600";
+  };
+
+  sops.secrets."borba_ssh_github_public_key" = {
+    path = "${sshKeysDir}/id_ed25519_github.pub";
+    owner = username;
+    group = "users";
+    mode = "0644";
+  };
+
+  system.activationScripts.setupBorbaSshKeys = ''
+    install -d -o ${username} -g users -m 700 ${sshKeysDir}
+    install -d -o root -g root -m 755 /etc/ssh/ssh_config.d
+
+    cat > ${sshClientConfigPath} <<EOF
+    Host 192.168.* *.infra
+      HostName %h
+      User ${username}
+      IdentityFile ${sshKeysDir}/id_ed25519_infra
+      IdentitiesOnly yes
+
+    Host github.com gitlab.com
+      User git
+      IdentityFile ${sshKeysDir}/id_ed25519_github
+      IdentitiesOnly yes
+
+    Host forgejo.local
+      HostName forgejo.local
+      User git
+      IdentityFile ${sshKeysDir}/id_ed25519_github
+      IdentitiesOnly yes
+    EOF
+
+    chown ${username}:users ${sshKeysDir}
+    chmod 700 ${sshKeysDir}
+    chown root:root ${sshClientConfigPath}
+    chmod 644 ${sshClientConfigPath}
+  '';
+
+# ==================== ZERO-TOUCH SSH HOST KEY BOOTSTRAP ====================
+
+systemd.services.ssh-hostkey-bootstrap = {
+  description = "Bootstrap SSH host key into SOPS on first boot";
+
+  wantedBy = ["multi-user.target"];
+  wants = ["sshd.service"];
+  before = ["sshd.service"];
+  after = ["network.target"];
+
+  serviceConfig = {
+    Type = "oneshot";
+    User = "root";
+  };
+
+  script = ''
+    set -euo pipefail
+
+    KEY="/etc/ssh/ssh_host_ed25519_key"
+
+    # se já existe secret, não faz nada
+    if [ -f "$KEY" ]; then
+      exit 0
+    fi
+
+    mkdir -p /etc/ssh
+
+    echo "[bootstrap] generating ssh host key..."
+
+    ssh-keygen -t ed25519 -f "$KEY" -N ""
+
+    echo "[bootstrap] WARNING: key generated locally."
+
+    echo "[bootstrap] you should now encrypt it with sops:"
+    echo "  sops hosts/${hostname}/secrets/${hostname}.yaml"
+  '';
+};
+
+  # ==================== STATE VERSION ====================
   system.stateVersion = "26.05";
 }
