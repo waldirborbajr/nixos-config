@@ -122,7 +122,24 @@ in {
     }
   ];
 
-  # ==================== X11 + i3 + LIGHTDM ====================
+  # ==================== X11 + i3 + LY ====================
+  # NOTA (branch de teste): LightDM foi substituído por ly aqui, buscando um
+  # display manager mais leve (sem stack GTK). Pontos confirmados antes de
+  # aplicar, documentados para referência futura:
+  #   - services.displayManager.ly.settings tem um bug conhecido reportado
+  #     no NixOS Discourse onde o merge de config pode fazer a lista de
+  #     sessões (ex: i3) sumir da tela do ly. Teste via
+  #     `./nixos-manager.sh dry` antes de aplicar de verdade, e mantenha uma
+  #     sessão SSH separada aberta no primeiro `switch` real.
+  #   - bg/fg no config.ini só afetam a caixa de diálogo e a barra superior;
+  #     o fundo de tela cheio do ly é sempre preto, não é configurável por
+  #     aqui (exigiria sobrescrever o unit systemd do ly com sequências ANSI).
+  #   - Cores usam IDs inteiros (0-8), não hex 0xRRGGBB — hex 24-bit só é
+  #     suportado em builds mais recentes do ly; não confirmado para a
+  #     revisão de nixpkgs que este flake resolve. Ajustar para hex somente
+  #     após checar `ly --version` e o /etc/ly/config.ini real gerado.
+  #   - Não existe módulo catppuccin/nix oficial para o ly (só para sddm),
+  #     então este tema é uma aproximação manual, não um pacote de tema.
   services.xserver = {
     enable = true;
 
@@ -137,39 +154,25 @@ in {
         rofi
       ];
     };
+  };
 
-    displayManager.lightdm = {
-      enable = true;
+  services.displayManager.ly = {
+    enable = true;
+    settings = {
+      # Mapeamento aproximado pro espírito do Catppuccin Mocha usando a
+      # paleta segura de inteiros (0-8), compatível com qualquer versão:
+      #   bg = 0 (preto)   -- só afeta caixa de diálogo/barra superior
+      #   fg = 6 (magenta) -- analogia mais próxima ao mauve do Mocha
+      bg = 0;
+      fg = 6;
+      border_fg = 6;
 
-      greeters.gtk = {
-        enable = true;
-
-        theme = {
-          package = pkgs.catppuccin-gtk.override {
-            accents = ["mauve"];
-            size = "standard";
-            variant = "mocha";
-          };
-          name = "catppuccin-mocha-mauve-standard";
-        };
-
-        iconTheme = {
-          package = pkgs.papirus-icon-theme;
-          name = "Papirus-Dark";
-        };
-
-        cursorTheme = {
-          package = pkgs.catppuccin-cursors.mochaDark;
-          name = "catppuccin-mocha-dark-cursors";
-        };
-
-        extraConfig = ''
-          font-name = FiraCode Nerd Font 11
-          xft-antialias = true
-          xft-hintstyle = hintslight
-          indicators = ~host;~spacer;~clock;~spacer;~session;~language;~a11y;~power
-        '';
-      };
+      animate = false;
+      blank_password = true;
+      hide_borders = false;
+      default_input = "login";
+      load = true;
+      save = true;
     };
   };
 
@@ -332,43 +335,43 @@ in {
     chmod 644 ${sshClientConfigPath}
   '';
 
-# ==================== ZERO-TOUCH SSH HOST KEY BOOTSTRAP ====================
+  # ==================== ZERO-TOUCH SSH HOST KEY BOOTSTRAP ====================
 
-systemd.services.ssh-hostkey-bootstrap = {
-  description = "Bootstrap SSH host key into SOPS on first boot";
+  systemd.services.ssh-hostkey-bootstrap = {
+    description = "Bootstrap SSH host key into SOPS on first boot";
 
-  wantedBy = ["multi-user.target"];
-  wants = ["sshd.service"];
-  before = ["sshd.service"];
-  after = ["network.target"];
+    wantedBy = ["multi-user.target"];
+    wants = ["sshd.service"];
+    before = ["sshd.service"];
+    after = ["network.target"];
 
-  serviceConfig = {
-    Type = "oneshot";
-    User = "root";
+    serviceConfig = {
+      Type = "oneshot";
+      User = "root";
+    };
+
+    script = ''
+      set -euo pipefail
+
+      KEY="/etc/ssh/ssh_host_ed25519_key"
+
+      # se já existe secret, não faz nada
+      if [ -f "$KEY" ]; then
+        exit 0
+      fi
+
+      mkdir -p /etc/ssh
+
+      echo "[bootstrap] generating ssh host key..."
+
+      ssh-keygen -t ed25519 -f "$KEY" -N ""
+
+      echo "[bootstrap] WARNING: key generated locally."
+
+      echo "[bootstrap] you should now encrypt it with sops:"
+      echo "  sops hosts/${hostname}/secrets/${hostname}.yaml"
+    '';
   };
-
-  script = ''
-    set -euo pipefail
-
-    KEY="/etc/ssh/ssh_host_ed25519_key"
-
-    # se já existe secret, não faz nada
-    if [ -f "$KEY" ]; then
-      exit 0
-    fi
-
-    mkdir -p /etc/ssh
-
-    echo "[bootstrap] generating ssh host key..."
-
-    ssh-keygen -t ed25519 -f "$KEY" -N ""
-
-    echo "[bootstrap] WARNING: key generated locally."
-
-    echo "[bootstrap] you should now encrypt it with sops:"
-    echo "  sops hosts/${hostname}/secrets/${hostname}.yaml"
-  '';
-};
 
   # ==================== STATE VERSION ====================
   system.stateVersion = "26.05";
