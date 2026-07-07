@@ -30,6 +30,13 @@
 # pending) -> pull -> [flake update, if applicable] -> rebuild -> push
 # (if there are commits to send). Everything runs in sequence, without
 # returning to the menu mid-process.
+#
+# Local branch cleanup: once feature branches are merged and deleted on
+# origin (e.g. after unifying everything into `main`), the corresponding
+# local branches are left behind. Menu option "a" / `prune` finds local
+# branches that no longer have a matching branch on origin and offers to
+# delete them (the default branch and the currently checked-out branch
+# are always kept, never offered for deletion).
 
 set -euo pipefail
 
@@ -314,6 +321,69 @@ git_checkout_branch() {
   ok "Switched to branch ${C_BOLD}${GIT_BRANCH}${C_RESET}."
 }
 
+# ----- local branch cleanup -----
+#
+# After a feature branch is merged and deleted on origin (the goal being
+# that, once everything is unified, only `main` remains remotely), the
+# matching local branch is left behind with nothing to track. This finds
+# local branches that no longer have a corresponding branch on origin and
+# offers to remove them. The default branch and whatever branch is
+# currently checked out are never candidates for deletion.
+
+prune_local_branches() {
+  require_dir
+  cd "$NIXOS_DIR"
+
+  log "Fetching from origin (with --prune) to get an up-to-date view..."
+  git fetch --all --prune --quiet 2>/dev/null || true
+
+  local current
+  current="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo '')"
+
+  local stale=()
+  local b
+  while IFS= read -r b; do
+    [ -z "$b" ] && continue
+    [ "$b" = "$GIT_DEFAULT_BRANCH" ] && continue
+    [ "$b" = "$current" ] && continue
+
+    if ! git ls-remote --exit-code --heads origin "$b" >/dev/null 2>&1; then
+      stale+=("$b")
+    fi
+  done < <(git for-each-ref --format='%(refname:short)' refs/heads/)
+
+  if [ "${#stale[@]}" -eq 0 ]; then
+    ok "No stale local branches found — every local branch (besides '${GIT_DEFAULT_BRANCH}' and the current one) still has a match on origin."
+    return 0
+  fi
+
+  echo -e "${C_YELLOW}Local branches with no matching branch on origin:${C_RESET}"
+  local i=1
+  for b in "${stale[@]}"; do
+    echo -e "  ${C_YELLOW}${i})${C_RESET} ${b}"
+    i=$((i + 1))
+  done
+
+  if ! confirm "Delete these ${#stale[@]} stale local branch(es)?"; then
+    warn "Cancelled — no branches deleted."
+    return 0
+  fi
+
+  for b in "${stale[@]}"; do
+    if git branch -d "$b" 2>/dev/null; then
+      ok "Deleted local branch: ${b}"
+    else
+      warn "'${b}' is not fully merged into the current branch."
+      if confirm "Force delete '${b}' anyway (git branch -D)?"; then
+        git branch -D "$b"
+        ok "Force-deleted local branch: ${b}"
+      else
+        warn "Skipped: ${b}"
+      fi
+    fi
+  done
+}
+
 # ----- git helpers -----
 #
 # The git flow is split into independent steps, called in sequence by
@@ -566,14 +636,18 @@ list_hosts() {
 list_branches_cmd() {
   require_dir
   cd "$NIXOS_DIR"
+  git fetch --all --prune --quiet 2>/dev/null || true
   local current
   current="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo '?')"
   echo -e "${C_BOLD}${C_CYAN}Branches (local + remote, deduplicated):${C_RESET}"
   local b
   while IFS= read -r b; do
     [ -z "$b" ] && continue
+
     if [ "$b" = "$current" ]; then
       echo -e "  ${C_GREEN}●${C_RESET} ${C_BOLD}${b}${C_RESET} ${C_GRAY}(current)${C_RESET}"
+    elif git show-ref --verify --quiet "refs/heads/${b}" && ! git ls-remote --exit-code --heads origin "$b" >/dev/null 2>&1; then
+      echo -e "  ${C_YELLOW}○${C_RESET} ${b} ${C_GRAY}(local only — no match on origin)${C_RESET}"
     else
       echo -e "  ${C_GRAY}○${C_RESET} ${b}"
     fi
@@ -606,6 +680,7 @@ show_menu() {
   echo -e " ${C_YELLOW}${C_BOLD}7)${C_RESET} Check flake ${C_GRAY}(nix flake check)${C_RESET}"
   echo -e " ${C_BLUE}${C_BOLD}8)${C_RESET} List hosts"
   echo -e " ${C_BLUE}${C_BOLD}9)${C_RESET} List branches"
+  echo -e " ${C_RED}${C_BOLD}a)${C_RESET} Prune local branches ${C_GRAY}(no match on origin)${C_RESET}"
   echo -e " ${C_BOLD}q)${C_RESET} Quit"
   echo
 }
@@ -624,6 +699,7 @@ run_choice() {
     7|check) check_flake "$extra_arg" ;;
     8|hosts) list_hosts ;;
     9|branches) list_branches_cmd ;;
+    a|A|prune) prune_local_branches ;;
     q|quit|exit) exit 0 ;;
     *) err "Invalid option: $choice"; return 1 ;;
   esac
