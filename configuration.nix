@@ -159,15 +159,21 @@ in {
   services.displayManager.ly = {
     enable = true;
     settings = {
-      # Mapeamento aproximado pro espírito do Catppuccin Mocha usando a
-      # paleta segura de inteiros (0-8), compatível com qualquer versão:
-      #   bg = 0 (preto)   -- só afeta caixa de diálogo/barra superior
-      #   fg = 6 (magenta) -- analogia mais próxima ao mauve do Mocha
-      bg = 0;
-      fg = 6;
-      border_fg = 6;
+      animation = "matrix";
+      bigclock = true;
+      # --- Color Settings (0xAARRGGBB) ---
+      # Background color of dialog box (Black)
+      bg = "0x00000000";
+      # Foreground text color (Cyan: #00FFFF)
+      fg = "0x0000FFFF";
+      # Border color (Red: #FF0000)
+      border_fg = "0x00FF0000";
+      # Error message color (Red)
+      error_fg = "0x00FF0000";
+      # Clock color (Purple: #800080)
+      clock_color = "#800080";
 
-      animate = false;
+      #animate = false;
       blank_password = true;
       hide_borders = false;
       default_input = "login";
