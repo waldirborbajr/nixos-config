@@ -156,31 +156,27 @@ in {
     };
   };
 
-  services.displayManager.ly = {
-    enable = true;
-    settings = {
-      animation = "matrix";
-      bigclock = true;
-      # --- Color Settings (0xAARRGGBB) ---
-      # Background color of dialog box (Black)
-      bg = "0x00000000";
-      # Foreground text color (Cyan: #00FFFF)
-      fg = "0x0000FFFF";
-      # Border color (Red: #FF0000)
-      border_fg = "0x00FF0000";
-      # Error message color (Red)
-      error_fg = "0x00FF0000";
-      # Clock color (Purple: #800080)
-      clock_color = "#800080";
+services.displayManager.ly = {
+  enable = true;
+  settings = {
+    animation = "matrix";
+    bigclock = true;
 
-      #animate = false;
-      blank_password = true;
-      hide_borders = false;
-      default_input = "login";
-      load = true;
-      save = true;
-    };
+    bg = "0x001e1e2e";          # Base
+    fg = "0x00cba6f7";          # Mauve (mesmo accent do resto do seu setup)
+    border_fg = "0x00cba6f7";   # Mauve
+    error_fg = "0x00f38ba8";    # Red (Catppuccin, não vermelho puro)
+    clock_color = "0x00cba6f7"; # Mauve
+
+    term_reset_cmd = "/usr/bin/tput reset; echo -en \"\\e]P01e1e2e\"; echo -en \"\\e]P7cdd6f4\\ec\"; clear";
+
+    blank_password = true;
+    hide_borders = false;
+    default_input = "login";
+    load = true;
+    save = true;
   };
+};
 
   services.displayManager.defaultSession = "none+i3";
   services.gnome.gnome-keyring.enable = true;
