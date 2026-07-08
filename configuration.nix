@@ -25,6 +25,7 @@
     "oh-my-posh"
     "helix"
     "git"
+    "zsh"
     # add more as needed
   ];
 
@@ -46,7 +47,6 @@ in {
     ++ [
       "d ${sshKeysDir} 0700 ${username} users -"
       "L+ /home/${username}/.zshenv - - - - ${dotfilesDir}/zsh/.zshenv"
-      "L+ /home/${username}/.config/zsh - - - - ${dotfilesDir}/zsh/.config/zsh"
     ];
 
   # ==================== SLEEP POLICY ====================
