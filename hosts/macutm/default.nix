@@ -21,6 +21,13 @@ in {
   boot.kernelParams = [ "mitigations=off" ];
   services.qemuGuest.enable = true;
 
+  virtualisation.podman = {
+    enable = true;
+    dockerCompat = true;
+    defaultNetwork.settings.dns_enabled = true;
+  };
+  virtualisation.containers.enable = true;
+
   # ==================== KEYBOARD ====================
   console.keyMap = "us";
 
@@ -38,7 +45,7 @@ in {
 
     brightnessctl playerctl pciutils pavucontrol ffmpeg
 
-    docker gcc gnumake cmake gdb glibc libgcc libcxx
+    podman lazydocker gcc gnumake cmake gdb glibc libgcc libcxx
 
     rust-analyzer rustfmt
     lua-language-server stylua

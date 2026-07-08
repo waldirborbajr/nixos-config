@@ -107,7 +107,7 @@ in {
     isNormalUser = true;
     home = "/home/${username}";
     description = "borba jr, w";
-    extraGroups = ["networkmanager" "wheel"];
+    extraGroups = ["networkmanager" "wheel" "podman"];
   };
 
   security.sudo.extraRules = [
@@ -178,6 +178,11 @@ in {
   security.polkit.enable = true;
   programs.i3lock.enable = true;
 
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;
+  };
+
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
 
@@ -212,6 +217,8 @@ in {
       oh-my-posh
       alacritty
       zsh
+      direnv
+      nix-direnv
       nixd
       alejandra
       age

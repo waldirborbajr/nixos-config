@@ -160,6 +160,8 @@ flake-utils.lib.eachDefaultSystem (
       ];
 
       shellHook = ''
+        export GOPATH="$HOME/go"
+        export GOBIN="$GOPATH/bin"
         echo "🐹 Go Development Environment"
         echo "Go version: $(go version)"
         echo ""
@@ -177,10 +179,27 @@ flake-utils.lib.eachDefaultSystem (
         echo "  - mycli (MySQL/MariaDB)"
         echo "  - litecli (SQLite)"
       '';
+    };
 
-      # Go environment
-      GOPATH = "${builtins.getEnv "HOME"}/go";
-      GOBIN = "${builtins.getEnv "HOME"}/go/bin";
+    # ==========================================
+    # DevShell: Python
+    # ==========================================
+    devShells.python = pkgs.mkShell {
+      name = "python-dev";
+
+      buildInputs = with pkgs; [
+        python312
+        uv
+        ruff
+        python312Packages.python-lsp-server
+        python312Packages.mypy
+      ];
+
+      shellHook = ''
+        echo "🐍 Python Development Environment"
+        echo "Python: $(python3 --version)"
+        echo "uv: $(uv --version)"
+      '';
     };
 
     # ==========================================
@@ -233,6 +252,8 @@ flake-utils.lib.eachDefaultSystem (
       ];
 
       shellHook = ''
+        export LUA_PATH="$HOME/.luarocks/share/lua/5.4/?.lua;$HOME/.luarocks/share/lua/5.4/?/init.lua;;"
+        export LUA_CPATH="$HOME/.luarocks/lib/lua/5.4/?.so;;"
         echo "🌙 Lua Development Environment"
         echo "Lua: $(lua5.4 -v)"
         echo "LuaJIT: $(luajit -v)"
@@ -243,9 +264,6 @@ flake-utils.lib.eachDefaultSystem (
         echo "  - selene (linter)"
         echo "  - luarocks (package manager)"
       '';
-
-      LUA_PATH = "${builtins.getEnv "HOME"}/.luarocks/share/lua/5.4/?.lua;${builtins.getEnv "HOME"}/.luarocks/share/lua/5.4/?/init.lua;;";
-      LUA_CPATH = "${builtins.getEnv "HOME"}/.luarocks/lib/lua/5.4/?.so;;";
     };
 
     # ==========================================
@@ -448,7 +466,8 @@ flake-utils.lib.eachDefaultSystem (
 
       buildInputs = with pkgs; [
         # Container tools
-        k9s
+        lazydocker
+        podman
         cri-tools
 
         # Development workflow
@@ -471,8 +490,8 @@ flake-utils.lib.eachDefaultSystem (
         echo "🚀 DevOps Development Environment"
         echo ""
         echo "Container tools:"
-        echo "  - k9s (Kubernetes TUI)"
-        echo "  - cri-tools (crictl)"
+        echo "  - lazydocker (lightweight container TUI)"
+        echo "  - podman + cri-tools (crictl)"
         echo ""
         echo "Kubernetes:"
         echo "  - kubectl, helm, kubectx, stern"
@@ -504,6 +523,7 @@ flake-utils.lib.eachDefaultSystem (
         echo "  nix develop .#rust         → Rust stable"
         echo "  nix develop .#rust-nightly → Rust nightly"
         echo "  nix develop .#go           → Go with extras"
+        echo "  nix develop .#python       → Python with uv + ruff"
         echo "  nix develop .#lua          → Lua + LuaJIT"
         echo "  nix develop .#nix-dev      → Nix development tools"
         echo "  nix develop .#secrets      → SOPS/Age secrets management"
