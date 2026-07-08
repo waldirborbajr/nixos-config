@@ -25,6 +25,7 @@
     "oh-my-posh"
     "helix"
     "git"
+    "zsh"
     # add more as needed
   ];
 
@@ -46,7 +47,6 @@ in {
     ++ [
       "d ${sshKeysDir} 0700 ${username} users -"
       "L+ /home/${username}/.zshenv - - - - ${dotfilesDir}/zsh/.zshenv"
-      "L+ /home/${username}/.config/zsh - - - - ${dotfilesDir}/zsh/.config/zsh"
     ];
 
   # ==================== SLEEP POLICY ====================
@@ -107,7 +107,7 @@ in {
     isNormalUser = true;
     home = "/home/${username}";
     description = "borba jr, w";
-    extraGroups = ["networkmanager" "wheel"];
+    extraGroups = ["networkmanager" "wheel" "podman"];
   };
 
   security.sudo.extraRules = [
@@ -179,9 +179,13 @@ services.displayManager.ly = {
 };
 
   services.displayManager.defaultSession = "none+i3";
-  services.gnome.gnome-keyring.enable = true;
   security.polkit.enable = true;
   programs.i3lock.enable = true;
+
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;
+  };
 
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
@@ -235,7 +239,6 @@ services.displayManager.ly = {
       feh
       picom
       xclip
-      lxappearance
     ])
     ++ (with pkgs-unstable; [
       neovim
@@ -320,6 +323,21 @@ services.displayManager.ly = {
       IdentitiesOnly yes
 
     Host github.com gitlab.com
+      User git
+      IdentityFile ${sshKeysDir}/id_ed25519_github
+      IdentitiesOnly yes
+
+    Host gitea.com gitea.com
+      User git
+      IdentityFile ${sshKeysDir}/id_ed25519_github
+      IdentitiesOnly yes
+
+    Host codeberg.org codeberg.org
+      User git
+      IdentityFile ${sshKeysDir}/id_ed25519_github
+      IdentitiesOnly yes
+
+    Host codefloe.com codefloe.com
       User git
       IdentityFile ${sshKeysDir}/id_ed25519_github
       IdentitiesOnly yes
