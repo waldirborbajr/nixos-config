@@ -315,6 +315,21 @@ in {
       IdentityFile ${sshKeysDir}/id_ed25519_github
       IdentitiesOnly yes
 
+    Host gitea.com gitea.com
+      User git
+      IdentityFile ${sshKeysDir}/id_ed25519_github
+      IdentitiesOnly yes
+
+    Host codeberg.org codeberg.org
+      User git
+      IdentityFile ${sshKeysDir}/id_ed25519_github
+      IdentitiesOnly yes
+
+    Host codefloe.com codefloe.com
+      User git
+      IdentityFile ${sshKeysDir}/id_ed25519_github
+      IdentitiesOnly yes
+
     Host forgejo.local
       HostName forgejo.local
       User git

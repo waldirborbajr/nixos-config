@@ -34,18 +34,27 @@ nix develop .#rust-nightly
 # Go + gopls + delve + tools
 nix develop .#go
 
+# Python + uv + ruff + LSP tooling
+nix develop .#python
+
 # Lua + LuaJIT + LSP
 nix develop .#lua
 
 # Nix development (formatters, LSPs, linters)
 nix develop .#nix-dev
 
-# Full stack (Rust + Go + Node)
-nix develop .#fullstack
+# DevOps tooling: podman, lazydocker, kubectl, helm, terraform, ansible
+nix develop .#devops
 
 # Default (basic)
 nix develop
 ```
+
+**Recent additions:**
+- ✅ Python shell with `uv`, `ruff`, `mypy` and Python LSP support
+- ✅ DevOps shell with `podman`, `lazydocker`, `kubectl`, `helm`, `terraform` and `ansible`
+- ✅ `direnv` support enabled globally for project-local flake environments
+- ✅ Podman configured with Docker compatibility for smoother container workflows
 
 **Advantages:**
 - ✅ Isolated environments per project
@@ -58,7 +67,8 @@ nix develop
 - Rust (`modules/languages/rust.nix`)
 - Lua (`modules/languages/lua.nix` - toggle)
 - Nix (`modules/languages/nix-dev.nix`)
-- Python, Node.js
+- Python (via `nix develop .#python`)
+- Node.js
 
 ## 🔐 SSH keys via SOPS
 

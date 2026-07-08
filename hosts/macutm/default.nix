@@ -1,4 +1,4 @@
-# hosts/m2utm/default.nix
+# hosts/macutm/default.nix
 #
 { lib, pkgs, pkgs-unstable, common, ... }:
 

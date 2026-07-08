@@ -187,52 +187,26 @@ flake-utils.lib.eachDefaultSystem (
     devShells.python = pkgs.mkShell {
       name = "python-dev";
 
+      nativeBuildInputs = with pkgs; [
+        uv
+      ];
+
       buildInputs = with pkgs; [
         python312
-        uv
         ruff
         python312Packages.python-lsp-server
         python312Packages.mypy
       ];
 
       shellHook = ''
+        export PATH="${pkgs.uv}/bin:$PATH"
+        if ! command -v uv >/dev/null 2>&1; then
+          echo "uv is not available in this shell" >&2
+          exit 1
+        fi
         echo "🐍 Python Development Environment"
         echo "Python: $(python3 --version)"
         echo "uv: $(uv --version)"
-      '';
-    };
-
-    # ==========================================
-    # DevShell: Full Stack (Rust + Go + Node)
-    # ==========================================
-    devShells.fullstack = pkgs.mkShell {
-      name = "fullstack-dev";
-
-      buildInputs = with pkgs; [
-        # Rust
-        rustStable
-        cargo-edit
-        cargo-watch
-
-        # Go
-        go_1_25
-        gopls
-        delve
-
-        # Node.js
-        nodejs_20
-        nodePackages.pnpm
-
-        # Tools
-        git
-        gh
-      ];
-
-      shellHook = ''
-        echo "🚀 Full Stack Development Environment"
-        echo "Rust: $(rustc --version)"
-        echo "Go: $(go version)"
-        echo "Node: $(node --version)"
       '';
     };
 
@@ -527,8 +501,7 @@ flake-utils.lib.eachDefaultSystem (
         echo "  nix develop .#lua          → Lua + LuaJIT"
         echo "  nix develop .#nix-dev      → Nix development tools"
         echo "  nix develop .#secrets      → SOPS/Age secrets management"
-        echo "  nix develop .#fullstack    → Rust + Go + Node"
-        echo "  nix develop .#devops       → K8s, Terraform, Ansible"
+        echo "  nix develop .#devops       → Container + IaC tools"
         echo ""
         echo "Databases:"
         echo "  nix develop .#postgresql   → PostgreSQL + tools"

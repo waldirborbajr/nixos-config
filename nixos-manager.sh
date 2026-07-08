@@ -33,7 +33,8 @@
 
 set -euo pipefail
 
-NIXOS_DIR="/home/borba/nixos-config"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+NIXOS_DIR="${NIXOS_DIR:-$SCRIPT_DIR}"
 GIT_DEFAULT_BRANCH="main"
 GIT_REPO_URL="git@github.com:waldirborbajr/nixos-config.git"
 
