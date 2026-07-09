@@ -39,6 +39,10 @@ in {
     zellij yazi jq just duf psmisc asciinema
     lazygit jujutsu lazyjj
 
+    flameshot vlc
+
+     # chromium
+
     emacs emacsPackages.vterm emacsPackages.pbcopy
 
     dex lxsession autorandr xkill
