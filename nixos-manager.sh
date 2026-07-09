@@ -67,15 +67,32 @@ FLAKE_ATTRS=(m2utm dell macbook2011)
 # set at runtime by select_flake_attr()
 FLAKE_ATTR=""
 
-# ----- colors (disabled when not an interactive terminal) -----
+# ----- colors: Catppuccin Mocha (24-bit ANSI), disabled when not a tty -----
+# Same palette as devshell.sh, so both tools look consistent across
+# macutm, dell1456 and macbook2011.
 if [ -t 1 ]; then
   C_RESET='\033[0m'; C_BOLD='\033[1m'; C_DIM='\033[2m'
-  C_GREEN='\033[32m'; C_YELLOW='\033[33m'; C_RED='\033[31m'
-  C_BLUE='\033[34m'; C_CYAN='\033[36m'; C_MAGENTA='\033[35m'; C_GRAY='\033[90m'
+
+  C_MAUVE='\033[38;2;203;166;247m'    # accent / headers
+  C_BLUE='\033[38;2;137;180;250m'     # info
+  C_SKY='\033[38;2;137;220;235m'      # prompts (replaces plain cyan)
+  C_GREEN='\033[38;2;166;227;161m'    # success
+  C_YELLOW='\033[38;2;249;226;175m'   # warnings / menu numbers
+  C_PEACH='\033[38;2;250;179;135m'    # step markers
+  C_RED='\033[38;2;243;139;168m'      # errors / destructive actions
+  C_TEAL='\033[38;2;148;226;213m'     # secondary info
+  C_TEXT='\033[38;2;205;214;244m'     # default foreground
+  C_OVERLAY='\033[38;2;108;112;134m'  # dim / gray
+
+  # kept for backward compatibility with the rest of the script
+  C_CYAN="$C_SKY"
+  C_MAGENTA="$C_MAUVE"
+  C_GRAY="$C_OVERLAY"
 else
   C_RESET=''; C_BOLD=''; C_DIM=''
-  C_GREEN=''; C_YELLOW=''; C_RED=''
-  C_BLUE=''; C_CYAN=''; C_MAGENTA=''; C_GRAY=''
+  C_MAUVE=''; C_BLUE=''; C_SKY=''; C_GREEN=''; C_YELLOW=''
+  C_PEACH=''; C_RED=''; C_TEAL=''; C_TEXT=''; C_OVERLAY=''
+  C_CYAN=''; C_MAGENTA=''; C_GRAY=''
 fi
 
 log()  { echo -e "${C_BLUE}${C_BOLD}==>${C_RESET} $*"; }
@@ -85,7 +102,7 @@ err()  { echo -e "${C_RED}✗${C_RESET} $*" >&2; }
 step() {
   # step <current> <total> <description>
   echo
-  echo -e "${C_MAGENTA}${C_BOLD}[$1/$2]${C_RESET} ${C_BOLD}$3${C_RESET}"
+  echo -e "${C_MAUVE}${C_BOLD}[$1/$2]${C_RESET} ${C_BOLD}$3${C_RESET}"
 }
 
 require_dir() {
@@ -108,7 +125,7 @@ check_etc_symlink() {
 confirm() {
   # confirm "question" -> returns 0 if yes
   local prompt="$1"
-  read -r -p "$(echo -e "${C_CYAN}?${C_RESET} ${prompt} ${C_DIM}[y/N]${C_RESET} ")" reply
+  read -r -p "$(echo -e "${C_SKY}?${C_RESET} ${prompt} ${C_DIM}[y/N]${C_RESET} ")" reply
   [[ "$reply" =~ ^[YySs]$ ]]
 }
 
@@ -182,14 +199,14 @@ detect_flake_attr() {
 }
 
 prompt_flake_attr() {
-  echo -e "${C_CYAN}Available hosts:${C_RESET}" >&2
+  echo -e "${C_SKY}Available hosts:${C_RESET}" >&2
   local i=1 attr
   for attr in "${FLAKE_ATTRS[@]}"; do
-    echo -e "  ${C_YELLOW}${i})${C_RESET} ${C_BOLD}${HOST_ATTR_TO_LABEL[$attr]}${C_RESET} ${C_GRAY}(${HOST_ATTR_TO_MACHINE[$attr]})${C_RESET}" >&2
+    echo -e "  ${C_YELLOW}${i})${C_RESET} ${C_BOLD}${HOST_ATTR_TO_LABEL[$attr]}${C_RESET} ${C_OVERLAY}(${HOST_ATTR_TO_MACHINE[$attr]})${C_RESET}" >&2
     i=$((i + 1))
   done
   local choice
-  read -r -p "$(echo -e "${C_CYAN}?${C_RESET} Choose a host [1-${#FLAKE_ATTRS[@]}]: ")" choice
+  read -r -p "$(echo -e "${C_SKY}?${C_RESET} Choose a host [1-${#FLAKE_ATTRS[@]}]: ")" choice
   if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le "${#FLAKE_ATTRS[@]}" ]; then
     echo "${FLAKE_ATTRS[$((choice - 1))]}"
     return 0
@@ -273,11 +290,11 @@ select_git_branch() {
     return 0
   fi
 
-  echo -e "${C_CYAN}Branches found:${C_RESET}" >&2
+  echo -e "${C_SKY}Branches found:${C_RESET}" >&2
   local i=1
   for b in "${branches[@]}"; do
     if [ "$b" = "$GIT_DEFAULT_BRANCH" ]; then
-      echo -e "  ${C_YELLOW}${i})${C_RESET} ${C_BOLD}${b}${C_RESET} ${C_GRAY}(default)${C_RESET}" >&2
+      echo -e "  ${C_YELLOW}${i})${C_RESET} ${C_BOLD}${b}${C_RESET} ${C_OVERLAY}(default)${C_RESET}" >&2
     else
       echo -e "  ${C_YELLOW}${i})${C_RESET} ${b}" >&2
     fi
@@ -285,7 +302,7 @@ select_git_branch() {
   done
 
   local choice
-  read -r -p "$(echo -e "${C_CYAN}?${C_RESET} Which branch? ${C_DIM}[1-${#branches[@]}, Enter = ${GIT_DEFAULT_BRANCH}]${C_RESET}: ")" choice
+  read -r -p "$(echo -e "${C_SKY}?${C_RESET} Which branch? ${C_DIM}[1-${#branches[@]}, Enter = ${GIT_DEFAULT_BRANCH}]${C_RESET}: ")" choice
 
   if [ -z "$choice" ]; then
     GIT_BRANCH="$GIT_DEFAULT_BRANCH"
@@ -411,7 +428,7 @@ git_commit_if_dirty() {
   fi
 
   git add -A
-  read -r -p "$(echo -e "${C_CYAN}?${C_RESET} Commit message ${C_DIM}[lock: update]${C_RESET}: ")" msg
+  read -r -p "$(echo -e "${C_SKY}?${C_RESET} Commit message ${C_DIM}[lock: update]${C_RESET}: ")" msg
   msg="${msg:-lock: update}"
   git commit -m "$msg"
   ok "Local commit created."
@@ -478,11 +495,11 @@ build_flake() {
   step 2 5 "Checking for local changes"
   git_commit_if_dirty
 
-  step 3 5 "Switching to ${C_CYAN}${GIT_BRANCH}${C_RESET} and syncing"
+  step 3 5 "Switching to ${C_TEAL}${GIT_BRANCH}${C_RESET} and syncing"
   git_checkout_branch
   git_sync_pull
 
-  step 4 5 "Applying rebuild — ${C_CYAN}${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]}${C_RESET} ${C_GRAY}(${FLAKE_ATTR})${C_RESET}"
+  step 4 5 "Applying rebuild — ${C_TEAL}${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]}${C_RESET} ${C_OVERLAY}(${FLAKE_ATTR})${C_RESET}"
   sudo nixos-rebuild switch --flake "${NIXOS_DIR}#${FLAKE_ATTR}"
   ok "Rebuild complete on ${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]} (${FLAKE_ATTR})."
 
@@ -499,11 +516,11 @@ build_flake_dry() {
   step 1 3 "Selecting git branch"
   select_git_branch
 
-  step 2 3 "Switching to ${C_CYAN}${GIT_BRANCH}${C_RESET} and syncing"
+  step 2 3 "Switching to ${C_TEAL}${GIT_BRANCH}${C_RESET} and syncing"
   git_checkout_branch
   git_sync_pull
 
-  step 3 3 "Test build (not activated) — ${C_CYAN}${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]}${C_RESET} ${C_GRAY}(${FLAKE_ATTR})${C_RESET}"
+  step 3 3 "Test build (not activated) — ${C_TEAL}${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]}${C_RESET} ${C_OVERLAY}(${FLAKE_ATTR})${C_RESET}"
   sudo nixos-rebuild build --flake "${NIXOS_DIR}#${FLAKE_ATTR}"
   ok "Test build complete — nothing was activated. Result in ./result"
 }
@@ -520,7 +537,7 @@ update_system() {
   step 2 7 "Checking for local changes"
   git_commit_if_dirty
 
-  step 3 7 "Switching to ${C_CYAN}${GIT_BRANCH}${C_RESET} and syncing"
+  step 3 7 "Switching to ${C_TEAL}${GIT_BRANCH}${C_RESET} and syncing"
   git_checkout_branch
   git_sync_pull
 
@@ -530,7 +547,7 @@ update_system() {
   step 5 7 "Committing updated flake.lock (if changed)"
   git_commit_if_dirty
 
-  step 6 7 "Applying rebuild — ${C_CYAN}${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]}${C_RESET} ${C_GRAY}(${FLAKE_ATTR})${C_RESET}"
+  step 6 7 "Applying rebuild — ${C_TEAL}${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]}${C_RESET} ${C_OVERLAY}(${FLAKE_ATTR})${C_RESET}"
   sudo nixos-rebuild switch --flake "${NIXOS_DIR}#${FLAKE_ATTR}"
   ok "System updated on ${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]} (${FLAKE_ATTR})."
 
@@ -557,7 +574,7 @@ clean_cache() {
   if [ -z "$mode" ]; then
     echo -e "  ${C_YELLOW}1)${C_RESET} Quick      — remove generations older than 14 days"
     echo -e "  ${C_RED}2)${C_RESET} Aggressive — remove ALL old generations (nix-collect-garbage -d)"
-    read -r -p "$(echo -e "${C_CYAN}?${C_RESET} Choose [1/2]: ")" mode
+    read -r -p "$(echo -e "${C_SKY}?${C_RESET} Choose [1/2]: ")" mode
   fi
 
   case "$mode" in
@@ -620,10 +637,10 @@ check_flake() {
 }
 
 list_hosts() {
-  echo -e "${C_BOLD}${C_CYAN}Hosts configured in the flake:${C_RESET}"
+  echo -e "${C_BOLD}${C_SKY}Hosts configured in the flake:${C_RESET}"
   local attr
   for attr in "${FLAKE_ATTRS[@]}"; do
-    echo -e "  ${C_GREEN}●${C_RESET} ${C_BOLD}${HOST_ATTR_TO_LABEL[$attr]}${C_RESET}  ${C_GRAY}(attr: ${attr}, hostname: ${HOST_ATTR_TO_MACHINE[$attr]})${C_RESET}"
+    echo -e "  ${C_GREEN}●${C_RESET} ${C_BOLD}${HOST_ATTR_TO_LABEL[$attr]}${C_RESET}  ${C_OVERLAY}(attr: ${attr}, hostname: ${HOST_ATTR_TO_MACHINE[$attr]})${C_RESET}"
   done
   local detected
   echo
@@ -640,17 +657,17 @@ list_branches_cmd() {
   git fetch --all --prune --quiet 2>/dev/null || true
   local current
   current="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo '?')"
-  echo -e "${C_BOLD}${C_CYAN}Branches (local + remote, deduplicated):${C_RESET}"
+  echo -e "${C_BOLD}${C_SKY}Branches (local + remote, deduplicated):${C_RESET}"
   local b
   while IFS= read -r b; do
     [ -z "$b" ] && continue
 
     if [ "$b" = "$current" ]; then
-      echo -e "  ${C_GREEN}●${C_RESET} ${C_BOLD}${b}${C_RESET} ${C_GRAY}(current)${C_RESET}"
+      echo -e "  ${C_GREEN}●${C_RESET} ${C_BOLD}${b}${C_RESET} ${C_OVERLAY}(current)${C_RESET}"
     elif git show-ref --verify --quiet "refs/heads/${b}" && ! git ls-remote --exit-code --heads origin "$b" >/dev/null 2>&1; then
-      echo -e "  ${C_YELLOW}○${C_RESET} ${b} ${C_GRAY}(local only — no match on origin)${C_RESET}"
+      echo -e "  ${C_YELLOW}○${C_RESET} ${b} ${C_OVERLAY}(local only — no match on origin)${C_RESET}"
     else
-      echo -e "  ${C_GRAY}○${C_RESET} ${b}"
+      echo -e "  ${C_OVERLAY}○${C_RESET} ${b}"
     fi
   done < <(list_git_branches)
 }
@@ -661,11 +678,11 @@ print_banner() {
   local detected
   detected="$(detect_flake_attr 2>/dev/null || echo 'not identified')"
   echo
-  echo -e "${C_CYAN}╭──────────────────────────────────────╮${C_RESET}"
-  printf "${C_CYAN}│${C_RESET}  ${C_BOLD}NixOS Manager${C_RESET}%*s${C_CYAN}│${C_RESET}\n" 24 ""
-  echo -e "${C_CYAN}│${C_RESET}  ${C_GRAY}this machine: ${C_RESET}${C_GREEN}${detected}${C_RESET}$(printf '%*s' $((25 - ${#detected})) '')${C_CYAN}│${C_RESET}"
-  echo -e "${C_CYAN}╰──────────────────────────────────────╯${C_RESET}"
-  echo -e "  ${C_GRAY}${C_DIM}(host and git branch are always asked — nothing is assumed)${C_RESET}"
+  echo -e "${C_MAUVE}╭──────────────────────────────────────╮${C_RESET}"
+  printf "${C_MAUVE}│${C_RESET}  ${C_BOLD}${C_TEXT}NixOS Manager${C_RESET}%*s${C_MAUVE}│${C_RESET}\n" 24 ""
+  echo -e "${C_MAUVE}│${C_RESET}  ${C_OVERLAY}this machine: ${C_RESET}${C_GREEN}${detected}${C_RESET}$(printf '%*s' $((25 - ${#detected})) '')${C_MAUVE}│${C_RESET}"
+  echo -e "${C_MAUVE}╰──────────────────────────────────────╯${C_RESET}"
+  echo -e "  ${C_OVERLAY}${C_DIM}(host and git branch are always asked — nothing is assumed)${C_RESET}"
 }
 
 show_menu() {
@@ -678,10 +695,10 @@ show_menu() {
   echo -e " ${C_YELLOW}${C_BOLD}4)${C_RESET} Update system"
   echo -e " ${C_YELLOW}${C_BOLD}5)${C_RESET} Test build (dry)"
   echo -e " ${C_RED}${C_BOLD}6)${C_RESET} Rollback"
-  echo -e " ${C_YELLOW}${C_BOLD}7)${C_RESET} Check flake ${C_GRAY}(nix flake check)${C_RESET}"
+  echo -e " ${C_YELLOW}${C_BOLD}7)${C_RESET} Check flake ${C_OVERLAY}(nix flake check)${C_RESET}"
   echo -e " ${C_BLUE}${C_BOLD}8)${C_RESET} List hosts"
   echo -e " ${C_BLUE}${C_BOLD}9)${C_RESET} List branches"
-  echo -e " ${C_RED}${C_BOLD}a)${C_RESET} Prune local branches ${C_GRAY}(no match on origin)${C_RESET}"
+  echo -e " ${C_RED}${C_BOLD}a)${C_RESET} Prune local branches ${C_OVERLAY}(no match on origin)${C_RESET}"
   echo -e " ${C_BOLD}q)${C_RESET} Quit"
   echo
 }
@@ -714,7 +731,7 @@ main() {
 
   while true; do
     show_menu
-    read -r -p "$(echo -e "${C_CYAN}?${C_RESET} Choose an option: ")" choice
+    read -r -p "$(echo -e "${C_SKY}?${C_RESET} Choose an option: ")" choice
     run_choice "$choice" || true
   done
 }
