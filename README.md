@@ -120,53 +120,41 @@ The steps must run in this order:
 
 ## 🛠️ Development Shells
 
-This flake includes **devShells** for isolated development environments:
+Development environments are now organized in dedicated folders under [devshells](devshells), each with its own flake. You can enter them directly from the repository without changing the main flake configuration.
+
+### Available environments
 
 ```bash
-# Rust stable + complete toolchain
-nix develop .#rust
+# Go
+nix develop ./devshells/go
 
-# Rust nightly via fenix
-nix develop .#rust-nightly
+# Lua
+nix develop ./devshells/lua
 
-# Go + gopls + delve + tools
-nix develop .#go
+# Rust
+nix develop ./devshells/rust
 
-# Python + uv + ruff + LSP tooling
-nix develop .#python
+# PostgreSQL
+nix develop ./devshells/postgresql
 
-# Lua + LuaJIT + LSP
-nix develop .#lua
+# MariaDB
+nix develop ./devshells/mariadb
 
-# Nix development (formatters, LSPs, linters)
-nix develop .#nix-dev
-
-# DevOps tooling: podman, lazydocker, kubectl, helm, terraform, ansible
-nix develop .#devops
-
-# Default (basic)
-nix develop
+# MongoDB
+nix develop ./devshells/mongodb
 ```
 
-**Recent additions:**
-- ✅ Python shell with `uv`, `ruff`, `mypy` and Python LSP support
-- ✅ DevOps shell with `podman`, `lazydocker`, `kubectl`, `helm`, `terraform` and `ansible`
-- ✅ `direnv` support enabled globally for project-local flake environments
-- ✅ Podman configured with Docker compatibility for smoother container workflows
+### Usage notes
+
+- Each folder contains its own [flake.nix](flake.nix) style definition for that toolchain or database.
+- The shell name is usually the same as the folder name, so `nix develop ./devshells/go` works as expected.
+- This keeps each environment isolated and easier to maintain.
 
 **Advantages:**
-- ✅ Isolated environments per project
-- ✅ Specific tool versions
+- ✅ Isolated environments per stack
+- ✅ Specific tool versions per language/database
 - ✅ Reproducible across machines
-- ✅ Doesn't pollute global system
-
-**Languages available globally:**
-- Go (`modules/languages/go.nix`)
-- Rust (`modules/languages/rust.nix`)
-- Lua (`modules/languages/lua.nix` - toggle)
-- Nix (`modules/languages/nix-dev.nix`)
-- Python (via `nix develop .#python`)
-- Node.js
+- ✅ No need to modify the main flake for day-to-day use
 
 ---
 
