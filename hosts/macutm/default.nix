@@ -21,6 +21,9 @@ in {
   boot.kernelParams = [ "mitigations=off" ];
   services.qemuGuest.enable = true;
 
+  # share clipboard with UTM
+  services.spice-vdagentd.enable = true;
+
   virtualisation.podman = {
     enable = true;
     dockerCompat = true;
