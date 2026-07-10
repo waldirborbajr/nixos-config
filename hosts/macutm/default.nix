@@ -39,6 +39,9 @@ in {
 
   # ==================== PACKAGES ====================
   environment.systemPackages = with pkgs; [
+    # share clipboard with UTM
+    spice-vdagent
+
     zellij yazi jq just duf psmisc asciinema
     lazygit jujutsu lazyjj
 
