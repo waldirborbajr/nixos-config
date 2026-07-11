@@ -19,6 +19,7 @@
 #   m2utm       (macutm)    aarch64-linux
 #   dell        (dell1456)  x86_64-linux
 #   macbook2011 (mac2011)   x86_64-linux
+#   macvmf      (macvmf)    aarch64-linux
 #
 # Branch selection: build/update actions detect all local + remote branches.
 # If only the default branch exists, it's used automatically without asking.
@@ -53,6 +54,7 @@ declare -A HOST_ATTR_TO_MACHINE=(
   [m2utm]="macutm"
   [dell]="dell1456"
   [macbook2011]="mac2011"
+  [macvmf]="macvmf"
 )
 
 # flake attr -> friendly name (display only, used in the menu)
@@ -60,16 +62,17 @@ declare -A HOST_ATTR_TO_LABEL=(
   [m2utm]="MacBook M2 - UTM"
   [dell]="Dell Inspiron 1456"
   [macbook2011]="MacBook Pro 13in (2011)"
+  [macvmf]="MacBook M2 - VMware Fusion"
 )
 
-FLAKE_ATTRS=(m2utm dell macbook2011)
+FLAKE_ATTRS=(m2utm dell macbook2011 macvmf)
 
 # set at runtime by select_flake_attr()
 FLAKE_ATTR=""
 
 # ----- colors: Catppuccin Mocha (24-bit ANSI), disabled when not a tty -----
 # Same palette as devshell.sh, so both tools look consistent across
-# macutm, dell1456 and macbook2011.
+# macutm, dell1456, mac2011 and macvmf.
 if [ -t 1 ]; then
   C_RESET='\033[0m'; C_BOLD='\033[1m'; C_DIM='\033[2m'
 
