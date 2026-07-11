@@ -169,7 +169,7 @@ else
   set_key "borba_ssh_infra_public_key"   "$(jq -Rs . < "$HOME/.ssh/id_ed25519_infra.pub")"
   set_key "borba_ssh_github_private_key" "$(jq -Rs . < "$HOME/.ssh/id_ed25519_github")"
   set_key "borba_ssh_github_public_key"  "$(jq -Rs . < "$HOME/.ssh/id_ed25519_github.pub")"
-  set_key "ssh_host_ed25519_key"         "$(sudo jq -Rs . < "$host_key_path")"
+  set_key "ssh_host_ed25519_key"         "$(sudo cat "$host_key_path" | jq -Rs .)"
 
   chmod 600 "$secrets_file"
   echo "Secrets file updated (existing unrelated keys preserved): $secrets_file"
