@@ -26,6 +26,12 @@
 # extension makes sops fall back to wrapping everything under a single
 # `data:` key instead of real top-level keys. This script always passes
 # --input-type yaml explicitly, regardless of temp file naming.
+#
+# First-install bootstrap: on a brand-new machine, none of age/sops/jq/
+# ssh-keygen exist yet (they only land on PATH after the first
+# nixos-rebuild). If any are missing, this script re-execs itself inside
+# `nix shell nixpkgs#age nixpkgs#sops nixpkgs#jq nixpkgs#openssh -c ...`
+# so it's usable before the system has ever been built.
 
 set -euo pipefail
 
@@ -63,12 +69,27 @@ if [[ ! -d "$repo_root/hosts/$host" ]]; then
   exit 1
 fi
 
+# ----- First-install bootstrap: re-exec inside `nix shell` if tools are missing -----
+# On a fresh machine (before the first nixos-rebuild), age/sops/jq/ssh-keygen
+# aren't on PATH yet. Rather than failing, pull them in via `nix shell` and
+# re-run this same script inside it. The env guard prevents infinite
+# recursion if a tool is still missing even inside that shell.
+missing_tool=false
 for tool in ssh-keygen age-keygen sops jq; do
   if ! command -v "$tool" >/dev/null 2>&1; then
-    echo "$tool not found" >&2
-    exit 1
+    missing_tool=true
+    break
   fi
 done
+
+if $missing_tool; then
+  if [[ -n "${MANAGE_SSH_SOPS_NIX_SHELL_WRAPPED:-}" ]]; then
+    echo "Required tool(s) still missing even inside 'nix shell' (age/sops/jq/openssh). Aborting." >&2
+    exit 1
+  fi
+  echo "age/sops/jq/ssh-keygen not found on PATH (first install?) — re-running inside 'nix shell'..." >&2
+  exec env MANAGE_SSH_SOPS_NIX_SHELL_WRAPPED=1 nix shell nixpkgs#age nixpkgs#sops nixpkgs#jq nixpkgs#openssh -c "$0" "$@"
+fi
 
 mkdir -p "$HOME/.ssh" "$HOME/.config/sops/age"
 chmod 700 "$HOME/.ssh"
