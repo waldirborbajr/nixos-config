@@ -88,7 +88,7 @@ if $missing_tool; then
     exit 1
   fi
   echo "age/sops/jq/ssh-keygen not found on PATH (first install?) — re-running inside 'nix shell'..." >&2
-  exec env MANAGE_SSH_SOPS_NIX_SHELL_WRAPPED=1 nix shell nixpkgs#age nixpkgs#sops nixpkgs#jq nixpkgs#openssh -c "$0" "$@"
+  exec env MANAGE_SSH_SOPS_NIX_SHELL_WRAPPED=1 nix --extra-experimental-features "nix-command flakes" shell nixpkgs#age nixpkgs#sops nixpkgs#jq nixpkgs#openssh -c "$0" "$@"
 fi
 
 mkdir -p "$HOME/.ssh" "$HOME/.config/sops/age"
