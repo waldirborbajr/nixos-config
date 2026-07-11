@@ -46,6 +46,11 @@
           system = "aarch64-linux";
         };
 
+        macvmf = mkHost {
+          hostname = "macvmf";
+          system = "aarch64-linux";
+        };
+
         macbook2011 = mkHost {
           hostname = "mac2011";
           system = "x86_64-linux";
