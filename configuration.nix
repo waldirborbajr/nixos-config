@@ -18,6 +18,7 @@
 
   dotfilePrograms = [
     "tmux"
+    "zellij"
     "alacritty"
     "i3"
     "i3status"
