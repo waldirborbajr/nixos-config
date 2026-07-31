@@ -20,6 +20,7 @@
     "tmux"
     "zellij"
     "alacritty"
+    "wezterm"
     "i3"
     "i3status"
     "rofi"
@@ -234,6 +235,7 @@ services.displayManager.ly = {
       fastfetch
       oh-my-posh
       alacritty
+      wezterm
       zsh
       nixd
       alejandra
