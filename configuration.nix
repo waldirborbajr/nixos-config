@@ -221,12 +221,15 @@ services.displayManager.ly = {
       wget
       curl
       git
+      tuicr
       tmux
+      herdr
       bat
       ripgrep
       eza
       btop
       htop
+      neohtop-cli
       fastfetch
       oh-my-posh
       alacritty
