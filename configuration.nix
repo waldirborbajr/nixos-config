@@ -229,7 +229,7 @@ services.displayManager.ly = {
       eza
       btop
       htop
-      neohtop-cli
+      # neohtop-cli
       fastfetch
       oh-my-posh
       alacritty
