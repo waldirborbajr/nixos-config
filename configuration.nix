@@ -221,9 +221,9 @@ services.displayManager.ly = {
       wget
       curl
       git
-      #tuicr
+      # tuicr
       tmux
-      herdr
+      # herdr
       bat
       ripgrep
       eza
