@@ -221,7 +221,7 @@ services.displayManager.ly = {
       wget
       curl
       git
-      tuicr
+      #tuicr
       tmux
       herdr
       bat
