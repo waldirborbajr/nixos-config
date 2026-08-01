@@ -3,6 +3,7 @@
   pkgs,
   pkgs-unstable,
   hostname,
+  inputs,
   ...
 }: let
   username = "borba";
