@@ -19,7 +19,6 @@ in {
 
   # ==================== VM OPT ====================
   boot.kernelParams = [ "mitigations=off" ];
-  services.qemuGuest.enable = true;
 
   # VMware Fusion (não UTM)
   virtualisation.vmware.guest.enable = true;
@@ -43,9 +42,6 @@ in {
   # ==================== PACKAGES ====================
   environment.systemPackages = with pkgs; [
     open-vm-tools
-
-    # share clipboard with UTM
-    # spice-vdagent
 
     zellij yazi jq just duf psmisc asciinema
     lazygit jujutsu lazyjj
