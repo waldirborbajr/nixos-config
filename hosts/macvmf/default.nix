@@ -21,8 +21,11 @@ in {
   boot.kernelParams = [ "mitigations=off" ];
   services.qemuGuest.enable = true;
 
-  # share clipboard with UTM
-  services.spice-vdagentd.enable = true;
+  # VMware Fusion (não UTM)
+  virtualisation.vmware.guest.enable = true;
+
+  # opcional, mas ajuda em VMs
+  boot.kernelParams = [ "mitigations=off" ];
 
   virtualisation.podman = {
     enable = true;
@@ -39,8 +42,10 @@ in {
 
   # ==================== PACKAGES ====================
   environment.systemPackages = with pkgs; [
+    open-vm-tools
+
     # share clipboard with UTM
-    spice-vdagent
+    # spice-vdagent
 
     zellij yazi jq just duf psmisc asciinema
     lazygit jujutsu lazyjj
