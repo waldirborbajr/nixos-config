@@ -228,7 +228,7 @@ services.displayManager.ly = {
     ++ (with pkgs-unstable; [
       neovim
       helix
-      noctalia-shell
+      # noctalia-shell
     ])
     ++ [
       (pkgs.writeShellScriptBin "noctalia" ''
