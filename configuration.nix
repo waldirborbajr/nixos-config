@@ -21,10 +21,8 @@
     "zellij"
     "alacritty"
     "wezterm"
-    "i3"
-    "i3status"
-    "rofi"
-    "oh-my-posh"
+    "niri"
+    "noctalia"
     "helix"
     "git"
     "zsh"
@@ -124,40 +122,20 @@ in {
     }
   ];
 
-  # ==================== X11 + i3 + LY ====================
-  # NOTA (branch de teste): LightDM foi substituído por ly aqui, buscando um
-  # display manager mais leve (sem stack GTK). Pontos confirmados antes de
-  # aplicar, documentados para referência futura:
-  #   - services.displayManager.ly.settings tem um bug conhecido reportado
-  #     no NixOS Discourse onde o merge de config pode fazer a lista de
-  #     sessões (ex: i3) sumir da tela do ly. Teste via
-  #     `./nixos-manager.sh dry` antes de aplicar de verdade, e mantenha uma
-  #     sessão SSH separada aberta no primeiro `switch` real.
-  #   - bg/fg no config.ini só afetam a caixa de diálogo e a barra superior;
-  #     o fundo de tela cheio do ly é sempre preto, não é configurável por
-  #     aqui (exigiria sobrescrever o unit systemd do ly com sequências ANSI).
-  #   - Cores usam IDs inteiros (0-8), não hex 0xRRGGBB — hex 24-bit só é
-  #     suportado em builds mais recentes do ly; não confirmado para a
-  #     revisão de nixpkgs que este flake resolve. Ajustar para hex somente
-  #     após checar `ly --version` e o /etc/ly/config.ini real gerado.
-  #   - Não existe módulo catppuccin/nix oficial para o ly (só para sddm),
-  #     então este tema é uma aproximação manual, não um pacote de tema.
-  services.xserver = {
-    enable = true;
+  # ==================== NIRI (Wayland) + LY ====================
+  # NOTA: migrado de i3/X11 para niri (Wayland scrollable-tiling compositor)
+  # + noctalia-shell (shell baseado em Quickshell). ly permanece como
+  # display manager: o módulo `programs.niri` registra a sessão niri
+  # automaticamente em /run/current-system/sw/share/wayland-sessions, e o
+  # ly já sabe listar sessões wayland — só precisa apontar defaultSession
+  # pro nome certo ("niri"). Se o menu do ly não mostrar a sessão depois do
+  # switch, confira o nome exato do .desktop gerado com:
+  #   ls /run/current-system/sw/share/wayland-sessions/
+  programs.niri.enable = true;
 
-    desktopManager.xterm.enable = false;
-
-    windowManager.i3 = {
-      enable = true;
-      extraPackages = with pkgs; [
-        polybar
-        i3status
-        i3blocks
-        rofi
-      ];
-    };
-  };
-
+  # NOTA (branch de teste): mesmo bug documentado antes continua valendo
+  # pro ly em si (settings merge / cores / tema), independente do WM por
+  # trás da sessão.
 services.displayManager.ly = {
   enable = true;
   settings = {
@@ -180,9 +158,11 @@ services.displayManager.ly = {
   };
 };
 
-  services.displayManager.defaultSession = "none+i3";
+  services.displayManager.defaultSession = "niri";
   security.polkit.enable = true;
-  programs.i3lock.enable = true;
+
+  # lock screen usado pelo bind padrão do noctalia (Mod+L -> lockScreen lock)
+  programs.swaylock.enable = true;
 
   programs.direnv = {
     enable = true;
@@ -223,15 +203,12 @@ services.displayManager.ly = {
       wget
       curl
       git
-      # tuicr
       tmux
-      # herdr
       bat
       ripgrep
       eza
       btop
       htop
-      # neohtop-cli
       fastfetch
       oh-my-posh
       alacritty
@@ -241,14 +218,13 @@ services.displayManager.ly = {
       alejandra
       age
       sops
-      rofi
-      feh
-      picom
-      xclip
+      wl-clipboard # substitui xclip no Wayland
+      xwayland-satellite # compat pra apps que só falam X11 dentro do niri
     ])
     ++ (with pkgs-unstable; [
       neovim
       helix
+      noctalia-shell
     ]);
 
   # ==================== NIX ====================
