@@ -17,11 +17,11 @@ in {
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  # ==================== VM OPT ====================
-  boot.kernelParams = [ "mitigations=off" ];
-
   # VMware Fusion (não UTM)
   virtualisation.vmware.guest.enable = true;
+
+  # opcional, mas ajuda em VMs
+  boot.kernelParams = [ "mitigations=off" ];
 
   virtualisation.podman = {
     enable = true;
