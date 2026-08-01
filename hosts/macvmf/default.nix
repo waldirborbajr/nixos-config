@@ -23,9 +23,6 @@ in {
   # VMware Fusion (não UTM)
   virtualisation.vmware.guest.enable = true;
 
-  # opcional, mas ajuda em VMs
-  boot.kernelParams = [ "mitigations=off" ];
-
   virtualisation.podman = {
     enable = true;
     dockerCompat = true;
