@@ -162,7 +162,10 @@ services.displayManager.ly = {
   security.polkit.enable = true;
 
   # lock screen usado pelo bind padrão do noctalia (Mod+L -> lockScreen lock)
-  programs.swaylock.enable = true;
+  # `programs.swaylock.enable` NÃO existe no NixOS puro (é opção do
+  # home-manager) — aqui é só o pacote + PAM manual, senão o unlock falha
+  # com "pam_authenticate failed: invalid credentials".
+  security.pam.services.swaylock = {};
 
   programs.direnv = {
     enable = true;
@@ -220,6 +223,7 @@ services.displayManager.ly = {
       sops
       wl-clipboard # substitui xclip no Wayland
       xwayland-satellite # compat pra apps que só falam X11 dentro do niri
+      swaylock
     ])
     ++ (with pkgs-unstable; [
       neovim
