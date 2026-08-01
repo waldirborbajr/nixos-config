@@ -229,7 +229,15 @@ services.displayManager.ly = {
       neovim
       helix
       noctalia-shell
-    ]);
+    ])
+    ++ [
+      (pkgs.writeShellScriptBin "noctalia" ''
+        exec ${pkgs-unstable.noctalia-shell}/bin/noctalia-shell "$@"
+      '')
+      (pkgs.writeShellScriptBin "qs" ''
+        exec ${pkgs-unstable.noctalia-shell}/bin/noctalia-shell "$@"
+      '')
+    ];
 
   # ==================== NIX ====================
   nix.gc = {
