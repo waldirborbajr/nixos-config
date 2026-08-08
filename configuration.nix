@@ -24,7 +24,6 @@
     "wezterm"
     "niri"
     "waybar"
-    "noctalia"
     "helix"
     "git"
     "zsh"
