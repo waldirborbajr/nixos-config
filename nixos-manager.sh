@@ -60,7 +60,7 @@ declare -A HOST_ATTR_TO_MACHINE=(
 # flake attr -> friendly name (display only, used in the menu)
 declare -A HOST_ATTR_TO_LABEL=(
   [m2utm]="MacBook M2 - UTM"
-  [dell]="Dell Inspiron 1456"
+  [dell]="Dell Inspiron 1564"
   [macbook2011]="MacBook Pro 13in (2011)"
   [macvmf]="MacBook M2 - VMware Fusion"
 )
