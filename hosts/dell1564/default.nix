@@ -88,7 +88,7 @@ in {
 
     # Desktop utilities
     dex
-    lxsession
+    # lxsession   ← remover (puxa lxpolkit e conflita com soteria)
     autorandr
     xkill
 
