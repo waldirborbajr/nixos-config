@@ -23,6 +23,7 @@
     "alacritty"
     "wezterm"
     "niri"
+    "waybar"
     "noctalia"
     "helix"
     "git"
@@ -162,6 +163,21 @@ services.displayManager.ly = {
   services.displayManager.defaultSession = "niri";
   security.polkit.enable = true;
 
+  # Polkit auth agent para o niri (standalone WM, sem DE que já forneça um).
+  # Substitui o antigo spawn-at-startup "/usr/lib/soteria-polkit/soteria" do
+  # startup.kdl/misc.kdl — aquele caminho é FHS (Arch/Ubuntu) e não existe no
+  # NixOS. Este módulo já cuida de instalar o pacote e rodar como serviço de
+  # usuário; remova a linha spawn-at-startup correspondente do dotfiles.
+  security.soteria.enable = true;
+
+  # waybar tem o módulo "power-profiles-daemon" no config.jsonc; sem o serviço
+  # dbus rodando, esse módulo simplesmente fica quebrado/vazio.
+  services.power-profiles-daemon.enable = true;
+
+  # gsettings (usado no misc.kdl pra setar o tema do cursor) precisa do dconf
+  # rodando; sem isso o comando falha silenciosamente.
+  programs.dconf.enable = true;
+
   # lock screen usado pelo bind padrão do noctalia (Mod+L -> lockScreen lock)
   # `programs.swaylock.enable` NÃO existe no NixOS puro (é opção do
   # home-manager) — aqui é só o pacote + PAM manual, senão o unlock falha
@@ -226,6 +242,17 @@ services.displayManager.ly = {
       xwayland-satellite # compat pra apps que só falam X11 dentro do niri
       swaylock
       inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default
+
+      # ---- niri + waybar (compartilhado por todos os hosts) ----
+      waybar # a bar em si; sem isso config.jsonc/style.css do dotfiles não têm o que rodar
+      fuzzel # launcher (Mod+D) e power-menu.sh do waybar (dmenu mode)
+      swaybg # wallpaper, chamado no startup.kdl
+      wlr-which-key # menu invocado no bind Mod+Shift+E (binds.kdl)
+      orca # leitor de tela, bind Super+Alt+S (binds.kdl)
+      networkmanagerapplet # fornece o nm-applet chamado no misc.kdl
+      nextcloud-client # fornece o binário "nextcloud" chamado no misc.kdl
+      capitaine-cursors # tema de cursor setado via gsettings no misc.kdl
+      qt6ct # QT_QPA_PLATFORMTHEME=qt6ct está setado no misc.kdl
     ])
     ++ (with pkgs-unstable; [
       neovim
