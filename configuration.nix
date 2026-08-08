@@ -252,7 +252,7 @@ services.displayManager.ly = {
       networkmanagerapplet # fornece o nm-applet chamado no misc.kdl
       nextcloud-client # fornece o binário "nextcloud" chamado no misc.kdl
       capitaine-cursors # tema de cursor setado via gsettings no misc.kdl
-      qt6ct # QT_QPA_PLATFORMTHEME=qt6ct está setado no misc.kdl
+      qt6Packages.qt6ct # QT_QPA_PLATFORMTHEME=qt6ct está setado no misc.kdl
     ])
     ++ (with pkgs-unstable; [
       neovim
