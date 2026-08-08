@@ -46,6 +46,16 @@ in {
   # it does NOT apply to mac2011/macutm/macvmf.
   hardware.enableRedistributableFirmware = true;
 
+  # broadcom_sta is flagged insecure upstream (CVE-2019-9501/9502, unmaintained
+  # driver). Allowed ONLY for this host's build — scoped here, not globally,
+  # so mac2011/macutm/macvmf still refuse to build it if ever referenced.
+  # NOTE: the exact string below is version-pinned; if `nixos-rebuild` later
+  # complains about a different broadcom-sta-X.Y.Z string, update this line
+  # to match (nixpkgs bumps the driver version over time).
+  nixpkgs.config.permittedInsecurePackages = [
+    "broadcom-sta-6.30.223.271-59-7.1.6"
+  ];
+
   # Blacklist open-source drivers that conflict with the proprietary Broadcom driver
   boot.blacklistedKernelModules = [
     "b43"
