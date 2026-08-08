@@ -50,11 +50,19 @@ GIT_REPO_URL="git@github.com:waldirborbajr/nixos-config.git"
 GIT_BRANCH=""
 
 # flake attr -> real machine name (used for auto-detection via `hostname`)
+# Note: Dell may still report hostname "dell1456" until the first successful
+# switch applies networking.hostName = "dell1564" from the flake.
 declare -A HOST_ATTR_TO_MACHINE=(
   [m2utm]="macutm"
   [dell]="dell1564"
   [macbook2011]="mac2011"
   [macvmf]="macvmf"
+)
+
+# Extra hostnames that should map to a flake attr (legacy / pre-switch names).
+declare -A HOST_ALIAS_TO_ATTR=(
+  [dell1456]="dell"
+  [dell1564]="dell"
 )
 
 # flake attr -> friendly name (display only, used in the menu)
@@ -190,6 +198,12 @@ detect_flake_attr() {
   local machine
   machine="$(hostname -s 2>/dev/null || cat /etc/hostname 2>/dev/null || true)"
   [ -z "$machine" ] && return 1
+
+  # Legacy / pre-switch aliases first (e.g. dell1456 -> dell)
+  if [ -n "${HOST_ALIAS_TO_ATTR[$machine]:-}" ]; then
+    echo "${HOST_ALIAS_TO_ATTR[$machine]}"
+    return 0
+  fi
 
   local attr
   for attr in "${FLAKE_ATTRS[@]}"; do
@@ -470,6 +484,133 @@ git_push_if_ahead() {
   fi
 }
 
+# ----- rebuild helpers -----
+#
+# Low-RAM hosts (Dell) must never parallelize builds — OOM killer sends
+# SIGKILL to the nix process.  Without careful exit-code handling a pipeline
+# like `nixos-rebuild | tee` can still report exit 0 (tee succeeds) even when
+# the build was killed, leaving the system on the old generation with a false
+# "success" message.  All rebuild entry points go through run_nixos_rebuild.
+
+# Extra flags for nixos-rebuild, per flake attr.
+# Dell Inspiron 1564 is an old dual-core with little RAM and no swap by
+# default; force serial builds to avoid the OOM killer.
+rebuild_extra_flags() {
+  local attr="${1:-${FLAKE_ATTR:-}}"
+  case "$attr" in
+    dell)
+      echo "--max-jobs 1 --cores 1"
+      ;;
+    *)
+      echo ""
+      ;;
+  esac
+}
+
+# run_nixos_rebuild <action> [extra nixos-rebuild args...]
+# action: switch | boot | build | test | ...
+#
+# - Captures the real exit status of nixos-rebuild (not of a tee pipeline).
+# - Streams output to the terminal AND to a log under /tmp.
+# - After switch/boot, verifies that /run/current-system actually changed
+#   (or at least that a new generation was written for `boot`).
+# - Treats SIGKILL / missing generation change as hard failure.
+run_nixos_rebuild() {
+  local action="$1"
+  shift
+  local -a extra_flags=()
+  local flags_str
+  flags_str="$(rebuild_extra_flags "${FLAKE_ATTR:-}")"
+  # shellcheck disable=SC2206
+  if [ -n "$flags_str" ]; then
+    extra_flags=( $flags_str )
+  fi
+
+  local before_gen="" after_gen=""
+  before_gen="$(readlink -f /run/current-system 2>/dev/null || true)"
+
+  local logfile
+  logfile="$(mktemp /tmp/nixos-rebuild-XXXXXX.log)"
+
+  log "Running: nixos-rebuild ${action} ${extra_flags[*]:-} $*"
+  if [ "${#extra_flags[@]}" -gt 0 ]; then
+    ok "Host-specific flags: ${C_BOLD}${extra_flags[*]}${C_RESET}"
+  fi
+  echo -e "${C_OVERLAY}Full log: ${logfile}${C_RESET}"
+
+  local rc=0
+  # Run without a pipeline so we get the real exit code of nixos-rebuild.
+  # Process substitution still streams to the terminal while tee writes the log.
+  set +e
+  if [ "${#extra_flags[@]}" -gt 0 ]; then
+    sudo nixos-rebuild "$action" "${extra_flags[@]}" "$@" > >(tee "$logfile") 2>&1
+  else
+    sudo nixos-rebuild "$action" "$@" > >(tee "$logfile") 2>&1
+  fi
+  rc=$?
+  set -e
+
+  # Also scan the log for silent-kill markers that some wrappers report
+  # without a non-zero exit (defensive — should be rare with the above).
+  if grep -qE 'died with <Signals\.SIGKILL|Killed|signal 9|error: interrupted by the user' "$logfile" 2>/dev/null; then
+    err "Build log indicates the process was killed (OOM / SIGKILL)."
+    err "Last lines of ${logfile}:"
+    tail -20 "$logfile" >&2 || true
+    return 1
+  fi
+
+  if [ "$rc" -ne 0 ]; then
+    err "nixos-rebuild ${action} failed with exit code ${rc}."
+    err "Last lines of ${logfile}:"
+    tail -30 "$logfile" >&2 || true
+    return "$rc"
+  fi
+
+  after_gen="$(readlink -f /run/current-system 2>/dev/null || true)"
+
+  case "$action" in
+    switch|test)
+      if [ -n "$before_gen" ] && [ -n "$after_gen" ] && [ "$before_gen" = "$after_gen" ]; then
+        # Same path can be legitimate if the config produced an identical
+        # toplevel (no-op rebuild).  Check whether a newer profile link exists.
+        local newest
+        newest="$(readlink -f /nix/var/nix/profiles/system 2>/dev/null || true)"
+        if [ -n "$newest" ] && [ "$newest" != "$before_gen" ]; then
+          # Profile advanced but /run/current-system did not — activation issue.
+          err "A new system generation was built (${newest})"
+          err "but /run/current-system is still ${after_gen}."
+          err "Activation may have failed. Inspect ${logfile}."
+          return 1
+        fi
+        warn "System generation unchanged (config produced the same toplevel — no-op is OK)."
+      else
+        ok "System generation updated."
+        echo -e "  ${C_OVERLAY}before: ${before_gen}${C_RESET}"
+        echo -e "  ${C_OVERLAY}after:  ${after_gen}${C_RESET}"
+      fi
+      ;;
+    boot)
+      local newest
+      newest="$(readlink -f /nix/var/nix/profiles/system 2>/dev/null || true)"
+      if [ -n "$before_gen" ] && [ -n "$newest" ] && [ "$newest" = "$before_gen" ]; then
+        warn "system profile unchanged after 'boot' (identical toplevel — no-op is OK)."
+      else
+        ok "New generation registered for next boot: ${newest}"
+      fi
+      ;;
+    build)
+      if [ -e ./result ]; then
+        ok "Build result: $(readlink -f ./result 2>/dev/null || echo ./result)"
+      else
+        warn "Build reported success but ./result is missing."
+      fi
+      ;;
+  esac
+
+  ok "nixos-rebuild ${action} finished successfully (log: ${logfile})."
+  return 0
+}
+
 # ----- main actions -----
 
 build_legacy() {
@@ -477,10 +618,10 @@ build_legacy() {
   log "Building WITHOUT flake (classic channels)..."
 
   if check_etc_symlink; then
-    sudo nixos-rebuild switch
+    run_nixos_rebuild switch
   else
     warn "/etc/nixos is not a symlink to $NIXOS_DIR — using explicit -I nixos-config."
-    sudo nixos-rebuild switch -I nixos-config="${NIXOS_DIR}/configuration.nix"
+    run_nixos_rebuild switch -I "nixos-config=${NIXOS_DIR}/configuration.nix"
   fi
 
   ok "Legacy rebuild complete."
@@ -503,7 +644,7 @@ build_flake() {
   git_sync_pull
 
   step 4 5 "Applying rebuild — ${C_TEAL}${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]}${C_RESET} ${C_OVERLAY}(${FLAKE_ATTR})${C_RESET}"
-  sudo nixos-rebuild switch --flake "${NIXOS_DIR}#${FLAKE_ATTR}"
+  run_nixos_rebuild switch --flake "${NIXOS_DIR}#${FLAKE_ATTR}"
   ok "Rebuild complete on ${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]} (${FLAKE_ATTR})."
 
   step 5 5 "Pushing pending changes"
@@ -524,7 +665,7 @@ build_flake_dry() {
   git_sync_pull
 
   step 3 3 "Test build (not activated) — ${C_TEAL}${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]}${C_RESET} ${C_OVERLAY}(${FLAKE_ATTR})${C_RESET}"
-  sudo nixos-rebuild build --flake "${NIXOS_DIR}#${FLAKE_ATTR}"
+  run_nixos_rebuild build --flake "${NIXOS_DIR}#${FLAKE_ATTR}"
   ok "Test build complete — nothing was activated. Result in ./result"
 }
 
@@ -551,7 +692,7 @@ update_system() {
   git_commit_if_dirty
 
   step 6 7 "Applying rebuild — ${C_TEAL}${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]}${C_RESET} ${C_OVERLAY}(${FLAKE_ATTR})${C_RESET}"
-  sudo nixos-rebuild switch --flake "${NIXOS_DIR}#${FLAKE_ATTR}"
+  run_nixos_rebuild switch --flake "${NIXOS_DIR}#${FLAKE_ATTR}"
   ok "System updated on ${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]} (${FLAKE_ATTR})."
 
   step 7 7 "Pushing pending changes"
@@ -562,7 +703,7 @@ rollback_system() {
   log "Available generations:"
   sudo nix-env --list-generations -p /nix/var/nix/profiles/system
   if confirm "Roll back to the previous generation?"; then
-    sudo nixos-rebuild switch --rollback
+    run_nixos_rebuild switch --rollback
     ok "Rollback complete."
   else
     warn "Cancelled."
@@ -609,7 +750,11 @@ clean_cache() {
   # it's a broken-boot risk.
   log "Syncing bootloader with the remaining generations..."
   if confirm "Run 'nixos-rebuild boot' to update the boot menu now?"; then
-    sudo nixos-rebuild boot
+    # Prefer the detected host for Dell low-RAM flags when possible.
+    if [ -z "${FLAKE_ATTR:-}" ]; then
+      FLAKE_ATTR="$(detect_flake_attr 2>/dev/null || true)"
+    fi
+    run_nixos_rebuild boot
     ok "Bootloader updated — the boot menu now reflects only the generations that still exist."
   else
     warn "Bootloader NOT updated — the boot menu may keep showing removed generations until you run 'sudo nixos-rebuild boot' manually."
