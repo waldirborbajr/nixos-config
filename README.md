@@ -63,7 +63,7 @@ The steps must run in this order:
    nix shell nixpkgs#sops nixpkgs#age nixpkgs#jq nixpkgs#openssh
    ./scripts/manage-ssh-sops.sh <host> --clean
    ```
-   Replace `<host>` with one of: `dell1456`, `mac2011`, `macutm` (aliases
+   Replace `<host>` with one of: `dell1564`, `mac2011`, `macutm` (aliases
    like `dell`, `mac`, `m2utm` also work — see the script header).
 
    Always use `--clean` the **first** time you set up a host — it builds a
