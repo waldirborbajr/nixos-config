@@ -1,6 +1,6 @@
 # hosts/dell/default.nix
 # Dell-specific configuration (legacy BIOS machine)
-{ lib, pkgs, pkgs-unstable, common, ... }:
+{ config, lib, pkgs, pkgs-unstable, common, ... }:
 let
   # Inherit common variables from configuration.nix
   inherit (common) dotfilesDir dotfileConfigDir;
@@ -39,6 +39,29 @@ in {
     options = [ "noatime" "nodiratime" "commit=60" ];
   };
 
+  # ==================== BROADCOM WIRELESS ====================
+  # This Dell has a Broadcom BCM4312 802.11b/g (PCI ID 14e4:4315) that needs
+  # the proprietary wl driver — the open b43 driver is unreliable on this
+  # LP-PHY revision. Set only here (per-host), not in configuration.nix, so
+  # it does NOT apply to mac2011/macutm/macvmf.
+  hardware.enableRedistributableFirmware = true;
+
+  # Blacklist open-source drivers that conflict with the proprietary Broadcom driver
+  boot.blacklistedKernelModules = [
+    "b43"
+    "brcmsmac"
+    "bcma"
+    "ssb"
+  ];
+
+  # Proprietary Broadcom driver
+  boot.kernelModules = [ "wl" ];
+
+  # Driver package built against the active kernel
+  boot.extraModulePackages = with config.boot.kernelPackages; [
+    broadcom_sta
+  ];
+
   # ==================== PACKAGES SPECIFIC TO THIS HOST ====================
   # Keep this list light — Dell is the oldest/slowest machine
   environment.systemPackages = with pkgs; [
@@ -66,6 +89,10 @@ in {
     playerctl
     pciutils
     pavucontrol
+
+    # Broadcom wireless debug/config tools
+    iw
+    wirelesstools
 
     # Basic build tools
     gdb
