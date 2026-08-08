@@ -17,7 +17,7 @@
 #
 # Known hosts (defined in flake.nix -> nixosConfigurations):
 #   m2utm       (macutm)    aarch64-linux
-#   dell        (dell1456)  x86_64-linux
+#   dell        (dell1564)  x86_64-linux
 #   macbook2011 (mac2011)   x86_64-linux
 #   macvmf      (macvmf)    aarch64-linux
 #
@@ -52,7 +52,7 @@ GIT_BRANCH=""
 # flake attr -> real machine name (used for auto-detection via `hostname`)
 declare -A HOST_ATTR_TO_MACHINE=(
   [m2utm]="macutm"
-  [dell]="dell1456"
+  [dell]="dell1564"
   [macbook2011]="mac2011"
   [macvmf]="macvmf"
 )
@@ -72,7 +72,7 @@ FLAKE_ATTR=""
 
 # ----- colors: Catppuccin Mocha (24-bit ANSI), disabled when not a tty -----
 # Same palette as devshell.sh, so both tools look consistent across
-# macutm, dell1456, mac2011 and macvmf.
+# macutm, dell1564, mac2011 and macvmf.
 if [ -t 1 ]; then
   C_RESET='\033[0m'; C_BOLD='\033[1m'; C_DIM='\033[2m'
 
