@@ -240,7 +240,7 @@ services.displayManager.ly = {
       wl-clipboard # substitui xclip no Wayland
       xwayland-satellite # compat pra apps que só falam X11 dentro do niri
       swaylock
-      inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default
+      # inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default
 
       # ---- niri + waybar (compartilhado por todos os hosts) ----
       waybar # a bar em si; sem isso config.jsonc/style.css do dotfiles não têm o que rodar
