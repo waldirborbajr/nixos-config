@@ -2,7 +2,7 @@
 
 ## Por que isso existe
 
-Cada host (`macutm`, `dell1456`, `mac2011`, `macvmf`) tem uma chave privada
+Cada host (`macutm`, `dell1564`, `mac2011`, `macvmf`) tem uma chave privada
 `age` em `~/.config/sops/age/keys.txt`. Essa chave **nunca vai pro git** —
 é ela que decifra `hosts/<host>/secrets/<host>.yaml`, onde ficam guardadas
 as chaves SSH (`infra`, `github`) e a `ssh_host_ed25519_key`.
@@ -34,7 +34,7 @@ em uma nota segura por host — por exemplo:
 | Entrada no gerenciador | Conteúdo |
 |---|---|
 | `age-key-macutm`      | conteúdo de `keys.txt` da MacBook M2 - UTM |
-| `age-key-dell1456`    | conteúdo de `keys.txt` do Dell Inspiron 1456 |
+| `age-key-dell1564`    | conteúdo de `keys.txt` do Dell Inspiron 1456 |
 | `age-key-mac2011`     | conteúdo de `keys.txt` do MacBook Pro 2011 |
 | `age-key-macvmf`      | conteúdo de `keys.txt` da MacBook M2 - VMware Fusion |
 

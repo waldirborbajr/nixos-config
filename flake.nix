@@ -41,7 +41,7 @@
     {
       nixosConfigurations = {
         dell = mkHost {
-          hostname = "dell1456";
+          hostname = "dell1564";
           system = "x86_64-linux";
         };
 

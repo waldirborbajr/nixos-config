@@ -5,7 +5,7 @@
 #
 # Usage:
 #   ./ssh-keys-to-sops.sh                  # incremental update, current hostname
-#   ./ssh-keys-to-sops.sh dell             # or dell1456
+#   ./ssh-keys-to-sops.sh dell             # or dell1564
 #   ./ssh-keys-to-sops.sh mac2011          # or mac, macbook2011
 #   ./ssh-keys-to-sops.sh macutm           # or m2utm
 #   ./ssh-keys-to-sops.sh macutm --clean   # wipe local keys + secrets file,
@@ -46,8 +46,8 @@ done
 
 hostname_now="$(hostname)"
 case "${host_arg:-$hostname_now}" in
-  dell|dell1456)
-    host="dell1456"
+  dell|dell1564)
+    host="dell1564"
     ;;
   mac|mac2011|macbook2011)
     host="mac2011"

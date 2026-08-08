@@ -56,4 +56,4 @@ echo
 echo "Reminder:"
 echo "  - Store ONLY in your password manager's secure-note feature."
 echo "  - Never commit this to git, paste in chat, or save unencrypted."
-echo "  - Repeat this on every host: macutm, dell1456, mac2011, macvmf."
+echo "  - Repeat this on every host: macutm, dell1564, mac2011, macvmf."
