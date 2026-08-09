@@ -1,9 +1,9 @@
-# hosts/macutm/default.nix
+# hosts/macvmf/default.nix
 #
 { lib, pkgs, pkgs-unstable, common, ... }:
 
 let
-  inherit (common) dotfilesDir dotfileConfigDir;
+  inherit (common) dotfilesDir dotfileConfigDir username;
 
   dotfilePrograms = [
     "lazygit"
@@ -65,5 +65,10 @@ in {
   programs.firefox.enable = lib.mkDefault true;
 
   # ==================== DOTFILES ====================
-  systemd.tmpfiles.rules = map mkDotfileLink dotfilePrograms;
+  # + input.kdl do Niri apontando para a variante Mac (VM)
+  systemd.tmpfiles.rules =
+    (map mkDotfileLink dotfilePrograms)
+    ++ [
+      "L+ /home/${username}/.config/niri/input.kdl - - - - ${dotfilesDir}/niri/.config/niri/input-mac.kdl"
+    ];
 }
