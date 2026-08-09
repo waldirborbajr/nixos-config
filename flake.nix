@@ -33,8 +33,8 @@
             sops-nix.nixosModules.sops
 
             ./configuration.nix
-            ./hosts/${hostname}/default.nix
-            ./hosts/${hostname}/hardware-configuration.nix
+            ./hosts/${hostname}/default.nix              # ← macutm ou macvmf, nunca os dois juntos
+            ./hosts/${hostname}/hardware-configuration.nix # ← idem
           ];
         };
     in
