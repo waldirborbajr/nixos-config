@@ -49,7 +49,7 @@ in {
 
     emacs emacsPackages.vterm emacsPackages.pbcopy
 
-    dex lxsession autorandr xkill
+    dex  autorandr xkill
 
     brightnessctl playerctl pciutils pavucontrol ffmpeg
 
