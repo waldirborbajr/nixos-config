@@ -238,6 +238,12 @@ services.displayManager.ly = {
       alejandra
       age
       sops
+      swaylock
+      swayidle
+      grim
+      slurp
+      swappy
+      cliphist
       wl-clipboard # substitui xclip no Wayland
       xwayland-satellite # compat pra apps que só falam X11 dentro do niri
       swaylock
