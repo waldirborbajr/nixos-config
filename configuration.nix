@@ -27,6 +27,7 @@
     "helix"
     "git"
     "zsh"
+    "wlr-which-key"
     # add more as needed
   ];
 
