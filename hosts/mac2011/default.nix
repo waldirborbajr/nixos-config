@@ -3,7 +3,7 @@
 { config, lib, pkgs, pkgs-unstable, common, ... }:
 let
   # Inherit common variables from configuration.nix
-  inherit (common) dotfilesDir dotfileConfigDir;
+  inherit (common) dotfilesDir dotfileConfigDir username;
   # Dotfiles specific to this host
   # Keep this list minimal — only add what this machine actually needs
   dotfilePrograms = [
@@ -104,5 +104,10 @@ in {
 
   # ==================== HOST-SPECIFIC DOTFILES ====================
   # Only symlink dotfiles specific to this MacBook 2011 machine
-  systemd.tmpfiles.rules = map mkDotfileLink dotfilePrograms;
+  # + input.kdl do Niri apontando para a variante Mac físico + K380
+  systemd.tmpfiles.rules =
+    (map mkDotfileLink dotfilePrograms)
+    ++ [
+      "L+ /home/${username}/.config/niri/input.kdl - - - - ${dotfilesDir}/niri/.config/niri/input-mac2011.kdl"
+    ];
 }
