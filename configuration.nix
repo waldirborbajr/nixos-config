@@ -18,17 +18,10 @@
   };
 
   dotfilePrograms = [
-    "tmux"
-    "zellij"
-    "alacritty"
-    "wezterm"
-    "niri"
-    "waybar"
-    "helix"
-    "git"
-    "zsh"
-    "wlr-which-key"
-    # add more as needed
+  "tmux" "zellij" "alacritty" "wezterm" "niri" "waybar"
+  "helix" "git" "zsh" "wlr-which-key"
+  "nvim" "bat" "btop" "ripgrep" "oh-my-posh"
+  # add more as needed
   ];
 
   mkDotfileLink = name:
