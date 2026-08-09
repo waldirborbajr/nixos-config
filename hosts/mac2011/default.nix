@@ -79,7 +79,7 @@ in {
 
     # Desktop utilities
     dex
-    lxsession
+    
     autorandr
     xkill
 
