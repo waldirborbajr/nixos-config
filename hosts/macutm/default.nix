@@ -3,7 +3,7 @@
 { lib, pkgs, pkgs-unstable, common, ... }:
 
 let
-  inherit (common) dotfilesDir dotfileConfigDir;
+  inherit (common) dotfilesDir dotfileConfigDir username;
 
   dotfilePrograms = [
     "lazygit"
@@ -17,12 +17,11 @@ in {
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  # ==================== VM OPT ====================
-  boot.kernelParams = [ "mitigations=off" ];
-  services.qemuGuest.enable = true;
+  # UTM (Apple Silicon)
+  # virtualisation.vmware.guest não se aplica aqui
 
-  # share clipboard with UTM
-  services.spice-vdagentd.enable = true;
+  # opcional, mas ajuda em VMs
+  boot.kernelParams = [ "mitigations=off" ];
 
   virtualisation.podman = {
     enable = true;
@@ -67,5 +66,10 @@ in {
   programs.firefox.enable = lib.mkDefault true;
 
   # ==================== DOTFILES ====================
-  systemd.tmpfiles.rules = map mkDotfileLink dotfilePrograms;
+  # + input.kdl do Niri apontando para a variante Mac (VM/UTM)
+  systemd.tmpfiles.rules =
+    (map mkDotfileLink dotfilePrograms)
+    ++ [
+      "L+ /home/${username}/.config/niri/input.kdl - - - - ${dotfilesDir}/niri/.config/niri/input-mac.kdl"
+    ];
 }
