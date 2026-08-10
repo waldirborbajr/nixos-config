@@ -131,27 +131,27 @@ in {
   # NOTA (branch de teste): mesmo bug documentado antes continua valendo
   # pro ly em si (settings merge / cores / tema), independente do WM por
   # trás da sessão.
-services.displayManager.ly = {
-  enable = true;
-  settings = {
-    animation = "matrix";
-    bigclock = true;
+  services.displayManager.ly = {
+    enable = true;
+    settings = {
+      animation = "matrix";
+      bigclock = true;
 
-    bg = "0x001e1e2e";          # Base
-    fg = "0x00cba6f7";          # Mauve (mesmo accent do resto do seu setup)
-    border_fg = "0x00cba6f7";   # Mauve
-    error_fg = "0x00f38ba8";    # Red (Catppuccin, não vermelho puro)
-    clock_color = "0x00cba6f7"; # Mauve
+      bg = "0x001e1e2e";          # Base
+      fg = "0x00cba6f7";          # Mauve (mesmo accent do resto do seu setup)
+      border_fg = "0x00cba6f7";   # Mauve
+      error_fg = "0x00f38ba8";    # Red (Catppuccin, não vermelho puro)
+      clock_color = "0x00cba6f7"; # Mauve
 
-    term_reset_cmd = "/usr/bin/tput reset; echo -en \"\\e]P01e1e2e\"; echo -en \"\\e]P7cdd6f4\\ec\"; clear";
+      term_reset_cmd = "/usr/bin/tput reset; echo -en \"\\e]P01e1e2e\"; echo -en \"\\e]P7cdd6f4\\ec\"; clear";
 
-    blank_password = true;
-    hide_borders = false;
-    default_input = "login";
-    load = true;
-    save = true;
+      blank_password = true;
+      hide_borders = false;
+      default_input = "login";
+      load = true;
+      save = true;
+    };
   };
-};
 
   services.displayManager.defaultSession = "niri";
   security.polkit.enable = true;
@@ -239,7 +239,6 @@ services.displayManager.ly = {
       cliphist
       wl-clipboard # substitui xclip no Wayland
       xwayland-satellite # compat pra apps que só falam X11 dentro do niri
-      swaylock
       # inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default
 
       # ---- niri + waybar (compartilhado por todos os hosts) ----
@@ -349,17 +348,17 @@ services.displayManager.ly = {
       IdentityFile ${sshKeysDir}/id_ed25519_github
       IdentitiesOnly yes
 
-    Host gitea.com gitea.com
+    Host gitea.com
       User git
       IdentityFile ${sshKeysDir}/id_ed25519_github
       IdentitiesOnly yes
 
-    Host codeberg.org codeberg.org
+    Host codeberg.org
       User git
       IdentityFile ${sshKeysDir}/id_ed25519_github
       IdentitiesOnly yes
 
-    Host codefloe.com codefloe.com
+    Host codefloe.com
       User git
       IdentityFile ${sshKeysDir}/id_ed25519_github
       IdentitiesOnly yes

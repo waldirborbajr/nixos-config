@@ -4,21 +4,41 @@
 
 ## 🖥️ Supported Hardware
 
-### 🍎 MacBook Pro 13" (2011)
+> ⚠️ Desktop stack atual (todos os hosts): **niri** (Wayland scrollable-tiling
+> compositor) + **waybar** + **ly** como display manager. Não há i3/X11 nem
+> GNOME/GDM em nenhum host deste flake — essa seção listava a stack antiga,
+> anterior à migração para niri (ver comentários em `configuration.nix`).
+
+### 🍎 MacBook Pro 13" (2011) — `mac2011`
 - Architecture: x86_64
 - RAM: 16 GB
 - Storage: 500 GB SSD
 - Role: main workstation
-- Desktop: Niri & GNOME (Wayland via GDM)
+- Desktop: niri + waybar (Wayland, via ly)
 - Optional features: DEVOPS / QEMU (on-demand)
 
-### 💻 Dell Inspiron 1456
+### 💻 Dell Inspiron 1564 — `dell1564`
 - Architecture: x86_64
 - RAM: 4 GB
 - Storage: 120 GB SSD
 - Role: basic usage / study machine
-- Desktop: i3 (X11)
+- Desktop: niri + waybar (Wayland, via ly)
 - Optional features: all disabled (Docker, K3s, QEMU)
+- Nota: hostname legado da máquina física era `dell1456`; o flake usa
+  `dell1564` (ver alias em `nixos-manager.sh`). Confirme o nome de modelo
+  real do hardware antes de considerar um dos dois um typo.
+
+### 🍏 Apple Silicon VM (UTM) — `macutm`
+- Architecture: aarch64
+- Role: workstation em VM (UTM), guest agent `spice-vdagent`
+- Desktop: niri + waybar (Wayland, via ly), base compartilhada com `macvmf`
+  em `hosts/common/mac-vm-workstation.nix`
+
+### 🍏 Apple Silicon VM (VMware Fusion) — `macvmf`
+- Architecture: aarch64
+- Role: workstation em VM (VMware Fusion), guest agent `open-vm-tools`
+- Desktop: niri + waybar (Wayland, via ly), base compartilhada com `macutm`
+  em `hosts/common/mac-vm-workstation.nix`
 
 ---
 

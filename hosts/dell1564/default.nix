@@ -1,6 +1,6 @@
 # hosts/dell/default.nix
 # Dell-specific configuration (legacy BIOS machine)
-{ lib, pkgs, pkgs-unstable, common, ... }:
+{ lib, pkgs, common, ... }:
 let
   # Inherit common variables from configuration.nix
   inherit (common) dotfilesDir dotfileConfigDir username;
@@ -34,10 +34,12 @@ in {
   };
 
   # ==================== FILESYSTEM OPTIMIZATIONS ====================
-  # Good for older HDDs
-  fileSystems."/" = {
-    options = [ "noatime" "nodiratime" "commit=60" ];
-  };
+  # Good for older HDDs. NOTE: the actual "noatime nodiratime commit=60"
+  # options already live in hardware-configuration.nix (same fileSystems."/"
+  # attrset, next to `device`/`fsType`) — do NOT redeclare them here, since
+  # NixOS list-type options concatenate across modules instead of
+  # overwriting, so a second declaration silently doubled every mount
+  # option on the real system.
 
   # ==================== BROADCOM WIRELESS ====================
   # This Dell has a Broadcom BCM4312 802.11b/g LP-PHY (PCI ID 14e4:4315).

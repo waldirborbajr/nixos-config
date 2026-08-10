@@ -1,6 +1,6 @@
 # hosts/macbook2011/default.nix
 # MacBook Pro 2011-specific configuration (x86_64, real Apple hardware)
-{ config, lib, pkgs, pkgs-unstable, common, ... }:
+{ config, lib, pkgs, common, ... }:
 let
   # Inherit common variables from configuration.nix
   inherit (common) dotfilesDir dotfileConfigDir username;

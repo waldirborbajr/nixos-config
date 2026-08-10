@@ -1,3 +1,15 @@
+> 🚧 **STATUS: aspiracional / não implementado neste repositório.**
+> Este documento descreve uma arquitetura-alvo (`core.nix`, `profiles/`,
+> `modules/category/default.nix` como agregadores, etc.) que **não existe**
+> na árvore atual — hoje o flake é: `flake.nix` → `configuration.nix`
+> (monolítico) → `hosts/<host>/default.nix` (+ `hosts/common/` para as VMs
+> Mac). Nenhum diretório `core.nix`, `profiles/` ou `modules/` está presente.
+> A seção "Real-World Example" abaixo também não reflete o estado real do
+> repo (não existem `hosts/dell.nix` nem `hosts/macbook.nix`, por exemplo).
+> Mantido aqui como referência de design para uma eventual refatoração
+> futura — **não usar como documentação do estado atual**, especialmente
+> ao planejar a migração para home-manager.
+
 # Dendritic Pattern for NixOS Configurations
 
 ## What is the Dendritic Pattern?
