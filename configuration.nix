@@ -85,6 +85,15 @@ in {
     };
   };
 
+  # ==================== SHELL ====================
+  # System-level zsh must be enabled whenever a user's login shell is
+  # pkgs.zsh, otherwise zsh won't be registered in /etc/shells and the
+  # Nix directories won't be added to its PATH (login may become
+  # impossible). This is distinct from home-manager's programs.zsh
+  # (in home/default.nix), which only manages the user's zsh config
+  # files/dotfiles, not the system-level shell registration.
+  programs.zsh.enable = true;
+
   # ==================== USERS ====================
   users.users.${username} = {
     isNormalUser = true;
