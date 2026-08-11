@@ -1,0 +1,306 @@
+##############################################################################
+# TMUX CONFIGURATION - OPTIMIZED FOR PERFORMANCE & DEVOPS WORKFLOW
+# Theme: Nord | Prefix: C-a | Vim-style Navigation
+##############################################################################
+
+##############################################################################
+# 1. TERMINAL & DISPLAY CORE
+##############################################################################
+
+# Set terminal features for proper color support (fastest method)
+set -ag terminal-overrides ",*:RGB"
+
+# Enable OSC 52 for cross-machine copy/paste
+set -g set-clipboard on
+
+# Enable focus events for editor integration
+set -g focus-events on
+
+# Status bar at bottom for better visibility
+set -g status-position bottom
+
+# Refresh interval (optimized to avoid excessive redraws)
+set -g status-interval 5
+
+# Display transient messages briefly
+set -g display-time 800
+
+##############################################################################
+# 2. BEHAVIOR & PERFORMANCE
+##############################################################################
+
+# Use zsh as default shell
+set -g default-shell /bin/zsh
+
+# Increase history for better scrollback
+set -g history-limit 15000
+
+# Enable mouse support (pane selection, window switching, copy mode)
+set -g mouse on
+
+# Repeat timeout for key combinations (ms)
+set -g repeat-time 600
+
+# Enable activity alerts
+setw -g monitor-activity off
+
+##############################################################################
+# 3. INDEXING & WINDOW MANAGEMENT
+##############################################################################
+
+# Start window numbers from 1 (better ergonomics)
+set -g base-index 1
+
+# Start pane numbers from 1
+set -g pane-base-index 1
+
+# Automatically renumber windows when one is closed
+set -g renumber-windows on
+
+# Smart window naming based on command
+setw -g automatic-rename on
+set -g automatic-rename-format '#{pane_current_command}'
+
+##############################################################################
+# 4. KEY BINDINGS - PREFIX & CORE
+##############################################################################
+
+# Change prefix from C-b to C-a (faster, Vim-native)
+unbind C-b
+set -g prefix C-a
+bind C-a send-prefix
+
+# Fast config reload
+bind r source-file ~/.config/tmux/tmux.conf \; display-message "󰑓 tmux reloaded"
+
+##############################################################################
+# 5. PANE NAVIGATION - VIM STYLE (CRITICAL PATH)
+##############################################################################
+
+# Standard Vim-style pane selection (with prefix)
+bind h select-pane -L
+bind j select-pane -D
+bind k select-pane -U
+bind l select-pane -R
+
+# Turbo mode: Alt+hjkl without prefix (fastest workflow)
+bind -n M-h select-pane -L
+bind -n M-j select-pane -D
+bind -n M-k select-pane -U
+bind -n M-l select-pane -R
+
+# Arrow keys: Ctrl+arrows (alternative fast mode)
+# Commented out to avoid conflicts - uncomment if preferred
+#bind -n C-h select-pane -L
+#bind -n C-j select-pane -D
+#bind -n C-k select-pane -U
+#bind -n C-l select-pane -R
+
+##############################################################################
+# 6. PANE RESIZING - REPEATABLE BINDINGS
+##############################################################################
+
+# Vim-style resize with repeat (hold down for continuous resize)
+bind -r H resize-pane -L 5
+bind -r J resize-pane -D 3
+bind -r K resize-pane -U 3
+bind -r L resize-pane -R 5
+
+# Arrow key resize (alternative method)
+# Commented out - uncomment if preferred over vim-style
+#bind -r Left  resize-pane -L 5
+#bind -r Right resize-pane -R 5
+#bind -r Up    resize-pane -U 3
+#bind -r Down  resize-pane -D 3
+
+##############################################################################
+# 7. WINDOW MANAGEMENT - SPLITS & NEW WINDOWS
+##############################################################################
+
+# Unbind default split bindings
+unbind %
+unbind '"'
+
+# Split horizontally (vertical pane) with path awareness
+bind | split-window -h -c "#{pane_current_path}"
+bind v split-window -h -c "#{pane_current_path}"
+
+# Split vertically (horizontal pane) with path awareness
+bind _ split-window -v -c "#{pane_current_path}"
+bind s split-window -v -c "#{pane_current_path}"
+
+# New window in current directory
+bind c new-window -c "#{pane_current_path}"
+
+# Maximize/restore pane (space toggle)
+bind m resize-pane -Z
+
+##############################################################################
+# 8. WINDOW SWITCHING (FAST HORIZONTAL NAVIGATION)
+##############################################################################
+
+# Shift+arrows for window navigation
+bind -n S-Left  previous-window
+bind -n S-Right next-window
+
+# Alt+H/L for window navigation (vim-style alternative)
+bind -n M-H previous-window
+bind -n M-L next-window
+
+# Alt+number quick access (1-9 windows)
+bind -n M-1 select-window -t 1
+bind -n M-2 select-window -t 2
+bind -n M-3 select-window -t 3
+bind -n M-4 select-window -t 4
+bind -n M-5 select-window -t 5
+bind -n M-6 select-window -t 6
+bind -n M-7 select-window -t 7
+bind -n M-8 select-window -t 8
+bind -n M-9 select-window -t 9
+
+##############################################################################
+# 9. COPY MODE - VI KEYBINDINGS (CRITICAL FOR POWER USERS)
+##############################################################################
+
+# Use vi keybindings in copy mode
+setw -g mode-keys vi
+
+# Visual selection start
+bind -T copy-mode-vi v send-keys -X begin-selection
+
+# Rectangle selection toggle
+bind -T copy-mode-vi C-v send-keys -X rectangle-toggle
+
+# Yank (copy to clipboard)
+bind -T copy-mode-vi y send-keys -X copy-selection-and-cancel
+
+# Yank on Enter
+bind -T copy-mode-vi Enter send-keys -X copy-selection-and-cancel
+
+# Remove default mouse drag end behavior (use yank instead)
+unbind -T copy-mode-vi MouseDragEnd1Pane
+
+##############################################################################
+# 10. COLOR THEME - NORD
+##############################################################################
+
+# Nord Palette (single source of truth)
+# Polar Night (dark backgrounds)
+set -g thm_bg        "#2E3440"
+set -g thm_bg1       "#3B4252"
+set -g thm_bg2       "#434C5E"
+set -g thm_bg3       "#4C566A"
+# Snow Storm (light foregrounds)
+set -g thm_fg        "#D8DEE9"
+set -g thm_fg1       "#E5E9F0"
+set -g thm_fg2       "#ECEFF4"
+# Frost (cool accent blues)
+set -g thm_nord7     "#8FBCBB"   # frost teal
+set -g thm_nord8     "#88C0D0"   # frost light blue
+set -g thm_nord9     "#81A1C1"   # frost blue
+set -g thm_nord10    "#5E81AC"   # frost dark blue
+# Aurora (semantic accent colors)
+set -g thm_red       "#BF616A"
+set -g thm_orange    "#D08770"
+set -g thm_yellow    "#EBCB8B"
+set -g thm_green     "#A3BE8C"
+set -g thm_purple    "#B48EAD"
+
+# Convenience aliases matching original variable names
+set -g thm_cyan      "#{thm_nord8}"
+set -g thm_blue      "#{thm_nord9}"
+set -g thm_magenta   "#{thm_purple}"
+set -g thm_gray      "#{thm_bg2}"
+set -g thm_black     "#{thm_bg}"
+set -g thm_black4    "#{thm_bg3}"
+
+##############################################################################
+# 11. STATUS BAR STYLING
+##############################################################################
+
+# Master status switch
+set -g status "on"
+set -g status-bg "#2E3440"
+set -g status-justify "left"
+set -g status-left-length "100"
+set -g status-right-length "100"
+
+# Message styling
+set -g message-style "fg=#88C0D0,bg=#434C5E,align=centre"
+set -g message-command-style "fg=#88C0D0,bg=#434C5E,align=centre"
+
+# Pane borders
+set -g pane-border-style "fg=#434C5E"
+set -g pane-active-border-style "fg=#81A1C1"
+
+# Window status styling
+set -g window-status-activity-style "fg=#D8DEE9,bg=#2E3440,none"
+set -g window-status-separator ""
+set -g window-status-style "fg=#D8DEE9,bg=#2E3440,none"
+
+# Active window indicator (current)
+set -g window-status-current-format "#[fg=#81A1C1,bg=#2E3440] #I: #[fg=#B48EAD,bg=#2E3440](✓) #[fg=#88C0D0,bg=#2E3440]#(echo '#{pane_current_path}' | rev | cut -d'/' -f-2 | rev) #[fg=#B48EAD,bg=#2E3440]"
+
+# Inactive window indicator
+set -g window-status-format "#[fg=#81A1C1,bg=#2E3440] #I: #[fg=#D8DEE9,bg=#2E3440]#W"
+
+# Right status bar (session info & prefix indicator)
+set -g status-right "#[fg=#81A1C1,bg=#2E3440,nobold,nounderscore,noitalics]#[fg=#2E3440,bg=#81A1C1,nobold,nounderscore,noitalics] #[fg=#D8DEE9,bg=#434C5E] #W #{?client_prefix,#[fg=#B48EAD],#[fg=#88C0D0]}#[bg=#434C5E]#{?client_prefix,#[bg=#B48EAD],#[bg=#88C0D0]}#[fg=#2E3440] #[fg=#D8DEE9,bg=#434C5E] #S "
+
+# Left status bar (empty for cleaner look)
+set -g status-left ""
+
+# Clock and selection mode colors
+set -g clock-mode-colour "#81A1C1"
+set -g mode-style "fg=#88C0D0,bg=#4C566A,bold"
+
+##############################################################################
+# 12. PLUGINS - TPM (TMUX PLUGIN MANAGER)
+##############################################################################
+
+# TPM initialization
+set -g @plugin 'tmux-plugins/tpm'
+
+# Sensible defaults (performance + ergonomics)
+set -g @plugin 'tmux-plugins/tmux-sensible'
+
+# Vim <-> tmux seamless navigation (vim-tmux-navigator in Neovim/Vim)
+set -g @plugin 'joshmedeski/vim-tmux-navigator'
+
+# System clipboard integration (OSC 52 fallback)
+set -g @plugin 'tmux-plugins/tmux-yank'
+
+##############################################################################
+# 13. SESSION PERSISTENCE & AUTO-RESTORE (DEVOPS CRITICAL)
+##############################################################################
+
+# Resurrect: save/restore sessions on tmux restart
+set -g @plugin 'tmux-plugins/tmux-resurrect'
+
+# Continuum: auto-save and auto-restore sessions
+set -g @plugin 'tmux-plugins/tmux-continuum'
+
+# Capture pane contents when saving
+set -g @resurrect-capture-pane-contents 'on'
+
+# Smart process resurrection (preserve tools during restore)
+set -g @resurrect-strategy-nvim 'session'
+set -g @resurrect-strategy-vim 'session'
+set -g @resurrect-processes 'ssh kubectl helm terraform nvim vim'
+
+# Auto-restore on tmux start
+set -g @continuum-restore 'on'
+
+# Auto-save interval (10 minutes - balance between safety and performance)
+set -g @continuum-save-interval '10'
+
+##############################################################################
+# 14. TPM BOOTSTRAP (MUST BE AT END OF FILE)
+##############################################################################
+
+# Auto-install TPM if not present (ensures portability)
+if "test ! -d ~/.config/tmux/plugins/tpm" \
+  "run 'git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm && ~/.config/tmux/plugins/tpm/bin/install_plugins'"
+
+# Load TPM (initialize all plugins)
+run "$HOME/.config/tmux/plugins/tpm/tpm"

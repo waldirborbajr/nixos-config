@@ -10,22 +10,11 @@
   sshKeysDir = "/home/${username}/.ssh";
   sshClientConfigPath = "/etc/ssh/ssh_config.d/50-borba.conf";
 
-  dotfilesDir = "/home/${username}/dotfiles";
-  dotfileConfigDir = "/home/${username}/.config";
-
+  # Shared values for host modules (username mainly).
+  # Dotfile contents now live inside the flake under home/configs/ (fase 3).
   common = {
-    inherit username dotfilesDir dotfileConfigDir;
+    inherit username;
   };
-
-  dotfilePrograms = [
-  "tmux" "zellij" "alacritty" "wezterm" "niri" "waybar"
-  "helix" "git" "zsh" "wlr-which-key"
-  "nvim" "bat" "btop" "ripgrep" "oh-my-posh"
-  # add more as needed
-  ];
-
-  mkDotfileLink = name:
-    "L+ ${dotfileConfigDir}/${name} - - - - ${dotfilesDir}/${name}/.config/${name}";
 in {
   _module.args.common = common;
 
@@ -36,13 +25,12 @@ in {
   # ==================== KERNEL ====================
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  # ==================== AUTOMATIC DOTFILES ====================
-  systemd.tmpfiles.rules =
-    (map mkDotfileLink dotfilePrograms)
-    ++ [
-      "d ${sshKeysDir} 0700 ${username} users -"
-      "L+ /home/${username}/.zshenv - - - - ${dotfilesDir}/zsh/.zshenv"
-    ];
+  # ==================== SSH KEY DIR (tmpfiles) ====================
+  # Only the SSH directory creation remains here so sops can write keys
+  # before the user session exists. All user configs are managed by HM.
+  systemd.tmpfiles.rules = [
+    "d ${sshKeysDir} 0700 ${username} users -"
+  ];
 
   # ==================== SLEEP POLICY ====================
   systemd.sleep.settings.Sleep = {
@@ -103,6 +91,19 @@ in {
     home = "/home/${username}";
     description = "borba jr, w";
     extraGroups = ["networkmanager" "wheel" "podman"];
+    shell = pkgs.zsh;
+  };
+
+  # ==================== HOME MANAGER (fase 3) ====================
+  # User configs live in home/configs/ and are applied via home/default.nix.
+  # Host modules only override host-specific fragments (e.g. niri/input.kdl).
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    extraSpecialArgs = {
+      inherit inputs hostname pkgs-unstable;
+    };
+    users.${username} = import ./home/default.nix;
   };
 
   security.sudo.extraRules = [
@@ -160,7 +161,7 @@ in {
   # Substitui o antigo spawn-at-startup "/usr/lib/soteria-polkit/soteria" do
   # startup.kdl/misc.kdl — aquele caminho é FHS (Arch/Ubuntu) e não existe no
   # NixOS. Este módulo já cuida de instalar o pacote e rodar como serviço de
-  # usuário; remova a linha spawn-at-startup correspondente do dotfiles.
+  # usuário; remova a linha spawn-at-startup correspondente dos configs do niri.
   security.soteria.enable = true;
 
   # waybar tem o módulo "power-profiles-daemon" no config.jsonc; sem o serviço
@@ -242,7 +243,7 @@ in {
       # inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default
 
       # ---- niri + waybar (compartilhado por todos os hosts) ----
-      waybar # a bar em si; sem isso config.jsonc/style.css do dotfiles não têm o que rodar
+      waybar # a bar em si; sem isso config.jsonc/style.css do HM não têm o que rodar
       fuzzel # launcher (Mod+D) e power-menu.sh do waybar (dmenu mode)
       swaybg # wallpaper, chamado no startup.kdl
       wlr-which-key # menu invocado no bind Mod+Shift+E (binds.kdl)

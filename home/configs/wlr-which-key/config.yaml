@@ -1,0 +1,116 @@
+# Theming
+font: JetBrainsMono Nerd Font 18
+background: "#2e3440ee"
+color: "#eceff4"
+border: "#88c0d0"
+separator: "  →  "
+border_width: 3
+corner_r: 16
+padding: 24
+rows_per_column: 8
+column_padding: 32
+
+# Posição
+anchor: center
+margin_right: 0
+margin_bottom: 0
+margin_left: 0
+margin_top: 0
+
+# Opcional: não conflitar com binds do niri
+inhibit_compositor_keyboard_shortcuts: true
+
+# namespace to use for the layer shell surface
+#namespace: "wlr_which_key"
+
+menu:
+  - key: "m"
+    desc: Notifications
+    submenu:
+      - key: "Return"
+        desc: Invoce and Dismiss
+        cmd: makoctl invoke && makoctl dismiss
+      - key: "d"
+        desc: Dismiss
+        cmd: makoctl dismiss
+      - key: "D"
+        desc: Dismiss all
+        cmd: makoctl dismiss -a
+      - key: "m"
+        desc: Action
+        cmd: makoctl menu -- fuzzel -d -w 20 -l 5
+  - key: "s"
+    desc: Resize windows
+    submenu:
+      - key: "Up"
+        desc: "Up"
+        cmd: niri msg action set-window-height -10% && wlr-which-key -k s
+      - key: "Down"
+        desc: "Down"
+        cmd: niri msg action set-window-height +10% && wlr-which-key -k s
+  - key: "e"
+    desc: Exit menu
+    submenu:
+      - key: "l"
+        desc: "Lock"
+        cmd: swaylock -f
+      - key: "e"
+        desc: "Exit"
+        cmd: loginctl terminate-user $USER
+      - key: "s"
+        desc: "Suspend"
+        cmd: systemctl suspend
+      - key: "r"
+        desc: "Restart"
+        cmd: systemctl reboot
+      - key: "S"
+        desc: "Shutdown"
+        cmd: systemctl poweroff
+      - key: "h"
+        desc: "Hibernate"
+        cmd: systemctl hibernate
+  - key: "p"
+    desc: Lecture mode
+    submenu:
+      - key: "p"
+        desc: "Presentation"
+        cmd: niri msg action focus-monitor-right && niri msg action focus-workspace 1 && niri msg action focus-monitor-left && niri msg action focus-workspace 1
+      - key: "j"
+        desc: "Jupyter Notebook"
+        cmd: niri msg action focus-monitor-left && niri msg action focus-workspace 2 && niri msg action focus-monitor-right && niri msg action focus-workspace 2
+      - key: "m"
+        desc: "Misc"
+        cmd: niri msg action focus-monitor-left && niri msg action focus-workspace 2 && niri msg action focus-monitor-right && niri msg action focus-workspace 3
+  - key: "b"
+    desc: Monitor brightness
+    submenu:
+      - key: "1"
+        desc: "10%"
+        cmd: ddcutil setvcp 10 10
+      - key: "2"
+        desc: "20%"
+        cmd: ddcutil setvcp 10 20
+      - key: "3"
+        desc: "30%"
+        cmd: ddcutil setvcp 10 30
+      - key: "4"
+        desc: "40%"
+        cmd: ddcutil setvcp 10 40
+      - key: "5"
+        desc: "50%"
+        cmd: ddcutil setvcp 10 50
+      - key: "6"
+        desc: "60%"
+        cmd: ddcutil setvcp 10 60
+      - key: "7"
+        desc: "70%"
+        cmd: ddcutil setvcp 10 70
+      - key: "8"
+        desc: "80%"
+        cmd: ddcutil setvcp 10 80
+      - key: "9"
+        desc: "90%"
+        cmd: ddcutil setvcp 10 90
+      - key: "0"
+        desc: "100%"
+        cmd: ddcutil setvcp 10 100

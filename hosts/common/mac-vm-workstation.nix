@@ -5,15 +5,9 @@
 # específicos de cada host — o resto é idêntico entre os dois.
 { lib, pkgs, common, ... }:
 let
-  inherit (common) dotfilesDir dotfileConfigDir username;
-
-  dotfilePrograms = [
-    "lazygit"
-    "yazi"
-  ];
-
-  mkDotfileLink = name:
-    "L+ ${dotfileConfigDir}/${name} - - - - ${dotfilesDir}/${name}/.config/${name}";
+  inherit (common) username;
+  # Local configs now live inside the flake (fase 3)
+  niriInput = ../../home/configs/niri/input-mac.kdl;
 in {
   # ==================== BOOT ====================
   boot.loader.systemd-boot.enable = true;
@@ -57,11 +51,10 @@ in {
 
   programs.firefox.enable = lib.mkDefault true;
 
-  # ==================== DOTFILES ====================
-  # + input.kdl do Niri apontando para a variante Mac (VM)
-  systemd.tmpfiles.rules =
-    (map mkDotfileLink dotfilePrograms)
-    ++ [
-      "L+ /home/${username}/.config/niri/input.kdl - - - - ${dotfilesDir}/niri/.config/niri/input-mac.kdl"
-    ];
+  # ==================== HOME MANAGER (host-specific, fase 3) ====================
+  # Override only the niri input fragment for Mac keyboard / trackpad in VMs.
+  # lazygit is already in the common home/configs; no need to re-declare.
+  home-manager.users.${username} = {
+    xdg.configFile."niri/input.kdl".source = niriInput;
+  };
 }

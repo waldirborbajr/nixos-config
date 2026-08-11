@@ -3,14 +3,7 @@
 { lib, pkgs, common, ... }:
 let
   # Inherit common variables from configuration.nix
-  inherit (common) dotfilesDir dotfileConfigDir username;
-  # Dotfiles specific to this host (Dell)
-  # Keep this list minimal — only add what this machine actually needs
-  dotfilePrograms = [
-    "lazygit"
-    # Example: add more host-specific dotfiles here if needed
-  ];
-  mkDotfileLink = name: "L+ ${dotfileConfigDir}/${name} - - - - ${dotfilesDir}/${name}/.config/${name}";
+  inherit (common) username;
 in {
   # ==================== BOOTLOADER ====================
   # Assumes legacy BIOS + GRUB (older Dell hardware).
@@ -113,12 +106,10 @@ in {
   # NOTE: pkgs-unstable.neovim already comes from configuration.nix.
   # Not repeated here to avoid duplicate entries in systemPackages.
 
-  # ==================== HOST-SPECIFIC DOTFILES ====================
-  # Only symlink dotfiles specific to this Dell machine
-  # + input.kdl do Niri apontando para a variante ABNT2
-  systemd.tmpfiles.rules =
-    (map mkDotfileLink dotfilePrograms)
-    ++ [
-      "L+ /home/${username}/.config/niri/input.kdl - - - - ${dotfilesDir}/niri/.config/niri/input-dell.kdl"
-    ];
+  # ==================== HOME MANAGER (host-specific, fase 3) ====================
+  # Override only the niri input fragment for Dell ABNT2 keyboard.
+  # lazygit lives in the common home/configs.
+  home-manager.users.${username} = {
+    xdg.configFile."niri/input.kdl".source = ../../home/configs/niri/input-dell.kdl;
+  };
 }

@@ -1,0 +1,3 @@
+# Run `bat --help` to get a list of all possible configuration options.
+--theme="Catppuccin Mocha"
+--plain

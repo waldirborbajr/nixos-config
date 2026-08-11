@@ -11,9 +11,15 @@
 
     # 🔐 secrets management
     sops-nix.url = "github:Mic92/sops-nix";
+
+    # 🏠 home-manager (fase 2)
+    home-manager = {
+      url = "github:nix-community/home-manager/release-26.05";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, sops-nix, ... } @ inputs:
+  outputs = { self, nixpkgs, nixpkgs-unstable, sops-nix, home-manager, ... } @ inputs:
     let
       mkHost = { hostname, system }:
         nixpkgs.lib.nixosSystem {
@@ -31,6 +37,9 @@
           modules = [
             # 🔐 SOPS module (global)
             sops-nix.nixosModules.sops
+
+            # 🏠 Home Manager (fase 2)
+            home-manager.nixosModules.home-manager
 
             ./configuration.nix
             ./hosts/${hostname}/default.nix              # ← macutm ou macvmf, nunca os dois juntos
