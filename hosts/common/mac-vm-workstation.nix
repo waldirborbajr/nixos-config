@@ -3,7 +3,7 @@
 # Base compartilhada pelas VMs Mac (macutm e macvmf). Só o agente de guest
 # da VM (UTM vs VMware Fusion) e o hardware-configuration.nix continuam
 # específicos de cada host — o resto é idêntico entre os dois.
-{ lib, pkgs, pkgs-unstable, common, ... }:
+{ lib, pkgs, common, ... }:
 let
   inherit (common) username;
   # Local configs now live inside the flake (fase 3)
@@ -68,12 +68,14 @@ in {
     networkmanagerapplet # applet de rede na systray
     wl-clipboard        # clipboard Wayland
     kooha               # gravador de tela
-    diskonaut           # TUI de espaço em disco (o nome real no nixpkgs é "diskonaut", não "diskonaut-ng")
-  ]
-  # ---- pkgs-unstable: hyprlax é pacote recente, pode não estar no branch 26.05 estável ----
-  ++ (with pkgs-unstable; [
-    hyprlax # dynamic/parallax wallpaper daemon
-  ]);
+    diskonaut-ng        # TUI de espaço em disco
+    hyprlax             # dynamic/parallax wallpaper daemon (confirmado no nixos-26.05, não precisa de pkgs-unstable)
+    satty               # anotação de screenshot (nixpkgs usa "satty", não "satty-shot")
+    handy               # speech to text (app tauri/rust)
+    pear-desktop        # youtube music com suporte a mpris
+    snitch              # inspeciona conexões de rede
+    wooz                # zoom / magnifier utility
+  ];
 
   # ---- NÃO adicionados: exigem flake input / overlay que este repo ainda não tem ----
   # As linhas abaixo ficam comentadas de propósito — adicionar como está quebraria o
@@ -85,12 +87,7 @@ in {
   #   nsticky             -> ferramenta de terceiros para niri, não encontrada em nixpkgs
   #   hyprlax-toggle      -> parece script complementar do próprio hyprlax, não é pacote nixpkgs
   #   mpvpaper-toggle     -> idem, provável script/overlay pessoal
-  #   pear-desktop        -> não encontrado em nixpkgs
-  #   handy               -> não encontrado em nixpkgs (não confundir com libhandy)
   #   dnix                -> parece ser o instalador da Determinate Systems, não um atributo de pkgs
-  #   satty-shot          -> nixpkgs tem "satty" (anotação de screenshot), não "satty-shot"
-  #   snitch              -> não encontrado em nixpkgs
-  #   wooz                -> não encontrado em nixpkgs
   #   pkgs.video-scripts.* (compression/recording/trimming/extractFrame)
   #                       -> namespace customizado, não existe em nixpkgs
   #
