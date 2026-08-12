@@ -109,6 +109,11 @@ in {
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
+    # Pre-existing plain files at HM-managed paths (e.g. from before this
+    # migration) get renamed with this suffix instead of blocking
+    # activation. Safe to remove once the migration is verified and the
+    # .hm-backup files are no longer needed.
+    backupFileExtension = "hm-backup";
     extraSpecialArgs = {
       inherit inputs hostname pkgs-unstable;
     };
