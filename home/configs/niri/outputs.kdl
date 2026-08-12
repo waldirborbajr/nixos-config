@@ -7,9 +7,9 @@
 // via home-manager xdg.configFile."niri/outputs.kdl".
 // Confirm real name with: niri msg outputs
 
-output "LVDS-1" {
-    mode "1280x800@60.223"
-    scale 1
-    transform "normal"
-    position x=0 y=0
-}
+//output "LVDS-1" {
+//    mode "1280x800@60.223"
+//    scale 1
+//    transform "normal"
+//    position x=0 y=0
+//}
