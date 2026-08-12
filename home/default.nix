@@ -63,9 +63,9 @@ in {
   # Git — fully structured; the old config file is no longer needed as source.
   programs.git = {
     enable = true;
-    userName = "Waldir Borba Junior";
-    userEmail = "wborbajr@gmail.com";
-    extraConfig = {
+    settings = {
+      user.name = "Waldir Borba Junior";
+      user.email = "wborbajr@gmail.com";
       core.editor = "nvim";
       core.pager = "bat";
       init.defaultBranch = "main";
