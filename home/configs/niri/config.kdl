@@ -2,10 +2,28 @@
 // https://niri-wm.github.io/niri/Configuration:-Introduction
 // https://niri-wm.github.io/niri/Configuration:-Include
 
-include "input.kdl"
-include "outputs.kdl"
-include "layout.kdl"
-include "startup.kdl"
-include "window-rules.kdl"
-include "binds.kdl"
-include "misc.kdl"
+include "config/input.kdl"
+include "config/outputs.kdl"
+include "config/layout.kdl"
+include "config/startup.kdl"
+include "config/window-rules.kdl"
+include "config/binds.kdl"
+include "config/misc.kdl"
+
+// essential apps
+// spawn-at-startup "helium"
+// spawn-at-startup "spotify"
+// spawn-at-startup "nemo"
+// spawn-at-startup "pavucontrol"
+
+// systray apps
+// spawn-at-startup "blueman-applet"
+// spawn-sh-at-startup "nm-applet --sm-disable --indicator"
+
+// wallpaper
+// spawn-sh-at-startup "waypaper --restore"
+
+// workspace apps
+// spawn-sh-at-startup "kitty -d ~/workspace/nix-config --app-id='nitch' --hold 'nitch' &"
+// spawn-sh-at-startup "kitty -d ~/workspace/nix-config --app-id='fastfetch' --hold 'fastfetch' &"
+// spawn-sh-at-startup "kitty -d ~/workspace/nix-config --app-id='btm-monitor' --hold 'btm' &"
