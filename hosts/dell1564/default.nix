@@ -111,5 +111,6 @@ in {
   home-manager.users.${username} = {
     xdg.configFile."niri/config/input.kdl".source   = ../../home/configs/niri/config/input-dell.kdl;
     xdg.configFile."niri/config/outputs.kdl".source = ../../home/configs/niri/config/outputs-dell.kdl;
+    xdg.configFile."waybar/output.jsonc".source     = ../../home/configs/waybar/output-dell.jsonc;
   };
 }

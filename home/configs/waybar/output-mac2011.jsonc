@@ -1,0 +1,5 @@
+// Monitor selection — MacBook Pro 2011 (physical)
+// Keep this in sync with home/configs/niri/config/outputs-mac2011.kdl
+{
+    "output": ["LVDS-1"]
+}

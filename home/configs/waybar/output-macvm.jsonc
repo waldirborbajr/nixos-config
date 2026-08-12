@@ -1,0 +1,5 @@
+// Monitor selection — UTM / VMware Fusion (Apple Silicon VMs)
+// Keep this in sync with home/configs/niri/config/outputs-macvm.kdl
+{
+    "output": ["Virtual-1"]
+}

@@ -1,4 +1,11 @@
 {
+    // Per-host monitor selection. Not defined here on purpose — the
+    // included file below sets "output", and waybar gives precedence to
+    // whichever file defines a key first (this file, then includes).
+    // See home/configs/waybar/output-*.jsonc and the per-host overrides
+    // in hosts/<host>/default.nix (mirrors the niri input/outputs.kdl pattern).
+    "include": ["$XDG_CONFIG_HOME/waybar/output.jsonc"],
+
     "layer": "top",
     "position": "top",
     "height": 24,

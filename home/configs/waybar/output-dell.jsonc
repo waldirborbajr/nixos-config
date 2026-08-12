@@ -1,0 +1,5 @@
+// Monitor selection — Dell notebook (physical)
+// Keep this in sync with home/configs/niri/config/outputs-dell.kdl
+{
+    "output": ["eDP-1"]
+}

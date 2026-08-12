@@ -109,5 +109,6 @@ in {
   home-manager.users.${username} = {
     xdg.configFile."niri/config/input.kdl".source   = niriInput;
     xdg.configFile."niri/config/outputs.kdl".source = niriOutputs;
+    xdg.configFile."waybar/output.jsonc".source     = ../../home/configs/waybar/output-macvm.jsonc;
   };
 }
