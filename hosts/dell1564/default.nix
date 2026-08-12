@@ -107,9 +107,9 @@ in {
   # Not repeated here to avoid duplicate entries in systemPackages.
 
   # ==================== HOME MANAGER (host-specific, fase 3) ====================
-  # Override only the niri input fragment for Dell ABNT2 keyboard.
-  # lazygit lives in the common home/configs.
+  # Override niri input + outputs for Dell ABNT2 keyboard and internal panel.
   home-manager.users.${username} = {
-    xdg.configFile."niri/input.kdl".source = ../../home/configs/niri/input-dell.kdl;
+    xdg.configFile."niri/input.kdl".source   = ../../home/configs/niri/input-dell.kdl;
+    xdg.configFile."niri/outputs.kdl".source = ../../home/configs/niri/outputs-dell.kdl;
   };
 }

@@ -1,8 +1,12 @@
-// Monitor configuration.
-// Find the output name by running `niri msg outputs`.
-// https://niri-wm.github.io/niri/Configuration:-Outputs
+// Fallback outputs.kdl (used only if a host does not override it).
+// Host-specific files:
+//   outputs-mac2011.kdl  → mac2011
+//   outputs-dell.kdl     → dell1564
+//   outputs-macvm.kdl    → macutm + macvmf
+// Override is done in hosts/*/default.nix and hosts/common/mac-vm-workstation.nix
+// via home-manager xdg.configFile."niri/outputs.kdl".
+// Confirm real name with: niri msg outputs
 
-// MacBook 2011 built-in display
 output "LVDS-1" {
     mode "1280x800@60.223"
     scale 1

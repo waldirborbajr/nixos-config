@@ -7,7 +7,8 @@
 let
   inherit (common) username;
   # Local configs now live inside the flake (fase 3)
-  niriInput = ../../home/configs/niri/input-mac.kdl;
+  niriInput   = ../../home/configs/niri/input-mac.kdl;
+  niriOutputs = ../../home/configs/niri/outputs-macvm.kdl;
 in {
   # ==================== BOOT ====================
   boot.loader.systemd-boot.enable = true;
@@ -51,10 +52,15 @@ in {
 
   programs.firefox.enable = lib.mkDefault true;
 
+  # ==================== GRAPHICS (VM / virtio-gpu) ====================
+  # Required for niri (Wayland) under UTM / Fusion — avoids black screen after login.
+  hardware.graphics.enable = true;
+  boot.kernelModules = [ "virtio_gpu" "virtio_pci" ];
+
   # ==================== HOME MANAGER (host-specific, fase 3) ====================
-  # Override only the niri input fragment for Mac keyboard / trackpad in VMs.
-  # lazygit is already in the common home/configs; no need to re-declare.
+  # Override niri input + outputs for Mac keyboard/trackpad and Virtual-1 display.
   home-manager.users.${username} = {
-    xdg.configFile."niri/input.kdl".source = niriInput;
+    xdg.configFile."niri/input.kdl".source   = niriInput;
+    xdg.configFile."niri/outputs.kdl".source = niriOutputs;
   };
 }
