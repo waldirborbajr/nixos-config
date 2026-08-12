@@ -109,7 +109,7 @@ in {
   # ==================== HOME MANAGER (host-specific, fase 3) ====================
   # Override niri input + outputs for Dell ABNT2 keyboard and internal panel.
   home-manager.users.${username} = {
-    xdg.configFile."niri/input.kdl".source   = ../../home/configs/niri/input-dell.kdl;
-    xdg.configFile."niri/outputs.kdl".source = ../../home/configs/niri/outputs-dell.kdl;
+    xdg.configFile."niri/config/input.kdl".source   = ../../home/configs/niri/config/input-dell.kdl;
+    xdg.configFile."niri/config/outputs.kdl".source = ../../home/configs/niri/config/outputs-dell.kdl;
   };
 }
