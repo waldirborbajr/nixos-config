@@ -3,7 +3,7 @@
 # Base compartilhada pelas VMs Mac (macutm e macvmf). Só o agente de guest
 # da VM (UTM vs VMware Fusion) e o hardware-configuration.nix continuam
 # específicos de cada host — o resto é idêntico entre os dois.
-{ lib, pkgs, common, ... }:
+{ lib, pkgs, pkgs-unstable, common, ... }:
 let
   inherit (common) username;
   # Local configs now live inside the flake (fase 3)
@@ -68,14 +68,18 @@ in {
     networkmanagerapplet # applet de rede na systray
     wl-clipboard        # clipboard Wayland
     kooha               # gravador de tela
-    diskonaut-ng        # TUI de espaço em disco
     hyprlax             # dynamic/parallax wallpaper daemon (confirmado no nixos-26.05, não precisa de pkgs-unstable)
     satty               # anotação de screenshot (nixpkgs usa "satty", não "satty-shot")
-    handy               # speech to text (app tauri/rust)
     pear-desktop        # youtube music com suporte a mpris
     snitch              # inspeciona conexões de rede
     wooz                # zoom / magnifier utility
-  ];
+  ]
+  # ---- Só existem na nixos-unstable até agora — ainda não chegaram no branch
+  # nixos-26.05 (confirmei contra o HEAD atual do branch, não só o seu pin) ----
+  ++ (with pkgs-unstable; [
+    diskonaut-ng # TUI de espaço em disco
+    handy        # speech to text (app tauri/rust)
+  ]);
 
   # ---- NÃO adicionados: exigem flake input / overlay que este repo ainda não tem ----
   # As linhas abaixo ficam comentadas de propósito — adicionar como está quebraria o
