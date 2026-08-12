@@ -9,7 +9,7 @@
 #
 # Usage:
 #   ./nixos-manager.sh                    # opens the interactive menu
-#   ./nixos-manager.sh <option>            # runs directly: legacy | flake | clean | update
+#   ./nixos-manager.sh <option>            # runs directly: legacy | flake | clean | update | generation
 #   ./nixos-manager.sh <option> <host>     # runs directly on a specific host: flake dell
 #   NIXOS_FLAKE_ATTR=dell ./nixos-manager.sh flake   # force the host via env var
 #
@@ -699,6 +699,55 @@ update_system() {
   git_push_if_ahead
 }
 
+show_generation() {
+  log "System profile generations (/nix/var/nix/profiles/system):"
+  echo
+
+  # Full list (oldest → newest). The last line is the current generation.
+  local list
+  if ! list="$(sudo nix-env --list-generations -p /nix/var/nix/profiles/system 2>/dev/null)"; then
+    err "Could not list generations (need sudo / profile missing)."
+    return 1
+  fi
+
+  if [ -z "$list" ]; then
+    warn "No generations found."
+    return 0
+  fi
+
+  echo -e "${C_OVERLAY}${list}${C_RESET}"
+  echo
+
+  local last current_id current_date
+  last="$(echo "$list" | tail -n1)"
+  current_id="$(echo "$last" | awk '{print $1}')"
+  current_date="$(echo "$last" | awk '{print $2, $3}')"
+
+  # nix-env marks the current one with "(current)" on the same line
+  if echo "$last" | grep -q '(current)'; then
+    ok "Current generation: ${C_BOLD}${current_id}${C_RESET}  ${C_OVERLAY}(${current_date})${C_RESET}"
+  else
+    # Fallback: read the profile symlink target
+    local link
+    link="$(readlink -f /nix/var/nix/profiles/system 2>/dev/null || true)"
+    if [[ "$link" =~ -([0-9]+)-link$ ]]; then
+      current_id="${BASH_REMATCH[1]}"
+    fi
+    ok "Last generation listed: ${C_BOLD}${current_id}${C_RESET}  ${C_OVERLAY}(${current_date})${C_RESET}"
+  fi
+
+  # Also show bootloader default if systemd-boot is present
+  if [ -d /boot/loader/entries ] || [ -d /boot/EFI/Linux ]; then
+    echo
+    log "Bootloader entries (systemd-boot):"
+    if command -v bootctl >/dev/null 2>&1; then
+      bootctl list 2>/dev/null | head -n 40 || true
+    else
+      ls -1 /boot/loader/entries 2>/dev/null || ls -1 /boot/EFI/Linux 2>/dev/null || true
+    fi
+  fi
+}
+
 rollback_system() {
   log "Available generations:"
   sudo nix-env --list-generations -p /nix/var/nix/profiles/system
@@ -847,6 +896,7 @@ show_menu() {
   echo -e " ${C_BLUE}${C_BOLD}8)${C_RESET} List hosts"
   echo -e " ${C_BLUE}${C_BOLD}9)${C_RESET} List branches"
   echo -e " ${C_RED}${C_BOLD}a)${C_RESET} Prune local branches ${C_OVERLAY}(no match on origin)${C_RESET}"
+  echo -e " ${C_TEAL}${C_BOLD}g)${C_RESET} Show last generation ${C_OVERLAY}(nix profile + boot)${C_RESET}"
   echo -e " ${C_BOLD}q)${C_RESET} Quit"
   echo
 }
@@ -866,6 +916,7 @@ run_choice() {
     8|hosts) list_hosts ;;
     9|branches) list_branches_cmd ;;
     a|A|prune) prune_local_branches ;;
+    g|G|generation|generations) show_generation ;;
     q|quit|exit) exit 0 ;;
     *) err "Invalid option: $choice"; return 1 ;;
   esac
