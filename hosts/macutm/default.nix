@@ -8,6 +8,6 @@
   environment.sessionVariables = {
     WLR_NO_HARDWARE_CURSORS = "1";
     # último recurso se ainda falhar:
-    # WLR_RENDERER = "pixman";
+    WLR_RENDERER = "pixman";
   };
 }
