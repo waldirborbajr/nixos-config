@@ -108,6 +108,10 @@ in {
       source = "${configs}/niri";
       recursive = true;
     };
+    "niri/outputs.kdl" = {
+  source = niriOutputs;
+  force = true;
+};
     "waybar" = {
       source = "${configs}/waybar";
       recursive = true;
