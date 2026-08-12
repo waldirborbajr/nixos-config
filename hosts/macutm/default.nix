@@ -1,8 +1,13 @@
-# hosts/macutm/default.nix
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 {
   imports = [ ../common/mac-vm-workstation.nix ];
 
-  # UTM (Apple Silicon) — agente de clipboard compartilhado com o host
   environment.systemPackages = [ pkgs.spice-vdagent ];
+
+  # cursor / DRM em virtio às vezes quebra sem isso
+  environment.sessionVariables = {
+    WLR_NO_HARDWARE_CURSORS = "1";
+    # último recurso se ainda falhar:
+    # WLR_RENDERER = "pixman";
+  };
 }
