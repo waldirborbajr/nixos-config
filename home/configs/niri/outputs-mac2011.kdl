@@ -1,0 +1,10 @@
+// Monitor configuration — MacBook Pro 2011 (physical)
+// Confirm with: niri msg outputs
+// https://niri-wm.github.io/niri/Configuration:-Outputs
+
+output "LVDS-1" {
+    mode "1280x800@60.223"
+    scale 1
+    transform "normal"
+    position x=0 y=0
+}

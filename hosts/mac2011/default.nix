@@ -96,8 +96,9 @@ in {
   # Not repeated here to avoid duplicate entries in systemPackages.
 
   # ==================== HOME MANAGER (host-specific, fase 3) ====================
-  # Override only the niri input fragment for physical MacBook 2011 + K380.
+  # Override niri input + outputs for physical MacBook 2011 + K380.
   home-manager.users.${username} = {
-    xdg.configFile."niri/input.kdl".source = ../../home/configs/niri/input-mac2011.kdl;
+    xdg.configFile."niri/input.kdl".source   = ../../home/configs/niri/input-mac2011.kdl;
+    xdg.configFile."niri/outputs.kdl".source = ../../home/configs/niri/outputs-mac2011.kdl;
   };
 }
