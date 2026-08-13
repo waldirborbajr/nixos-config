@@ -70,7 +70,6 @@ window-rule {
     match app-id="localsend"
     match app-id="com.github.wwmm.easyeffects"
     match app-id="org.raspberrypi.rpi-imager"
-    match app-id="org.pulseaudio.pavucontrol"
     match app-id="OpenFlipper"
     open-floating true
 }
@@ -183,16 +182,90 @@ window-rule {
     open-floating true
 }
 
-// Example: block out two password managers from screen capture.
-// (This example rule is commented out with a "/-" in front.)
-/-window-rule {
+// Block out password managers from screencasts.
+window-rule {
     match app-id=r#"^org\.keepassxc\.KeePassXC$"#
     match app-id=r#"^org\.gnome\.World\.Secrets$"#
+    block-out-from "screencast"
+}
 
-    block-out-from "screen-capture"
+// Block Kooha's own window from being captured by itself.
+window-rule {
+    match app-id=r#"^io\.github\.seadve\.Kooha$"#
+    block-out-from "screencast"
+}
 
-    // Use this instead if you want them visible on third-party screenshot tools.
-    // block-out-from "screencast"
+// -------- named-workspace routing --------
+// niri creates a named workspace on the fly the first time something opens
+// on it via open-on-workspace, no need to pre-declare "nix"/"mon" elsewhere.
+
+// fastfetch already installed; nitch is NOT — add it to
+// hosts/common/mac-vm-workstation.nix if you want this rule to ever match it.
+window-rule {
+    match app-id=r#"^fastfetch$"#
+    match app-id=r#"^nitch$"#
+    open-on-workspace "nix"
+}
+
+// btm-monitor is the --class used in the wezterm startup spawn.
+// Requires "bottom" (binary "btm") to be installed — not in the repo yet.
+window-rule {
+    match at-startup=true app-id=r#"^btm-monitor$"#
+    open-on-workspace "mon"
+    open-maximized true
+}
+
+// Web browsing on its own workspace.
+window-rule {
+    match at-startup=true app-id="firefox"
+    open-on-workspace "web"
+    open-maximized true
+}
+
+// -------- scratchpad-style floating utilities --------
+window-rule {
+    match app-id="nemo"
+    open-on-workspace "scratch"
+    open-floating true
+    default-column-width { fixed 1157; }
+    default-window-height { fixed 736; }
+    popups {
+        geometry-corner-radius 6
+        opacity 0.85
+        background-effect {
+            blur true
+        }
+    }
+}
+
+window-rule {
+    match app-id="Spotify|spotify"
+    open-on-workspace "scratch"
+    open-floating true
+    default-column-width { fixed 1596; }
+    default-window-height { fixed 1240; }
+    popups {
+        geometry-corner-radius 6
+        opacity 0.85
+        background-effect {
+            blur true
+        }
+    }
+}
+
+window-rule {
+    match app-id="org.pulseaudio.pavucontrol"
+    open-on-workspace "scratch"
+    open-floating true
+    default-column-width { fixed 1438; }
+    default-window-height { fixed 846; }
+}
+
+// -------- floating utility windows --------
+window-rule {
+    match app-id="xdg-desktop-portal-gtk"
+    match app-id="org.gnome.Loupe"
+    open-floating true
 }
 
 // Example: enable rounded corners for all windows.
