@@ -13,10 +13,10 @@ include "config/workspaces.kdl"
 
 
 // essential apps
-// spawn-at-startup "helium"
-// spawn-at-startup "spotify"
+spawn-at-startup "helium"
+spawn-at-startup "spotify"
 // spawn-at-startup "nemo"
-// spawn-at-startup "pavucontrol"
+spawn-at-startup "pavucontrol"
 
 // systray apps
 // spawn-at-startup "blueman-applet"
@@ -29,3 +29,7 @@ include "config/workspaces.kdl"
 // spawn-sh-at-startup "kitty -d ~/workspace/nix-config --app-id='nitch' --hold 'nitch' &"
 // spawn-sh-at-startup "kitty -d ~/workspace/nix-config --app-id='fastfetch' --hold 'fastfetch' &"
 // spawn-sh-at-startup "kitty -d ~/workspace/nix-config --app-id='btm-monitor' --hold 'btm' &"
+
+spawn-sh-at-startup "wezterm start --class 'nitch' --cwd ~/nixos-config -- zsh -ic 'nitch; exec zsh' &"
+spawn-sh-at-startup "wezterm start --class 'fastfetch' --cwd ~/nixos-config -- zsh -ic 'fastfetch; exec zsh' &"
+spawn-sh-at-startup "wezterm start --class 'btm-monitor' --cwd ~/nixos-config -- zsh -ic 'btm; exec zsh' &"
