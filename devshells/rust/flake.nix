@@ -57,6 +57,8 @@
             cargo-nextest
             clang
             llvmPackages.bintools
+            mold
+            sccache
             openssl
             zlib
             postgresql
@@ -70,6 +72,8 @@
 
           RUST_SRC_PATH = "${stableToolchain}/lib/rustlib/src/rust/library";
           LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
+          RUSTC_WRAPPER = "${pkgs.sccache}/bin/sccache";
+          RUSTFLAGS = "-C link-arg=-fuse-ld=mold";
 
           shellHook = ''
             echo "🦀 Rust Development Environment (stable)"
@@ -79,6 +83,7 @@
             echo "Available tools:"
             echo "  - cargo-edit, cargo-watch, cargo-make, cargo-nextest"
             echo "  - clippy, rustfmt, rust-analyzer"
+            echo "  - mold (linker) + sccache (compile cache) ativos via RUSTFLAGS/RUSTC_WRAPPER"
           '';
         };
 
@@ -97,6 +102,8 @@
             cargo-nextest
             clang
             llvmPackages.bintools
+            mold
+            sccache
             openssl
             zlib
             postgresql
@@ -110,11 +117,14 @@
 
           RUST_SRC_PATH = "${nightlyToolchain}/lib/rustlib/src/rust/library";
           LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
+          RUSTC_WRAPPER = "${pkgs.sccache}/bin/sccache";
+          RUSTFLAGS = "-C link-arg=-fuse-ld=mold";
 
           shellHook = ''
             echo "🦀 Rust Development Environment (nightly)"
             echo "Rust version: $(rustc --version)"
             echo "Cargo version: $(cargo --version)"
+            echo "  - mold (linker) + sccache (compile cache) ativos via RUSTFLAGS/RUSTC_WRAPPER"
           '';
         };
       in
