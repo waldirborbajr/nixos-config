@@ -35,10 +35,12 @@ in {
     broadcom_sta
   ];
 
-  # Ferramentas de debug wireless (úteis só com o chip físico)
+  # Ferramentas de debug wireless (úteis só com o chip físico) +
+  # Spotify: só neste host (não disponível p/ aarch64-linux das VMs UTM/Fusion)
   environment.systemPackages = lib.mkAfter (with pkgs; [
     iw
     wirelesstools
+    spotify
   ]);
 
   # ==================== HOME MANAGER (niri/waybar do hardware físico) ====================

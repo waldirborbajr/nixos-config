@@ -48,7 +48,10 @@ in {
     pasystray  # systray do pulseaudio
     pulsemixer # mixer de pulseaudio em TUI
     reaper     # DAW (unfree; allowUnfree já está ligado em configuration.nix/flake.nix)
-    spotify    # cliente oficial (unfree; allowUnfree já está ligado)
+    # spotify: NÃO fica aqui. Só existe binário oficial p/ x86_64-linux,
+    # x86_64-darwin e aarch64-darwin (não há build p/ aarch64-linux, caso do
+    # macutm/macvmf). Além disso o pedido é usar Spotify só no mac2011 —
+    # ver hosts/mac2011/default.nix.
   ]
   # ---- Desktop/Wayland extras — confirmados em nixpkgs ----
   ++ [
