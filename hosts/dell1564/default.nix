@@ -106,6 +106,11 @@ in {
   # NOTE: pkgs-unstable.neovim already comes from configuration.nix.
   # Not repeated here to avoid duplicate entries in systemPackages.
 
+  # ==================== BROWSER (leve, específico deste host) ====================
+  # Apenas Firefox estável — máquina antiga/lenta. Navegadores ficam por host,
+  # não no core (configuration.nix).
+  programs.firefox.enable = true;
+
   # ==================== HOME MANAGER (host-specific, fase 3) ====================
   # Override niri input + outputs for Dell ABNT2 keyboard and internal panel.
   home-manager.users.${username} = {

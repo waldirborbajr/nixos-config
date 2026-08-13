@@ -77,7 +77,11 @@ in {
   ++ (with pkgs-unstable; [
     diskonaut-ng # TUI de espaço em disco
     handy        # speech to text (app tauri/rust)
-  ]);
+  ])
+  # ---- Browsers (específicos deste host / VMs Mac) ----
+  ++ [
+    brave                 # Chromium-based (unfree; allowUnfree já ligado)
+  ];
 
   # ---- NÃO adicionados: exigem flake input / overlay que este repo ainda não tem ----
   # As linhas abaixo ficam comentadas de propósito — adicionar como está quebraria o
@@ -96,7 +100,12 @@ in {
   # Se você tem um overlay ou flake próprio que fornece isso, me avisa que eu adiciono
   # o input no flake.nix e habilito essas linhas.
 
-  programs.firefox.enable = lib.mkDefault true;
+  # Firefox module: usa Developer Edition como o binário `firefox` padrão.
+  # (não instala o firefox estável; só de vedition + brave)
+  programs.firefox = {
+    enable = true;
+    package = pkgs.firefox-devedition;
+  };
 
   # ==================== GRAPHICS (VM / virtio-gpu) ====================
   # Required for niri (Wayland) under UTM / Fusion — avoids black screen after login.

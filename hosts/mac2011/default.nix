@@ -95,6 +95,17 @@ in {
   # NOTE: pkgs-unstable.neovim already comes from configuration.nix.
   # Not repeated here to avoid duplicate entries in systemPackages.
 
+  # ==================== BROWSERS (iguais às VMs Mac) ====================
+  # Navegadores ficam por host, não no core.
+  environment.systemPackages = lib.mkAfter [
+    pkgs.brave                 # Chromium-based (unfree; allowUnfree já ligado)
+  ];
+
+  programs.firefox = {
+    enable = true;
+    package = pkgs.firefox-devedition;
+  };
+
   # ==================== HOME MANAGER (host-specific, fase 3) ====================
   # Override niri input + outputs for physical MacBook 2011 + K380.
   home-manager.users.${username} = {
