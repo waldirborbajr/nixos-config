@@ -231,6 +231,8 @@ in {
       wget
       curl
       git
+      gh # github-cli
+      gh-dash
       tmux
       bat
       ripgrep

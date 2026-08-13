@@ -43,11 +43,8 @@ in {
 
     podman lazydocker gcc gnumake cmake gdb glibc libgcc libcxx
 
-    rust-analyzer rustfmt
     lua-language-server stylua
-    gotools golangci-lint-langserver
-
-    python3Packages.python-lsp-server black taplo marksman
+    taplo marksman
   ]
   # ---- Áudio (pulseaudio/DAW) — confirmados em nixpkgs ----
   ++ [

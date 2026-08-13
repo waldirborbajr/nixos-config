@@ -87,6 +87,10 @@
             packages = [
               virtualenv
               pkgs.uv
+              # LSP + formatter/linter (equivalente ao que existia no sistema)
+              pkgs.python3Packages.python-lsp-server
+              pkgs.black
+              pkgs.ruff
             ];
             env = {
               UV_NO_CACHE = "1";

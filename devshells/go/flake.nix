@@ -27,6 +27,7 @@
             gotools
             gofumpt
             golangci-lint
+            golangci-lint-langserver # wrapper LSP, equivalente ao que existia no sistema
             go-task
             air
 
