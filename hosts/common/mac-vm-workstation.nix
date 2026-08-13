@@ -55,6 +55,7 @@ in {
     pasystray  # systray do pulseaudio
     pulsemixer # mixer de pulseaudio em TUI
     reaper     # DAW (unfree; allowUnfree já está ligado em configuration.nix/flake.nix)
+    spotify    # cliente oficial (unfree; allowUnfree já está ligado)
     # playerctl e pavucontrol já estão na lista acima, não duplicados
   ]
   # ---- Desktop/Wayland extras — confirmados em nixpkgs ----
