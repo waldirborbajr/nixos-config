@@ -55,7 +55,7 @@ window-rule {
 }
 
 window-rule {
-    match app-id="firefox"
+    match app-id="firefox-devedition"
     default-column-width { proportion 0.75; }
 }
 
@@ -174,12 +174,6 @@ window-rule {
         on
         inactive-color "#88c0d0"
     }
-}
-
-// FreeCAD
-window-rule {
-    match app-id="org.freecad.FreeCAD" title="Unsaved Document"
-    open-floating true
 }
 
 // Block out password managers from screencasts.
