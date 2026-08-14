@@ -204,7 +204,7 @@ window-rule {
 // btm-monitor is the --class used in the wezterm startup spawn.
 // Requires "bottom" (binary "btm") to be installed — not in the repo yet.
 window-rule {
-    match at-startup=true app-id=r#"^btm-monitor$"#
+    match at-startup=true app-id=r#"^btop$"#
     open-on-workspace "mon"
     open-maximized true
 }
