@@ -354,8 +354,6 @@ in {
         IdentityFile ${sshKeysDir}/id_ed25519_github
         IdentitiesOnly yes
     '';
-    # Iniciar o agente SSH automaticamente
-    startAgent = true;
   };
 
   # ==================== SOPS ====================
