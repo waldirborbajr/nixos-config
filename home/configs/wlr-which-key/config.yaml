@@ -62,10 +62,10 @@ menu:
         cmd: systemctl suspend
       - key: "r"
         desc: "Restart"
-        cmd: systemctl reboot
+        cmd: systemctl reboot -i
       - key: "S"
         desc: "Shutdown"
-        cmd: systemctl poweroff
+        cmd: systemctl poweroff -i
       - key: "h"
         desc: "Hibernate"
         cmd: systemctl hibernate
