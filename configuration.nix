@@ -45,14 +45,15 @@ in {
     MemorySleepMode = "s2idle";
   };
 
+  # ==================== SECURITY / SESSION ====================
   security.polkit.enable = true;
+  security.soteria.enable = true; # polkit agent pro niri
+  security.pam.services.swaylock = {}; # unlock do swaylock
   services.gnome.gnome-keyring.enable = true;
-  security.pam.services.swaylock = {};
 
   # ==================== NETWORK ====================
   networking.hostName = hostname;
   networking.networkmanager.enable = true;
-
   networking.firewall.allowedTCPPorts = [22];
 
   # ==================== TIME / LOCALE ====================
@@ -112,7 +113,7 @@ in {
   };
 
   # Greeter precisa de acesso a DRM / input (obrigatório para cage + regreet)
-  users.users.greeter.extraGroups = [ "video" "input" "render" ];
+  users.users.greeter.extraGroups = ["video" "input" "render"];
 
   # ==================== HOME MANAGER (fase 3) ====================
   # User configs live in home/configs/ and are applied via home/default.nix.
@@ -156,61 +157,61 @@ in {
   # e WLR_NO_HARDWARE_CURSORS=1, senão o greeter sai imediatamente.
   services.greetd.enable = true;
 
-programs.regreet = {
-  enable = true;
+  programs.regreet = {
+    enable = true;
 
-  theme = {
-    name = "Catppuccin-Mocha-Standard-Mauve-Dark";
-    package = pkgs.catppuccin-gtk.override {
-      accents = [ "mauve" ];
-      size = "standard";
-      tweaks = [ ];
-      variant = "mocha";
-    };
-  };
-
-  iconTheme = {
-    name = "Papirus-Dark";
-    package = pkgs.symlinkJoin {
-      name = "papirus-catppuccin-mauve";
-      paths = [
-        pkgs.papirus-icon-theme
-        (pkgs.catppuccin-papirus-folders.override {
-          accent = "mauve";
-          flavor = "mocha";
-        })
-      ];
-    };
-  };
-
-  cursorTheme = {
-    name = "Catppuccin-Mocha-Mauve-Cursors";
-    package = pkgs.catppuccin-cursors.mochaMauve;
-  };
-
-  font = {
-    name = "JetBrainsMono Nerd Font";
-    size = 12;
-  };
-
-  cageArgs = [ "-s" ];
-
-  settings = {
-    GTK = {
-      application_prefer_dark_theme = true;
-      theme_name = "Catppuccin-Mocha-Standard-Mauve-Dark";
-      icon_theme_name = "Papirus-Dark";
-      cursor_theme_name = "Catppuccin-Mocha-Mauve-Cursors";
-      font_name = "JetBrainsMono Nerd Font 12";
+    theme = {
+      name = "Catppuccin-Mocha-Standard-Mauve-Dark";
+      package = pkgs.catppuccin-gtk.override {
+        accents = ["mauve"];
+        size = "standard";
+        tweaks = [];
+        variant = "mocha";
+      };
     };
 
-    # Wallpaper da tela de login (tem que ficar aqui dentro de settings)
-    background = {
-      path = "${./home/configs/wallpapers/login.jpg}";
-      fit = "Fill";   # Cover | Contain | Fill | ScaleDown
+    iconTheme = {
+      name = "Papirus-Dark";
+      package = pkgs.symlinkJoin {
+        name = "papirus-catppuccin-mauve";
+        paths = [
+          pkgs.papirus-icon-theme
+          (pkgs.catppuccin-papirus-folders.override {
+            accent = "mauve";
+            flavor = "mocha";
+          })
+        ];
+      };
+    };
+
+    cursorTheme = {
+      name = "Catppuccin-Mocha-Mauve-Cursors";
+      package = pkgs.catppuccin-cursors.mochaMauve;
+    };
+
+    font = {
+      name = "JetBrainsMono Nerd Font";
+      size = 12;
+    };
+
+    cageArgs = ["-s"];
+
+    settings = {
+      GTK = {
+        application_prefer_dark_theme = true;
+        theme_name = "Catppuccin-Mocha-Standard-Mauve-Dark";
+        icon_theme_name = "Papirus-Dark";
+        cursor_theme_name = "Catppuccin-Mocha-Mauve-Cursors";
+        font_name = "JetBrainsMono Nerd Font 12";
+      };
+
+      # Wallpaper da tela de login (tem que ficar aqui dentro de settings)
+      background = {
+        path = "${./home/configs/wallpapers/login.jpg}";
+        fit = "Fill"; # Cover | Contain | Fill | ScaleDown
+      };
     };
   };
-};
 
   # NOTA: o override de comando do greetd com WLR_RENDERER=pixman (necessário
   # só em virtio-gpu/VMware Fusion) foi movido para hosts/common/mac-vm-workstation.nix
@@ -218,14 +219,6 @@ programs.regreet = {
   # (mac2011/dell1564), que tem GPU real e deveria usar o renderer acelerado.
 
   services.displayManager.defaultSession = "niri";
-  security.polkit.enable = true;
-
-  # Polkit auth agent para o niri (standalone WM, sem DE que já forneça um).
-  # Substitui o antigo spawn-at-startup "/usr/lib/soteria-polkit/soteria" do
-  # startup.kdl/misc.kdl — aquele caminho é FHS (Arch/Ubuntu) e não existe no
-  # NixOS. Este módulo já cuida de instalar o pacote e rodar como serviço de
-  # usuário; remova a linha spawn-at-startup correspondente dos configs do niri.
-  security.soteria.enable = true;
 
   # waybar tem o módulo "power-profiles-daemon" no config.jsonc; sem o serviço
   # dbus rodando, esse módulo simplesmente fica quebrado/vazio.
@@ -234,12 +227,6 @@ programs.regreet = {
   # gsettings (usado no misc.kdl pra setar o tema do cursor) precisa do dconf
   # rodando; sem isso o comando falha silenciosamente.
   programs.dconf.enable = true;
-
-  # lock screen usado pelo bind padrão do noctalia (Mod+L -> lockScreen lock)
-  # `programs.swaylock.enable` NÃO existe no NixOS puro (é opção do
-  # home-manager) — aqui é só o pacote + PAM manual, senão o unlock falha
-  # com "pam_authenticate failed: invalid credentials".
-  security.pam.services.swaylock = {};
 
   programs.direnv = {
     enable = true;
@@ -256,6 +243,19 @@ programs.regreet = {
     pulse.enable = true;
   };
 
+  # ==================== BLUETOOTH ====================
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+    settings = {
+      General = {
+        Experimental = true;
+        FastConnectable = true;
+      };
+    };
+  };
+  services.blueman.enable = true;
+
   # ==================== PROGRAMS ====================
   nixpkgs.config.allowUnfree = true;
 
@@ -269,10 +269,6 @@ programs.regreet = {
     vim = "hx";
     nvim = "hx";
   };
-
-  # SSH client host-specific identity selection is handled by the activation
-  # script below, which writes /etc/ssh/ssh_config.d/50-borba.conf for this
-  # NixOS release.
 
   # ==================== PACKAGES ====================
   environment.systemPackages =
@@ -317,6 +313,7 @@ programs.regreet = {
       nextcloud-client # fornece o binário "nextcloud" chamado no misc.kdl
       capitaine-cursors # tema de cursor setado via gsettings no misc.kdl
       qt6Packages.qt6ct # QT_QPA_PLATFORMTHEME=qt6ct está setado no misc.kdl
+      seahorse # GUI do gnome-keyring
     ])
     ++ (with pkgs-unstable; [
       neovim
@@ -343,21 +340,6 @@ programs.regreet = {
 
   nix.settings.experimental-features = ["nix-command" "flakes"];
 
-# ==================== BLUETOOTH ====================
-hardware.bluetooth = {
-  enable = true;
-  powerOnBoot = true;          # liga o adaptador no boot
-  settings = {
-    General = {
-      Experimental = true;     # mostra bateria de dispositivos suportados
-      FastConnectable = true;
-    };
-  };
-};
-
-# GUI para parear (niri não tem gerenciador próprio)
-services.blueman.enable = true;
-
   # ==================== SSH ====================
   services.openssh = {
     enable = true;
@@ -372,9 +354,7 @@ services.blueman.enable = true;
 
   sops = {
     defaultSopsFile = ./hosts/${hostname}/secrets/${hostname}.yaml;
-
     age.keyFile = "/home/${username}/.config/sops/age/keys.txt";
-
     validateSopsFiles = false;
   };
 
@@ -457,7 +437,6 @@ services.blueman.enable = true;
   '';
 
   # ==================== ZERO-TOUCH SSH HOST KEY BOOTSTRAP ====================
-
   systemd.services.ssh-hostkey-bootstrap = {
     description = "Bootstrap SSH host key into SOPS on first boot";
 
