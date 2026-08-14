@@ -204,8 +204,8 @@ programs.regreet = {
 
   # Wallpaper da tela de login
     background = {
-      path = "/caminho/para/sua/imagem.png";  # ou .jpg
-      fit = "Cover";   # Cover | Contain | Fill | ScaleDown
+      path = "${./home/configs/wallpapers/login.jpg}";
+      fit = "Fill";   # Cover | Contain | Fill | ScaleDown
     };
 };
 
