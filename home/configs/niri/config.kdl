@@ -34,4 +34,4 @@ spawn-at-startup "helium"
 
 spawn-sh-at-startup "wezterm start --class 'nitch' --cwd ~/nixos-config -- zsh -ic 'nitch; exec zsh' &"
 spawn-sh-at-startup "wezterm start --class 'fastfetch' --cwd ~/nixos-config -- zsh -ic 'fastfetch; exec zsh' &"
-spawn-sh-at-startup "wezterm start --class 'btm-monitor' --cwd ~/nixos-config -- zsh -ic 'btm; exec zsh' &"
+spawn-sh-at-startup "wezterm start --class 'btop-monitor' --cwd ~/nixos-config -- zsh -ic 'btop; exec zsh' &"
