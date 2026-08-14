@@ -146,76 +146,25 @@ in {
   # NOTA (branch de teste): mesmo bug documentado antes continua valendo
   # pro ly em si (settings merge / cores / tema), independente do WM por
   # trás da sessão.
-  #
-  # ---- LY (comentado — substituído por greetd+regreet abaixo) ----
-  # services.displayManager.ly = {
-  #   enable = true;
-  #   settings = {
-  #     animation = "matrix";
-  #     bigclock = true;
-  #
-  #     bg = "0x001e1e2e";          # Base
-  #     fg = "0x00cba6f7";          # Mauve (mesmo accent do resto do seu setup)
-  #     border_fg = "0x00cba6f7";   # Mauve
-  #     error_fg = "0x00f38ba8";    # Red (Catppuccin, não vermelho puro)
-  #     clock_color = "0x00cba6f7"; # Mauve
-  #
-  #     term_reset_cmd = "/usr/bin/tput reset; echo -en \"\\e]P01e1e2e\"; echo -en \"\\e]P7cdd6f4\\ec\"; clear";
-  #
-  #     blank_password = true;
-  #     hide_borders = false;
-  #     default_input = "login";
-  #     load = true;
-  #     save = true;
-  #   };
-  # };
-
-  # ==================== GREETD + REGREET (Catppuccin Mocha/Mauve) ====================
-  # greetd é o daemon de login (agnóstico de compositor); regreet é o
-  # greeter gráfico GTK que roda em cima dele. O módulo programs.regreet
-  # já configura o services.greetd.settings.default_session pra rodar o
-  # regreet dentro do cage (compositor Wayland minimalista só pra tela de
-  # login) — não precisa declarar isso manualmente.
-  services.greetd.enable = true;
-
-  programs.regreet = {
+  services.displayManager.ly = {
     enable = true;
+    settings = {
+      animation = "matrix";
+      bigclock = true;
 
-    theme = {
-      name = "Catppuccin-Mocha-Standard-Mauve-Dark";
-      package = pkgs.catppuccin-gtk.override {
-        accents = ["mauve"];
-        size = "standard";
-        tweaks = [];
-        variant = "mocha";
-      };
-    };
+      bg = "0x001e1e2e";          # Base
+      fg = "0x00cba6f7";          # Mauve (mesmo accent do resto do seu setup)
+      border_fg = "0x00cba6f7";   # Mauve
+      error_fg = "0x00f38ba8";    # Red (Catppuccin, não vermelho puro)
+      clock_color = "0x00cba6f7"; # Mauve
 
-    # catppuccin-papirus-folders só tinge as pastas do ícone Papirus-Dark
-    # já existente — o pacote base tem que estar instalado também.
-    iconTheme = {
-      name = "Papirus-Dark";
-      package = pkgs.symlinkJoin {
-        name = "papirus-catppuccin-mauve";
-        paths = [
-          pkgs.papirus-icon-theme
-          (pkgs.catppuccin-papirus-folders.override {
-            accent = "mauve";
-            flavor = "mocha";
-          })
-        ];
-      };
-    };
+      term_reset_cmd = "/usr/bin/tput reset; echo -en \"\\e]P01e1e2e\"; echo -en \"\\e]P7cdd6f4\\ec\"; clear";
 
-    cursorTheme = {
-      name = "Catppuccin-Mocha-Mauve-Cursors";
-      package = pkgs.catppuccin-cursors.mochaMauve;
-      size = 24;
-    };
-
-    font = {
-      name = "JetBrainsMono Nerd Font";
-      size = 12;
+      blank_password = true;
+      hide_borders = false;
+      default_input = "login";
+      load = true;
+      save = true;
     };
   };
 
