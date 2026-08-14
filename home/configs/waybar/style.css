@@ -82,6 +82,7 @@ window#waybar {
 #battery,
 #network,
 #pulseaudio,
+#bluetooth,          /* ← adicione */
 #power-profiles-daemon,
 #backlight,
 #idle_inhibitor,
