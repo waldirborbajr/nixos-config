@@ -48,6 +48,17 @@ services.mako = {
   };
 };
 
+# home/default.nix
+
+services.gnome-keyring = {
+  enable = true;
+  components = [ "pkcs11" "secrets" "ssh" ];
+};
+
+# Se quiser usar o keyring como SSH agent:
+home.sessionVariables.SSH_AUTH_SOCK = "$XDG_RUNTIME_DIR/keyring/ssh";
+
+
   # ------------------------------------------------------------------
   # Shell (ZDOTDIR layout preserved)
   # ------------------------------------------------------------------
