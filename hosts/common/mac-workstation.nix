@@ -27,6 +27,7 @@ in {
   environment.systemPackages = with pkgs; [
     zellij yazi jq just duf psmisc asciinema
     lazygit jujutsu lazyjj
+    nitch
 
     flameshot vlc
 
