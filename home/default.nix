@@ -31,6 +31,23 @@ in {
 
   xdg.enable = true;
 
+# home/default.nix
+
+services.mako = {
+  enable = true;
+  settings = {
+    # opcional — estilo Catppuccin Mocha
+    background-color = "#1e1e2e";
+    text-color = "#cdd6f4";
+    border-color = "#cba6f7";
+    border-size = 2;
+    border-radius = 8;
+    padding = "10";
+    default-timeout = 5000;
+    font = "JetBrainsMono Nerd Font 11";
+  };
+};
+
   # ------------------------------------------------------------------
   # Shell (ZDOTDIR layout preserved)
   # ------------------------------------------------------------------
