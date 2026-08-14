@@ -339,8 +339,22 @@ programs.regreet = {
 
   nix.settings.experimental-features = ["nix-command" "flakes"];
 
-  # ==================== SSH ====================
+# ==================== BLUETOOTH ====================
+hardware.bluetooth = {
+  enable = true;
+  powerOnBoot = true;          # liga o adaptador no boot
+  settings = {
+    General = {
+      Experimental = true;     # mostra bateria de dispositivos suportados
+      FastConnectable = true;
+    };
+  };
+};
 
+# GUI para parear (niri não tem gerenciador próprio)
+services.blueman.enable = true;
+
+  # ==================== SSH ====================
   services.openssh = {
     enable = true;
 
