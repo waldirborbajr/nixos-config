@@ -152,47 +152,56 @@ in {
   # e WLR_NO_HARDWARE_CURSORS=1, senão o greeter sai imediatamente.
   services.greetd.enable = true;
 
-  programs.regreet = {
-    enable = true;
+programs.regreet = {
+  enable = true;
 
-    theme = {
-      name = "Catppuccin-Mocha-Standard-Mauve-Dark";
-      package = pkgs.catppuccin-gtk.override {
-        accents = ["mauve"];
-        size = "standard";
-        tweaks = [];
-        variant = "mocha";
-      };
+  theme = {
+    name = "Catppuccin-Mocha-Standard-Mauve-Dark";
+    package = pkgs.catppuccin-gtk.override {
+      accents = [ "mauve" ];
+      size = "standard";
+      tweaks = [ ];
+      variant = "mocha";
     };
-
-    # catppuccin-papirus-folders só tinge as pastas do ícone Papirus-Dark
-    # já existente — o pacote base tem que estar instalado também.
-    iconTheme = {
-      name = "Papirus-Dark";
-      package = pkgs.symlinkJoin {
-        name = "papirus-catppuccin-mauve";
-        paths = [
-          pkgs.papirus-icon-theme
-          (pkgs.catppuccin-papirus-folders.override {
-            accent = "mauve";
-            flavor = "mocha";
-          })
-        ];
-      };
-    };
-
-    cursorTheme = {
-      name = "Catppuccin-Mocha-Mauve-Cursors";
-      package = pkgs.catppuccin-cursors.mochaMauve;
-    };
-
-    font = {
-      name = "JetBrainsMono Nerd Font";
-      size = 12;
-    };
-
-    cageArgs = [ "-s" ];
   };
+
+  iconTheme = {
+    name = "Papirus-Dark";
+    package = pkgs.symlinkJoin {
+      name = "papirus-catppuccin-mauve";
+      paths = [
+        pkgs.papirus-icon-theme
+        (pkgs.catppuccin-papirus-folders.override {
+          accent = "mauve";
+          flavor = "mocha";
+        })
+      ];
+    };
+  };
+
+  cursorTheme = {
+    name = "Catppuccin-Mocha-Mauve-Cursors";
+    package = pkgs.catppuccin-cursors.mochaMauve;
+  };
+
+  font = {
+    name = "JetBrainsMono Nerd Font";
+    size = 12;
+  };
+
+  cageArgs = [ "-s" ];
+
+  # Força explicitamente no TOML (mais confiável)
+  settings = {
+    GTK = {
+      application_prefer_dark_theme = true;
+      theme_name = "Catppuccin-Mocha-Standard-Mauve-Dark";
+      icon_theme_name = "Papirus-Dark";
+      cursor_theme_name = "Catppuccin-Mocha-Mauve-Cursors";
+      font_name = "JetBrainsMono Nerd Font 12";
+    };
+  };
+};
 
   # Força o comando com variáveis estáveis para VM (virtio-gpu / VMware Fusion)
   services.greetd.settings.default_session.command = lib.mkForce ''
