@@ -212,7 +212,7 @@ programs.regreet = {
   services.greetd.settings.default_session.command = lib.mkForce ''
     ${pkgs.dbus}/bin/dbus-run-session \
     env GSK_RENDERER=cairo WLR_NO_HARDWARE_CURSORS=1 WLR_RENDERER=pixman \
-    ${lib.getExe pkgs.cage} -s -- ${lib.getExe pkgs.greetd.regreet}
+    ${lib.getExe pkgs.cage} -s -- ${lib.getExe pkgs.regreet}
   '';
 
   services.displayManager.defaultSession = "niri";
