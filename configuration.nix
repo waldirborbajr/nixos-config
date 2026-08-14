@@ -191,7 +191,6 @@ programs.regreet = {
 
   cageArgs = [ "-s" ];
 
-  # Força explicitamente no TOML (mais confiável)
   settings = {
     GTK = {
       application_prefer_dark_theme = true;
@@ -200,13 +199,13 @@ programs.regreet = {
       cursor_theme_name = "Catppuccin-Mocha-Mauve-Cursors";
       font_name = "JetBrainsMono Nerd Font 12";
     };
-  };
 
-  # Wallpaper da tela de login
+    # Wallpaper da tela de login (tem que ficar aqui dentro de settings)
     background = {
       path = "${./home/configs/wallpapers/login.jpg}";
       fit = "Fill";   # Cover | Contain | Fill | ScaleDown
     };
+  };
 };
 
   # Força o comando com variáveis estáveis para VM (virtio-gpu / VMware Fusion)
