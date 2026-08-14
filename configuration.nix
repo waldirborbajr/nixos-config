@@ -201,6 +201,12 @@ programs.regreet = {
       font_name = "JetBrainsMono Nerd Font 12";
     };
   };
+
+  # Wallpaper da tela de login
+    background = {
+      path = "/caminho/para/sua/imagem.png";  # ou .jpg
+      fit = "Cover";   # Cover | Contain | Fill | ScaleDown
+    };
 };
 
   # Força o comando com variáveis estáveis para VM (virtio-gpu / VMware Fusion)
