@@ -205,3 +205,16 @@ window#waybar {
 .modules-right:last-child {
     margin-right: 6px;
 }
+
+
+#bluetooth {
+    background: @sapphire;
+    color: @base;
+}
+
+#bluetooth.disabled,
+#bluetooth.off {
+    background: @surface0;
+    color: @overlay0;
+}
+
