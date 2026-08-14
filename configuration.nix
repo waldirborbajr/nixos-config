@@ -45,6 +45,10 @@ in {
     MemorySleepMode = "s2idle";
   };
 
+  security.polkit.enable = true;
+  services.gnome.gnome-keyring.enable = true;
+  security.pam.services.swaylock = {};
+
   # ==================== NETWORK ====================
   networking.hostName = hostname;
   networking.networkmanager.enable = true;
