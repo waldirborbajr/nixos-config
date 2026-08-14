@@ -26,8 +26,6 @@ in {
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
   # ==================== SSH KEY DIR + REGREET DIRS (tmpfiles) ====================
-  # Only the SSH directory creation remains here so sops can write keys
-  # before the user session exists. All user configs are managed by HM.
   systemd.tmpfiles.rules = [
     "d ${sshKeysDir} 0700 ${username} users -"
     "d /var/log/regreet 0755 greeter greeter -"
@@ -46,8 +44,8 @@ in {
 
   # ==================== SECURITY / SESSION ====================
   security.polkit.enable = true;
-  security.soteria.enable = true; # polkit agent pro niri
-  security.pam.services.swaylock = {}; # unlock do swaylock
+  security.soteria.enable = true;
+  security.pam.services.swaylock = {};
   services.gnome.gnome-keyring.enable = true;
 
   # ==================== NETWORK ====================
@@ -94,12 +92,6 @@ in {
   };
 
   # ==================== SHELL ====================
-  # System-level zsh must be enabled whenever a user's login shell is
-  # pkgs.zsh, otherwise zsh won't be registered in /etc/shells and the
-  # Nix directories won't be added to its PATH (login may become
-  # impossible). This is distinct from home-manager's programs.zsh
-  # (in home/default.nix), which only manages the user's zsh config
-  # files/dotfiles, not the system-level shell registration.
   programs.zsh.enable = true;
 
   # ==================== USERS ====================
@@ -111,23 +103,18 @@ in {
     shell = pkgs.zsh;
   };
 
-  # Greeter precisa de acesso a DRM / input (obrigatório para cage + regreet)
   users.users.greeter.extraGroups = ["video" "input" "render"];
 
-  # ==================== HOME MANAGER (fase 3) ====================
-  # User configs live in home/configs/ and are applied via home/default.nix.
-  # Host modules only override host-specific fragments (e.g. niri/input.kdl).
+  # ==================== HOME MANAGER ====================
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
-    # Pre-existing plain files at HM-managed paths (e.g. from before this
-    # migration) get renamed with this suffix instead of blocking
-    # activation. Safe to remove once the migration is verified and the
-    # .hm-backup files are no longer needed.
     backupFileExtension = "hm-backup";
+
     extraSpecialArgs = {
       inherit inputs hostname pkgs-unstable;
     };
+
     users.${username} = import ./home/default.nix;
   };
 
@@ -143,17 +130,10 @@ in {
     }
   ];
 
-  # ==================== NIRI (Wayland) ====================
-  # NOTA: migrado de i3/X11 para niri (Wayland scrollable-tiling compositor)
-  # + noctalia-shell (shell baseado em Quickshell).
-  # O módulo `programs.niri` registra a sessão niri automaticamente em
-  # /run/current-system/sw/share/wayland-sessions.
+  # ==================== NIRI ====================
   programs.niri.enable = true;
 
-  # ==================== GREETD + REGREET (Catppuccin Mocha/Mauve) ====================
-  # greetd é o daemon de login; regreet é o greeter gráfico GTK.
-  # Em VMs (virtio-gpu / VMware) o cage costuma precisar de GSK_RENDERER=cairo
-  # e WLR_NO_HARDWARE_CURSORS=1, senão o greeter sai imediatamente.
+  # ==================== GREETD + REGREET ====================
   services.greetd.enable = true;
 
   programs.regreet = {
@@ -204,27 +184,17 @@ in {
         font_name = "JetBrainsMono Nerd Font 12";
       };
 
-      # Wallpaper da tela de login (tem que ficar aqui dentro de settings)
       background = {
         path = "${./home/configs/wallpapers/login.jpg}";
-        fit = "Fill"; # Cover | Contain | Fill | ScaleDown
+        fit = "Fill";
       };
     };
   };
 
-  # NOTA: o override de comando do greetd com WLR_RENDERER=pixman (necessário
-  # só em virtio-gpu/VMware Fusion) foi movido para hosts/common/mac-vm-workstation.nix
-  # — estava aqui antes e sendo aplicado (por engano) até em hardware físico
-  # (mac2011/dell1564), que tem GPU real e deveria usar o renderer acelerado.
-
   services.displayManager.defaultSession = "niri";
 
-  # waybar tem o módulo "power-profiles-daemon" no config.jsonc; sem o serviço
-  # dbus rodando, esse módulo simplesmente fica quebrado/vazio.
   services.power-profiles-daemon.enable = true;
 
-  # gsettings (usado no misc.kdl pra setar o tema do cursor) precisa do dconf
-  # rodando; sem isso o comando falha silenciosamente.
   programs.dconf.enable = true;
 
   programs.direnv = {
@@ -242,42 +212,6 @@ in {
     pulse.enable = true;
   };
 
-  programs.ssh = {
-  extraConfig = ''
-    Host 192.168.* *.infra
-      HostName %h
-      User borba
-      IdentityFile /home/borba/.ssh/id_ed25519_infra
-      IdentitiesOnly yes
-
-    Host github.com gitlab.com
-      User git
-      IdentityFile /home/borba/.ssh/id_ed25519_github
-      IdentitiesOnly yes
-
-    Host gitea.com
-      User git
-      IdentityFile /home/borba/.ssh/id_ed25519_github
-      IdentitiesOnly yes
-
-    Host codeberg.org
-      User git
-      IdentityFile /home/borba/.ssh/id_ed25519_github
-      IdentitiesOnly yes
-
-    Host codefloe.com
-      User git
-      IdentityFile /home/borba/.ssh/id_ed25519_github
-      IdentitiesOnly yes
-
-    Host forgejo.local
-      HostName forgejo.local
-      User git
-      IdentityFile /home/borba/.ssh/id_ed25519_github
-      IdentitiesOnly yes
-  '';
-};
-
   # ==================== BLUETOOTH ====================
   hardware.bluetooth = {
     enable = true;
@@ -289,6 +223,7 @@ in {
       };
     };
   };
+
   services.blueman.enable = true;
 
   # ==================== PROGRAMS ====================
@@ -311,7 +246,7 @@ in {
       wget
       curl
       git
-      gh # github-cli
+      gh
       gh-dash
       tmux
       bat
@@ -334,26 +269,22 @@ in {
       slurp
       swappy
       cliphist
-      wl-clipboard # substitui xclip no Wayland
-      xwayland-satellite # compat pra apps que só falam X11 dentro do niri
-      # inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default
-
-      # ---- niri + waybar (compartilhado por todos os hosts) ----
-      waybar # a bar em si; sem isso config.jsonc/style.css do HM não têm o que rodar
-      fuzzel # launcher (Mod+D) e power-menu.sh do waybar (dmenu mode)
-      swaybg # wallpaper, chamado no startup.kdl
-      wlr-which-key # menu invocado no bind Mod+Shift+E (binds.kdl)
-      orca # leitor de tela, bind Super+Alt+S (binds.kdl)
-      networkmanagerapplet # fornece o nm-applet chamado no misc.kdl
-      nextcloud-client # fornece o binário "nextcloud" chamado no misc.kdl
-      capitaine-cursors # tema de cursor setado via gsettings no misc.kdl
-      qt6Packages.qt6ct # QT_QPA_PLATFORMTHEME=qt6ct está setado no misc.kdl
-      seahorse # GUI do gnome-keyring
+      wl-clipboard
+      xwayland-satellite
+      waybar
+      fuzzel
+      swaybg
+      wlr-which-key
+      orca
+      networkmanagerapplet
+      nextcloud-client
+      capitaine-cursors
+      qt6Packages.qt6ct
+      seahorse
     ])
     ++ (with pkgs-unstable; [
       neovim
       helix
-      # noctalia-shell
     ])
     ++ [
       (pkgs.writeShellScriptBin "noctalia" ''
@@ -387,6 +318,45 @@ in {
     ];
   };
 
+  # SSH client configuration is generated by NixOS.
+  # No manual /etc/ssh/ssh_config.d/50-borba.conf is needed.
+  programs.ssh = {
+    extraConfig = ''
+      Host 192.168.* *.infra
+        HostName %h
+        User ${username}
+        IdentityFile ${sshKeysDir}/id_ed25519_infra
+        IdentitiesOnly yes
+
+      Host github.com gitlab.com
+        User git
+        IdentityFile ${sshKeysDir}/id_ed25519_github
+        IdentitiesOnly yes
+
+      Host gitea.com
+        User git
+        IdentityFile ${sshKeysDir}/id_ed25519_github
+        IdentitiesOnly yes
+
+      Host codeberg.org
+        User git
+        IdentityFile ${sshKeysDir}/id_ed25519_github
+        IdentitiesOnly yes
+
+      Host codefloe.com
+        User git
+        IdentityFile ${sshKeysDir}/id_ed25519_github
+        IdentitiesOnly yes
+
+      Host forgejo.local
+        HostName forgejo.local
+        User git
+        IdentityFile ${sshKeysDir}/id_ed25519_github
+        IdentitiesOnly yes
+    '';
+  };
+
+  # ==================== SOPS ====================
   sops = {
     defaultSopsFile = ./hosts/${hostname}/secrets/${hostname}.yaml;
     age.keyFile = "/home/${username}/.config/sops/age/keys.txt";
@@ -446,7 +416,6 @@ in {
 
       KEY="/etc/ssh/ssh_host_ed25519_key"
 
-      # se já existe secret, não faz nada
       if [ -f "$KEY" ]; then
         exit 0
       fi
@@ -467,3 +436,4 @@ in {
   # ==================== STATE VERSION ====================
   system.stateVersion = "26.05";
 }
+
