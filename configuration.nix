@@ -436,4 +436,3 @@ in {
   # ==================== STATE VERSION ====================
   system.stateVersion = "26.05";
 }
-
