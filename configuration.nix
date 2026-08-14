@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   pkgs,
   pkgs-unstable,
   hostname,
@@ -25,11 +26,14 @@ in {
   # ==================== KERNEL ====================
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  # ==================== SSH KEY DIR (tmpfiles) ====================
+  # ==================== SSH KEY DIR + REGREET DIRS (tmpfiles) ====================
   # Only the SSH directory creation remains here so sops can write keys
   # before the user session exists. All user configs are managed by HM.
   systemd.tmpfiles.rules = [
     "d ${sshKeysDir} 0700 ${username} users -"
+    "d /var/log/regreet 0755 greeter greeter -"
+    "d /var/cache/regreet 0755 greeter greeter -"
+    "d /var/lib/regreet 0755 greeter greeter -"
   ];
 
   # ==================== SLEEP POLICY ====================
@@ -103,6 +107,9 @@ in {
     shell = pkgs.zsh;
   };
 
+  # Greeter precisa de acesso a DRM / input (obrigatório para cage + regreet)
+  users.users.greeter.extraGroups = [ "video" "input" "render" ];
+
   # ==================== HOME MANAGER (fase 3) ====================
   # User configs live in home/configs/ and are applied via home/default.nix.
   # Host modules only override host-specific fragments (e.g. niri/input.kdl).
@@ -132,50 +139,17 @@ in {
     }
   ];
 
-  # ==================== NIRI (Wayland) + LY ====================
+  # ==================== NIRI (Wayland) ====================
   # NOTA: migrado de i3/X11 para niri (Wayland scrollable-tiling compositor)
-  # + noctalia-shell (shell baseado em Quickshell). ly permanece como
-  # display manager: o módulo `programs.niri` registra a sessão niri
-  # automaticamente em /run/current-system/sw/share/wayland-sessions, e o
-  # ly já sabe listar sessões wayland — só precisa apontar defaultSession
-  # pro nome certo ("niri"). Se o menu do ly não mostrar a sessão depois do
-  # switch, confira o nome exato do .desktop gerado com:
-  #   ls /run/current-system/sw/share/wayland-sessions/
+  # + noctalia-shell (shell baseado em Quickshell).
+  # O módulo `programs.niri` registra a sessão niri automaticamente em
+  # /run/current-system/sw/share/wayland-sessions.
   programs.niri.enable = true;
 
-  # NOTA (branch de teste): mesmo bug documentado antes continua valendo
-  # pro ly em si (settings merge / cores / tema), independente do WM por
-  # trás da sessão.
-  #
-  # ---- LY (comentado — substituído por greetd+regreet abaixo) ----
-  # services.displayManager.ly = {
-  #   enable = true;
-  #   settings = {
-  #     animation = "matrix";
-  #     bigclock = true;
-  #
-  #     bg = "0x001e1e2e";          # Base
-  #     fg = "0x00cba6f7";          # Mauve (mesmo accent do resto do seu setup)
-  #     border_fg = "0x00cba6f7";   # Mauve
-  #     error_fg = "0x00f38ba8";    # Red (Catppuccin, não vermelho puro)
-  #     clock_color = "0x00cba6f7"; # Mauve
-  #
-  #     term_reset_cmd = "/usr/bin/tput reset; echo -en \"\\e]P01e1e2e\"; echo -en \"\\e]P7cdd6f4\\ec\"; clear";
-  #
-  #     blank_password = true;
-  #     hide_borders = false;
-  #     default_input = "login";
-  #     load = true;
-  #     save = true;
-  #   };
-  # };
-
   # ==================== GREETD + REGREET (Catppuccin Mocha/Mauve) ====================
-  # greetd é o daemon de login (agnóstico de compositor); regreet é o
-  # greeter gráfico GTK que roda em cima dele. O módulo programs.regreet
-  # já configura o services.greetd.settings.default_session pra rodar o
-  # regreet dentro do cage (compositor Wayland minimalista só pra tela de
-  # login) — não precisa declarar isso manualmente.
+  # greetd é o daemon de login; regreet é o greeter gráfico GTK.
+  # Em VMs (virtio-gpu / VMware) o cage costuma precisar de GSK_RENDERER=cairo
+  # e WLR_NO_HARDWARE_CURSORS=1, senão o greeter sai imediatamente.
   services.greetd.enable = true;
 
   programs.regreet = {
@@ -216,7 +190,16 @@ in {
       name = "JetBrainsMono Nerd Font";
       size = 12;
     };
+
+    cageArgs = [ "-s" ];
   };
+
+  # Força o comando com variáveis estáveis para VM (virtio-gpu / VMware Fusion)
+  services.greetd.settings.default_session.command = lib.mkForce ''
+    ${pkgs.dbus}/bin/dbus-run-session \
+    env GSK_RENDERER=cairo WLR_NO_HARDWARE_CURSORS=1 WLR_RENDERER=pixman \
+    ${lib.getExe pkgs.cage} -s -- ${lib.getExe pkgs.greetd.regreet}
+  '';
 
   services.displayManager.defaultSession = "niri";
   security.polkit.enable = true;
