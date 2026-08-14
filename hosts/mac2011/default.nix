@@ -35,6 +35,13 @@ in {
     broadcom_sta
   ];
 
+  # ==================== GRAPHICS (Mesa/OpenGL) ====================
+  # Sem isso, niri e o greeter (cage+regreet, ambos wlroots) não conseguem
+  # criar contexto EGL/GBM e ficam mudos — boot completa, gera geração nova,
+  # mas nenhuma tela gráfica aparece. Já era feito em mac-vm-workstation.nix
+  # (macutm/macvmf) mas nunca tinha sido replicado para o hardware físico.
+  hardware.graphics.enable = true;
+
   # Ferramentas de debug wireless (úteis só com o chip físico) +
   # Spotify: só neste host (não disponível p/ aarch64-linux das VMs UTM/Fusion)
   environment.systemPackages = lib.mkAfter (with pkgs; [

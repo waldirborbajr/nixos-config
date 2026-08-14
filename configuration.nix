@@ -208,12 +208,10 @@ programs.regreet = {
   };
 };
 
-  # Força o comando com variáveis estáveis para VM (virtio-gpu / VMware Fusion)
-  services.greetd.settings.default_session.command = lib.mkForce ''
-    ${pkgs.dbus}/bin/dbus-run-session \
-    env GSK_RENDERER=cairo WLR_NO_HARDWARE_CURSORS=1 WLR_RENDERER=pixman \
-    ${lib.getExe pkgs.cage} -s -- ${lib.getExe pkgs.regreet}
-  '';
+  # NOTA: o override de comando do greetd com WLR_RENDERER=pixman (necessário
+  # só em virtio-gpu/VMware Fusion) foi movido para hosts/common/mac-vm-workstation.nix
+  # — estava aqui antes e sendo aplicado (por engano) até em hardware físico
+  # (mac2011/dell1564), que tem GPU real e deveria usar o renderer acelerado.
 
   services.displayManager.defaultSession = "niri";
   security.polkit.enable = true;

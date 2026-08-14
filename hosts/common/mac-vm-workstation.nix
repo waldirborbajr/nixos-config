@@ -29,6 +29,17 @@ in {
   hardware.graphics.enable = true;
   boot.kernelModules = [ "virtio_gpu" "virtio_pci" ];
 
+  # cage/regreet e niri via virtio-gpu geralmente precisam de renderer por
+  # software (a aceleração 3D do virtio-gpu costuma ser instável nesses
+  # hypervisors) — senão o greeter sai imediatamente / tela preta.
+  # Movido de configuration.nix: antes era aplicado (por engano) até em
+  # hardware físico (mac2011/dell1564), que tem GPU real e não precisa disso.
+  services.greetd.settings.default_session.command = lib.mkForce ''
+    ${pkgs.dbus}/bin/dbus-run-session \
+    env GSK_RENDERER=cairo WLR_NO_HARDWARE_CURSORS=1 WLR_RENDERER=pixman \
+    ${lib.getExe pkgs.cage} -s -- ${lib.getExe pkgs.regreet}
+  '';
+
   # ==================== HOME MANAGER (niri/waybar das VMs) ====================
   home-manager.users.${username} = {
     xdg.configFile."niri/config/input.kdl".source   = niriInput;
