@@ -245,6 +245,7 @@ in {
     (with pkgs; [
       wget
       curl
+      expect
       git
       gh
       gh-dash
