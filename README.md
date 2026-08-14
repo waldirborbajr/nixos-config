@@ -1,3 +1,5 @@
+<img alt="NixOS" src="https://raw.githubusercontent.com/NixOS/nixos-artwork/9d2cdedd73d64a068214482902adea3d02783ba8/logo/nix-snowflake-rainbow.svg" width="140px"/>
+
 <h1>
 ❄️ NixOS - BORBA JR, W - Configuration ❄️
 </h1>
