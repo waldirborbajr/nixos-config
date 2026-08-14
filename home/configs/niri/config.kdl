@@ -16,9 +16,9 @@ include "config/workspaces.kdl"
 spawn-at-startup "helium"
 // spotify só existe no pacote do mac2011 (ver hosts/mac2011/default.nix);
 // nas VMs (macutm/macvmf) o binário não está instalado, então checa antes.
-spawn-sh-at-startup "command -v spotify >/dev/null 2>&1 && spotify"
+// spawn-sh-at-startup "command -v spotify >/dev/null 2>&1 && spotify"
 // spawn-at-startup "nemo"
-spawn-at-startup "pavucontrol"
+// spawn-at-startup "pavucontrol"
 
 // systray apps
 // spawn-at-startup "blueman-applet"
