@@ -1,0 +1,54 @@
+#!/usr/bin/env expect
+
+# Script para parear Logitech K380 com Linux
+# Automatiza o processo de pareamento Bluetooth e exibe o código PIN
+
+set timeout 60
+
+spawn bluetoothctl
+expect "bluetooth"
+
+send "agent KeyboardDisplay\r"
+expect "bluetooth"
+
+send "default-agent\r"
+expect "bluetooth"
+
+send "scan on\r"
+expect "bluetooth"
+
+sleep 5
+
+# Substitua pelo endereço MAC do seu K380 se necessário
+send "pair F4:73:35:5E:89:38\r"
+
+expect {
+    -re "Passkey: (\[0-9\]+)" {
+        puts "\n"
+        puts "========================================"
+        puts "DIGITE ESTE CÓDIGO NO TECLADO K380:"
+        puts ">>> $expect_out(1,string) <<<"
+        puts "Você tem 60 segundos para digitar!"
+        puts "========================================"
+        puts "\n"
+        
+        expect {
+            "Pairing successful" {
+                puts "Pareamento bem-sucedido!"
+                send "connect F4:73:35:5E:89:38\r"
+                expect "bluetooth"
+                send "quit\r"
+            }
+            timeout {
+                puts "Tempo esgotado - tente novamente"
+                send "quit\r"
+            }
+        }
+    }
+    timeout {
+        puts "Timeout - certifique-se que o teclado está piscando"
+        send "quit\r"
+    }
+}
+
+expect eof

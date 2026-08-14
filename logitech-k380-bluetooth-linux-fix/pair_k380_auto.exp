@@ -1,0 +1,71 @@
+#!/usr/bin/expect -f
+
+# Script genérico para parear Logitech K380 com Linux
+# Detecta automaticamente o endereço MAC do teclado
+
+set timeout 60
+
+spawn bluetoothctl
+expect "bluetooth"
+
+send "agent KeyboardDisplay\r"
+expect "bluetooth"
+
+send "default-agent\r"
+expect "bluetooth"
+
+puts "Iniciando busca por dispositivos..."
+puts "Certifique-se que o K380 está piscando (tecla 1, 2 ou 3)"
+
+send "scan on\r"
+expect "bluetooth"
+
+sleep 8
+
+# Buscar por dispositivos K380
+send "devices\r"
+expect "bluetooth"
+
+puts "\nProcurando por Logitech K380..."
+puts "Se não encontrar, pressione Ctrl+C e tente novamente"
+
+# Tentar parear com endereço conhecido ou solicitar manual
+puts "\nTentando parear automaticamente..."
+send "pair F4:73:35:94:F2:0B\r"
+
+expect {
+    -re "Passkey: (\[0-9\]+)" {
+        puts "\n"
+        puts "========================================"
+        puts "DIGITE ESTE CÓDIGO NO TECLADO K380:"
+        puts ">>> $expect_out(1,string) <<<"
+        puts "Você tem 60 segundos para digitar!"
+        puts "========================================"
+        puts "\n"
+        
+        expect {
+            "Pairing successful" {
+                puts "Pareamento bem-sucedido!"
+                send "connect F4:73:35:94:F2:0B\r"
+                expect "bluetooth"
+                send "quit\r"
+            }
+            timeout {
+                puts "Tempo esgotado - tente novamente"
+                send "quit\r"
+            }
+        }
+    }
+    "Device * not available" {
+        puts "\nDispositivo não encontrado!"
+        puts "Verifique se o K380 está em modo de pareamento (luz piscando)"
+        puts "Execute: sudo hcitool scan para ver dispositivos disponíveis"
+        send "quit\r"
+    }
+    timeout {
+        puts "Timeout - certifique-se que o teclado está piscando"
+        send "quit\r"
+    }
+}
+
+expect eof
