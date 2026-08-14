@@ -210,7 +210,6 @@ in {
     cursorTheme = {
       name = "Catppuccin-Mocha-Mauve-Cursors";
       package = pkgs.catppuccin-cursors.mochaMauve;
-      size = 24;
     };
 
     font = {
