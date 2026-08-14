@@ -9,6 +9,7 @@
 }: let
   username = "borba";
   sshKeysDir = "/home/${username}/.ssh";
+  sshClientConfigPath = "/etc/ssh/ssh_config.d/50-borba.conf";
 
   # Shared values for host modules (username mainly).
   # Dotfile contents now live inside the flake under home/configs/ (fase 3).
@@ -242,42 +243,6 @@ in {
     pulse.enable = true;
   };
 
-  programs.ssh = {
-  extraConfig = ''
-    Host 192.168.* *.infra
-      HostName %h
-      User borba
-      IdentityFile /home/borba/.ssh/id_ed25519_infra
-      IdentitiesOnly yes
-
-    Host github.com gitlab.com
-      User git
-      IdentityFile /home/borba/.ssh/id_ed25519_github
-      IdentitiesOnly yes
-
-    Host gitea.com
-      User git
-      IdentityFile /home/borba/.ssh/id_ed25519_github
-      IdentitiesOnly yes
-
-    Host codeberg.org
-      User git
-      IdentityFile /home/borba/.ssh/id_ed25519_github
-      IdentitiesOnly yes
-
-    Host codefloe.com
-      User git
-      IdentityFile /home/borba/.ssh/id_ed25519_github
-      IdentitiesOnly yes
-
-    Host forgejo.local
-      HostName forgejo.local
-      User git
-      IdentityFile /home/borba/.ssh/id_ed25519_github
-      IdentitiesOnly yes
-  '';
-};
-
   # ==================== BLUETOOTH ====================
   hardware.bluetooth = {
     enable = true;
@@ -426,6 +391,50 @@ in {
     group = "users";
     mode = "0644";
   };
+
+  system.activationScripts.setupBorbaSshKeys = ''
+    install -d -o ${username} -g users -m 700 ${sshKeysDir}
+    install -d -o root -g root -m 755 /etc/ssh/ssh_config.d
+
+    cat > ${sshClientConfigPath} <<EOF
+    Host 192.168.* *.infra
+      HostName %h
+      User ${username}
+      IdentityFile ${sshKeysDir}/id_ed25519_infra
+      IdentitiesOnly yes
+
+    Host github.com gitlab.com
+      User git
+      IdentityFile ${sshKeysDir}/id_ed25519_github
+      IdentitiesOnly yes
+
+    Host gitea.com
+      User git
+      IdentityFile ${sshKeysDir}/id_ed25519_github
+      IdentitiesOnly yes
+
+    Host codeberg.org
+      User git
+      IdentityFile ${sshKeysDir}/id_ed25519_github
+      IdentitiesOnly yes
+
+    Host codefloe.com
+      User git
+      IdentityFile ${sshKeysDir}/id_ed25519_github
+      IdentitiesOnly yes
+
+    Host forgejo.local
+      HostName forgejo.local
+      User git
+      IdentityFile ${sshKeysDir}/id_ed25519_github
+      IdentitiesOnly yes
+    EOF
+
+    chown ${username}:users ${sshKeysDir}
+    chmod 700 ${sshKeysDir}
+    chown root:root ${sshClientConfigPath}
+    chmod 644 ${sshClientConfigPath}
+  '';
 
   # ==================== ZERO-TOUCH SSH HOST KEY BOOTSTRAP ====================
   systemd.services.ssh-hostkey-bootstrap = {
