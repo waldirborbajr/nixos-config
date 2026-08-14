@@ -41,6 +41,7 @@ in {
     iw
     wirelesstools
     spotify
+    chirp
   ]);
 
   # ==================== HOME MANAGER (niri/waybar do hardware físico) ====================
