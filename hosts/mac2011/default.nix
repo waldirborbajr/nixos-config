@@ -2,38 +2,40 @@
 # MacBook Pro 2011 — hardware físico Apple (x86_64)
 #
 # Programas / browsers / teclado / boot EFI → hosts/common/mac-workstation.nix
-# Aqui só o que é específico deste hardware (Broadcom wl + niri/waybar físicos).
+# Aqui só o que é específico deste hardware (Wi-Fi + niri/waybar físicos).
 { config, lib, pkgs, common, ... }:
 let
   inherit (common) username;
 in {
   imports = [ ../common/mac-workstation.nix ];
 
-  # ==================== BROADCOM WIRELESS ====================
-  # Este MacBook usa chip Broadcom que precisa do driver proprietário wl.
+  # ==================== WIRELESS (open-source b43) ====================
+  # BCM4331 do MacBook Pro 2011 funciona com o driver open-source b43.
+  # Evita o broadcom-sta (proprietário, inseguro e quebrando em kernel ≥ 7.1).
   hardware.enableRedistributableFirmware = true;
+  networking.enableB43Firmware = true;
 
-  # broadcom_sta é marcado insecure upstream (CVE-2019-9501/9502, driver
-  # sem manutenção). Permitido SOMENTE neste host — não afeta dell/macutm/macvmf.
-  # Se o nixos-rebuild reclamar de outra string broadcom-sta-X.Y.Z, atualize
-  # a linha abaixo para bater com a versão do nixpkgs pinado.
-  nixpkgs.config.permittedInsecurePackages = [
-    "broadcom-sta-6.30.223.271-59-7.1.6"
-  ];
-
-  # Blacklist dos drivers open-source que conflitam com o wl proprietário
-  boot.blacklistedKernelModules = [
-    "b43"
-    "brcmsmac"
-    "bcma"
-    "ssb"
-  ];
-
-  boot.kernelModules = [ "wl" ];
-
-  boot.extraModulePackages = with config.boot.kernelPackages; [
-    broadcom_sta
-  ];
+  # ---- broadcom-sta (proprietário) — DESATIVADO ----
+  # Falha ao compilar contra kernel 7.1.6 (incompatible pointer types no cfg80211).
+  # Descomente apenas se precisar voltar ao wl e pinando um kernel mais antigo
+  # (ex.: linuxPackages_6_12).
+  #
+  # nixpkgs.config.permittedInsecurePackages = [
+  #   "broadcom-sta-6.30.223.271-59-7.1.6"   # ajuste a string se o Nix reclamar
+  # ];
+  #
+  # boot.blacklistedKernelModules = [
+  #   "b43"
+  #   "brcmsmac"
+  #   "bcma"
+  #   "ssb"
+  # ];
+  #
+  # boot.kernelModules = [ "wl" ];
+  #
+  # boot.extraModulePackages = with config.boot.kernelPackages; [
+  #   broadcom_sta
+  # ];
 
   # ==================== GRAPHICS (Mesa/OpenGL) ====================
   # Sem isso, niri e o greeter (cage+regreet, ambos wlroots) não conseguem
