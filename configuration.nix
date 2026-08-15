@@ -254,6 +254,7 @@ in {
       bat
       ripgrep
       eza
+      zoxide
       btop
       htop
       fastfetch

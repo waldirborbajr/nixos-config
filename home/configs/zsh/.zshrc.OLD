@@ -34,7 +34,10 @@ setopt NUMERIC_GLOB_SORT  # sort file10 after file9, not after file1
 # Smart directory navigation
 # =========================================================
 
-# Zoxide — config completa em zoxide.zsh (Modular Config Files, abaixo)
+# Zoxide
+if command -v zoxide >/dev/null 2>&1; then
+  eval "$(zoxide init zsh)"
+fi
 
 # Oh-My-Posh
 if command -v oh-my-posh >/dev/null 2>&1; then
@@ -72,9 +75,6 @@ zstyle ':completion:*' completer _complete _approximate
 
 # fzf: env vars + registra fzf-history-widget e demais widgets
 source "$ZDOTDIR/fzf.zsh"
-
-# Zoxide: navegação inteligente (z / zi)
-source "$ZDOTDIR/zoxide.zsh"
 
 # Aliases
 source "$ZDOTDIR/aliases.zsh"
