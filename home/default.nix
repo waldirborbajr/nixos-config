@@ -31,33 +31,32 @@ in {
 
   xdg.enable = true;
 
-# home/default.nix
+  # home/default.nix
 
-services.mako = {
-  enable = true;
-  settings = {
-    # opcional — estilo Catppuccin Mocha
-    background-color = "#1e1e2e";
-    text-color = "#cdd6f4";
-    border-color = "#cba6f7";
-    border-size = 2;
-    border-radius = 8;
-    padding = "10";
-    default-timeout = 5000;
-    font = "JetBrainsMono Nerd Font 11";
+  services.mako = {
+    enable = true;
+    settings = {
+      # opcional — estilo Catppuccin Mocha
+      background-color = "#1e1e2e";
+      text-color = "#cdd6f4";
+      border-color = "#cba6f7";
+      border-size = 2;
+      border-radius = 8;
+      padding = "10";
+      default-timeout = 5000;
+      font = "JetBrainsMono Nerd Font 11";
+    };
   };
-};
 
-# home/default.nix
+  # home/default.nix
 
-services.gnome-keyring = {
-  enable = true;
-  components = [ "pkcs11" "secrets" "ssh" ];
-};
+  services.gnome-keyring = {
+    enable = true;
+    components = ["pkcs11" "secrets" "ssh"];
+  };
 
-# Se quiser usar o keyring como SSH agent:
-home.sessionVariables.SSH_AUTH_SOCK = "$XDG_RUNTIME_DIR/keyring/ssh";
-
+  # Se quiser usar o keyring como SSH agent:
+  home.sessionVariables.SSH_AUTH_SOCK = "$XDG_RUNTIME_DIR/keyring/ssh";
 
   # ------------------------------------------------------------------
   # Shell (ZDOTDIR layout preserved)
@@ -181,6 +180,10 @@ home.sessionVariables.SSH_AUTH_SOCK = "$XDG_RUNTIME_DIR/keyring/ssh";
       recursive = true;
     };
 
+    "atuin" = {
+      source = "${configs}/atuin";
+      recursive = true;
+    };
     # Extra helix script not covered by the module
     "helix/yazi-picker.sh" = {
       source = "${configs}/helix/yazi-picker.sh";
@@ -197,5 +200,5 @@ home.sessionVariables.SSH_AUTH_SOCK = "$XDG_RUNTIME_DIR/keyring/ssh";
   };
 
   # Pure-user packages can migrate here over time.
-  home.packages = [ ];
+  home.packages = [];
 }

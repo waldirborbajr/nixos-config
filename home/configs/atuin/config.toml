@@ -1,0 +1,23 @@
+auto_sync = true
+sync_address = "https://atuin.internal.leomercier.dev"
+sync_frequency = "5m"
+
+style = "compact"
+inline_height = 0
+
+history_filter = [
+  "^cd",
+  "^clear",
+  "^e",
+  "^exit",
+  "^htop",
+  "^ls",
+  "^rm",
+  "^shred",
+  "^z",
+]
+
+enter_accept = true
+
+[theme]
+name = "catppuccin-mocha"

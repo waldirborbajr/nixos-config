@@ -244,6 +244,7 @@ in {
   environment.systemPackages =
     (with pkgs; [
       wget
+      atuin
       curl
       expect
       git
