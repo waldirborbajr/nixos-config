@@ -21,3 +21,15 @@ enter_accept = true
 
 [theme]
 name = "catppuccin-mocha"
+
+[ai]
+enabled = false
+
+[daemon]
+enabled = false
+autostart = false
+
+[tmux]
+enabled = true
+width = "80%"
+height = "60%"
