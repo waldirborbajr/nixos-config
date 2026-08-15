@@ -255,6 +255,14 @@ in {
       ripgrep
       eza
       zoxide
+
+      # Compactação / descompactação
+      unzip
+      zip
+      p7zip      # 7z (também lida com vários outros formatos)
+      xarchiver  # GUI leve (GTK) para abrir/extrair zip, 7z, tar, rar, etc.
+                 # combina bem com um setup minimalista tipo niri/waybar
+                 # (não puxa dependências pesadas do GNOME como o file-roller)
       btop
       htop
       fastfetch
