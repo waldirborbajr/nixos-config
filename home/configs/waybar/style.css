@@ -86,6 +86,7 @@ window#waybar {
 #power-profiles-daemon,
 #backlight,
 #idle_inhibitor,
+#custom-kb-layout,
 #tray,
 #custom-wallpaper {
 
@@ -160,6 +161,11 @@ window#waybar {
     color: @base;
 }
 
+#custom-kb-layout {
+    background: @sapphire;
+    color: @base;
+}
+
 #backlight {
     background: @lavender;
     color: @base;
@@ -218,4 +224,3 @@ window#waybar {
     background: @surface0;
     color: @overlay0;
 }
-
