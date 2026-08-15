@@ -874,10 +874,28 @@ list_branches_cmd() {
 print_banner() {
   local detected
   detected="$(detect_flake_attr 2>/dev/null || echo 'not identified')"
+
+  # Nome curto e amigável da máquina (ex: "mac2011"), não o atributo do
+  # flake (ex: "macbook2011"). Cai pro próprio $detected se não houver
+  # mapeamento (ex: "not identified").
+  local machine_label="${HOST_ATTR_TO_MACHINE[$detected]:-$detected}"
+
+  # Largura interna da caixa = nº de "─" entre os cantos ╭ e ╮.
+  # Cada linha de conteúdo precisa somar exatamente esse tanto de
+  # caracteres (2 espaços de indentação + texto + padding) pra alinhar
+  # com a borda direita "│".
+  local inner_width=38
+
+  local title="NixOS Manager"
+  local pad_title=$(( inner_width - 2 - ${#title} ))
+
+  local label2="this machine: "
+  local pad2=$(( inner_width - 2 - ${#label2} - ${#machine_label} ))
+
   echo
   echo -e "${C_MAUVE}╭──────────────────────────────────────╮${C_RESET}"
-  printf "${C_MAUVE}│${C_RESET}  ${C_BOLD}${C_TEXT}NixOS Manager${C_RESET}%*s${C_MAUVE}│${C_RESET}\n" 24 ""
-  echo -e "${C_MAUVE}│${C_RESET}  ${C_OVERLAY}this machine: ${C_RESET}${C_GREEN}${detected}${C_RESET}$(printf '%*s' $((25 - ${#detected})) '')${C_MAUVE}│${C_RESET}"
+  printf "${C_MAUVE}│${C_RESET}  ${C_BOLD}${C_TEXT}%s${C_RESET}%*s${C_MAUVE}│${C_RESET}\n" "$title" "$pad_title" ""
+  printf "${C_MAUVE}│${C_RESET}  ${C_OVERLAY}%s${C_RESET}${C_GREEN}%s${C_RESET}%*s${C_MAUVE}│${C_RESET}\n" "$label2" "$machine_label" "$pad2" ""
   echo -e "${C_MAUVE}╰──────────────────────────────────────╯${C_RESET}"
   echo -e "  ${C_OVERLAY}${C_DIM}(host and git branch are always asked — nothing is assumed)${C_RESET}"
 }
