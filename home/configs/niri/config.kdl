@@ -11,9 +11,8 @@ include "config/binds.kdl"
 include "config/misc.kdl"
 include "config/workspaces.kdl"
 
-
 // essential apps
-spawn-at-startup "helium"
+// spawn-at-startup "helium"
 // spotify só existe no pacote do mac2011 (ver hosts/mac2011/default.nix);
 // nas VMs (macutm/macvmf) o binário não está instalado, então checa antes.
 // spawn-sh-at-startup "command -v spotify >/dev/null 2>&1 && spotify"
@@ -32,6 +31,6 @@ spawn-at-startup "helium"
 // spawn-sh-at-startup "kitty -d ~/workspace/nix-config --app-id='fastfetch' --hold 'fastfetch' &"
 // spawn-sh-at-startup "kitty -d ~/workspace/nix-config --app-id='btm-monitor' --hold 'btm' &"
 
-spawn-sh-at-startup "wezterm start --class 'nitch' --cwd ~/nixos-config -- zsh -ic 'nitch; exec zsh' &"
-spawn-sh-at-startup "wezterm start --class 'fastfetch' --cwd ~/nixos-config -- zsh -ic 'fastfetch; exec zsh' &"
-spawn-sh-at-startup "wezterm start --class 'btop-monitor' --cwd ~/nixos-config -- zsh -ic 'btop; exec zsh' &"
+// spawn-sh-at-startup "wezterm start --class 'nitch' --cwd ~/nixos-config -- zsh -ic 'nitch; exec zsh' &"
+// spawn-sh-at-startup "wezterm start --class 'fastfetch' --cwd ~/nixos-config -- zsh -ic 'fastfetch; exec zsh' &"
+// spawn-sh-at-startup "wezterm start --class 'btop-monitor' --cwd ~/nixos-config -- zsh -ic 'btop; exec zsh' &"
