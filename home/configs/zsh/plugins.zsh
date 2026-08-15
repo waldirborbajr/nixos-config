@@ -27,7 +27,7 @@ _zplugin_load zsh-users zsh-autosuggestions
 _zplugin_load zsh-users zsh-history-substring-search
 _zplugin_load jeffreytse zsh-vi-mode
 _zplugin_load zdharma-continuum fast-syntax-highlighting
-# zsh-z removido: zoxide (já iniciado no _zshrc) faz o mesmo com melhor algoritmo
+# zsh-z removido: zoxide (ver zoxide.zsh) faz o mesmo com melhor algoritmo
 
 # Atuin — history search/sync, substitui o fzf-history-widget (ver fzf.zsh).
 # Isso só registra o widget (_atuin_search_widget); o bindkey de Ctrl+R
