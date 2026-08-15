@@ -27,8 +27,8 @@ zvm_after_init() {
   # Ctrl+\ -> toggle autosuggestions
   bindkey '^\' autosuggest-toggle
 
-  # Ctrl+R -> atuin history (fzf-history-widget desativado, ver fzf.zsh)
-  bindkey '^R' _atuin_search_widget
+  # Ctrl+R -> fzf history
+  bindkey '^R' fzf-history-widget
 
   # Setas -> history substring search
   bindkey '^[[A' history-substring-search-up

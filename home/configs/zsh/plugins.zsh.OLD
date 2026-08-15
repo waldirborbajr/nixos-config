@@ -28,12 +28,3 @@ _zplugin_load zsh-users zsh-history-substring-search
 _zplugin_load jeffreytse zsh-vi-mode
 _zplugin_load zdharma-continuum fast-syntax-highlighting
 # zsh-z removido: zoxide (já iniciado no _zshrc) faz o mesmo com melhor algoritmo
-
-# Atuin — history search/sync, substitui o fzf-history-widget (ver fzf.zsh).
-# Isso só registra o widget (_atuin_search_widget); o bindkey de Ctrl+R
-# fica em bindings.zsh/zvm_after_init, pois o zsh-vi-mode reseta os
-# bindkeys ao inicializar. --disable-up-arrow evita conflito com
-# history-substring-search-up, que já está nas setas.
-if command -v atuin &>/dev/null; then
-  eval "$(atuin init zsh --disable-up-arrow)"
-fi
