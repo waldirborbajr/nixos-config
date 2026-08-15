@@ -86,7 +86,7 @@ in {
     fontconfig = {
       enable = true;
       defaultFonts = {
-        monospace = ["FiraCode Nerd Font" "JetBrainsMono Nerd Font"];
+        monospace = ["JetBrainsMono Nerd Font"];
       };
     };
   };

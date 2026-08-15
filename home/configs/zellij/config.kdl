@@ -256,5 +256,5 @@ pane_frames false
 // default_mode "locked"
 
 web_client {
-    font "monospace"
+    font "JetBrainsMono Nerd Font"
 }
