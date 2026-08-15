@@ -21,7 +21,8 @@ else
   echo "zsh: zoxide não encontrado no PATH — pulando inicialização." >&2
 fi
 
-# Atalhos curtos de navegação
-alias za='zoxide add'      # adiciona o diretório atual manualmente ao banco
-alias zq='zoxide query'    # consulta sem entrar no diretório
-alias zr='zoxide remove'   # remove uma entrada do banco
+# Atalhos curtos de navegação (prefixo "zox" pra não colidir com os
+# atalhos do zellij em functions.zsh: zl, za, zs, zc)
+alias zoxa='zoxide add'      # adiciona o diretório atual manualmente ao banco
+alias zoxq='zoxide query'    # consulta sem entrar no diretório
+alias zoxr='zoxide remove'   # remove uma entrada do banco
