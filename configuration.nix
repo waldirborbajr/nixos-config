@@ -248,11 +248,41 @@ in {
       General = {
         Experimental = true;
         FastConnectable = true;
+        # Reautentica silenciosamente em vez de exigir novo pareamento
+        # quando o link key expira/diverge — comum em HID Bluetooth Classic.
+        JustWorksRepairing = "always";
+      };
+      Policy = {
+        AutoEnable = true;
+        # Reconecta automaticamente dispositivos HID (teclado/mouse) que
+        # caem, em vez de deixar o link morto até reconexão manual.
+        ReconnectAttempts = 7;
+        ReconnectIntervals = "1,2,4,8,16,32,64";
       };
     };
   };
 
+  # Corrige o bug clássico do ERTM (Enhanced Re-Transmission Mode) do L2CAP
+  # no bluetooth.ko: em vários controladores (Broadcom antigos incluídos —
+  # típico de Macs ~2011 — e alguns Realtek/Intel), a negociação ERTM com
+  # periféricos HID Bluetooth Classic (como o Logitech K380, que é
+  # "Bluetooth classic 3.0", não BLE) falha silenciosamente minutos após
+  # conectar: o dispositivo aparece "Connected: yes" no bluetoothctl mas
+  # para de responder, ou cai e reconecta em loop. disable_ertm=1 faz o
+  # kernel usar modo básico de L2CAP (sem retransmissão avançada), que é
+  # o workaround padrão documentado para exatamente esse sintoma.
+  boot.extraModprobeConfig = ''
+    options bluetooth disable_ertm=1
+  '';
+
   services.blueman.enable = true;
+
+  # Impede o USB autosuspend de suspender o próprio controlador Bluetooth
+  # (classe USB 0xE0 = Wireless Controller / Bluetooth) em segundo plano,
+  # o que também derruba links HID já conectados.
+  services.udev.extraRules = ''
+    ACTION=="add", SUBSYSTEM=="usb", ATTR{bDeviceClass}=="e0", TEST=="power/control", ATTR{power/control}="on"
+  '';
 
   # ==================== PROGRAMS ====================
   nixpkgs.config.allowUnfree = true;
