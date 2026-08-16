@@ -262,18 +262,12 @@ in {
     };
   };
 
-  # Corrige o bug clássico do ERTM (Enhanced Re-Transmission Mode) do L2CAP
-  # no bluetooth.ko: em vários controladores (Broadcom antigos incluídos —
-  # típico de Macs ~2011 — e alguns Realtek/Intel), a negociação ERTM com
-  # periféricos HID Bluetooth Classic (como o Logitech K380, que é
-  # "Bluetooth classic 3.0", não BLE) falha silenciosamente minutos após
-  # conectar: o dispositivo aparece "Connected: yes" no bluetoothctl mas
-  # para de responder, ou cai e reconecta em loop. disable_ertm=1 faz o
-  # kernel usar modo básico de L2CAP (sem retransmissão avançada), que é
-  # o workaround padrão documentado para exatamente esse sintoma.
-  boot.extraModprobeConfig = ''
-    options bluetooth disable_ertm=1
-  '';
+  # NOTA: já testamos boot.extraModprobeConfig com "disable_ertm=1" aqui.
+  # NÃO usar: nesse kernel + bluez 5.86, desligar ERTM faz o próprio
+  # bluetoothd falhar ao configurar os sockets L2CAP de vários perfis
+  # (setsockopt(L2CAP_OPTIONS): Invalid argument), incluindo, ao que tudo
+  # indica, parte da negociação do perfil HID. Era workaround pra kernels
+  # ~4.x; nessa combinação de versões ele quebra mais do que resolve.
 
   services.blueman.enable = true;
 
