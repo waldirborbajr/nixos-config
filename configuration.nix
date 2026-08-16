@@ -222,6 +222,20 @@ in {
     config.common.default = [ "gnome" ];
   };
 
+  # ==================== NIX-LD ====================
+  # Permite rodar binários dinâmicos genéricos de Linux (ex.: RadioManager
+  # de CPS de rádio, instaladores .run, etc.) que esperam um ld-linux.so e
+  # libs em /lib, coisa que o NixOS não tem fora da Nix store.
+  programs.nix-ld = {
+    enable = true;
+    libraries = with pkgs; [
+      stdenv.cc.cc.lib   # libstdc++
+      zlib
+      libusb1            # acesso USB direto (CPS de rádio, programadores)
+      udev
+    ];
+  };
+
   # ==================== BLUETOOTH ====================
   hardware.bluetooth = {
     enable = true;
