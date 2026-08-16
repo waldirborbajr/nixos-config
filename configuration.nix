@@ -233,6 +233,7 @@ in {
       zlib
       libusb1            # acesso USB direto (CPS de rádio, programadores)
       udev
+      icu                # runtime .NET (RadioManager e outros CPS baseados em .NET)
     ];
   };
 
