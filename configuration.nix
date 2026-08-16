@@ -234,6 +234,9 @@ in {
       libusb1            # acesso USB direto (CPS de rádio, programadores)
       udev
       icu                # runtime .NET (RadioManager e outros CPS baseados em .NET)
+      fontconfig         # SkiaSharp (UI gráfica do RadioManager) precisa pra achar fontes
+      freetype
+      harfbuzz
     ];
   };
 
