@@ -99,7 +99,7 @@ in {
     isNormalUser = true;
     home = "/home/${username}";
     description = "borba jr, w";
-    extraGroups = ["networkmanager" "wheel" "podman"];
+    extraGroups = ["networkmanager" "wheel" "podman" "dialout"]; # dialout: cabo serial do CHIRP
     shell = pkgs.zsh;
   };
 
@@ -210,6 +210,16 @@ in {
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
+  };
+
+  # ==================== XDG DESKTOP PORTAL ====================
+  # niri não tem DE por trás dele, então precisa de um backend de portal
+  # explícito. gnome = screen share/gravação (Brave, Discord, OBS via
+  # PipeWire); gtk = file chooser de apps sandboxed/Electron.
+  xdg.portal = {
+    enable = true;
+    extraPortals = with pkgs; [ xdg-desktop-portal-gnome xdg-desktop-portal-gtk ];
+    config.common.default = [ "gnome" ];
   };
 
   # ==================== BLUETOOTH ====================

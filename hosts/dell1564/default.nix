@@ -26,6 +26,11 @@ in {
     variant = "abnt2";
   };
 
+  # ==================== GRAPHICS ====================
+  # Faltava aqui (já existe no mac2011 e nas VMs). Sem isso o niri fica sem
+  # aceleração OpenGL/Vulkan garantida e pode cair pro fallback por software.
+  hardware.graphics.enable = true;
+
   # ==================== FILESYSTEM OPTIMIZATIONS ====================
   # Good for older HDDs. NOTE: the actual "noatime nodiratime commit=60"
   # options already live in hardware-configuration.nix (same fileSystems."/"
