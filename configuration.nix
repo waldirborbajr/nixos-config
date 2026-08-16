@@ -271,6 +271,13 @@ in {
 
   services.blueman.enable = true;
 
+  # TEMPORÁRIO — debug do bug de pareamento do K380 no mac2011.
+  # Remover depois de identificar a causa raiz.
+  systemd.services.bluetooth.serviceConfig.ExecStart = lib.mkForce [
+    ""
+    "${pkgs.bluez}/libexec/bluetooth/bluetoothd -d"
+  ];
+
   # Impede o USB autosuspend de suspender o próprio controlador Bluetooth
   # (classe USB 0xE0 = Wireless Controller / Bluetooth) em segundo plano,
   # o que também derruba links HID já conectados.
