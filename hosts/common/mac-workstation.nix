@@ -22,6 +22,11 @@ in {
   services.xserver.xkb.layout = "us";
   services.xserver.xkb.variant = "mac";
 
+  # ==================== FILE MANAGER (Nemo) ====================
+  # Sem o gvfs, o Nemo não consegue mandar arquivos pra lixeira: a tecla
+  # Delete simplesmente não faz nada (falha silenciosa, sem erro na tela).
+  services.gvfs.enable = true;
+
   # ==================== PACKAGES ====================
   # Lista única para a família Mac. Dell continua com a lista própria (mais leve).
   environment.systemPackages = with pkgs; [
