@@ -292,6 +292,7 @@ in {
       eza
       zoxide
 
+      kdlfmt
       # Compactação / descompactação
       unzip
       zip
