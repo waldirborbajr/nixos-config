@@ -121,10 +121,10 @@ in {
   # ------------------------------------------------------------------
   xdg.configFile = {
     # Terminals
-    "alacritty" = {
-      source = "${configs}/alacritty";
-      recursive = true;
-    };
+    # "alacritty" = {
+    #   source = "${configs}/alacritty";
+    #   recursive = true;
+    # };
     "wezterm" = {
       source = "${configs}/wezterm";
       recursive = true;
