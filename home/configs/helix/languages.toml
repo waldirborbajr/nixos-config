@@ -187,3 +187,9 @@ indent = { tab-width = 2, unit = " " }
 # ... (YAML, Markdown, Shell, etc. ficam como estavam — lembre-se de adicionar `scope`
 # e, se quiser os LSPs globais, incluir "llm-suggest", "colors", "scls" na lista de
 # language-servers de cada um deles também)
+
+[[language]]
+name = "kdl"
+formatter = { command = "kdlfmt", args = ["format", "-"] }
+auto-format = true  # Optional: formats automatically whenever you save the file
+
