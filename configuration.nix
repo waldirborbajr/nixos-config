@@ -29,6 +29,11 @@
       url = "https://github.com/bluez/bluez/archive/refs/tags/${version}.tar.gz";
       sha256 = "07c878513ef03bb536c06d547506c12771d3823e656993869552b246a02e8a2e";
     };
+    # Os patches do nixpkgs (old.patches) foram escritos contra o
+    # código-fonte do 5.86 e não se aplicam ao 5.83 (arquivo já é
+    # diferente nessa versão) — descartamos, o próprio 5.83 já não tem
+    # a regressão que esses patches corrigiam.
+    patches = [];
   });
 in {
   _module.args.common = common;
