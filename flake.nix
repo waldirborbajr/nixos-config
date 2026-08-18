@@ -17,6 +17,24 @@
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # 🚀 Vicinae — Raycast-like launcher (mac2011 + VMs only, see mac-workstation.nix)
+    vicinae = {
+      url = "github:vicinaehq/vicinae";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # 🔎 nix-index-database — prebuilt "command not found" DB (all hosts)
+    nix-index-database = {
+      url = "github:nix-community/nix-index-database";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # 🎨 treefmt-nix — repo-wide formatter, exposed via `nix fmt` (all hosts)
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -77,5 +95,14 @@
         system = "x86_64-linux";
       };
     };
+
+    # `nix fmt` — same formatter regardless of which host you're on
+    # (dell1564/mac2011 = x86_64-linux, macutm/macvmf = aarch64-linux).
+    formatter = nixpkgs.lib.genAttrs ["x86_64-linux" "aarch64-linux"] (
+      system: let
+        pkgs = nixpkgs.legacyPackages.${system};
+      in
+        (treefmt-nix.lib.evalModule pkgs ./treefmt.nix).config.build.wrapper
+    );
   };
 }

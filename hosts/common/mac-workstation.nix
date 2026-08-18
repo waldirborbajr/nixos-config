@@ -9,7 +9,7 @@
 # Específicos de VM (podman, virtio, mitigations, guest tools) e de
 # hardware físico (Broadcom wl, insecure packages) ficam nos módulos
 # filhos — assim uma novidade de programa se configura uma única vez.
-{ lib, pkgs, pkgs-unstable, common, ... }:
+{ lib, pkgs, pkgs-unstable, common, inputs, ... }:
 let
   inherit (common) username;
 in {
@@ -95,5 +95,13 @@ in {
   programs.firefox = {
     enable = true;
     package = pkgs.firefox-devedition;
+  };
+
+  # ==================== VICINAE (launcher, mac2011 + VMs) ====================
+  # Raycast-like launcher for Linux, native C++/Qt. Only wired here — this
+  # file is shared by mac2011/macutm/macvmf, and NOT imported by dell1564.
+  home-manager.users.${username} = {
+    imports = [ inputs.vicinae.homeManagerModules.default ];
+    programs.vicinae.enable = true;
   };
 }

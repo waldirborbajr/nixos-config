@@ -278,62 +278,79 @@ in {
   # ==================== PACKAGES ====================
   environment.systemPackages =
     (with pkgs; [
+      # ---- Shell & CLI core (fetch, files, search) ----
       wget
-      atuin
       curl
+      atuin # shell history sync/search
       expect
-      git
-      gh
-      gh-dash
-      delta
-      tmux
-      bat
       ripgrep
-      eza
-      zoxide
+      eza # ls replacement
+      zoxide # cd replacement
+      bat # cat with syntax highlighting
+      tmux
 
-      zathura
-      mupdf
+      # ---- Version control ----
+      git
+      gh # GitHub CLI
+      gh-dash # GitHub CLI TUI dashboard
+      delta # git diff pager
 
+      # ---- Document viewers ----
+      zathura # PDF/document viewer
+      mupdf # lightweight PDF renderer/tools
+
+      # ---- Config file linters/formatters (KDL, TOML — niri/waybar configs, Cargo.toml, etc.) ----
       kdlfmt
       taplo
 
-      # Compactação / descompactação
+      # ---- Archive / compression ----
       unzip
       zip
-      p7zip # 7z (também lida com vários outros formatos)
-      xarchiver # GUI leve (GTK) para abrir/extrair zip, 7z, tar, rar, etc.
-      # combina bem com um setup minimalista tipo niri/waybar
-      # (não puxa dependências pesadas do GNOME como o file-roller)
+      p7zip # 7z (handles several other formats too)
+      xarchiver # lightweight GTK GUI for zip/7z/tar/rar extraction —
+      # fits a minimal niri/waybar setup better than file-roller
+      # (avoids pulling in heavy GNOME dependencies)
+
+      # ---- System monitoring / info ----
       btop
       htop
       fastfetch
+
+      # ---- Shell / prompt / terminal ----
+      zsh
       oh-my-posh
       # alacritty
       wezterm
-      zsh
-      nixd
-      alejandra
+
+      # ---- Nix tooling ----
+      nixd # Nix language server
+      alejandra # Nix formatter (also wired into `nix fmt` via treefmt.nix)
+
+      # ---- Secrets ----
       age
       sops
+
+      # ---- Wayland session / niri desktop ----
       swaylock
       swayidle
-      grim
-      slurp
-      swappy
-      cliphist
+      grim # screenshot capture
+      slurp # screen area selector (used with grim)
+      swappy # screenshot annotation
+      cliphist # clipboard history
       wl-clipboard
       xwayland-satellite
       waybar
-      fuzzel
-      swaybg
-      wlr-which-key
-      orca
+      fuzzel # app launcher
+      swaybg # wallpaper daemon
+      wlr-which-key # keybinding cheatsheet popup
+      orca # screen reader
+
+      # ---- Desktop integration ----
       networkmanagerapplet
       nextcloud-client
       capitaine-cursors
-      qt6Packages.qt6ct
-      seahorse
+      qt6Packages.qt6ct # Qt theming control panel
+      seahorse # GNOME Keyring GUI
     ])
     ++ (with pkgs-unstable; [
       neovim
