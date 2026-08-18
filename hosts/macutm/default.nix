@@ -1,8 +1,11 @@
-{ pkgs, lib, ... }:
 {
-  imports = [ ../common/mac-vm-workstation.nix ];
+  pkgs,
+  lib,
+  ...
+}: {
+  imports = [../common/mac-vm-workstation.nix];
 
-  environment.systemPackages = [ pkgs.spice-vdagent ];
+  environment.systemPackages = [pkgs.spice-vdagent];
 
   # cursor / DRM em virtio às vezes quebra sem isso
   environment.sessionVariables = {

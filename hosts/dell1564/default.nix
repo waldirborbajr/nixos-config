@@ -1,7 +1,11 @@
 # hosts/dell/default.nix
 # Dell-specific configuration (legacy BIOS machine)
-{ lib, pkgs, common, ... }:
-let
+{
+  lib,
+  pkgs,
+  common,
+  ...
+}: let
   # Inherit common variables from configuration.nix
   inherit (common) username;
 in {
@@ -60,7 +64,7 @@ in {
   # b43 needs firmware version 6.30.163.46 specifically for LP-PHY chips
   # (this Dell's revision) — newer/older firmware versions target different
   # PHY generations and won't work with this card.
-  hardware.firmware = [ pkgs.b43Firmware_6_30_163_46 ];
+  hardware.firmware = [pkgs.b43Firmware_6_30_163_46];
 
   # No blacklist needed: b43/bcma/ssb are the drivers we WANT this time.
   # (Contrast with the old `wl`-based approach, which had to blacklist these
@@ -68,7 +72,7 @@ in {
 
   # b43 is a regular kernel module (boot.kernelModules), no extraModulePackages
   # needed since it ships in-tree — the kernel build already includes it.
-  boot.kernelModules = [ "b43" ];
+  boot.kernelModules = ["b43"];
 
   # ==================== PACKAGES SPECIFIC TO THIS HOST ====================
   # Keep this list light — Dell is the oldest/slowest machine
@@ -119,8 +123,8 @@ in {
   # ==================== HOME MANAGER (host-specific, fase 3) ====================
   # Override niri input + outputs for Dell ABNT2 keyboard and internal panel.
   home-manager.users.${username} = {
-    xdg.configFile."niri/config/input.kdl".source   = ../../home/configs/niri/config/input-dell.kdl;
+    xdg.configFile."niri/config/input.kdl".source = ../../home/configs/niri/config/input-dell.kdl;
     xdg.configFile."niri/config/outputs.kdl".source = ../../home/configs/niri/config/outputs-dell.kdl;
-    xdg.configFile."waybar/output.jsonc".source     = ../../home/configs/waybar/output-dell.jsonc;
+    xdg.configFile."waybar/output.jsonc".source = ../../home/configs/waybar/output-dell.jsonc;
   };
 }
