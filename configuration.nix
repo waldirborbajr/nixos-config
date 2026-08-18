@@ -293,6 +293,8 @@ in {
       zoxide
 
       kdlfmt
+      taplo
+
       # Compactação / descompactação
       unzip
       zip

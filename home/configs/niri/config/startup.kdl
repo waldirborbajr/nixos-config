@@ -1,12 +1,9 @@
 // Processes spawned at niri startup.
-
-spawn-at-startup "waybar"
-
+spawn-at-startup waybar
 spawn-sh-at-startup "swaybg -i \"$HOME/Pictures/Wallpapers/wallpaper.jpg\" -m fill"
-
 // Histórico de clipboard
 spawn-sh-at-startup "wl-paste --type text --watch cliphist store"
 spawn-sh-at-startup "wl-paste --type image --watch cliphist store"
-
 // Idle: tela off aos 5 min, lock aos 10 min, sleep aos 15 min
 spawn-sh-at-startup "swayidle -w timeout 300 'niri msg action power-off-monitors' timeout 600 'swaylock -f' timeout 900 'systemctl suspend' before-sleep 'swaylock -f'"
+

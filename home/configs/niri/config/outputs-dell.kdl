@@ -2,10 +2,10 @@
 // Confirm the exact name with: niri msg outputs
 // Common names: eDP-1, LVDS-1, HDMI-A-1
 // https://niri-wm.github.io/niri/Configuration:-Outputs
-
-output "eDP-1" {
+output eDP-1 {
     mode "1920x1080@60"
     scale 1
-    transform "normal"
+    transform normal
     position x=0 y=0
 }
+

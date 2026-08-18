@@ -1,12 +1,11 @@
-workspace "web" {
-  layout {
-    focus-ring {
-        width 5
-        active-gradient from="#62BAF5" to="#8962F5" angle=45 relative-to="workspace-view"
+workspace web {
+    layout {
+        focus-ring {
+            width 5
+            active-gradient from="#62BAF5" to="#8962F5" angle=45 relative-to=workspace-view
+        }
     }
-  }
 }
-
 // workspace "nix" {
 //   layout {
 //     focus-ring {
@@ -15,10 +14,8 @@ workspace "web" {
 //     }
 //   }
 // }
-
-workspace "dev"
-
-// workspace "chat" {
+workspace dev
+ // workspace "chat" {
 //   layout {
 //     focus-ring {
 //         width 5
@@ -38,3 +35,4 @@ workspace "dev"
 
 // workspace "mon"
 // workspace "scratch"
+
