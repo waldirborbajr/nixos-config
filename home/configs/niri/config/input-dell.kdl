@@ -3,7 +3,7 @@ input {
         xkb {
             layout "br"
             variant "abnt2"
- // options "compose:ralt"   # se quiser
+            // options "compose:ralt"   # se quiser
         }
         numlock
     }
@@ -30,4 +30,3 @@ gestures {
         off
     }
 }
-

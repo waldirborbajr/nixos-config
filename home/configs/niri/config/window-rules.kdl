@@ -1,63 +1,69 @@
 // Window rules let you adjust behavior for individual windows.
 // Find more information on the wiki:
 // https://github.com/YaLTeR/niri/wiki/Configuration:-Window-Rules
+
 // Work around WezTerm's initial configure bug
 // by setting an empty default-column-width.
 window-rule {
     // This regular expression is intentionally made as specific as possible,
     // since this is the default config, and we want no false positives.
     // You can get away with just app-id="wezterm" if you want.
-    match app-id="^org\\.wezfurlong\\.wezterm$"
-    default-column-width {
-
-    }
+    match app-id=r#"^org\.wezfurlong\.wezterm$"#
+    default-column-width {}
 }
+
 window-rule {
     match is-floating=true
     default-floating-position x=0 y=50 relative-to="top"
-    default-window-height {
-        proportion 0.75
-    }
+    default-window-height { proportion 0.75; }
+
     focus-ring {
         active-color "#a3be8c"
     }
 }
+
 // Mark screencasted window
 window-rule {
     match is-window-cast-target=true
+
     focus-ring {
         active-color "#f38ba8"
         inactive-color "#7d0d2d"
     }
+
     border {
         inactive-color "#7d0d2d"
     }
+
     shadow {
         color "#7d0d2d70"
     }
+
     tab-indicator {
         active-color "#f38ba8"
         inactive-color "#7d0d2d"
     }
 }
+
 // Open the Firefox picture-in-picture player as floating by default.
 window-rule {
     // This app-id regular expression will work for both:
     // - host Firefox (app-id is "firefox")
     // - Flatpak Firefox (app-id is "org.mozilla.firefox")
-    match app-id="firefox$" title="^Picture-in-Picture$"
+    match app-id=r#"firefox$"# title="^Picture-in-Picture$"
     open-floating true
 }
+
 window-rule {
     match app-id="firefox-devedition"
-    default-column-width {
-        proportion 0.75
-    }
+    default-column-width { proportion 0.75; }
 }
+
 window-rule {
     match app-id="org.gnome.Evolution"
     open-maximized true
 }
+
 window-rule {
     match app-id="Pinentry-gtk"
     match app-id="org.gnome.PowerStats"
@@ -67,84 +73,66 @@ window-rule {
     match app-id="OpenFlipper"
     open-floating true
 }
+
 window-rule {
-    match app-id="OpenFlipper" title="OpenFlipper.+"
+    match app-id="OpenFlipper" title=r#"OpenFlipper.+"#
     open-floating false
     open-maximized true
 }
+
 window-rule {
     match app-id="footclient" title="compose-message"
-    default-column-width {
-        proportion 0.45
-    }
-    default-window-height {
-        proportion 0.65
-    }
+    default-column-width { proportion 0.45; }
+    default-window-height { proportion 0.65; }
     open-floating true
 }
+
 window-rule {
     match app-id="org.gnome.Evolution" title="Evolution Preferences"
-    default-column-width {
-        proportion 0.55
-    }
-    default-window-height {
-        proportion 0.85
-    }
+    default-column-width { proportion 0.55; }
+    default-window-height { proportion 0.85; }
 }
+
 window-rule {
-    match app-id="org.gnome.Evolution" title="Compose Message|Appointment — .*|Assigned Task — .*|Meeting — .*|Re: .*|Fwd:.*"
+    match app-id="org.gnome.Evolution" title=r#"Compose Message|Appointment — .*|Assigned Task — .*|Meeting — .*|Re: .*|Fwd:.*"#
     open-floating true
-    default-window-height {
-        proportion 0.75
-    }
-    default-column-width {
-        proportion 0.55
-    }
+    default-window-height { proportion 0.75; }
+    default-column-width { proportion 0.55; }
 }
+
 window-rule {
     match app-id="blueman-manager"
     open-floating true
-    default-window-height {
-        proportion 0.65
-    }
+    default-window-height { proportion 0.65; }
 }
+
 window-rule {
     match app-id="nm-connection-editor"
     open-floating true
-    default-window-height {
-        proportion 0.75
-    }
+    default-window-height { proportion 0.75; }
 }
+
 window-rule {
     match app-id="foot" title="Pubs edit"
     open-floating true
-    default-window-height {
-        proportion 0.6
-    }
-    default-column-width {
-        proportion 0.5
-    }
+    default-window-height { proportion 0.6; }
+    default-column-width { proportion 0.50; }
 }
+
 window-rule {
     match app-id="rofi-pubs" title="Wofi-pubs"
     open-floating true
-    default-window-height {
-        proportion 0.15
-    }
-    default-column-width {
-        proportion 0.2
-    }
+    default-window-height { proportion 0.15; }
+    default-column-width { proportion 0.20; }
 }
+
 window-rule {
     match app-id="footclient" title="vimwiki"
     open-floating true
-    default-window-height {
-        proportion 0.85
-    }
-    default-column-width {
-        proportion 0.5
-    }
+    default-window-height { proportion 0.85; }
+    default-column-width { proportion 0.50; }
 }
+
 window-rule {
     match app-id="blender"
     match app-id="prusa-slicer"
@@ -154,34 +142,30 @@ window-rule {
     match app-id="PrusaSlicer"
     match app-id="org.freecad.FreeCAD"
     match app-id="steam"
-    match title="^CQ-Editor:.*$"
+    match title=r#"^CQ-Editor:.*$"#
     open-maximized true
 }
+
 window-rule {
     match app-id="footclient" title="codelldb-nvim"
     default-column-display "normal"
-    default-window-height {
-        proportion 0.5
-    }
-    default-column-width {
-        proportion 0.3
-    }
+    default-window-height { proportion 0.5; }
+    default-column-width { proportion 0.3; }
 }
+
 window-rule {
     match app-id="blender" title="Preferences"
     open-floating true
-    default-column-width {
-        proportion 0.65
-    }
-    default-window-height {
-        proportion 0.65
-    }
+    default-column-width { proportion 0.65; }
+    default-window-height { proportion 0.65; }
 }
+
 // Solvespace
 window-rule {
     match app-id="solvespace"
     open-maximized true
 }
+
 window-rule {
     match app-id="solvespace" title="Property Browser — SolveSpace"
     open-floating true
@@ -191,44 +175,46 @@ window-rule {
         inactive-color "#88c0d0"
     }
 }
+
 // Block out password managers from screencasts.
 window-rule {
-    match app-id="^org\\.keepassxc\\.KeePassXC$"
-    match app-id="^org\\.gnome\\.World\\.Secrets$"
+    match app-id=r#"^org\.keepassxc\.KeePassXC$"#
+    match app-id=r#"^org\.gnome\.World\.Secrets$"#
     block-out-from "screencast"
 }
+
 // Block Kooha's own window from being captured by itself.
 window-rule {
-    match app-id="^io\\.github\\.seadve\\.Kooha$"
+    match app-id=r#"^io\.github\.seadve\.Kooha$"#
     block-out-from "screencast"
 }
+
 // -------- named-workspace routing --------
 // niri creates a named workspace on the fly the first time something opens
 // on it via open-on-workspace, no need to pre-declare "nix"/"mon" elsewhere.
+
 // fastfetch already installed; nitch is NOT — add it to
 // hosts/common/mac-vm-workstation.nix if you want this rule to ever match it.
 window-rule {
-    match app-id="^fastfetch$"
-    match app-id="^nitch$"
+    match app-id=r#"^fastfetch$"#
+    match app-id=r#"^nitch$"#
     open-on-workspace "nix"
 }
+
 // btop-monitor is the --class used in the wezterm startup spawn.
 window-rule {
-    match at-startup=true app-id="^btop-monitor$"
+    match at-startup=true app-id=r#"^btop-monitor$"#
     open-on-workspace "mon"
     open-maximized true
 }
+
 // -------- scratchpad-style floating utilities --------
 window-rule {
     match app-id="nemo"
     open-on-workspace "scratch"
     open-floating true
-    default-column-width {
-        fixed 1157
-    }
-    default-window-height {
-        fixed 736
-    }
+    default-column-width { fixed 1157; }
+    default-window-height { fixed 736; }
     popups {
         geometry-corner-radius 6
         opacity 0.85
@@ -237,16 +223,13 @@ window-rule {
         }
     }
 }
+
 window-rule {
     match app-id="Spotify|spotify"
     open-on-workspace "scratch"
     open-floating true
-    default-column-width {
-        fixed 1596
-    }
-    default-window-height {
-        fixed 1240
-    }
+    default-column-width { fixed 1596; }
+    default-window-height { fixed 1240; }
     popups {
         geometry-corner-radius 6
         opacity 0.85
@@ -255,33 +238,32 @@ window-rule {
         }
     }
 }
+
 window-rule {
     match app-id="org.pulseaudio.pavucontrol"
     open-on-workspace "scratch"
     open-floating true
-    default-column-width {
-        fixed 1438
-    }
-    default-window-height {
-        fixed 846
-    }
+    default-column-width { fixed 1438; }
+    default-window-height { fixed 846; }
 }
+
 // -------- floating utility windows --------
 window-rule {
     match app-id="xdg-desktop-portal-gtk"
     match app-id="org.gnome.Loupe"
     open-floating true
 }
+
 // Example: enable rounded corners for all windows.
 // (This example rule is commented out with a "/-" in front.)
 window-rule {
     geometry-corner-radius 12
     clip-to-geometry true
 }
+
 layer-rule {
     // This is for swaybg; change for other wallpaper tools.
     // Find the right namespace by running niri msg layers.
     // match namespace="^wallpaper$"
     place-within-backdrop true
 }
-

@@ -3,7 +3,7 @@ input {
         xkb {
             layout "us"
             variant "mac"
- // model "macbook79"   # opcional
+            // model "macbook79"   # opcional
         }
         numlock
     }
@@ -30,4 +30,3 @@ gestures {
         off
     }
 }
-
