@@ -102,7 +102,7 @@
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
       in
-        (treefmt-nix.lib.evalModule pkgs ./treefmt.nix).config.build.wrapper
+        (inputs.treefmt-nix.lib.evalModule pkgs ./treefmt.nix).config.build.wrapper
     );
   };
 }
