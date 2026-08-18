@@ -285,6 +285,7 @@ in {
       git
       gh
       gh-dash
+      delta
       tmux
       bat
       ripgrep
