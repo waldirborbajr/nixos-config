@@ -30,6 +30,16 @@ in {
 
   hardware.bluetooth.package = bluezPinned;
 
+  # O módulo hardware.bluetooth do NixOS força General.ControllerMode =
+  # "dual" como default (sempre, mesmo sem configurar nada) — em
+  # nixos/modules/services/hardware/bluetooth.nix. O controlador
+  # Broadcom interno do mac2011 é BR/EDR clássico puro, sem LE de
+  # verdade. Forçar "dual" pode travar a máquina de estados de
+  # pareamento do bluetoothd esperando uma etapa LE que esse chip nunca
+  # cumpre — bate com o sintoma (conecta, fica ~18s parado, cai sozinho
+  # depois). Testando "bredr" explícito pra descartar essa hipótese.
+  hardware.bluetooth.settings.General.ControllerMode = lib.mkForce "bredr";
+
   # ==================== WIRELESS (open-source b43) ====================
   # BCM4331 do MacBook Pro 2011 funciona com o driver open-source b43.
   # Evita o broadcom-sta (proprietário, inseguro e quebrando em kernel ≥ 7.1).

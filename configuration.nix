@@ -218,8 +218,8 @@ in {
   # PipeWire); gtk = file chooser de apps sandboxed/Electron.
   xdg.portal = {
     enable = true;
-    extraPortals = with pkgs; [ xdg-desktop-portal-gnome xdg-desktop-portal-gtk ];
-    config.common.default = [ "gnome" ];
+    extraPortals = with pkgs; [xdg-desktop-portal-gnome xdg-desktop-portal-gtk];
+    config.common.default = ["gnome"];
   };
 
   # ==================== NIX-LD ====================
@@ -229,12 +229,12 @@ in {
   programs.nix-ld = {
     enable = true;
     libraries = with pkgs; [
-      stdenv.cc.cc.lib   # libstdc++
+      stdenv.cc.cc.lib # libstdc++
       zlib
-      libusb1            # acesso USB direto (CPS de rádio, programadores)
+      libusb1 # acesso USB direto (CPS de rádio, programadores)
       udev
-      icu                # runtime .NET (RadioManager e outros CPS baseados em .NET)
-      fontconfig         # SkiaSharp (UI gráfica do RadioManager) precisa pra achar fontes
+      icu # runtime .NET (RadioManager e outros CPS baseados em .NET)
+      fontconfig # SkiaSharp (UI gráfica do RadioManager) precisa pra achar fontes
       freetype
       harfbuzz
     ];
@@ -294,10 +294,10 @@ in {
       # Compactação / descompactação
       unzip
       zip
-      p7zip      # 7z (também lida com vários outros formatos)
-      xarchiver  # GUI leve (GTK) para abrir/extrair zip, 7z, tar, rar, etc.
-                 # combina bem com um setup minimalista tipo niri/waybar
-                 # (não puxa dependências pesadas do GNOME como o file-roller)
+      p7zip # 7z (também lida com vários outros formatos)
+      xarchiver # GUI leve (GTK) para abrir/extrair zip, 7z, tar, rar, etc.
+      # combina bem com um setup minimalista tipo niri/waybar
+      # (não puxa dependências pesadas do GNOME como o file-roller)
       btop
       htop
       fastfetch

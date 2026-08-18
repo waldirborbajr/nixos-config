@@ -19,55 +19,63 @@
     };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, sops-nix, home-manager, ... } @ inputs:
-    let
-      mkHost = { hostname, system }:
-        nixpkgs.lib.nixosSystem {
-          inherit system;
+  outputs = {
+    self,
+    nixpkgs,
+    nixpkgs-unstable,
+    sops-nix,
+    home-manager,
+    ...
+  } @ inputs: let
+    mkHost = {
+      hostname,
+      system,
+    }:
+      nixpkgs.lib.nixosSystem {
+        inherit system;
 
-          specialArgs = {
-            inherit inputs hostname;
+        specialArgs = {
+          inherit inputs hostname;
 
-            pkgs-unstable = import nixpkgs-unstable {
-              inherit system;
-              config.allowUnfree = true;
-            };
+          pkgs-unstable = import nixpkgs-unstable {
+            inherit system;
+            config.allowUnfree = true;
           };
-
-          modules = [
-            # 🔐 SOPS module (global)
-            sops-nix.nixosModules.sops
-
-            # 🏠 Home Manager (fase 2)
-            home-manager.nixosModules.home-manager
-
-            ./configuration.nix
-            ./hosts/${hostname}/default.nix              # ← macutm ou macvmf, nunca os dois juntos
-            ./hosts/${hostname}/hardware-configuration.nix # ← idem
-          ];
-        };
-    in
-    {
-      nixosConfigurations = {
-        dell = mkHost {
-          hostname = "dell1564";
-          system = "x86_64-linux";
         };
 
-        m2utm = mkHost {
-          hostname = "macutm";
-          system = "aarch64-linux";
-        };
+        modules = [
+          # 🔐 SOPS module (global)
+          sops-nix.nixosModules.sops
 
-        macvmf = mkHost {
-          hostname = "macvmf";
-          system = "aarch64-linux";
-        };
+          # 🏠 Home Manager (fase 2)
+          home-manager.nixosModules.home-manager
 
-        macbook2011 = mkHost {
-          hostname = "mac2011";
-          system = "x86_64-linux";
-        };
+          ./configuration.nix
+          ./hosts/${hostname}/default.nix # ← macutm ou macvmf, nunca os dois juntos
+          ./hosts/${hostname}/hardware-configuration.nix # ← idem
+        ];
+      };
+  in {
+    nixosConfigurations = {
+      dell = mkHost {
+        hostname = "dell1564";
+        system = "x86_64-linux";
+      };
+
+      m2utm = mkHost {
+        hostname = "macutm";
+        system = "aarch64-linux";
+      };
+
+      macvmf = mkHost {
+        hostname = "macvmf";
+        system = "aarch64-linux";
+      };
+
+      macbook2011 = mkHost {
+        hostname = "mac2011";
+        system = "x86_64-linux";
       };
     };
+  };
 }
