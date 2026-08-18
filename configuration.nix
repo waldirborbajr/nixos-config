@@ -15,6 +15,21 @@
   common = {
     inherit username;
   };
+
+  # bluez do nixos-26.05 é 5.86, que tem regressão confirmada de
+  # pareamento BR/EDR clássico com o K380 nesse controlador Broadcom
+  # (mac2011): conecta, nunca dispara autenticação, cai sozinho depois
+  # de ~18s (ver histórico de debug). Confirmado que a MESMA máquina
+  # pareia sem problema no Fedora 42, que usa bluez 5.83. Fixando o
+  # source nessa versão exata via overrideAttrs — fica dentro do mesmo
+  # nixpkgs-26.05, sem puxar canal/input novo.
+  bluezPinned = pkgs.bluez.overrideAttrs (old: rec {
+    version = "5.83";
+    src = pkgs.fetchurl {
+      url = "https://github.com/bluez/bluez/archive/refs/tags/${version}.tar.gz";
+      sha256 = "07c878513ef03bb536c06d547506c12771d3823e656993869552b246a02e8a2e";
+    };
+  });
 in {
   _module.args.common = common;
 
@@ -241,49 +256,26 @@ in {
   };
 
   # ==================== BLUETOOTH ====================
+  # Voltado ao estado mínimo original. Testamos disable_ertm=1 (quebrou
+  # setsockopt do bluetoothd), Policy.AutoEnable/ReconnectAttempts/
+  # JustWorksRepairing (suspeito de brigar com pareamento manual em
+  # background) e regra de udev de autosuspend — nenhum resolveu, e o
+  # usuário confirmou que o MESMO hardware pareia sem problema no Fedora
+  # com bluez "de fábrica". Ou seja: quanto menos customização aqui,
+  # mais perto do baseline que sabemos que funciona.
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
+    package = bluezPinned;
     settings = {
       General = {
         Experimental = true;
         FastConnectable = true;
-        # Reautentica silenciosamente em vez de exigir novo pareamento
-        # quando o link key expira/diverge — comum em HID Bluetooth Classic.
-        JustWorksRepairing = "always";
-      };
-      Policy = {
-        AutoEnable = true;
-        # Reconecta automaticamente dispositivos HID (teclado/mouse) que
-        # caem, em vez de deixar o link morto até reconexão manual.
-        ReconnectAttempts = 7;
-        ReconnectIntervals = "1,2,4,8,16,32,64";
       };
     };
   };
 
-  # NOTA: já testamos boot.extraModprobeConfig com "disable_ertm=1" aqui.
-  # NÃO usar: nesse kernel + bluez 5.86, desligar ERTM faz o próprio
-  # bluetoothd falhar ao configurar os sockets L2CAP de vários perfis
-  # (setsockopt(L2CAP_OPTIONS): Invalid argument), incluindo, ao que tudo
-  # indica, parte da negociação do perfil HID. Era workaround pra kernels
-  # ~4.x; nessa combinação de versões ele quebra mais do que resolve.
-
   services.blueman.enable = true;
-
-  # TEMPORÁRIO — debug do bug de pareamento do K380 no mac2011.
-  # Remover depois de identificar a causa raiz.
-  systemd.services.bluetooth.serviceConfig.ExecStart = lib.mkForce [
-    ""
-    "${pkgs.bluez}/libexec/bluetooth/bluetoothd -d"
-  ];
-
-  # Impede o USB autosuspend de suspender o próprio controlador Bluetooth
-  # (classe USB 0xE0 = Wireless Controller / Bluetooth) em segundo plano,
-  # o que também derruba links HID já conectados.
-  services.udev.extraRules = ''
-    ACTION=="add", SUBSYSTEM=="usb", ATTR{bDeviceClass}=="e0", TEST=="power/control", ATTR{power/control}="on"
-  '';
 
   # ==================== PROGRAMS ====================
   nixpkgs.config.allowUnfree = true;
