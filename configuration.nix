@@ -306,7 +306,7 @@ in {
       htop
       fastfetch
       oh-my-posh
-      alacritty
+      # alacritty
       wezterm
       zsh
       nixd
