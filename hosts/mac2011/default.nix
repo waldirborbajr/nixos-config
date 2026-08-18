@@ -6,38 +6,14 @@
 { config, lib, pkgs, common, ... }:
 let
   inherit (common) username;
-
-  # bluez do nixos-26.05 é 5.86, que tem regressão confirmada de
-  # pareamento BR/EDR clássico com o K380 neste controlador Broadcom
-  # interno (mac2011): conecta, nunca dispara autenticação, cai sozinho
-  # depois de ~18s (ver histórico de debug). Confirmado que a MESMA
-  # máquina pareia sem problema no Fedora 42, que usa bluez 5.83.
-  # Fixando o source nessa versão exata via overrideAttrs — fica dentro
-  # do mesmo nixpkgs-26.05, sem puxar canal/input novo. Só neste host:
-  # dell1564/macutm/macvmf não têm K380 e não precisam disso.
-  bluezPinned = pkgs.bluez.overrideAttrs (old: rec {
-    version = "5.83";
-    src = pkgs.fetchurl {
-      url = "https://github.com/bluez/bluez/archive/refs/tags/${version}.tar.gz";
-      sha256 = "07c878513ef03bb536c06d547506c12771d3823e656993869552b246a02e8a2e";
-    };
-    # Os patches do nixpkgs (old.patches) foram escritos contra o
-    # código-fonte do 5.86 e não se aplicam ao 5.83 — descartamos.
-    patches = [];
-  });
 in {
   imports = [ ../common/mac-workstation.nix ];
-
-  hardware.bluetooth.package = bluezPinned;
 
   # O módulo hardware.bluetooth do NixOS força General.ControllerMode =
   # "dual" como default (sempre, mesmo sem configurar nada) — em
   # nixos/modules/services/hardware/bluetooth.nix. O controlador
   # Broadcom interno do mac2011 é BR/EDR clássico puro, sem LE de
-  # verdade. Forçar "dual" pode travar a máquina de estados de
-  # pareamento do bluetoothd esperando uma etapa LE que esse chip nunca
-  # cumpre — bate com o sintoma (conecta, fica ~18s parado, cai sozinho
-  # depois). Testando "bredr" explícito pra descartar essa hipótese.
+  # verdade. Testando "bredr" explícito.
   hardware.bluetooth.settings.General.ControllerMode = lib.mkForce "bredr";
 
   # ==================== WIRELESS (open-source b43) ====================
