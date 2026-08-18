@@ -292,6 +292,9 @@ in {
       eza
       zoxide
 
+      zathura
+      mupdf
+
       kdlfmt
       taplo
 
