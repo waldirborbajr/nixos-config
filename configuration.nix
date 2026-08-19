@@ -288,6 +288,7 @@ in {
       zoxide # cd replacement
       bat # cat with syntax highlighting
       tmux
+      fzf
 
       # ---- Version control ----
       git
