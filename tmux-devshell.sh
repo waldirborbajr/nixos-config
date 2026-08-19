@@ -75,12 +75,23 @@ pick_profile_menu() {
   IFS=$'\n' names=($(sort <<<"${names[*]}")); unset IFS
 
   if command -v fzf &>/dev/null; then
+    # Mapa profile→devshells num arquivo temporário: o preview do fzf roda no
+    # $SHELL do usuário (zsh) e NÃO herda o declare -A PROFILES do bash.
+    # ${PROFILES[custom]} no zsh vira aritmética → "bad math expression".
+    local profile_map
+    profile_map=$(mktemp)
+    for k in "${!PROFILES[@]}"; do
+      printf '%s\t%s\n' "$k" "${PROFILES[$k]}"
+    done >"$profile_map"
+    printf '%s\t%s\n' "custom" "(seleção manual de devshells)" >>"$profile_map"
+
     local choice
     choice=$(printf '%s\n' "${names[@]}" | fzf \
       --prompt="Escolha um profile [ENTER confirma] > " \
       --height=40% --border \
-      --preview 'echo Devshells: ${PROFILES[{}]:-"(selecao customizada)"}' \
+      --preview "awk -F'\t' -v p={} '\$1==p {print \"Devshells: \" \$2}' '$profile_map'" \
       --preview-window=up:2)
+    rm -f "$profile_map"
     echo "$choice"
   else
     echo -e "${C_YELLOW}fzf não encontrado, usando fallback numerado${C_RESET}" >&2
