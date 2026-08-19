@@ -9,9 +9,7 @@
   pkgs,
   modulesPath,
   ...
-}:
-
-{
+}: {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
   ];
@@ -24,9 +22,9 @@
     "sd_mod"
     "sr_mod"
   ];
-  boot.initrd.kernelModules = [ ];
-  boot.kernelModules = [ "kvm-intel" ];
-  boot.extraModulePackages = [ ];
+  boot.initrd.kernelModules = [];
+  boot.kernelModules = ["kvm-intel"];
+  boot.extraModulePackages = [];
 
   #  fileSystems."/" =
   #    { device = "/dev/disk/by-uuid/1acae91f-ffb3-40e6-8e0d-dd2b63c6c4bb";
@@ -41,12 +39,10 @@
       "nodiratime"
       "commit=60"
     ];
-  };    
+  };
 
-  swapDevices = [ ];
+  swapDevices = [];
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
-
-
 }

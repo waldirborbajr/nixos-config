@@ -3,11 +3,16 @@
 #
 # Programas / browsers / teclado / boot EFI → hosts/common/mac-workstation.nix
 # Aqui só o que é específico deste hardware (Wi-Fi + niri/waybar físicos).
-{ config, lib, pkgs, common, ... }:
-let
+{
+  config,
+  lib,
+  pkgs,
+  common,
+  ...
+}: let
   inherit (common) username;
 in {
-  imports = [ ../common/mac-workstation.nix ];
+  imports = [../common/mac-workstation.nix];
 
   # O módulo hardware.bluetooth do NixOS força General.ControllerMode =
   # "dual" como default (sempre, mesmo sem configurar nada) — em
@@ -62,8 +67,8 @@ in {
 
   # ==================== HOME MANAGER (niri/waybar do hardware físico) ====================
   home-manager.users.${username} = {
-    xdg.configFile."niri/config/input.kdl".source   = ../../home/configs/niri/config/input-mac2011.kdl;
+    xdg.configFile."niri/config/input.kdl".source = ../../home/configs/niri/config/input-mac2011.kdl;
     xdg.configFile."niri/config/outputs.kdl".source = ../../home/configs/niri/config/outputs-mac2011.kdl;
-    xdg.configFile."waybar/output.jsonc".source     = ../../home/configs/waybar/output-mac2011.jsonc;
+    xdg.configFile."waybar/output.jsonc".source = ../../home/configs/waybar/output-mac2011.jsonc;
   };
 }
