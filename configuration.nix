@@ -91,11 +91,6 @@ in {
     };
   };
 
-  programs.vicinae = {
-    enable = true;
-    systemd.enable = true;
-  };
-
   # ==================== SHELL ====================
   programs.zsh.enable = true;
 
