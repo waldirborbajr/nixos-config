@@ -21,8 +21,8 @@
 
     # Vicinae - Launcher (Raycast-like)
     vicinae = {
-      url = "github:vicinaehq/vicinae";
-      # inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:waldirborbajr/vicinae";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # Treefmt for code formatting
@@ -85,49 +85,73 @@
           ++ modules;
       };
 
-    # Helper to import devshells
+    # Helper to import devshells - each returns a set with 'default' attribute
+    mkDevShell = {
+      pkgs,
+      path,
+    }:
+      import path {inherit pkgs;};
+
     mkDevShells = system: let
       pkgs = nixpkgs.legacyPackages.${system};
     in {
-      # Go development environment
-      go = import ./devshells/go/flake.nix {inherit pkgs;};
-
-      # Rust development environment
-      rust = import ./devshells/rust/flake.nix {inherit pkgs;};
-
-      # Lua development environment
-      lua = import ./devshells/lua/flake.nix {inherit pkgs;};
-
-      # Python development environment
-      python = import ./devshells/python/flake.nix {inherit pkgs;};
-
-      # Arduino development environment
-      arduino = import ./devshells/arduino/flake.nix {inherit pkgs;};
-
-      # LaTeX development environment
-      latex = import ./devshells/latex/flake.nix {inherit pkgs;};
-
-      # PostgreSQL development environment
-      postgresql = import ./devshells/postgresql/flake.nix {inherit pkgs;};
-
-      # MariaDB development environment
-      mariadb = import ./devshells/mariadb/flake.nix {inherit pkgs;};
-
-      # MongoDB development environment
-      mongodb = import ./devshells/mongodb/flake.nix {inherit pkgs;};
-
-      # SQLite development environment (new)
-      sqlite = import ./devshells/sqlite/flake.nix {inherit pkgs;};
+      go =
+        (mkDevShell {
+          inherit pkgs;
+          path = ./devshells/go;
+        }).default;
+      rust =
+        (mkDevShell {
+          inherit pkgs;
+          path = ./devshells/rust;
+        }).default;
+      lua =
+        (mkDevShell {
+          inherit pkgs;
+          path = ./devshells/lua;
+        }).default;
+      python =
+        (mkDevShell {
+          inherit pkgs;
+          path = ./devshells/python;
+        }).default;
+      arduino =
+        (mkDevShell {
+          inherit pkgs;
+          path = ./devshells/arduino;
+        }).default;
+      latex =
+        (mkDevShell {
+          inherit pkgs;
+          path = ./devshells/latex;
+        }).default;
+      postgresql =
+        (mkDevShell {
+          inherit pkgs;
+          path = ./devshells/postgresql;
+        }).default;
+      mariadb =
+        (mkDevShell {
+          inherit pkgs;
+          path = ./devshells/mariadb;
+        }).default;
+      mongodb =
+        (mkDevShell {
+          inherit pkgs;
+          path = ./devshells/mongodb;
+        }).default;
+      sqlite =
+        (mkDevShell {
+          inherit pkgs;
+          path = ./devshells/sqlite;
+        }).default;
     };
   in {
     nixosConfigurations = {
-      # Dell Inspiron 1564 - Standardized hostname
+      # Dell Inspiron 1564
       dell1564 = mkSystem {
         system = "x86_64-linux";
         hostname = "dell1564";
-        specialArgs = {
-          isLegacyDell = false;
-        };
       };
 
       # MacBook Pro 13" (2011)
