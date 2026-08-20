@@ -73,6 +73,8 @@
           ./hosts/${hostname}/hardware-configuration.nix # ← idem
         ];
       };
+
+    supportedSystems = ["x86_64-linux" "aarch64-linux"];
   in {
     nixosConfigurations = {
       dell = mkHost {
@@ -90,7 +92,7 @@
         system = "aarch64-linux";
       };
 
-      macbook2011 = mkHost {
+      mac2011 = mkHost {
         hostname = "mac2011";
         system = "x86_64-linux";
       };
@@ -98,11 +100,16 @@
 
     # `nix fmt` — same formatter regardless of which host you're on
     # (dell1564/mac2011 = x86_64-linux, macutm/macvmf = aarch64-linux).
-    formatter = nixpkgs.lib.genAttrs ["x86_64-linux" "aarch64-linux"] (
+    formatter = nixpkgs.lib.genAttrs supportedSystems (
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
       in
         (inputs.treefmt-nix.lib.evalModule pkgs ./treefmt.nix).config.build.wrapper
     );
+
+    # `nix flake check` — verifies the repo is formatted (fails CI/local check if not).
+    checks = nixpkgs.lib.genAttrs supportedSystems (system: {
+      format = self.formatter.${system}.check ./.;
+    });
   };
 }

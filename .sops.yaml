@@ -1,6 +1,10 @@
 # .sops.yaml
 # SOPS configuration for NixOS secrets management
 # See: https://github.com/getsops/sops
+#
+# to generate pub key
+# ./scripts/backup-age-key.sh
+
 
 creation_rules:
   # Dell Inspiron 1564 secrets

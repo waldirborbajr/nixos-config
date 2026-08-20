@@ -18,7 +18,7 @@
 # Known hosts (defined in flake.nix -> nixosConfigurations):
 #   m2utm       (macutm)    aarch64-linux
 #   dell        (dell1564)  x86_64-linux
-#   macbook2011 (mac2011)   x86_64-linux
+#   mac2011              x86_64-linux
 #   macvmf      (macvmf)    aarch64-linux
 #
 # Branch selection: build/update actions detect all local + remote branches.
@@ -55,7 +55,7 @@ GIT_BRANCH=""
 declare -A HOST_ATTR_TO_MACHINE=(
   [m2utm]="macutm"
   [dell]="dell1564"
-  [macbook2011]="mac2011"
+  [mac2011]="mac2011"
   [macvmf]="macvmf"
 )
 
@@ -69,11 +69,11 @@ declare -A HOST_ALIAS_TO_ATTR=(
 declare -A HOST_ATTR_TO_LABEL=(
   [m2utm]="MacBook M2 - UTM"
   [dell]="Dell Inspiron 1564"
-  [macbook2011]="MacBook Pro 13in (2011)"
+  [mac2011]="MacBook Pro 13in (2011)"
   [macvmf]="MacBook M2 - VMware Fusion"
 )
 
-FLAKE_ATTRS=(m2utm dell macbook2011 macvmf)
+FLAKE_ATTRS=(m2utm dell mac2011 macvmf)
 
 # set at runtime by select_flake_attr()
 FLAKE_ATTR=""
@@ -875,9 +875,8 @@ print_banner() {
   local detected
   detected="$(detect_flake_attr 2>/dev/null || echo 'not identified')"
 
-  # Nome curto e amigável da máquina (ex: "mac2011"), não o atributo do
-  # flake (ex: "macbook2011"). Cai pro próprio $detected se não houver
-  # mapeamento (ex: "not identified").
+  # Nome curto e amigável da máquina (ex: "mac2011"). Cai pro próprio
+  # $detected se não houver mapeamento (ex: "not identified").
   local machine_label="${HOST_ATTR_TO_MACHINE[$detected]:-$detected}"
 
   # Largura interna da caixa = nº de "─" entre os cantos ╭ e ╮.
