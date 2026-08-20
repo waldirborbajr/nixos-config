@@ -19,7 +19,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Vicinae - Launcher (Raycast-like)
+    # 🚀 Vicinae — Raycast-like launcher (mac2011 + VMs only, see mac-workstation.nix)
     vicinae = {
       url = "github:vicinaehq/vicinae";
       # inputs.nixpkgs.follows = "nixpkgs";
@@ -84,68 +84,6 @@
           ]
           ++ modules;
       };
-
-    # Helper to import devshells - each returns a set with 'default' attribute
-    mkDevShell = {
-      pkgs,
-      path,
-    }:
-      import path {inherit pkgs;};
-
-    mkDevShells = system: let
-      pkgs = nixpkgs.legacyPackages.${system};
-    in {
-      go =
-        (mkDevShell {
-          inherit pkgs;
-          path = ./devshells/go;
-        }).default;
-      rust =
-        (mkDevShell {
-          inherit pkgs;
-          path = ./devshells/rust;
-        }).default;
-      lua =
-        (mkDevShell {
-          inherit pkgs;
-          path = ./devshells/lua;
-        }).default;
-      python =
-        (mkDevShell {
-          inherit pkgs;
-          path = ./devshells/python;
-        }).default;
-      arduino =
-        (mkDevShell {
-          inherit pkgs;
-          path = ./devshells/arduino;
-        }).default;
-      latex =
-        (mkDevShell {
-          inherit pkgs;
-          path = ./devshells/latex;
-        }).default;
-      postgresql =
-        (mkDevShell {
-          inherit pkgs;
-          path = ./devshells/postgresql;
-        }).default;
-      mariadb =
-        (mkDevShell {
-          inherit pkgs;
-          path = ./devshells/mariadb;
-        }).default;
-      mongodb =
-        (mkDevShell {
-          inherit pkgs;
-          path = ./devshells/mongodb;
-        }).default;
-      sqlite =
-        (mkDevShell {
-          inherit pkgs;
-          path = ./devshells/sqlite;
-        }).default;
-    };
   in {
     nixosConfigurations = {
       # Dell Inspiron 1564
@@ -172,9 +110,6 @@
         hostname = "macvmf";
       };
     };
-
-    # Development shells
-    # devShells = forAllSystems (system: mkDevShells system);
 
     # Formatter configuration
     formatter = forAllSystems (
