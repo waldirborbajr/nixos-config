@@ -21,8 +21,8 @@
 
     # Vicinae - Launcher (Raycast-like)
     vicinae = {
-      url = "github:waldirborbajr/vicinae";
-      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:vicinaehq/vicinae";
+      # inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # Treefmt for code formatting
