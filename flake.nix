@@ -1,21 +1,20 @@
-# flake.nix
-# NixOS Flake configuration for multiple hosts
 {
-  description = "NixOS configuration for Dell Inspiron 1564, MacBook Pro 2011, and Mac VMs";
+  description = "Master Flake for Borba NixOS Config";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-24.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    #noctalia = {
+    #  url = "github:noctalia-dev/noctalia";
+    #  inputs.nixpkgs.follows = "nixpkgs"; # this line is optional, prevents downloading two versions of nixpkgs but disables cache
+    #};
 
-    # Home Manager
+    # 🔐 secrets management
+    sops-nix.url = "github:Mic92/sops-nix";
+
+    # 🏠 home-manager (fase 2)
     home-manager = {
-      url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    # SOPS for secrets management
-    sops-nix = {
-      url = "github:Mic92/sops-nix";
+      url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -25,7 +24,13 @@
       # inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Treefmt for code formatting
+    # 🔎 nix-index-database — prebuilt "command not found" DB (all hosts)
+    nix-index-database = {
+      url = "github:nix-community/nix-index-database";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # 🎨 treefmt-nix — repo-wide formatter, exposed via `nix fmt` (all hosts)
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -35,99 +40,69 @@
   outputs = {
     self,
     nixpkgs,
-    home-manager,
+    nixpkgs-unstable,
     sops-nix,
-    vicinae,
-    treefmt-nix,
+    home-manager,
     ...
   } @ inputs: let
-    # Utility function to iterate over systems
-    forAllSystems = nixpkgs.lib.genAttrs [
-      "x86_64-linux"
-      "aarch64-linux"
-    ];
-
-    # System configuration function
-    mkSystem = {
-      system,
+    mkHost = {
       hostname,
-      modules ? [],
-      specialArgs ? {},
+      system,
     }:
       nixpkgs.lib.nixosSystem {
         inherit system;
-        specialArgs =
-          {
-            inherit inputs;
-            inherit hostname;
-            inherit (self) outputs;
-          }
-          // specialArgs;
-        modules =
-          [
-            sops-nix.nixosModules.sops
-            home-manager.nixosModules.home-manager
-            {
-              # Home Manager configuration
-              home-manager = {
-                useGlobalPkgs = true;
-                useUserPackages = true;
-                users.borba = import ./home;
-                extraSpecialArgs = {
-                  inherit inputs;
-                  inherit hostname;
-                };
-              };
-            }
-            ./configuration.nix
-            ./hosts/${hostname}/default.nix
-          ]
-          ++ modules;
+
+        specialArgs = {
+          inherit inputs hostname;
+
+          pkgs-unstable = import nixpkgs-unstable {
+            inherit system;
+            config.allowUnfree = true;
+          };
+        };
+
+        modules = [
+          # 🔐 SOPS module (global)
+          sops-nix.nixosModules.sops
+
+          # 🏠 Home Manager (fase 2)
+          home-manager.nixosModules.home-manager
+
+          ./configuration.nix
+          ./hosts/${hostname}/default.nix # ← macutm ou macvmf, nunca os dois juntos
+          ./hosts/${hostname}/hardware-configuration.nix # ← idem
+        ];
       };
   in {
     nixosConfigurations = {
-      # Dell Inspiron 1564
-      dell1564 = mkSystem {
-        system = "x86_64-linux";
+      dell = mkHost {
         hostname = "dell1564";
-      };
-
-      # MacBook Pro 13" (2011)
-      mac2011 = mkSystem {
         system = "x86_64-linux";
-        hostname = "mac2011";
       };
 
-      # Mac M2 - UTM VM
-      macutm = mkSystem {
-        system = "aarch64-linux";
+      m2utm = mkHost {
         hostname = "macutm";
+        system = "aarch64-linux";
       };
 
-      # Mac M2 - VMware Fusion VM
-      macvmf = mkSystem {
-        system = "aarch64-linux";
+      macvmf = mkHost {
         hostname = "macvmf";
+        system = "aarch64-linux";
+      };
+
+      macbook2011 = mkHost {
+        hostname = "mac2011";
+        system = "x86_64-linux";
       };
     };
 
-    # Formatter configuration
-    formatter = forAllSystems (
-      system:
-        treefmt-nix.lib.${system}.mkFormatter {
-          projectRoot = ./.;
-          programs = {
-            nixpkgs-fmt.enable = true;
-            alejandra.enable = true;
-            deadnix.enable = true;
-            statix.enable = true;
-          };
-        }
+    # `nix fmt` — same formatter regardless of which host you're on
+    # (dell1564/mac2011 = x86_64-linux, macutm/macvmf = aarch64-linux).
+    formatter = nixpkgs.lib.genAttrs ["x86_64-linux" "aarch64-linux"] (
+      system: let
+        pkgs = nixpkgs.legacyPackages.${system};
+      in
+        (inputs.treefmt-nix.lib.evalModule pkgs ./treefmt.nix).config.build.wrapper
     );
-
-    # Checks
-    checks = forAllSystems (system: {
-      format = self.formatter.${system}.check ./.;
-    });
   };
 }
