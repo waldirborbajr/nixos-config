@@ -41,6 +41,12 @@
     treefmt-nix,
     ...
   } @ inputs: let
+    # Utility function to iterate over systems
+    forAllSystems = nixpkgs.lib.genAttrs [
+      "x86_64-linux"
+      "aarch64-linux"
+    ];
+
     # System configuration function
     mkSystem = {
       system,
@@ -78,6 +84,41 @@
           ]
           ++ modules;
       };
+
+    # Helper to import devshells
+    mkDevShells = system: let
+      pkgs = nixpkgs.legacyPackages.${system};
+    in {
+      # Go development environment
+      go = import ./devshells/go/flake.nix {inherit pkgs;};
+
+      # Rust development environment
+      rust = import ./devshells/rust/flake.nix {inherit pkgs;};
+
+      # Lua development environment
+      lua = import ./devshells/lua/flake.nix {inherit pkgs;};
+
+      # Python development environment
+      python = import ./devshells/python/flake.nix {inherit pkgs;};
+
+      # Arduino development environment
+      arduino = import ./devshells/arduino/flake.nix {inherit pkgs;};
+
+      # LaTeX development environment
+      latex = import ./devshells/latex/flake.nix {inherit pkgs;};
+
+      # PostgreSQL development environment
+      postgresql = import ./devshells/postgresql/flake.nix {inherit pkgs;};
+
+      # MariaDB development environment
+      mariadb = import ./devshells/mariadb/flake.nix {inherit pkgs;};
+
+      # MongoDB development environment
+      mongodb = import ./devshells/mongodb/flake.nix {inherit pkgs;};
+
+      # SQLite development environment (new)
+      sqlite = import ./devshells/sqlite/flake.nix {inherit pkgs;};
+    };
   in {
     nixosConfigurations = {
       # Dell Inspiron 1564 - Standardized hostname
@@ -85,7 +126,6 @@
         system = "x86_64-linux";
         hostname = "dell1564";
         specialArgs = {
-          # Remove legacy alias to avoid confusion
           isLegacyDell = false;
         };
       };
@@ -110,22 +150,21 @@
     };
 
     # Development shells
-    # devShells = {
-    #   x86_64-linux = import ./devshells;
-    #   aarch64-linux = import ./devshells;
-    # };
+    # devShells = forAllSystems (system: mkDevShells system);
 
     # Formatter configuration
-    formatter = forAllSystems (system:
-      treefmt-nix.lib.${system}.mkFormatter {
-        projectRoot = ./.;
-        programs = {
-          nixpkgs-fmt.enable = true;
-          alejandra.enable = true;
-          deadnix.enable = true;
-          statix.enable = true;
-        };
-      });
+    formatter = forAllSystems (
+      system:
+        treefmt-nix.lib.${system}.mkFormatter {
+          projectRoot = ./.;
+          programs = {
+            nixpkgs-fmt.enable = true;
+            alejandra.enable = true;
+            deadnix.enable = true;
+            statix.enable = true;
+          };
+        }
+    );
 
     # Checks
     checks = forAllSystems (system: {
