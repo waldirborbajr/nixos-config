@@ -1,0 +1,36 @@
+# .sops.yaml
+# SOPS configuration for NixOS secrets management
+# See: https://github.com/getsops/sops
+
+creation_rules:
+  # Dell Inspiron 1564 secrets
+  - path_regex: hosts/dell1564/secrets/dell1564\.yaml$
+    encrypted_regex: '^(data|stringData)$'
+    age: age1q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q # Replace with your actual age public key
+    key_groups:
+      - age:
+        - age1q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q # Same key for all hosts initially
+
+  # MacBook Pro 2011 secrets
+  - path_regex: hosts/mac2011/secrets/mac2011\.yaml$
+    encrypted_regex: '^(data|stringData)$'
+    age: age13ggsqwyzrherf2pxg8ur99df8f7axnc0zr96nyfwxp9d9tpzspwq7xumza
+    key_groups:
+      - age:
+        - age13ggsqwyzrherf2pxg8ur99df8f7axnc0zr96nyfwxp9d9tpzspwq7xumza
+
+  # Mac UTM VM secrets
+  - path_regex: hosts/macutm/secrets/macutm\.yaml$
+    encrypted_regex: '^(data|stringData)$'
+    age: age1q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q
+    key_groups:
+      - age:
+        - age1q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q
+
+  # Mac VMware Fusion VM secrets
+  - path_regex: hosts/macvmf/secrets/macvmf\.yaml$
+    encrypted_regex: '^(data|stringData)$'
+    age: age1q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q
+    key_groups:
+      - age:
+        - age1q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q
