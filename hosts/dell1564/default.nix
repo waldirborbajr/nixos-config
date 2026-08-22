@@ -9,6 +9,8 @@
   # Inherit common variables from configuration.nix
   inherit (common) username;
 in {
+  imports = [../common/broadcom-wifi.nix];
+
   # ==================== BOOTLOADER ====================
   # Assumes legacy BIOS + GRUB (older Dell hardware).
   # TODO: confirm with `ls /sys/firmware/efi` — if that path exists, this
@@ -57,9 +59,10 @@ in {
   # ATTEMPT 2 (current): open-source in-tree `b43` driver + extracted
   # firmware. b43 ships with the kernel itself (no out-of-tree module to
   # compile against a moving kernel ABI), so it doesn't rot the same way.
-  # Set only here (per-host), not in configuration.nix, so it does NOT apply
-  # to mac2011/macutm/macvmf.
-  hardware.enableRedistributableFirmware = true;
+  # hardware.enableRedistributableFirmware = true; comes from
+  # ../common/broadcom-wifi.nix (imported above) — shared only with
+  # mac2011, the other physical Broadcom host; does NOT apply to
+  # macutm/macvmf (VMs, no physical Wi-Fi).
 
   # b43 needs firmware version 6.30.163.46 specifically for LP-PHY chips
   # (this Dell's revision) — newer/older firmware versions target different

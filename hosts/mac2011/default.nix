@@ -12,7 +12,7 @@
 }: let
   inherit (common) username;
 in {
-  imports = [../common/mac-workstation.nix];
+  imports = [../common/mac-workstation.nix ../common/broadcom-wifi.nix];
 
   # O módulo hardware.bluetooth do NixOS força General.ControllerMode =
   # "dual" como default (sempre, mesmo sem configurar nada) — em
@@ -24,7 +24,9 @@ in {
   # ==================== WIRELESS (open-source b43) ====================
   # BCM4331 do MacBook Pro 2011 funciona com o driver open-source b43.
   # Evita o broadcom-sta (proprietário, inseguro e quebrando em kernel ≥ 7.1).
-  hardware.enableRedistributableFirmware = true;
+  # hardware.enableRedistributableFirmware = true; vem de
+  # ../common/broadcom-wifi.nix (imported above) — compartilhado só com
+  # dell1564, o outro host Broadcom físico.
   networking.enableB43Firmware = true;
 
   # ---- broadcom-sta (proprietário) — DESATIVADO ----

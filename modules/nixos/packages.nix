@@ -1,8 +1,12 @@
 # modules/nixos/packages.nix
 #
-# allowUnfree, editor padrão, aliases de shell, lista de pacotes do
-# sistema e configuração do Nix (gc/optimise/settings). Extraído 1:1 de
+# allowUnfree, aliases de shell, lista de pacotes do sistema e
+# configuração do Nix (gc/optimise/settings). Extraído 1:1 de
 # configuration.nix (split cirúrgico, sem mudança de comportamento).
+#
+# EDITOR/VISUAL não vivem mais aqui — é preferência de usuário, não algo
+# que outras contas da máquina precisem herdar; fonte única agora é
+# home/modules/shell.nix (home.sessionVariables).
 {
   pkgs,
   pkgs-unstable,
@@ -10,11 +14,6 @@
 }: {
   # ==================== PROGRAMS ====================
   nixpkgs.config.allowUnfree = true;
-
-  environment.variables = {
-    EDITOR = "hx";
-    VISUAL = "hx";
-  };
 
   environment.shellAliases = {
     vi = "hx";
