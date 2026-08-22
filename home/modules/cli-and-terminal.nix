@@ -4,7 +4,11 @@
 # de CLI que precisam de arquivo de config extra (btop, ripgrep,
 # oh-my-posh, lazygit, atuin). Extraído 1:1 de home/default.nix (split
 # cirúrgico, sem mudança de comportamento).
-{lib, ...}: let
+{
+  lib,
+  config,
+  ...
+}: let
   configs = ../configs;
 in {
   # Tmux — package + full conf file
