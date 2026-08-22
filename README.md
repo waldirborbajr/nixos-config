@@ -4,13 +4,16 @@
 ❄️ NixOS - BORBA JR, W - Configuration ❄️
 </h1>
 
-Flake multi-host (`flake.nix` → `configuration.nix` monolítico compartilhado
-→ `hosts/<host>/default.nix`, com `hosts/common/*.nix` para a família Mac),
-com [Home Manager](https://github.com/nix-community/home-manager) cuidando
+Flake multi-host (`flake.nix` → `configuration.nix` como índice fino,
+importando módulos por tópico em `modules/nixos/` → `hosts/<host>/default.nix`,
+com `hosts/common/*.nix` para a família Mac), com
+[Home Manager](https://github.com/nix-community/home-manager) cuidando
 do usuário (`home/default.nix` + `home/configs/`) e
 [sops-nix](https://github.com/Mic92/sops-nix) cuidando dos segredos por
 host. Ver [`AUDIT-REPORT.md`](AUDIT-REPORT.md) para o histórico de
-correções aplicadas à árvore real (bugs de duplicação, docs desalinhadas).
+correções aplicadas à árvore real (bugs de duplicação, docs desalinhadas)
+e [`REFACTOR-NOTES.md`](REFACTOR-NOTES.md) para o split do antigo
+`configuration.nix` monolítico em `modules/nixos/`.
 
 ## 🖥️ Supported Hardware
 
@@ -81,6 +84,32 @@ Programas, teclado (`us` + variante `mac`) e browser (Firefox Developer
 Edition) usados por `mac2011`, `macutm` e `macvmf` vivem num único módulo
 comum, para não repetir 3x. `dell1564` **não** importa esse módulo — segue
 com sua própria lista de pacotes, mais enxuta, e Firefox estável.
+
+---
+
+## 🧩 Módulos compartilhados (`modules/nixos/`)
+
+`configuration.nix` é hoje só um índice: `imports = [ ... ]` apontando pros
+arquivos abaixo, aplicados a **todos** os hosts. Split puramente
+estrutural do antigo `configuration.nix` monolítico — mesmo comportamento,
+organizado por tópico. Detalhes de como o split foi feito e como validar
+(comparação de store path antes/depois) em
+[`REFACTOR-NOTES.md`](REFACTOR-NOTES.md).
+
+| Arquivo | Conteúdo |
+|---|---|
+| `system-base.nix` | Kernel, tmpfiles (ssh dir + regreet), sleep policy, security/session, network, time/locale |
+| `fonts.nix` | Fontes do sistema |
+| `users-and-home.nix` | Shell padrão, usuário principal, wiring do Home Manager, sudo |
+| `desktop-niri.nix` | niri, greetd/regreet, display manager, power-profiles-daemon, dconf, direnv, xdg portal |
+| `audio.nix` | PipeWire/PulseAudio/rtkit |
+| `hardware-quirks.nix` | nix-ld, bluetooth (comentários de troubleshooting preservados) |
+| `packages.nix` | allowUnfree, env vars, aliases, `environment.systemPackages`, config do Nix (gc/optimise/settings) |
+| `ssh.nix` | openssh (server) + `programs.ssh` (client config) |
+| `sops.nix` | sops + secrets + serviço de bootstrap da host key |
+
+Pra editar algo, vá direto no arquivo do tópico — não precisa mais
+navegar um `configuration.nix` de 500+ linhas pra achar uma seção.
 
 ---
 
@@ -411,6 +440,10 @@ troubleshooting (reset do teclado, reconexão manual via
 - [`AUDIT-REPORT.md`](AUDIT-REPORT.md) — auditoria pontual (bugs de opções
   duplicadas, arquivo órfão removido, docs desalinhadas) feita antes da
   migração para Home Manager. Histórico, não um guia de uso.
+- [`REFACTOR-NOTES.md`](REFACTOR-NOTES.md) — split do antigo
+  `configuration.nix` monolítico em `modules/nixos/`: mapeamento
+  seção→arquivo e como validar (comparação de store path) antes de
+  mergear a branch de teste.
 - [`TODO.md`](TODO.md) — pendências reais em aberto (boot mode/GRUB device
   do Dell não confirmados, firmware Wi-Fi do Dell, `.sops.yaml` ausente,
   candidatos a migrar para módulos nativos do Home Manager).
@@ -427,4 +460,3 @@ troubleshooting (reset do teclado, reconexão manual via
 ```text
 https://git.voidarc.co.uk/voidarc/nixos
 ```
-
