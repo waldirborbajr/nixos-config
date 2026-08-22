@@ -34,7 +34,7 @@ creation_rules:
   # Mac VMware Fusion VM secrets
   - path_regex: hosts/macvmf/secrets/macvmf\.yaml$
     encrypted_regex: '^(data|stringData)$'
-    age: age1q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q
+    age: age14ptfmtfh5j0qmk465znct92qclcwz46e3w3r2px6aph5na55afrqz33hgk
     key_groups:
       - age:
-        - age1q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q
+        - age14ptfmtfh5j0qmk465znct92qclcwz46e3w3r2px6aph5na55afrqz33hgk
