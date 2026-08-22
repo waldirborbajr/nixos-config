@@ -4,7 +4,7 @@
 # de CLI que precisam de arquivo de config extra (btop, ripgrep,
 # oh-my-posh, lazygit, atuin). Extraído 1:1 de home/default.nix (split
 # cirúrgico, sem mudança de comportamento).
-{...}: let
+{lib, ...}: let
   configs = ../configs;
 in {
   # Tmux — package + full conf file
@@ -55,7 +55,7 @@ in {
       recursive = true;
     };
   };
-# oh-my-posh grava o init script em ~/.cache/oh-my-posh com o caminho
+  # oh-my-posh grava o init script em ~/.cache/oh-my-posh com o caminho
   # absoluto do binário no Nix store. Depois de um rebuild esse path muda
   # e o cache antigo quebra o prompt (só aparece em hosts que rebuildaram).
   # Limpar em toda ativação garante que o próximo shell regenere o init.
