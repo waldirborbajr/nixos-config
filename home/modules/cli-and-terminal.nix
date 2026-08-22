@@ -55,4 +55,11 @@ in {
       recursive = true;
     };
   };
+# oh-my-posh grava o init script em ~/.cache/oh-my-posh com o caminho
+  # absoluto do binário no Nix store. Depois de um rebuild esse path muda
+  # e o cache antigo quebra o prompt (só aparece em hosts que rebuildaram).
+  # Limpar em toda ativação garante que o próximo shell regenere o init.
+  home.activation.clearOhMyPoshCache = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    $DRY_RUN_CMD rm -rf "${config.xdg.cacheHome}/oh-my-posh"
+  '';
 }
