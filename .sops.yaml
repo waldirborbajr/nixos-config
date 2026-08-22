@@ -26,10 +26,10 @@ creation_rules:
   # Mac UTM VM secrets
   - path_regex: hosts/macutm/secrets/macutm\.yaml$
     encrypted_regex: '^(data|stringData)$'
-    age: age1q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q
+    age: age1dk5mht8sj9z08w4thvn8kqq0c8qz3nuxhym6vlusu6rf9mj873wqsetycx
     key_groups:
       - age:
-        - age1q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q
+        - age1dk5mht8sj9z08w4thvn8kqq0c8qz3nuxhym6vlusu6rf9mj873wqsetycx
 
   # Mac VMware Fusion VM secrets
   - path_regex: hosts/macvmf/secrets/macvmf\.yaml$
