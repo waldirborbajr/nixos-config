@@ -13,15 +13,6 @@
 in {
   # Tmux — package + full conf file
   programs.tmux.enable = true;
-programs.lazygit = {
-    enable = true;
-    # settings = { ... };  # opcional; se preferires manter o YAML, deixa o xdg.configFile
-  };
-
-  programs.yazi = {
-    enable = true;
-    # enableZshIntegration = true;  # se quiseres
-  };
 
   # Btop
   programs.btop.enable = true;
