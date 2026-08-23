@@ -21,12 +21,6 @@
 #   mac2011              x86_64-linux
 #   macvmf      (macvmf)    aarch64-linux
 #
-# macbook (MacBook M2 físico, macOS) is NOT a nixosConfigurations host —
-# it's homeConfigurations."borba@macbook" (home-manager standalone, no
-# system management). Use menu option 'm' / `./nixos-manager.sh home`,
-# which runs `home-manager switch --flake .#borba@macbook` directly —
-# never routed through nixos-rebuild.
-#
 # Branch selection: build/update actions detect all local + remote branches.
 # If only the default branch exists, it's used automatically without asking.
 # If other branches exist (e.g. a feature branch you're testing), you're
@@ -839,26 +833,6 @@ check_flake() {
   fi
 }
 
-# ----- home-manager standalone (macbook, no nixos-rebuild/sudo) -----
-
-build_home_macbook() {
-  # Unlike every other action here, this is NOT a NixOS system rebuild —
-  # macbook is a `homeConfigurations` entry (home-manager standalone),
-  # no /etc/nixos, no bootloader, no system generation. Never route this
-  # through run_nixos_rebuild.
-  require_dir
-  cd "$NIXOS_DIR"
-  log "Applying home-manager config for ${C_BOLD}borba@macbook${C_RESET}..."
-  if command -v home-manager >/dev/null 2>&1; then
-    home-manager switch --flake ".#borba@macbook"
-  else
-    warn "home-manager not on PATH yet — running it via 'nix run' instead."
-    nix run home-manager/release-26.05 -- switch --flake ".#borba@macbook"
-  fi
-  ok "home-manager switch complete for borba@macbook."
-}
-
-
 list_hosts() {
   echo -e "${C_BOLD}${C_SKY}Hosts configured in the flake:${C_RESET}"
   local attr
@@ -938,7 +912,6 @@ show_menu() {
   echo -e " ${C_YELLOW}${C_BOLD}7)${C_RESET} Check flake ${C_OVERLAY}(nix flake check)${C_RESET}"
   echo -e " ${C_BLUE}${C_BOLD}8)${C_RESET} List hosts"
   echo -e " ${C_BLUE}${C_BOLD}9)${C_RESET} List branches"
-  echo -e " ${C_TEAL}${C_BOLD}m)${C_RESET} Home-manager switch ${C_OVERLAY}(macbook — borba@macbook, no sudo)${C_RESET}"
   echo -e " ${C_RED}${C_BOLD}a)${C_RESET} Prune local branches ${C_OVERLAY}(no match on origin)${C_RESET}"
   echo -e " ${C_TEAL}${C_BOLD}g)${C_RESET} Show last generation ${C_OVERLAY}(nix profile + boot)${C_RESET}"
   echo -e " ${C_BOLD}q)${C_RESET} Quit"
@@ -959,7 +932,6 @@ run_choice() {
     7|check) check_flake "$extra_arg" ;;
     8|hosts) list_hosts ;;
     9|branches) list_branches_cmd ;;
-    m|M|home|macbook) build_home_macbook ;;
     a|A|prune) prune_local_branches ;;
     g|G|generation|generations) show_generation ;;
     q|quit|exit) exit 0 ;;

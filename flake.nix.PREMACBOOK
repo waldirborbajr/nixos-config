@@ -74,35 +74,6 @@
         ];
       };
 
-    # 🍎 home-manager standalone (macOS físico) — sem gerenciar o sistema,
-    # só pacotes + dotfiles (zsh, git, helix, tmux, wezterm, etc). Cada host
-    # aqui é isolado: pacotes declarados em hosts/<hostname>/home.nix não
-    # afetam mac2011, dell1564, macutm nem macvmf.
-    mkMacHome = {
-      hostname,
-      username ? "borba",
-      system ? "aarch64-darwin",
-    }:
-      home-manager.lib.homeManagerConfiguration {
-        pkgs = import nixpkgs {
-          inherit system;
-          config.allowUnfree = true;
-        };
-
-        extraSpecialArgs = {
-          inherit inputs hostname;
-
-          pkgs-unstable = import nixpkgs-unstable {
-            inherit system;
-            config.allowUnfree = true;
-          };
-        };
-
-        modules = [
-          ./hosts/${hostname}/home.nix
-        ];
-      };
-
     supportedSystems = ["x86_64-linux" "aarch64-linux"];
   in {
     nixosConfigurations = {
@@ -124,13 +95,6 @@
       mac2011 = mkHost {
         hostname = "mac2011";
         system = "x86_64-linux";
-      };
-    };
-
-    homeConfigurations = {
-      # `home-manager switch --flake .#borba@macbook` no MacBook M2 físico.
-      "borba@macbook" = mkMacHome {
-        hostname = "macbook";
       };
     };
 
