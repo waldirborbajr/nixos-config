@@ -25,7 +25,9 @@
 # it's homeConfigurations."borba@macbook" (home-manager standalone, no
 # system management). Use menu option 'm' / `./nixos-manager.sh home`,
 # which runs `home-manager switch --flake .#borba@macbook` directly —
-# never routed through nixos-rebuild.
+# never routed through nixos-rebuild. To clean its Nix store, use menu
+# option 'c' / `./nixos-manager.sh cleanmac` — no sudo, no bootloader
+# sync (there's no boot menu on macOS to keep in sync).
 #
 # Branch selection: build/update actions detect all local + remote branches.
 # If only the default branch exists, it's used automatically without asking.
@@ -845,10 +847,23 @@ build_home_macbook() {
   # Unlike every other action here, this is NOT a NixOS system rebuild —
   # macbook is a `homeConfigurations` entry (home-manager standalone),
   # no /etc/nixos, no bootloader, no system generation. Never route this
-  # through run_nixos_rebuild.
+  # through run_nixos_rebuild. Same git flow as build_flake (commit if
+  # dirty -> checkout -> pull -> apply -> push), just without a NixOS
+  # host attr or nixos-rebuild in the middle.
   require_dir
   cd "$NIXOS_DIR"
-  log "Applying home-manager config for ${C_BOLD}borba@macbook${C_RESET}..."
+
+  step 1 4 "Selecting git branch"
+  select_git_branch
+
+  step 2 4 "Checking for local changes"
+  git_commit_if_dirty
+
+  step 3 4 "Switching to ${C_TEAL}${GIT_BRANCH}${C_RESET} and syncing"
+  git_checkout_branch
+  git_sync_pull
+
+  step 4 4 "Applying home-manager config for ${C_TEAL}borba@macbook${C_RESET}"
   if command -v home-manager >/dev/null 2>&1; then
     home-manager switch --flake ".#borba@macbook"
   else
@@ -856,6 +871,53 @@ build_home_macbook() {
     nix run home-manager/release-26.05 -- switch --flake ".#borba@macbook"
   fi
   ok "home-manager switch complete for borba@macbook."
+
+  git_push_if_ahead
+}
+
+clean_cache_macbook() {
+  # Same idea as clean_cache(), but for home-manager standalone: no sudo
+  # (this is a user-profile GC, not a system-wide one), no bootloader
+  # sync (macOS has no systemd-boot/GRUB entries to keep in sync).
+  local mode_arg="${1:-}"
+  log "Cleaning old home-manager generations and collecting Nix store garbage on this Mac..."
+
+  local mode="$mode_arg"
+  if [ -z "$mode" ]; then
+    echo -e "  ${C_YELLOW}1)${C_RESET} Quick      — remove generations older than 14 days"
+    echo -e "  ${C_RED}2)${C_RESET} Aggressive — remove ALL old generations (nix-collect-garbage -d)"
+    read -r -p "$(echo -e "${C_SKY}?${C_RESET} Choose [1/2]: ")" mode
+  fi
+
+  case "$mode" in
+    1)
+      nix-collect-garbage --delete-older-than 14d
+      ;;
+    2)
+      if [ -n "$mode_arg" ] || confirm "This removes ALL old home-manager generations. Confirm?"; then
+        nix-collect-garbage -d
+      else
+        warn "Cancelled."
+        return 0
+      fi
+      ;;
+    *)
+      err "Invalid option."
+      return 1
+      ;;
+  esac
+
+  log "Optimizing the store (hardlink deduplication)..."
+  # 'nix store optimise' (new CLI) if available, else the classic command.
+  if nix store optimise 2>/dev/null; then
+    :
+  else
+    nix-store --optimise
+  fi
+  ok "Store cleanup complete."
+
+  log "Current disk usage:"
+  df -h /nix/store 2>/dev/null || df -h /
 }
 
 
@@ -939,6 +1001,7 @@ show_menu() {
   echo -e " ${C_BLUE}${C_BOLD}8)${C_RESET} List hosts"
   echo -e " ${C_BLUE}${C_BOLD}9)${C_RESET} List branches"
   echo -e " ${C_TEAL}${C_BOLD}m)${C_RESET} Home-manager switch ${C_OVERLAY}(macbook — borba@macbook, no sudo)${C_RESET}"
+  echo -e " ${C_TEAL}${C_BOLD}c)${C_RESET} Clean cache ${C_OVERLAY}(macbook — no sudo, no bootloader sync)${C_RESET}"
   echo -e " ${C_RED}${C_BOLD}a)${C_RESET} Prune local branches ${C_OVERLAY}(no match on origin)${C_RESET}"
   echo -e " ${C_TEAL}${C_BOLD}g)${C_RESET} Show last generation ${C_OVERLAY}(nix profile + boot)${C_RESET}"
   echo -e " ${C_BOLD}q)${C_RESET} Quit"
@@ -960,6 +1023,7 @@ run_choice() {
     8|hosts) list_hosts ;;
     9|branches) list_branches_cmd ;;
     m|M|home|macbook) build_home_macbook ;;
+    c|C|cleanmac|macclean) clean_cache_macbook "$extra_arg" ;;
     a|A|prune) prune_local_branches ;;
     g|G|generation|generations) show_generation ;;
     q|quit|exit) exit 0 ;;
