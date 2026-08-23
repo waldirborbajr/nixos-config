@@ -1,0 +1,26 @@
+
+# yazi.toml — open/edit with Helix (hx), not nvim
+# https://yazi-rs.github.io/docs/configuration/yazi
+
+[opener]
+edit = [{ run = 'hx "$@"', desc = "Helix", block = true, for = "unix" }]
+# Fallback if hx missing (should not happen on our hosts)
+edit_fallback = [
+  { run = '${EDITOR:-vi} "$@"', desc = "$EDITOR", block = true, for = "unix" },
+]
+
+[open]
+rules = [
+  # Directories — enter (default yazi behavior via builtin)
+  { name = "*/", use = ["edit", "reveal"] },
+  # Text / code — Helix
+  { mime = "text/*", use = ["edit", "reveal"] },
+  { mime = "application/json", use = ["edit", "reveal"] },
+  { mime = "application/javascript", use = ["edit", "reveal"] },
+  { mime = "application/xml", use = ["edit", "reveal"] },
+  { mime = "application/x-yaml", use = ["edit", "reveal"] },
+  { mime = "application/toml", use = ["edit", "reveal"] },
+  { mime = "inode/x-empty", use = ["edit", "reveal"] },
+  # Everything else — still prefer edit (hx) then reveal
+  { name = "*", use = ["edit", "open", "reveal"] },
+]

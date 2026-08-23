@@ -68,6 +68,11 @@ in {
       recursive = true;
     };
 
+    "yazi" = {
+      source = "${configs}/yazi";
+      recursive = true;
+    };
+
     "atuin" = {
       source = "${configs}/atuin";
       recursive = true;
