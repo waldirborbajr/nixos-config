@@ -25,15 +25,13 @@
   environment.systemPackages =
     (with pkgs; [
       # ---- Shell & CLI core (fetch, files, search) ----
+      # atuin, ripgrep, tmux, btop, oh-my-posh, wezterm → home/modules/cli-and-terminal.nix
       wget
       curl
-      atuin # shell history sync/search
       expect
-      ripgrep
       eza # ls replacement
       zoxide # cd replacement
       bat # cat with syntax highlighting
-      tmux
       fzf
 
       # ---- Version control ----
@@ -59,15 +57,12 @@
       # (avoids pulling in heavy GNOME dependencies)
 
       # ---- System monitoring / info ----
-      btop
       htop
       fastfetch
 
       # ---- Shell / prompt / terminal ----
       zsh
-      oh-my-posh
       # alacritty
-      wezterm
 
       # ---- Nix tooling ----
       nixd # Nix language server
