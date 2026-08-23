@@ -2,20 +2,34 @@
 #
 # Multiplexers (tmux/zellij), terminal emulator (wezterm) e ferramentas
 # de CLI que precisam de arquivo de config extra (btop, ripgrep,
-# oh-my-posh, lazygit, atuin). Extraído 1:1 de home/default.nix (split
-# cirúrgico, sem mudança de comportamento).
+# oh-my-posh, lazygit, atuin, yazi).
+#
+# Fonte ÚNICA dos binários + configs: este módulo é importado por todos
+# os hosts (Linux via home/default.nix, MacBook via hosts/macbook/home.nix).
+# Não declarar estes pacotes em environment.systemPackages.
 {
   lib,
   config,
+  pkgs,
   ...
 }: let
   configs = ../configs;
 in {
-  # Tmux — package + full conf file
+  # Módulos nativos do HM — instalam o binário; a config fica no xdg abaixo.
   programs.tmux.enable = true;
-
-  # Btop
   programs.btop.enable = true;
+  programs.lazygit.enable = true;
+  programs.yazi.enable = true;
+
+  # Pacotes sem módulo HM (ou cujo módulo geraria config própria em conflito
+  # com o xdg.configFile abaixo). Só o binário — config via xdg.
+  home.packages = with pkgs; [
+    wezterm
+    zellij
+    ripgrep
+    oh-my-posh
+    atuin
+  ];
 
   xdg.configFile = {
     # Terminals
@@ -59,6 +73,7 @@ in {
       recursive = true;
     };
   };
+
   # oh-my-posh grava o init script em ~/.cache/oh-my-posh com o caminho
   # absoluto do binário no Nix store. Depois de um rebuild esse path muda
   # e o cache antigo quebra o prompt (só aparece em hosts que rebuildaram).
