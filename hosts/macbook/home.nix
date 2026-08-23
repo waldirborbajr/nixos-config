@@ -31,6 +31,17 @@ in {
 
   home.stateVersion = "26.05";
 
+  # ==================== FIRST-ACTIVATION OVERWRITE ====================
+  # Este Mac já tinha dotfiles soltos (não geridos pelo Nix) nesses
+  # caminhos, o que trava `home-manager switch` na primeira ativação
+  # (o Nix se recusa a sobrescrever arquivos que não criou). force = true
+  # resolve isso sem exigir `-b backup` toda vez. Escopo só deste host —
+  # não afeta mac2011/dell1564/VMs.
+  home.file.".zshenv".force = true;
+  xdg.configFile."tmux".force = true;
+  xdg.configFile."helix/config.toml".force = true;
+  xdg.configFile."helix/languages.toml".force = true;
+
   # ==================== PACOTES EXCLUSIVOS DESTE HOST ====================
   # Só afeta o MacBook M2 físico — não impacta mac2011, dell1564, macutm
   # nem macvmf. Adicione aqui o que só faz sentido nesta máquina.
