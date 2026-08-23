@@ -35,16 +35,14 @@ in {
 
   # ==================== PACKAGES ====================
   # Lista única para a família Mac. Dell continua com a lista própria (mais leve).
+  # zellij, yazi, lazygit → home/modules/cli-and-terminal.nix (fonte única + config)
   environment.systemPackages = with pkgs;
     [
-      zellij
-      yazi
       jq
       just
       duf
       psmisc
       asciinema
-      lazygit
       jujutsu
       lazyjj
       nitch
