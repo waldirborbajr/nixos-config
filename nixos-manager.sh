@@ -201,6 +201,24 @@ setup_machine() {
 
 # ----- host/machine selection -----
 
+detect_home_attr() {
+  # Best-effort match for home-manager-only hosts (not nixosConfigurations
+  # — those go through detect_flake_attr instead). macOS hostnames vary
+  # (e.g. "BORBAs-MacBook-Air"), so this matches loosely by substring
+  # instead of requiring an exact HOST_ATTR_TO_MACHINE-style entry.
+  local machine
+  machine="$(hostname -s 2>/dev/null || cat /etc/hostname 2>/dev/null || true)"
+  [ -z "$machine" ] && return 1
+
+  case "$(printf '%s' "$machine" | tr '[:upper:]' '[:lower:]')" in
+    *macbook*)
+      echo "macbook"
+      return 0
+      ;;
+  esac
+  return 1
+}
+
 detect_flake_attr() {
   # tries to match this machine's real hostname against a flake attr
   local machine
@@ -960,11 +978,15 @@ list_branches_cmd() {
 # ----- menu -----
 
 print_banner() {
-  local detected
-  detected="$(detect_flake_attr 2>/dev/null || echo 'not identified')"
+  local detected is_home=0
+  if detected="$(detect_home_attr 2>/dev/null)"; then
+    is_home=1
+  elif ! detected="$(detect_flake_attr 2>/dev/null)"; then
+    detected="not identified"
+  fi
 
   # Nome curto e amigável da máquina (ex: "mac2011"). Cai pro próprio
-  # $detected se não houver mapeamento (ex: "not identified").
+  # $detected se não houver mapeamento (ex: "not identified", "macbook").
   local machine_label="${HOST_ATTR_TO_MACHINE[$detected]:-$detected}"
 
   # Largura interna da caixa = nº de "─" entre os cantos ╭ e ╮.
@@ -984,6 +1006,9 @@ print_banner() {
   printf "${C_MAUVE}│${C_RESET}  ${C_BOLD}${C_TEXT}%s${C_RESET}%*s${C_MAUVE}│${C_RESET}\n" "$title" "$pad_title" ""
   printf "${C_MAUVE}│${C_RESET}  ${C_OVERLAY}%s${C_RESET}${C_GREEN}%s${C_RESET}%*s${C_MAUVE}│${C_RESET}\n" "$label2" "$machine_label" "$pad2" ""
   echo -e "${C_MAUVE}╰──────────────────────────────────────╯${C_RESET}"
+  if [ "$is_home" -eq 1 ]; then
+    echo -e "  ${C_OVERLAY}${C_DIM}(home-manager standalone — no sudo, no system rebuild)${C_RESET}"
+  fi
   echo -e "  ${C_OVERLAY}${C_DIM}(host and git branch are always asked — nothing is assumed)${C_RESET}"
 }
 
