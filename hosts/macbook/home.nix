@@ -46,7 +46,7 @@ in {
   # Só afeta o MacBook M2 físico — não impacta mac2011, dell1564, macutm
   # nem macvmf. Adicione aqui o que só faz sentido nesta máquina.
   home.packages = with pkgs; [
-    rapidraw
+   # rapidraw
     darktable
   ];
 }
