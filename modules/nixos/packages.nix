@@ -95,7 +95,11 @@
       seahorse # GNOME Keyring GUI
     ])
     ++ (with pkgs-unstable; [
-      neovim
+      # neovim → home/modules/editors.nix (home.packages), não mais aqui.
+      # Motivo: aquele módulo é importado por TODOS os hosts (4 NixOS +
+      # macbook standalone), então uma declaração só já cobre todo mundo —
+      # antes tinha nvim aqui (systemPackages, só hosts NixOS) e de novo
+      # em hosts/macbook/home.nix, duplicado e ainda faltando no macbook.
       helix
     ])
     ++ [
