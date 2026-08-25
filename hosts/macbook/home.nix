@@ -46,16 +46,13 @@ in {
   # ==================== PACOTES EXCLUSIVOS DESTE HOST ====================
   # Só afeta o MacBook M2 físico — não impacta mac2011, dell1564, macutm
   # nem macvmf. Adicione aqui o que só faz sentido nesta máquina.
+  #
+  # `neovim` NÃO mora mais aqui — foi pra home/modules/editors.nix (ver
+  # comentário lá) porque git.core.editor="nvim" e os dotfiles do zsh
+  # (aliases/functions) que esperam esse binário são compartilhados por
+  # TODOS os hosts, não só este.
   home.packages = with pkgs; [
     # rapidraw
-
-    # editors.nix fixa `programs.git.settings.core.editor = "nvim"` e os
-    # dotfiles compartilhados (home/configs/zsh/aliases.zsh, functions.zsh)
-    # esperam o binário `nvim` no PATH. Nos hosts NixOS isso vem de
-    # environment.systemPackages (modules/nixos/packages.nix); aqui não há
-    # essa camada, então precisa ser declarado explicitamente.
-    neovim
-
     darktable
   ];
 }
