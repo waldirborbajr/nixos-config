@@ -8,8 +8,8 @@
 
     "layer": "top",
     "position": "top",
-    "height": 24,
-    "spacing": 6,
+    "height": 26,
+    "spacing": 2,
     "margin-top": 0,
     "margin-left": 0,
     "margin-right": 0,
@@ -22,18 +22,20 @@
         "clock"
     ],
 
-"modules-right": [
-    "idle_inhibitor",
-    "pulseaudio",
-    "network",
-    "bluetooth",
-    "power-profiles-daemon",
-    "custom/kb-layout",
-    "cpu",
-    "memory",
-    "battery",
-    "tray"
-],
+    "modules-right": [
+        "idle_inhibitor",
+        "custom/clipboard",
+        "custom/notification",
+        "pulseaudio",
+        "network",
+        "bluetooth",
+        "power-profiles-daemon",
+        "custom/kb-layout",
+        "cpu",
+        "memory",
+        "battery",
+        "tray"
+    ],
 
     "niri/workspaces": {
         "format": "{icon}",
@@ -149,29 +151,46 @@
         "icon-size": 16
     },
 
-"bluetooth": {
-    "format": "󰂯",
-    "format-disabled": "󰂲",
-    "format-off": "󰂲",
-    "format-connected": "󰂱 {num_connections}",
-    "format-connected-battery": "󰂱 {device_battery_percentage}%",
-    "tooltip-format": "{controller_alias}\t{controller_address}\n\n{num_connections} connected",
-    "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{device_enumerate}",
-    "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
-    "tooltip-format-enumerate-connected-battery": "{device_alias}\t{device_address}\t{device_battery_percentage}%",
-    "on-click": "blueman-manager",
-    "on-click-right": "bluetoothctl power toggle"
-},
+    "bluetooth": {
+        "format": "󰂯",
+        "format-disabled": "󰂲",
+        "format-off": "󰂲",
+        "format-connected": "󰂱 {num_connections}",
+        "format-connected-battery": "󰂱 {device_battery_percentage}%",
+        "tooltip-format": "{controller_alias}\t{controller_address}\n\n{num_connections} connected",
+        "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{device_enumerate}",
+        "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
+        "tooltip-format-enumerate-connected-battery": "{device_alias}\t{device_address}\t{device_battery_percentage}%",
+        "on-click": "blueman-manager",
+        "on-click-right": "bluetoothctl power toggle"
+    },
 
-"custom/kb-layout": {
-    "exec": "$XDG_CONFIG_HOME/waybar/scripts/kb-layout.sh",
-    "interval": 1,
-    "tooltip": false
-},
+    "custom/kb-layout": {
+        "exec": "$XDG_CONFIG_HOME/waybar/scripts/kb-layout.sh",
+        "interval": 1,
+        "tooltip": false
+    },
 
     "custom/wallpaper": {
         "interval": 30,
         "return-type": "json",
         "exec": "bash -c 'c=$(find \"$HOME/Pictures/Wallpapers\" -type f \\( -iname \"*.jpg\" -o -iname \"*.jpeg\" -o -iname \"*.png\" -o -iname \"*.webp\" \\) | wc -l); echo \"{\\\"text\\\":\\\"󰸉 $c\\\",\\\"tooltip\\\":\\\"$HOME/Pictures/Wallpapers\\\"}\"'"
+    },
+
+    "custom/clipboard": {
+        "format": "",
+        "tooltip": true,
+        "tooltip-format": "Clipboard history",
+        "on-click": "cliphist list | fuzzel -d -p 'Clipboard: ' -l 12 -w 60 | cliphist decode | wl-copy",
+        "on-click-right": "cliphist wipe"
+    },
+
+    "custom/notification": {
+        "format": "",
+        "tooltip": true,
+        "tooltip-format": "Notifications (mako)\nLeft: dismiss / Middle: dismiss all\nRight: toggle DND",
+        "on-click": "makoctl dismiss",
+        "on-click-middle": "makoctl dismiss -a",
+        "on-click-right": "makoctl mode -t dnd"
     }
 }
