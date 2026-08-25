@@ -1,7 +1,7 @@
 /* ~/.config/waybar/style.css */
 
 /* ==========================
-   Catppuccin Mocha
+   Catppuccin Mocha (discreto)
    ========================== */
 
 @define-color rosewater #f5e0dc;
@@ -21,60 +21,67 @@
 
 @define-color text      #cdd6f4;
 @define-color subtext1  #bac2de;
+@define-color subtext0  #a6adc8;
 @define-color surface0  #313244;
 @define-color surface1  #45475a;
 @define-color surface2  #585b70;
 @define-color overlay0  #6c7086;
+@define-color overlay1  #7f849c;
 @define-color base      #1e1e2e;
 @define-color mantle    #181825;
 @define-color crust     #11111b;
 
 * {
     font-family: "JetBrainsMono Nerd Font", "Symbols Nerd Font", sans-serif;
-    font-size: 10px;
-    font-weight: 600;
+    font-size: 11px;
+    font-weight: 500;
     border: none;
     border-radius: 0;
     min-height: 0;
 }
 
 window#waybar {
-    background: alpha(@mantle, .82);
-    color: @text;
+    background: alpha(@mantle, 0.92);
+    color: @subtext1;
     border: none;
-    min-height: 24px;
+    min-height: 26px;
+    margin: 0;
+    padding: 0;
 }
 
 .modules-left,
 .modules-center,
 .modules-right {
     margin: 0;
+    padding: 0 4px;
 }
 
+/* ---------- Workspaces ---------- */
 #workspaces {
-    margin-left: 6px;
+    margin-left: 4px;
 }
 
 #workspaces button {
-    padding: 0 8px;
-    margin: 3px;
-    border-radius: 8px;
+    padding: 0 7px;
+    margin: 3px 1px;
+    border-radius: 6px;
     color: @overlay0;
     background: transparent;
-    transition: all .2s ease;
+    transition: all 0.15s ease;
 }
 
 #workspaces button.active,
 #workspaces button.focused {
-    color: @base;
-    background: @mauve;
+    color: @text;
+    background: alpha(@surface1, 0.7);
 }
 
 #workspaces button:hover {
-    background: @surface1;
+    background: alpha(@surface1, 0.5);
     color: @text;
 }
 
+/* ---------- Módulos genéricos (discretos) ---------- */
 #clock,
 #cpu,
 #memory,
@@ -82,145 +89,120 @@ window#waybar {
 #battery,
 #network,
 #pulseaudio,
-#bluetooth,          /* ← adicione */
+#bluetooth,
 #power-profiles-daemon,
 #backlight,
 #idle_inhibitor,
 #custom-kb-layout,
 #tray,
-#custom-wallpaper {
+#custom-wallpaper,
+#custom-clipboard,
+#custom-notification {
+    margin: 2px 1px;
+    padding: 0 8px;
+    border-radius: 6px;
+    min-height: 20px;
+    color: @subtext1;
+    background: transparent;
+    transition: color 0.15s ease, background 0.15s ease;
+}
 
-    margin: 3px;
-    padding: 0 10px;
-    border-radius: 8px;
-    min-height: 18px;
+#clock:hover,
+#cpu:hover,
+#memory:hover,
+#temperature:hover,
+#battery:hover,
+#network:hover,
+#pulseaudio:hover,
+#bluetooth:hover,
+#power-profiles-daemon:hover,
+#backlight:hover,
+#idle_inhibitor:hover,
+#custom-kb-layout:hover,
+#tray:hover,
+#custom-wallpaper:hover,
+#custom-clipboard:hover,
+#custom-notification:hover {
+    background: alpha(@surface1, 0.55);
     color: @text;
 }
 
+/* ---------- Clock (único com leve destaque) ---------- */
 #clock {
-    background: @mauve;
-    color: @base;
+    color: @text;
+    font-weight: 600;
 }
 
-#cpu {
-    background: @green;
-    color: @base;
-}
-
-#memory {
-    background: @blue;
-    color: @base;
-}
-
-#temperature {
-    background: @peach;
-    color: @base;
-}
-
-#temperature.critical {
-    background: @red;
-    color: @base;
-}
-
-#battery {
-    background: @yellow;
-    color: @base;
-}
-
+/* ---------- Estados sutis ---------- */
 #battery.charging,
 #battery.plugged {
-    background: @green;
+    color: @green;
+}
+
+#battery.warning {
+    color: @peach;
 }
 
 #battery.critical {
-    background: @red;
-    color: @base;
-}
-
-#network {
-    background: @sky;
-    color: @base;
+    color: @red;
 }
 
 #network.disconnected {
-    background: @red;
-}
-
-#pulseaudio {
-    background: @pink;
-    color: @base;
+    color: @overlay0;
 }
 
 #pulseaudio.muted {
-    background: @surface1;
-    color: @text;
-}
-
-#power-profiles-daemon {
-    background: @teal;
-    color: @base;
-}
-
-#custom-kb-layout {
-    background: @sapphire;
-    color: @base;
-}
-
-#backlight {
-    background: @lavender;
-    color: @base;
-}
-
-#idle_inhibitor {
-    background: @surface1;
-}
-
-#idle_inhibitor.activated {
-    background: @green;
-    color: @base;
-}
-
-#tray {
-    background: @surface0;
-}
-
-#custom-wallpaper {
-    background: @surface0;
-    color: @yellow;
-}
-
-tooltip {
-    background: @base;
-    color: @text;
-    border: 1px solid @surface2;
-    border-radius: 10px;
-}
-
-/* Barra ocupando 100% da largura */
-
-window#waybar {
-    margin: 0;
-    padding: 0;
-}
-
-/* Remove qualquer espaço reservado */
-
-.modules-left:first-child {
-    margin-left: 0;
-}
-
-.modules-right:last-child {
-    margin-right: 6px;
-}
-
-
-#bluetooth {
-    background: @sapphire;
-    color: @base;
+    color: @overlay0;
 }
 
 #bluetooth.disabled,
 #bluetooth.off {
-    background: @surface0;
     color: @overlay0;
+}
+
+#idle_inhibitor.activated {
+    color: @green;
+}
+
+#temperature.critical {
+    color: @red;
+}
+
+/* ---------- Custom: clipboard & notifications ---------- */
+#custom-clipboard {
+    color: @subtext1;
+}
+
+#custom-notification {
+    color: @subtext1;
+}
+
+#custom-notification.notification {
+    color: @mauve;
+}
+
+/* ---------- Tray ---------- */
+#tray {
+    padding: 0 6px;
+}
+
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+    color: @peach;
+}
+
+/* ---------- Tooltip ---------- */
+tooltip {
+    background: @base;
+    color: @text;
+    border: 1px solid @surface2;
+    border-radius: 8px;
+    padding: 6px 10px;
+}
+
+.modules-right:last-child {
+    margin-right: 6px;
 }
