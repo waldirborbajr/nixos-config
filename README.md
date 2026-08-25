@@ -89,10 +89,10 @@ e [`REFACTOR-NOTES.md`](REFACTOR-NOTES.md) para o split do antigo
 - Importa só um subconjunto de `home/modules/`: `identity`, `shell`,
   `editors`, `cli-and-terminal` — **sem** `desktop.nix` (que é só pra
   niri/Wayland, não faz sentido em macOS)
-- `home.packages` próprios deste host (`hosts/macbook/home.nix`), sem
-  herdar `environment.systemPackages` de nenhum host NixOS: inclui
-  `neovim` (as dotfiles/configs compartilhadas do zsh e do git esperam
-  esse binário) e `darktable`
+- `home.packages` próprios deste host (`hosts/macbook/home.nix`): hoje só
+  `darktable` — `neovim` **não** está mais aqui, foi consolidado em
+  `home/modules/editors.nix` (ver seção "Módulos compartilhados" abaixo),
+  já que é usado por todos os hosts, não só este
 - Primeira ativação usa `home.backupFileExtension = "hm-backup"` —
   dotfile pré-existente e não gerido pelo Nix vira `<arquivo>.hm-backup`
   em vez de ser sobrescrito sem cópia
@@ -470,6 +470,16 @@ troubleshooting (reset do teclado, reconexão manual via
 
 ## 📚 Other docs in this repo
 
+- [`AUDIT-REPORT.md`](AUDIT-REPORT.md) — auditoria pontual (bugs de opções
+  duplicadas, arquivo órfão removido, docs desalinhadas) feita antes da
+  migração para Home Manager. Histórico, não um guia de uso.
+- [`REFACTOR-NOTES.md`](REFACTOR-NOTES.md) — split do antigo
+  `configuration.nix` monolítico em `modules/nixos/`: mapeamento
+  seção→arquivo e como validar (comparação de store path) antes de
+  mergear a branch de teste.
+- [`TODO.md`](TODO.md) — pendências reais em aberto (boot mode/GRUB device
+  do Dell não confirmados, firmware Wi-Fi do Dell, `.sops.yaml` ausente,
+  candidatos a migrar para módulos nativos do Home Manager).
 - [`DENDRITIC-PATTERN.md`](DENDRITIC-PATTERN.md) — **aspiracional, não
   implementado.** Descreve uma arquitetura-alvo (`core.nix`, `profiles/`,
   `modules/category/default.nix`) que não existe nesta árvore hoje; mantido
