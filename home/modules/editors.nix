@@ -3,7 +3,7 @@
 # Git, Helix (+ script auxiliar) e bat/nvim. Extraído 1:1 de
 # home/default.nix (split cirúrgico, sem mudança de comportamento).
 {
-  pkgs,
+  pkgs-unstable,
   lib,
   ...
 }: let
@@ -38,10 +38,14 @@ in {
   # então uma única declaração cobre todo mundo. É preciso mesmo: git
   # settings.core.editor="nvim" acima e os dotfiles compartilhados do zsh
   # (home/configs/zsh/aliases.zsh, functions.zsh) chamam `nvim` direto.
-  # Antes vinha de environment.systemPackages nos hosts NixOS — o
-  # `macbook` (sem essa camada) não tinha e quebrava; consolidado aqui
-  # pra não precisar declarar de novo por host.
-  home.packages = [pkgs.neovim];
+  # `pkgs-unstable` (não `pkgs`) de propósito — antes vinha de
+  # `environment.systemPackages` via pkgs-unstable nos hosts NixOS
+  # (modules/nixos/packages.nix); mantendo o mesmo canal aqui pra não
+  # regredir a versão do neovim que já estava em uso. Disponível em todo
+  # host porque `pkgs-unstable` já é passado via extraSpecialArgs tanto em
+  # modules/nixos/users-and-home.nix (NixOS) quanto em mkMacHome
+  # (flake.nix, macbook).
+  home.packages = [pkgs-unstable.neovim];
 
   xdg.configFile = {
     "bat" = {
