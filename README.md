@@ -78,6 +78,31 @@ e [`REFACTOR-NOTES.md`](REFACTOR-NOTES.md) para o split do antigo
   compartilhada de `macutm` (`hosts/common/mac-vm-workstation.nix`)
 - Containers: `podman` com `dockerCompat = true`
 
+### 🍏 MacBook M2 (físico) — `macbook` (Home Manager standalone)
+- Architecture: aarch64-darwin
+- Role: instalador de apps no dia a dia — **não** é uma
+  `nixosConfiguration`, é uma entrada `homeConfigurations."borba@macbook"`
+  (home-manager standalone, via `mkMacHome` em `flake.nix`)
+- Sem nix-darwin, sem niri/waybar/greetd — nenhuma gestão de sistema ou
+  desktop, só `home-manager switch` cuidando de pacotes de usuário e
+  dotfiles
+- Importa só um subconjunto de `home/modules/`: `identity`, `shell`,
+  `editors`, `cli-and-terminal` — **sem** `desktop.nix` (que é só pra
+  niri/Wayland, não faz sentido em macOS)
+- `home.packages` próprios deste host (`hosts/macbook/home.nix`), sem
+  herdar `environment.systemPackages` de nenhum host NixOS: inclui
+  `neovim` (as dotfiles/configs compartilhadas do zsh e do git esperam
+  esse binário) e `darktable`
+- Primeira ativação usa `home.backupFileExtension = "hm-backup"` —
+  dotfile pré-existente e não gerido pelo Nix vira `<arquivo>.hm-backup`
+  em vez de ser sobrescrito sem cópia
+- **Pacotes das VMs (`macutm`/`macvmf`) ou de `modules/nixos/packages.nix`
+  não chegam aqui** — são `nixosConfigurations` completamente separadas;
+  só o que está em `home/modules/{identity,shell,editors,cli-and-terminal}.nix`
+  ou direto em `hosts/macbook/home.nix` é compartilhado com este host
+- Uso: `./nixos-manager.sh macbook` (ou menu `m`) — ver seção do
+  `nixos-manager.sh` abaixo
+
 ### Base compartilhada da família Mac (`hosts/common/mac-workstation.nix`)
 
 Programas, teclado (`us` + variante `mac`) e browser (Firefox Developer
@@ -269,6 +294,8 @@ NIXOS_FLAKE_ATTR=dell ./nixos-manager.sh flake   # força o host via env var
 | 9 | `branches` | Lista branches locais + remotas, marcando a atual e as sem correspondência na origin |
 | a | `prune` | Remove branches locais que não têm mais par na `origin` (branch padrão e a atual nunca são candidatas) |
 | g | `generation` | Mostra a última geração do sistema (perfil Nix + entradas do bootloader) |
+| m | `home` / `macbook` | **Só no MacBook M2 físico**: `home-manager switch --flake ".#borba@macbook"` — standalone, não é `nixos-rebuild` (sem sudo, sem bootloader, sem geração de sistema) |
+| c | `cleanmac` / `macclean` | **Só no MacBook M2 físico**: limpeza de gerações do home-manager (`nix-collect-garbage`, Quick/Aggressive) + otimização do store — equivalente ao `clean` (3), mas sem sudo e sem sync de bootloader |
 | q | `quit` | Sai |
 
 ### Hosts conhecidos (flake attr → hostname real)
@@ -279,6 +306,12 @@ NIXOS_FLAKE_ATTR=dell ./nixos-manager.sh flake   # força o host via env var
 | `dell` | `dell1564` (alias legado: `dell1456`) | Dell Inspiron 1564 |
 | `m2utm` | `macutm` | MacBook M2 - UTM |
 | `macvmf` | `macvmf` | MacBook M2 - VMware Fusion |
+
+> ⚠️ `macbook` (MacBook M2 físico) **não** está nesta tabela — ele não é
+> uma `nixosConfiguration`, então não tem "flake attr" nesse sentido.
+> As opções `m`/`c` chamam direto `homeConfigurations."borba@macbook"`
+> e não passam pelo fluxo de detecção/seleção de host usado por `flake`,
+> `update`, `dry` etc.
 
 ### Comportamento importante
 
@@ -437,16 +470,6 @@ troubleshooting (reset do teclado, reconexão manual via
 
 ## 📚 Other docs in this repo
 
-- [`AUDIT-REPORT.md`](AUDIT-REPORT.md) — auditoria pontual (bugs de opções
-  duplicadas, arquivo órfão removido, docs desalinhadas) feita antes da
-  migração para Home Manager. Histórico, não um guia de uso.
-- [`REFACTOR-NOTES.md`](REFACTOR-NOTES.md) — split do antigo
-  `configuration.nix` monolítico em `modules/nixos/`: mapeamento
-  seção→arquivo e como validar (comparação de store path) antes de
-  mergear a branch de teste.
-- [`TODO.md`](TODO.md) — pendências reais em aberto (boot mode/GRUB device
-  do Dell não confirmados, firmware Wi-Fi do Dell, `.sops.yaml` ausente,
-  candidatos a migrar para módulos nativos do Home Manager).
 - [`DENDRITIC-PATTERN.md`](DENDRITIC-PATTERN.md) — **aspiracional, não
   implementado.** Descreve uma arquitetura-alvo (`core.nix`, `profiles/`,
   `modules/category/default.nix`) que não existe nesta árvore hoje; mantido
