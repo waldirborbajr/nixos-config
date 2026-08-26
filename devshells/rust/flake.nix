@@ -61,13 +61,6 @@
             sccache
             openssl
             zlib
-            postgresql
-            mariadb.client
-            sqlite
-            usql
-            pgcli
-            mycli
-            litecli
           ];
 
           RUST_SRC_PATH = "${stableToolchain}/lib/rustlib/src/rust/library";
@@ -106,13 +99,6 @@
             sccache
             openssl
             zlib
-            postgresql
-            mariadb.client
-            sqlite
-            usql
-            pgcli
-            mycli
-            litecli
           ];
 
           RUST_SRC_PATH = "${nightlyToolchain}/lib/rustlib/src/rust/library";

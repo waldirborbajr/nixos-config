@@ -63,3 +63,4 @@ result*
 # Editor / tool state
 .vscode/
 .idea/
+/devshells/rust/flake.lock
