@@ -21,6 +21,18 @@ in {
     ./modules/nixos/packages.nix
     ./modules/nixos/ssh.nix
     ./modules/nixos/sops.nix
+
+    # ==================== CONTAINERS / K8S (sob demanda) ====================
+    # Docker, Podman e Kubernetes local são usados só em projetos
+    # específicos, não no dia a dia — ficam desligados por padrão.
+    # Descomente a linha relevante, rode o rebuild, use; comente de novo e
+    # rebuild quando não precisar mais. containers-docker.nix e
+    # containers-podman.nix são independentes (pode ligar só um, ou os
+    # dois); kubernetes-dev.nix (k3d+kubectl+k9s) precisa de um dos dois
+    # ligado junto, já que o k3d cria os nodes do cluster como containers.
+    # ./modules/nixos/containers-docker.nix
+    # ./modules/nixos/containers-podman.nix
+    # ./modules/nixos/kubernetes-dev.nix
   ];
 
   # ==================== STATE VERSION ====================
