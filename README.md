@@ -1,10 +1,9 @@
-<center>
+<p align="center">
 <img alt="NixOS" src="https://raw.githubusercontent.com/NixOS/nixos-artwork/9d2cdedd73d64a068214482902adea3d02783ba8/logo/nix-snowflake-rainbow.svg" width="140px"/>
-<h1>
+</p>
+<h1 align="center">
 NixOS - BORBA JR, W - Configuration
 </h1>
-</center>
-
 
 Flake multi-host (`flake.nix` → `configuration.nix` como índice fino,
 importando módulos por tópico em `modules/nixos/` → `hosts/<host>/default.nix`,
