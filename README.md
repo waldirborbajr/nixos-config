@@ -1,6 +1,10 @@
+<center>
 <img alt="NixOS" src="https://raw.githubusercontent.com/NixOS/nixos-artwork/9d2cdedd73d64a068214482902adea3d02783ba8/logo/nix-snowflake-rainbow.svg" width="140px"/>
+<h1>
+NixOS - BORBA JR, W - Configuration
+</h1>
+</center>
 
-<h1>NixOS - BORBA JR, W - Configuration</h1>
 
 Flake multi-host (`flake.nix` → `configuration.nix` como índice fino,
 importando módulos por tópico em `modules/nixos/` → `hosts/<host>/default.nix`,
@@ -130,9 +134,54 @@ organizado por tópico. Detalhes de como o split foi feito e como validar
 | `packages.nix` | allowUnfree, env vars, aliases, `environment.systemPackages`, config do Nix (gc/optimise/settings) |
 | `ssh.nix` | openssh (server) + `programs.ssh` (client config) |
 | `sops.nix` | sops + secrets + serviço de bootstrap da host key |
+| `containers-docker.nix` ⚠️ opt-in | Docker Engine (`enableOnBoot = false`, socket-activated) + grupo `docker` + `docker-compose` — import comentado, veja seção "Containers / Kubernetes" abaixo |
+| `containers-podman.nix` ⚠️ opt-in | Podman rootless + `dockerCompat` (ganha o comando `docker`) + `podman-compose`/`lazydocker` — import comentado |
+| `kubernetes-dev.nix` ⚠️ opt-in | `k3d` + `kubectl` + `k9s` (cluster local leve, sem systemd) — import comentado, precisa de um dos dois acima ligado junto |
 
 Pra editar algo, vá direto no arquivo do tópico — não precisa mais
 navegar um `configuration.nix` de 500+ linhas pra achar uma seção.
+
+---
+
+## 🐳 Containers / Kubernetes (opt-in, desligado por padrão)
+
+Docker, Podman e Kubernetes local são usados só em projetos específicos,
+não no dia a dia — por isso os 3 módulos existem no repo mas ficam **com
+o import comentado** em `configuration.nix`. Pra usar:
+
+```bash
+# configuration.nix — descomente a(s) linha(s) relevante(s):
+# ./modules/nixos/containers-docker.nix
+# ./modules/nixos/containers-podman.nix
+# ./modules/nixos/kubernetes-dev.nix
+```
+
+depois rode o rebuild normal (`./nixos-manager.sh flake` ou `build`).
+Quando não precisar mais, comente de novo e rebuild — nenhum dos três
+deixa serviço rodando à toa nesse estado desligado.
+
+| Módulo | O que dá | Footprint quando ligado mas sem uso |
+|---|---|---|
+| `containers-docker.nix` | Docker Engine + `docker-compose` | Zero — `enableOnBoot = false`, o daemon só sobe ao tocar o socket (`docker ps` etc.); depois de subir, fica rodando até `systemctl stop docker` ou reboot |
+| `containers-podman.nix` | Podman rootless + `dockerCompat` (alias `docker`) + `podman-compose`/`lazydocker` | Zero sempre — sem daemon, é fork-per-comando |
+| `kubernetes-dev.nix` | `k3d` + `kubectl` + `k9s` | Zero — são só binários, sem serviço systemd; o cluster só existe entre `k3d cluster create` e `k3d cluster delete` |
+
+> **`k9s` sozinho não sobe cluster nenhum** — é só um dashboard/TUI pra um
+> cluster que já existe (via kubeconfig), local ou remoto. Pra ter
+> cluster local de verdade, `kubernetes-dev.nix` inclui `k3d` também: ele
+> cria um cluster k3s efêmero rodando como containers, em cima do runtime
+> que você já tiver ligado (`containers-docker.nix` ou
+> `containers-podman.nix` — precisa de um dos dois, é ele quem cria os
+> nodes do cluster).
+>
+> `containers-docker.nix` e `containers-podman.nix` são independentes:
+> dá pra ligar só um, ou os dois juntos sem conflito.
+>
+> A família Mac (`hosts/common/mac-workstation.nix`) já tem um pacote
+> `podman` cru (+ `lazydocker`) pra uso básico rootless, sem passar por
+> `containers-podman.nix`. Ligar `containers-podman.nix` num host Mac não
+> quebra nada (Nix deduplica o pacote) — só passa a ligar o
+> `dockerCompat`/rede default que o pacote cru sozinho não configura.
 
 ---
 
