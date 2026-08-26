@@ -91,6 +91,11 @@ in {
       recursive = true;
     };
 
+    "fastfetch" = {
+      source = "${configs}/fastfetch";
+      recursive = true;
+    };
+
     "atuin" = {
       source = "${configs}/atuin";
       recursive = true;
