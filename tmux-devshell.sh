@@ -5,10 +5,17 @@
 # devshells Nix) ou montar um combo customizado, e abre uma sessão tmux
 # com uma window por devshell, cada uma já rodando `nix develop`.
 #
+# Pensado pra ser instalado como comando (~/.local/bin/tmux-devshell, via
+# home/modules/cli-and-terminal.nix) e rodado de DENTRO do projeto em
+# $HOME/prj/<algo> — não precisa estar na raiz do nixos-config. Os
+# devshells continuam vindo do nixos-config (NIXOS_CONFIG_DIR), mas o
+# `cwd` de cada window é o projeto de onde você chamou o comando
+# (PROJECT_DIR), não o repo.
+#
 # Uso:
-#   ./tmux-devshell.sh              # menu interativo
-#   ./tmux-devshell.sh --clean      # mata sessão existente antes de criar
-#   ./tmux-devshell.sh go+maria     # pula o menu, usa o profile direto
+#   tmux-devshell                # menu interativo, a partir do projeto atual
+#   tmux-devshell --clean        # mata sessão existente antes de criar
+#   tmux-devshell go+maria       # pula o menu, usa o profile direto
 #
 set -euo pipefail
 
@@ -25,9 +32,15 @@ C_OVERLAY='\033[38;2;108;112;134m'
 C_RESET='\033[0m'
 
 # --- Config ---------------------------------------------------------------
-# Raiz onde fica a pasta devshells/ (ex: ~/nixos-config)
-REPO_ROOT="${REPO_ROOT:-$(pwd)}"
-DEVSHELLS_DIR="${DEVSHELLS_DIR:-$REPO_ROOT/devshells}"
+# Onde fica o nixos-config (pra achar devshells/) — fixo, não depende de
+# onde o comando foi chamado. Mesmo caminho já usado em nixos-manager.sh.
+NIXOS_CONFIG_DIR="${NIXOS_CONFIG_DIR:-$HOME/nixos-config}"
+DEVSHELLS_DIR="${DEVSHELLS_DIR:-$NIXOS_CONFIG_DIR/devshells}"
+
+# Onde você está trabalhando — vira o cwd real de cada window/pane.
+# Default: diretório de onde o comando foi chamado (ex: $HOME/prj/minha-api).
+PROJECT_DIR="${PROJECT_DIR:-$(pwd)}"
+
 SESSION_PREFIX="${SESSION_PREFIX:-dev}"
 CLEAN=false
 
@@ -54,7 +67,7 @@ done
 
 if [[ ! -d "$DEVSHELLS_DIR" ]]; then
   echo -e "${C_RED}Erro: diretório de devshells não encontrado: ${DEVSHELLS_DIR}${C_RESET}"
-  echo -e "${C_OVERLAY}Defina REPO_ROOT ou rode este script na raiz do nixos-config.${C_RESET}"
+  echo -e "${C_OVERLAY}Confira se o nixos-config está clonado em ${NIXOS_CONFIG_DIR}, ou defina NIXOS_CONFIG_DIR.${C_RESET}"
   exit 1
 fi
 
@@ -161,10 +174,11 @@ for s in "${SELECTED[@]}"; do
   fi
 done
 
+echo -e "${C_GREEN}Projeto:${C_RESET} ${PROJECT_DIR}"
 echo -e "${C_GREEN}Profile:${C_RESET} ${PROFILE_NAME}"
-echo -e "${C_GREEN}Devshells:${C_RESET} ${SELECTED[*]}"
+echo -e "${C_GREEN}Devshells:${C_RESET} ${SELECTED[*]} ${C_OVERLAY}(de ${DEVSHELLS_DIR})${C_RESET}"
 
-SESSION_NAME="${SESSION_PREFIX}-${PROFILE_NAME}"
+SESSION_NAME="${SESSION_PREFIX}-$(basename "$PROJECT_DIR")-${PROFILE_NAME}"
 
 # --- Tmux session ---------------------------------------------------------
 if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
@@ -180,11 +194,11 @@ fi
 
 FIRST="${SELECTED[0]}"
 tmux new-session -d -s "$SESSION_NAME" -n "$FIRST" \
-  "cd '$REPO_ROOT' && nix develop ./devshells/$FIRST; exec \$SHELL"
+  "cd '$PROJECT_DIR' && nix develop '$DEVSHELLS_DIR/$FIRST'; exec \$SHELL"
 
 for shell in "${SELECTED[@]:1}"; do
   tmux new-window -t "$SESSION_NAME" -n "$shell" \
-    "cd '$REPO_ROOT' && nix develop ./devshells/$shell; exec \$SHELL"
+    "cd '$PROJECT_DIR' && nix develop '$DEVSHELLS_DIR/$shell'; exec \$SHELL"
 done
 
 tmux select-window -t "${SESSION_NAME}:1"

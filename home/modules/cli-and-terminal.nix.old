@@ -14,7 +14,6 @@
   ...
 }: let
   configs = ../configs;
-  repoRoot = ../..;
 in {
   # Módulos nativos do HM — instalam o binário; a config fica no xdg abaixo.
   programs.tmux.enable = true;
@@ -31,23 +30,6 @@ in {
     oh-my-posh
     atuin
   ];
-
-  # tmux-devshell / zellij-devshell viram comando de verdade em qualquer
-  # lugar (ex: dentro de $HOME/prj/algo), não só rodando ./script.sh da
-  # raiz do nixos-config. $HOME/.local/bin já está no PATH via
-  # home/configs/zshenv. O arquivo fonte continua sendo o da raiz do
-  # repo — ./tmux-devshell.sh e ./zellij-devshell.sh continuam funcionando
-  # normalmente pra quem preferir rodar direto de dentro do repo.
-  home.file = {
-    ".local/bin/tmux-devshell" = {
-      source = "${repoRoot}/tmux-devshell.sh";
-      executable = true;
-    };
-    ".local/bin/zellij-devshell" = {
-      source = "${repoRoot}/zellij-devshell.sh";
-      executable = true;
-    };
-  };
 
   xdg.configFile = {
     # Terminals

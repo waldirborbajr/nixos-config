@@ -1,8 +1,6 @@
 <img alt="NixOS" src="https://raw.githubusercontent.com/NixOS/nixos-artwork/9d2cdedd73d64a068214482902adea3d02783ba8/logo/nix-snowflake-rainbow.svg" width="140px"/>
 
-<h1>
-❄️ NixOS - BORBA JR, W - Configuration ❄️
-</h1>
+<h1>NixOS - BORBA JR, W - Configuration</h1>
 
 Flake multi-host (`flake.nix` → `configuration.nix` como índice fino,
 importando módulos por tópico em `modules/nixos/` → `hosts/<host>/default.nix`,
@@ -218,9 +216,12 @@ The steps must run in this order:
    ./nixos-manager.sh setup      # symlinks /etc/nixos -> ~/nixos-config
    ./nixos-manager.sh flake      # select branch + host, then rebuild
    ```
-   Note: `nixos-manager.sh` and `tmux-devshell.sh` live at the **repo
-   root**, not under `scripts/` — only `manage-ssh-sops.sh` and
-   `backup-age-key.sh` live in `scripts/`.
+   Note: `nixos-manager.sh`, `tmux-devshell.sh` and `zellij-devshell.sh`
+   live at the **repo root**, not under `scripts/` — only
+   `manage-ssh-sops.sh` and `backup-age-key.sh` live in `scripts/`. The two
+   devshell launchers are also installed as commands
+   (`tmux-devshell`/`zellij-devshell` in `~/.local/bin`, see the section
+   below) so they work from inside any project, not just the repo root.
 
    This is the first rebuild that can actually succeed, because the age key
    and encrypted secrets from step 3 already exist on disk. From here on,
@@ -332,20 +333,40 @@ NIXOS_FLAKE_ATTR=dell ./nixos-manager.sh flake   # força o host via env var
 
 ---
 
-## 🪟 `tmux-devshell.sh` — profiles de devshell em tmux
+## 🪟 `tmux-devshell` / `zellij-devshell` — profiles de devshell em qualquer projeto
 
-Abre uma sessão `tmux` com uma window por devshell Nix, a partir de um
-profile pré-definido (combo de devshells) ou de uma seleção manual (custom).
-Vive na **raiz do repo** (`./tmux-devshell.sh`) e espera encontrar as pastas
-em `devshells/` na raiz do repo (`$REPO_ROOT`, por padrão o diretório
-atual).
+Abrem uma sessão (tmux ou Zellij, mesmo profile system nos dois) com uma
+window/tab por devshell Nix, a partir de um profile pré-definido (combo de
+devshells) ou de uma seleção manual (custom).
+
+Os scripts-fonte vivem na **raiz do repo** (`./tmux-devshell.sh`,
+`./zellij-devshell.sh`), mas também são **instalados como comando**
+(`~/.local/bin/tmux-devshell`, `~/.local/bin/zellij-devshell` — via
+`home/modules/cli-and-terminal.nix`, `$HOME/.local/bin` já está no `PATH`
+por `home/configs/zshenv`). Rode de dentro de **qualquer projeto** em
+`$HOME/prj/<algo>` — não precisa estar no nixos-config nem passar
+caminho nenhum:
+
+```bash
+cd ~/prj/minha-api
+tmux-devshell rust+postgres      # ou: zellij-devshell rust+postgres
+```
+
+Os devshells continuam vindo do nixos-config (localizado via
+`NIXOS_CONFIG_DIR`, default `$HOME/nixos-config`), mas o `cwd` de cada
+window/tab é o projeto de onde você chamou o comando — é lá que o
+`cargo build`/`go build`/etc. realmente roda.
 
 ### Uso
 
 ```bash
-./tmux-devshell.sh              # menu interativo
-./tmux-devshell.sh --clean      # mata a sessão existente antes de criar uma nova
-./tmux-devshell.sh go+maria     # pula o menu, usa o profile direto
+tmux-devshell                # menu interativo, a partir do projeto atual
+tmux-devshell --clean        # mata a sessão existente antes de criar uma nova
+tmux-devshell go+maria       # pula o menu, usa o profile direto
+
+zellij-devshell                # idem, via Zellij
+zellij-devshell --clean
+zellij-devshell go+maria
 ```
 
 ### Profiles pré-definidos
@@ -363,14 +384,16 @@ atual).
 Além dos profiles, a opção **custom** no menu permite selecionar
 manualmente qualquer combinação das pastas existentes em `devshells/`
 (incluindo `arduino` e `latex`, que não entram em nenhum profile
-pré-definido — só via custom ou `nix develop ./devshells/<nome>` direto).
+pré-definido, e `rust+sqlite`/`go+sqlite`, que ainda não têm profile
+dedicado — só via custom).
 
-> ⚠️ Os profiles `lua+sqlite` e `python+mongo` referenciam devshells
-> chamados `sqlite` e `mongodb`; hoje só existe a pasta `devshells/mongodb`
-> — **não há `devshells/sqlite`** na árvore atual. `tmux-devshell.sh` avisa
-> e pula o devshell inexistente, então `lua+sqlite` hoje abre só a window
-> `lua`. Crie `devshells/sqlite/flake.nix` ou ajuste o profile em
-> `tmux-devshell.sh` para fechar essa lacuna.
+> `go`/`rust`/`python` são shells **puras de linguagem** (sem
+> Postgres/MariaDB/SQLite embutido) — quem entra no jogo é o profile
+> (ou a seleção custom), combinando a linguagem com o banco que você
+> quiser naquele projeto. Exceção: se algum projeto usa uma crate/lib
+> que **linka** contra a lib nativa do banco em tempo de build (ex:
+> `sqlx`/`diesel` sem feature `bundled`), abrir o banco numa tab separada
+> não basta — a lib precisa estar no mesmo shell do build.
 
 ### Requisitos e fallback
 
@@ -379,30 +402,34 @@ pré-definido — só via custom ou `nix develop ./devshells/<nome>` direto).
   mostrando quais devshells cada profile inclui.
 - **Sem `fzf`**: cai automaticamente para um menu numerado no terminal —
   nenhuma funcionalidade é perdida, só a experiência de seleção muda.
-- **`tmux`**: obrigatório — cada devshell selecionado vira uma window
-  rodando `nix develop ./devshells/<nome>`.
+- **`tmux-devshell`**: precisa de `tmux`.
+- **`zellij-devshell`**: precisa de `zellij`. Cada tab nasce com
+  `default_tab_template` (tab-bar + status-bar), igual ao layout `default`
+  de fábrica do Zellij — sem isso as tabs aparecem "nuas", sem barra
+  nenhuma.
 
 ### Variáveis de ambiente
 
 | Variável | Padrão | Descrição |
 |---|---|---|
-| `REPO_ROOT` | `$(pwd)` | Raiz do repo onde fica `devshells/` |
-| `DEVSHELLS_DIR` | `$REPO_ROOT/devshells` | Pasta com as subpastas de cada devshell |
-| `SESSION_PREFIX` | `dev` | Prefixo do nome da sessão tmux (ex: `dev-go+maria`) |
+| `NIXOS_CONFIG_DIR` | `$HOME/nixos-config` | Onde fica o nixos-config, pra achar `devshells/` |
+| `DEVSHELLS_DIR` | `$NIXOS_CONFIG_DIR/devshells` | Pasta com as subpastas de cada devshell |
+| `PROJECT_DIR` | `$(pwd)` no momento em que o comando é chamado | Vira o `cwd` real de cada window/tab — normalmente o projeto em `$HOME/prj/<algo>` |
+| `SESSION_PREFIX` | `dev` | Prefixo do nome da sessão (ex: `dev-minha-api-go+maria` — inclui o nome do projeto, pra não colidir entre projetos diferentes usando o mesmo profile) |
 
 ---
 
 ## 🛠️ Development Shells
 
-Development environments are organized in dedicated folders under [devshells](devshells), each with its own flake. You can enter them directly from the repository without changing the main flake configuration, or use `tmux-devshell.sh` (acima) to open several at once in separate tmux windows.
+Development environments are organized in dedicated folders under [devshells](devshells), each with its own flake. You can enter them directly from the repository without changing the main flake configuration, or use `tmux-devshell`/`zellij-devshell` (acima) to open several at once from inside any project directory.
 
 ### Available environments
 
 ```bash
-# Go
+# Go (pure — combine with a db devshell via tmux-devshell/zellij-devshell profiles)
 nix develop ./devshells/go
 
-# Rust
+# Rust (pure — combine with a db devshell via tmux-devshell/zellij-devshell profiles)
 nix develop ./devshells/rust
 
 # Lua
@@ -417,11 +444,14 @@ nix develop ./devshells/arduino
 # LaTeX
 nix develop ./devshells/latex
 
-# PostgreSQL
+# PostgreSQL (server + psql/pgcli)
 nix develop ./devshells/postgresql
 
-# MariaDB
+# MariaDB (server + mycli)
 nix develop ./devshells/mariadb
+
+# SQLite (sqlite3 + analyzer + docs)
+nix develop ./devshells/sqlite
 
 # MongoDB
 nix develop ./devshells/mongodb
@@ -431,6 +461,7 @@ nix develop ./devshells/mongodb
 
 - Each folder contains its own [flake.nix](flake.nix) style definition for that toolchain or database.
 - The shell name is usually the same as the folder name, so `nix develop ./devshells/go` works as expected.
+- `go`/`rust`/`python` are language-only shells — no database tooling baked in. Combine with a db devshell (`postgresql`, `mariadb`, `sqlite`, `mongodb`) via a `tmux-devshell`/`zellij-devshell` profile, or run both `nix develop` shells side by side manually.
 - This keeps each environment isolated and easier to maintain.
 
 **Advantages:**
@@ -470,16 +501,6 @@ troubleshooting (reset do teclado, reconexão manual via
 
 ## 📚 Other docs in this repo
 
-- [`AUDIT-REPORT.md`](AUDIT-REPORT.md) — auditoria pontual (bugs de opções
-  duplicadas, arquivo órfão removido, docs desalinhadas) feita antes da
-  migração para Home Manager. Histórico, não um guia de uso.
-- [`REFACTOR-NOTES.md`](REFACTOR-NOTES.md) — split do antigo
-  `configuration.nix` monolítico em `modules/nixos/`: mapeamento
-  seção→arquivo e como validar (comparação de store path) antes de
-  mergear a branch de teste.
-- [`TODO.md`](TODO.md) — pendências reais em aberto (boot mode/GRUB device
-  do Dell não confirmados, firmware Wi-Fi do Dell, `.sops.yaml` ausente,
-  candidatos a migrar para módulos nativos do Home Manager).
 - [`DENDRITIC-PATTERN.md`](DENDRITIC-PATTERN.md) — **aspiracional, não
   implementado.** Descreve uma arquitetura-alvo (`core.nix`, `profiles/`,
   `modules/category/default.nix`) que não existe nesta árvore hoje; mantido

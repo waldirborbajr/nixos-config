@@ -1,29 +1,14 @@
 #!/usr/bin/env bash
-# zellij-devshell.sh
+# tmux-devshell.sh
 #
-# Mesmo launcher do tmux-devshell.sh (escolher um "profile" pré-definido
-# de devshells Nix, ou montar um combo customizado), só que abrindo uma
-# sessão Zellij em vez de tmux — uma tab por devshell, cada uma já
-# rodando `nix develop`.
-#
-# Diferença de mecanismo (não de comportamento visível): tmux cria a
-# sessão detached e vai adicionando window por window via
-# `tmux new-window`; Zellij não tem um "-d" equivalente pra isso, então
-# a lista de devshells vira um layout KDL gerado na hora (um `tab` por
-# devshell) e a sessão nasce já com todas as tabs de uma vez via
-# `zellij --new-session-with-layout`.
-#
-# Pensado pra ser instalado como comando (~/.local/bin/zellij-devshell,
-# via home/modules/cli-and-terminal.nix) e rodado de DENTRO do projeto em
-# $HOME/prj/<algo> — não precisa estar na raiz do nixos-config. Os
-# devshells continuam vindo do nixos-config (NIXOS_CONFIG_DIR), mas o
-# `cwd` de cada tab é o projeto de onde você chamou o comando
-# (PROJECT_DIR), não o repo.
+# Launcher que permite escolher um "profile" (combinação pré-definida de
+# devshells Nix) ou montar um combo customizado, e abre uma sessão tmux
+# com uma window por devshell, cada uma já rodando `nix develop`.
 #
 # Uso:
-#   zellij-devshell                # menu interativo, a partir do projeto atual
-#   zellij-devshell --clean        # mata sessão existente antes de criar
-#   zellij-devshell go+maria       # pula o menu, usa o profile direto
+#   ./tmux-devshell.sh              # menu interativo
+#   ./tmux-devshell.sh --clean      # mata sessão existente antes de criar
+#   ./tmux-devshell.sh go+maria     # pula o menu, usa o profile direto
 #
 set -euo pipefail
 
@@ -40,21 +25,14 @@ C_OVERLAY='\033[38;2;108;112;134m'
 C_RESET='\033[0m'
 
 # --- Config ---------------------------------------------------------------
-# Onde fica o nixos-config (pra achar devshells/) — fixo, não depende de
-# onde o comando foi chamado. Mesmo caminho já usado em nixos-manager.sh.
-NIXOS_CONFIG_DIR="${NIXOS_CONFIG_DIR:-$HOME/nixos-config}"
-DEVSHELLS_DIR="${DEVSHELLS_DIR:-$NIXOS_CONFIG_DIR/devshells}"
-
-# Onde você está trabalhando — vira o cwd real de cada tab/pane.
-# Default: diretório de onde o comando foi chamado (ex: $HOME/prj/minha-api).
-PROJECT_DIR="${PROJECT_DIR:-$(pwd)}"
-
+# Raiz onde fica a pasta devshells/ (ex: ~/nixos-config)
+REPO_ROOT="${REPO_ROOT:-$(pwd)}"
+DEVSHELLS_DIR="${DEVSHELLS_DIR:-$REPO_ROOT/devshells}"
 SESSION_PREFIX="${SESSION_PREFIX:-dev}"
 CLEAN=false
 
 # Profiles pré-definidos: "nome" => "devshell1 devshell2 ..."
-# Mantido idêntico ao tmux-devshell.sh de propósito — edite os dois juntos
-# se for adicionar/remover profile, pra não desalinhar as duas ferramentas.
+# Edite/adicione livremente conforme suas pastas em devshells/
 declare -A PROFILES=(
   ["go+maria"]="go mariadb"
   ["go+postgres"]="go postgresql"
@@ -74,15 +52,9 @@ for arg in "$@"; do
   esac
 done
 
-if ! command -v zellij &>/dev/null; then
-  echo -e "${C_RED}Erro: zellij não encontrado no PATH.${C_RESET}"
-  echo -e "${C_OVERLAY}Está em home/modules/cli-and-terminal.nix — confirme que o host importa esse módulo.${C_RESET}"
-  exit 1
-fi
-
 if [[ ! -d "$DEVSHELLS_DIR" ]]; then
   echo -e "${C_RED}Erro: diretório de devshells não encontrado: ${DEVSHELLS_DIR}${C_RESET}"
-  echo -e "${C_OVERLAY}Confira se o nixos-config está clonado em ${NIXOS_CONFIG_DIR}, ou defina NIXOS_CONFIG_DIR.${C_RESET}"
+  echo -e "${C_OVERLAY}Defina REPO_ROOT ou rode este script na raiz do nixos-config.${C_RESET}"
   exit 1
 fi
 
@@ -93,7 +65,7 @@ if [[ ${#AVAILABLE_SHELLS[@]} -eq 0 ]]; then
   exit 1
 fi
 
-echo -e "${C_MAUVE}=== Nix Devshell Zellij Launcher ===${C_RESET}"
+echo -e "${C_MAUVE}=== Nix Devshell Tmux Launcher ===${C_RESET}"
 
 SELECTED=()
 PROFILE_NAME=""
@@ -189,67 +161,36 @@ for s in "${SELECTED[@]}"; do
   fi
 done
 
-echo -e "${C_GREEN}Projeto:${C_RESET} ${PROJECT_DIR}"
 echo -e "${C_GREEN}Profile:${C_RESET} ${PROFILE_NAME}"
-echo -e "${C_GREEN}Devshells:${C_RESET} ${SELECTED[*]} ${C_OVERLAY}(de ${DEVSHELLS_DIR})${C_RESET}"
+echo -e "${C_GREEN}Devshells:${C_RESET} ${SELECTED[*]}"
 
-SESSION_NAME="${SESSION_PREFIX}-$(basename "$PROJECT_DIR")-${PROFILE_NAME}"
+SESSION_NAME="${SESSION_PREFIX}-${PROFILE_NAME}"
 
-# --- Sessão já existe? ---------------------------------------------------
-# `zellij list-sessions` imprime "nome (detalhes...)" por linha; pegar só
-# a 1a coluna é mais resiliente a mudanças de formatação entre versões do
-# que tentar casar a linha inteira.
-session_exists() {
-  zellij list-sessions --no-formatting 2>/dev/null | awk '{print $1}' | grep -qx "$SESSION_NAME"
-}
-
-if session_exists; then
+# --- Tmux session ---------------------------------------------------------
+if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
   if [[ "$CLEAN" == true ]]; then
     echo -e "${C_YELLOW}Matando sessão existente '${SESSION_NAME}'...${C_RESET}"
-    zellij kill-session "$SESSION_NAME"
+    tmux kill-session -t "$SESSION_NAME"
   else
     echo -e "${C_YELLOW}Sessão '${SESSION_NAME}' já existe. Anexando...${C_RESET}"
-    if [[ -n "${ZELLIJ:-}" ]]; then
-      echo -e "${C_OVERLAY}(você já está dentro de uma sessão Zellij — nesting não é bem suportado; considere sair primeiro com Ctrl-o d)${C_RESET}"
-    fi
-    exec zellij attach "$SESSION_NAME"
+    tmux attach -t "$SESSION_NAME"
+    exit 0
   fi
 fi
 
-# --- Gera o layout KDL: uma tab por devshell, primeira tab focada -------
-# `default_tab_template` reproduz o que o layout `default.kdl` do próprio
-# Zellij faz de fábrica (tab-bar em cima, status-bar embaixo com os
-# atalhos). Como aqui é um layout escrito na mão, sem isso as tabs vêm
-# "nuas" — foi o que sumiu quando o layout gerado tinha só os `pane`.
-LAYOUT_FILE=$(mktemp --suffix=.kdl)
-trap 'rm -f "$LAYOUT_FILE"' EXIT
+FIRST="${SELECTED[0]}"
+tmux new-session -d -s "$SESSION_NAME" -n "$FIRST" \
+  "cd '$REPO_ROOT' && nix develop ./devshells/$FIRST; exec \$SHELL"
 
-{
-  cat <<'HEADER'
-layout {
-    default_tab_template {
-        pane size=1 borderless=true {
-            plugin location="zellij:tab-bar"
-        }
-        children
-        pane size=2 borderless=true {
-            plugin location="zellij:status-bar"
-        }
-    }
-HEADER
-  for i in "${!SELECTED[@]}"; do
-    shell="${SELECTED[$i]}"
-    focus_attr=""
-    [[ "$i" -eq 0 ]] && focus_attr=' focus=true'
-    cat <<EOF
-    tab name="$shell"$focus_attr {
-        pane command="bash" cwd="$PROJECT_DIR" {
-            args "-c" "cd '$PROJECT_DIR' && nix develop '$DEVSHELLS_DIR/$shell'; exec \$SHELL"
-        }
-    }
-EOF
-  done
-  echo "}"
-} > "$LAYOUT_FILE"
+for shell in "${SELECTED[@]:1}"; do
+  tmux new-window -t "$SESSION_NAME" -n "$shell" \
+    "cd '$REPO_ROOT' && nix develop ./devshells/$shell; exec \$SHELL"
+done
 
-exec zellij --new-session-with-layout "$LAYOUT_FILE" --session "$SESSION_NAME"
+tmux select-window -t "${SESSION_NAME}:1"
+
+if [[ -n "${TMUX:-}" ]]; then
+  tmux switch-client -t "$SESSION_NAME"
+else
+  tmux attach -t "$SESSION_NAME"
+fi
