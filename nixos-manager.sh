@@ -57,31 +57,43 @@ GIT_REPO_URL="git@github.com:waldirborbajr/nixos-config.git"
 # Set at runtime by select_git_branch(). Never assume a value beforehand.
 GIT_BRANCH=""
 
-# flake attr -> real machine name (used for auto-detection via `hostname`)
+# flake attr -> real machine name (used for auto-detection via `hostname`).
+# Source of truth is flake.nix (nixosConfigurations.<attr>.config.networking.hostName,
+# set from the `hostname` specialArg in modules/nixos/system-base.nix) — this
+# is populated at runtime by load_flake_hosts() below, NOT hardcoded here, so
+# adding/renaming a host in flake.nix doesn't also require editing this script.
+# HOST_ATTR_TO_MACHINE_FALLBACK is only used if `nix eval`/`jq` are unavailable
+# or evaluation fails (e.g. offline on first run); keep it a reasonably fresh
+# snapshot, but it's a safety net, not the thing to edit when hosts change.
 # Note: Dell may still report hostname "dell1456" until the first successful
 # switch applies networking.hostName = "dell1564" from the flake.
-declare -A HOST_ATTR_TO_MACHINE=(
+declare -A HOST_ATTR_TO_MACHINE_FALLBACK=(
   [m2utm]="macutm"
   [dell]="dell1564"
   [mac2011]="mac2011"
   [macvmf]="macvmf"
 )
+declare -A HOST_ATTR_TO_MACHINE=()
+FLAKE_ATTRS=()
 
 # Extra hostnames that should map to a flake attr (legacy / pre-switch names).
+# Not derivable from the flake (these are historical hostnames that predate
+# the current flake attr), so they stay hand-maintained here.
 declare -A HOST_ALIAS_TO_ATTR=(
   [dell1456]="dell"
   [dell1564]="dell"
 )
 
-# flake attr -> friendly name (display only, used in the menu)
+# flake attr -> friendly name (display only, used in the menu). Purely a
+# script/UI concern — flake.nix has no notion of "friendly name" — so this
+# stays hand-maintained. Falls back to the raw attr if a host is missing here
+# (e.g. a new host just added to flake.nix that hasn't gotten a label yet).
 declare -A HOST_ATTR_TO_LABEL=(
   [m2utm]="MacBook M2 - UTM"
   [dell]="Dell Inspiron 1564"
   [mac2011]="MacBook Pro 13in (2011)"
   [macvmf]="MacBook M2 - VMware Fusion"
 )
-
-FLAKE_ATTRS=(m2utm dell mac2011 macvmf)
 
 # set at runtime by select_flake_attr()
 FLAKE_ATTR=""
@@ -123,6 +135,48 @@ step() {
   echo
   echo -e "${C_MAUVE}${C_BOLD}[$1/$2]${C_RESET} ${C_BOLD}$3${C_RESET}"
 }
+
+load_flake_hosts() {
+  # Populates HOST_ATTR_TO_MACHINE + FLAKE_ATTRS from flake.nix itself
+  # (nixosConfigurations.<attr>.config.networking.hostName), so this script
+  # never has its own out-of-sync copy of "which hosts exist". Evaluation
+  # only (no build), but still needs `nix` + `jq` and a valid flake.
+  local json=""
+
+  if [ -d "$NIXOS_DIR" ] && command -v nix >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
+    json="$(
+      cd "$NIXOS_DIR" 2>/dev/null \
+        && nix eval --json ".#nixosConfigurations" \
+             --apply 'builtins.mapAttrs (_: v: v.config.networking.hostName)' \
+             2>/dev/null
+    )" || json=""
+  fi
+
+  if [ -n "$json" ] && echo "$json" | jq -e 'type == "object" and length > 0' >/dev/null 2>&1; then
+    local attr machine
+    while IFS=$'\t' read -r attr machine; do
+      [ -z "$attr" ] && continue
+      HOST_ATTR_TO_MACHINE[$attr]="$machine"
+      FLAKE_ATTRS+=("$attr")
+    done < <(echo "$json" | jq -r 'to_entries[] | "\(.key)\t\(.value)"' | sort)
+  else
+    warn "Couldn't read hosts from flake.nix via 'nix eval' (offline, or nix/jq missing) — using the last-known snapshot baked into this script. New/renamed hosts won't show up until nix+jq are available."
+    for attr in "${!HOST_ATTR_TO_MACHINE_FALLBACK[@]}"; do
+      HOST_ATTR_TO_MACHINE[$attr]="${HOST_ATTR_TO_MACHINE_FALLBACK[$attr]}"
+      FLAKE_ATTRS+=("$attr")
+    done
+    IFS=$'\n' FLAKE_ATTRS=($(sort <<<"${FLAKE_ATTRS[*]}")); unset IFS
+  fi
+}
+
+# Any HOST_ATTR_TO_LABEL lookup for an attr with no hand-written label
+# (e.g. a brand-new host from the flake) falls back to the raw attr name
+# instead of an empty string.
+label_for_attr() {
+  echo "${HOST_ATTR_TO_LABEL[$1]:-$1}"
+}
+
+load_flake_hosts
 
 require_dir() {
   if [ ! -d "$NIXOS_DIR" ]; then
@@ -189,7 +243,7 @@ setup_machine() {
   # 3) Detect / confirm this machine's flake attr
   local detected
   if detected="$(detect_flake_attr)"; then
-    ok "This machine's hostname matches flake host: ${C_BOLD}${detected}${C_RESET} (${HOST_ATTR_TO_LABEL[$detected]})"
+    ok "This machine's hostname matches flake host: ${C_BOLD}${detected}${C_RESET} ($(label_for_attr "$detected"))"
   else
     warn "This machine's hostname ($(hostname -s 2>/dev/null || echo '?')) does not match any known flake host."
     warn "Check HOST_ATTR_TO_MACHINE in this script, or set the hostname to match one of: ${FLAKE_ATTRS[*]}"
@@ -245,7 +299,7 @@ prompt_flake_attr() {
   echo -e "${C_SKY}Available hosts:${C_RESET}" >&2
   local i=1 attr
   for attr in "${FLAKE_ATTRS[@]}"; do
-    echo -e "  ${C_YELLOW}${i})${C_RESET} ${C_BOLD}${HOST_ATTR_TO_LABEL[$attr]}${C_RESET} ${C_OVERLAY}(${HOST_ATTR_TO_MACHINE[$attr]})${C_RESET}" >&2
+    echo -e "  ${C_YELLOW}${i})${C_RESET} ${C_BOLD}$(label_for_attr "$attr")${C_RESET} ${C_OVERLAY}(${HOST_ATTR_TO_MACHINE[$attr]})${C_RESET}" >&2
     i=$((i + 1))
   done
   local choice
@@ -669,9 +723,9 @@ build_flake() {
   git_checkout_branch
   git_sync_pull
 
-  step 4 5 "Applying rebuild — ${C_TEAL}${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]}${C_RESET} ${C_OVERLAY}(${FLAKE_ATTR})${C_RESET}"
+  step 4 5 "Applying rebuild — ${C_TEAL}$(label_for_attr "$FLAKE_ATTR")${C_RESET} ${C_OVERLAY}(${FLAKE_ATTR})${C_RESET}"
   run_nixos_rebuild switch --flake "${NIXOS_DIR}#${FLAKE_ATTR}"
-  ok "Rebuild complete on ${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]} (${FLAKE_ATTR})."
+  ok "Rebuild complete on $(label_for_attr "$FLAKE_ATTR") (${FLAKE_ATTR})."
 
   step 5 5 "Pushing pending changes"
   git_push_if_ahead
@@ -690,7 +744,7 @@ build_flake_dry() {
   git_checkout_branch
   git_sync_pull
 
-  step 3 3 "Test build (not activated) — ${C_TEAL}${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]}${C_RESET} ${C_OVERLAY}(${FLAKE_ATTR})${C_RESET}"
+  step 3 3 "Test build (not activated) — ${C_TEAL}$(label_for_attr "$FLAKE_ATTR")${C_RESET} ${C_OVERLAY}(${FLAKE_ATTR})${C_RESET}"
   run_nixos_rebuild build --flake "${NIXOS_DIR}#${FLAKE_ATTR}"
   ok "Test build complete — nothing was activated. Result in ./result"
 }
@@ -717,9 +771,9 @@ update_system() {
   step 5 7 "Committing updated flake.lock (if changed)"
   git_commit_if_dirty
 
-  step 6 7 "Applying rebuild — ${C_TEAL}${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]}${C_RESET} ${C_OVERLAY}(${FLAKE_ATTR})${C_RESET}"
+  step 6 7 "Applying rebuild — ${C_TEAL}$(label_for_attr "$FLAKE_ATTR")${C_RESET} ${C_OVERLAY}(${FLAKE_ATTR})${C_RESET}"
   run_nixos_rebuild switch --flake "${NIXOS_DIR}#${FLAKE_ATTR}"
-  ok "System updated on ${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]} (${FLAKE_ATTR})."
+  ok "System updated on $(label_for_attr "$FLAKE_ATTR") (${FLAKE_ATTR})."
 
   step 7 7 "Pushing pending changes"
   git_push_if_ahead
@@ -846,7 +900,7 @@ check_flake() {
 
   if [ -n "$host_arg" ]; then
     select_flake_attr "$host_arg"
-    log "Checking flake for host ${C_BOLD}${HOST_ATTR_TO_LABEL[$FLAKE_ATTR]}${C_RESET} (${FLAKE_ATTR})..."
+    log "Checking flake for host ${C_BOLD}$(label_for_attr "$FLAKE_ATTR")${C_RESET} (${FLAKE_ATTR})..."
   else
     log "Checking flake (all hosts)..."
   fi
@@ -943,7 +997,7 @@ list_hosts() {
   echo -e "${C_BOLD}${C_SKY}Hosts configured in the flake:${C_RESET}"
   local attr
   for attr in "${FLAKE_ATTRS[@]}"; do
-    echo -e "  ${C_GREEN}●${C_RESET} ${C_BOLD}${HOST_ATTR_TO_LABEL[$attr]}${C_RESET}  ${C_OVERLAY}(attr: ${attr}, hostname: ${HOST_ATTR_TO_MACHINE[$attr]})${C_RESET}"
+    echo -e "  ${C_GREEN}●${C_RESET} ${C_BOLD}$(label_for_attr "$attr")${C_RESET}  ${C_OVERLAY}(attr: ${attr}, hostname: ${HOST_ATTR_TO_MACHINE[$attr]})${C_RESET}"
   done
   local detected
   echo
