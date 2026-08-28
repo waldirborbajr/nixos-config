@@ -17,8 +17,12 @@ in {
     enable = true;
     package = pkgs.helix;
 
+    themes = {
+      onenord = import ./theme.nix;
+    };
+
     settings = {
-      theme = "nord";
+      theme = "onenord";
 
       editor = {
         true-color = true;
