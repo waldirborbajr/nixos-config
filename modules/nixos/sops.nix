@@ -52,6 +52,24 @@ in {
     mode = "0644";
   };
 
+  # Dedicated GitLab / Forgejo identities are intentionally not declared yet.
+  # Add their encrypted keys to each host's SOPS file first, then provision
+  # them with the same pattern:
+  #
+  # sops.secrets."borba_ssh_gitlab_private_key" = {
+  #   path = "${sshKeysDir}/id_ed25519_gitlab";
+  #   owner = username;
+  #   group = "users";
+  #   mode = "0600";
+  # };
+  #
+  # sops.secrets."borba_ssh_forgejo_private_key" = {
+  #   path = "${sshKeysDir}/id_ed25519_forgejo";
+  #   owner = username;
+  #   group = "users";
+  #   mode = "0600";
+  # };
+
   # ==================== ZERO-TOUCH SSH HOST KEY BOOTSTRAP ====================
   systemd.services.ssh-hostkey-bootstrap = {
     description = "Bootstrap SSH host key into SOPS on first boot";

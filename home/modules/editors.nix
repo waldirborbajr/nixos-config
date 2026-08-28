@@ -1,15 +1,14 @@
 # home/modules/editors.nix
 #
-# Git, Helix (+ script auxiliar) e bat/nvim. Extraído 1:1 de
-# home/default.nix (split cirúrgico, sem mudança de comportamento).
-{
-  pkgs-unstable,
-  lib,
-  ...
-}: let
+# Git, bat e neovim. Helix fica isolado em home/modules/helix/ para seguir
+# a estrutura modular do Foundry/Misterio77.
+{pkgs-unstable, ...}: let
   configs = ../configs;
 in {
-  # Git — fully structured; the old config file is no longer needed as source.
+  imports = [
+    ./helix
+  ];
+
   programs.git = {
     enable = true;
     settings = {
@@ -22,29 +21,10 @@ in {
     };
   };
 
-  # Helix — native settings + languages (was config.toml + languages.toml)
-  programs.helix = {
-    enable = true;
-    settings = lib.importTOML "${configs}/helix/config.toml";
-    languages = lib.importTOML "${configs}/helix/languages.toml";
-  };
-
-  # Bat — enable + keep custom theme via xdg
   programs.bat.enable = true;
 
-  # neovim — declarado aqui (não em modules/nixos/packages.nix) porque
-  # este módulo é importado por TODOS os hosts (os 4 NixOS via
-  # home/default.nix + o `macbook` standalone via hosts/macbook/home.nix),
-  # então uma única declaração cobre todo mundo. É preciso mesmo: git
-  # settings.core.editor="nvim" acima e os dotfiles compartilhados do zsh
-  # (home/configs/zsh/aliases.zsh, functions.zsh) chamam `nvim` direto.
-  # `pkgs-unstable` (não `pkgs`) de propósito — antes vinha de
-  # `environment.systemPackages` via pkgs-unstable nos hosts NixOS
-  # (modules/nixos/packages.nix); mantendo o mesmo canal aqui pra não
-  # regredir a versão do neovim que já estava em uso. Disponível em todo
-  # host porque `pkgs-unstable` já é passado via extraSpecialArgs tanto em
-  # modules/nixos/users-and-home.nix (NixOS) quanto em mkMacHome
-  # (flake.nix, macbook).
+  # neovim — declarado aqui porque este módulo é importado por todos os
+  # hosts (NixOS + macOS standalone).
   home.packages = [pkgs-unstable.neovim];
 
   xdg.configFile = {
@@ -56,12 +36,6 @@ in {
     "nvim" = {
       source = "${configs}/nvim";
       recursive = true;
-    };
-
-    # Extra helix script not covered by the module
-    "helix/yazi-picker.sh" = {
-      source = "${configs}/helix/yazi-picker.sh";
-      executable = true;
     };
   };
 }

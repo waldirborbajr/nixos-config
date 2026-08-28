@@ -1,40 +1,29 @@
-# .sops.yaml
-# SOPS configuration for NixOS secrets management
-# See: https://github.com/getsops/sops
-#
-# to generate pub key
-# ./scripts/backup-age-key.sh
-
+keys:
+  - &hosts
+    - &dell1564 age13tuya5ezwysz4sdjnrcn7u9x3dyst5wcknm5t6lm0tldljslq9pqtd7294
+    - &mac2011 age13ggsqwyzrherf2pxg8ur99df8f7axnc0zr96nyfwxp9d9tpzspwq7xumza
+    - &macutm age1dk5mht8sj9z08w4thvn8kqq0c8qz3nuxhym6vlusu6rf9mj873wqsetycx
+    - &macvmf age14ptfmtfh5j0qmk465znct92qclcwz46e3w3r2px6aph5na55afrqz33hgk
 
 creation_rules:
-  # Dell Inspiron 1564 secrets
-  - path_regex: hosts/dell1564/secrets/dell1564\.yaml$
-    encrypted_regex: '^(data|stringData)$'
-    age: age1q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q # Replace with your actual age public key
+  # Each host's complete secret file is decryptable only by that host.
+  # This preserves the current security boundary.
+  - path_regex: hosts/dell1564/secrets/dell1564\.ya?ml$
     key_groups:
       - age:
-        - age1q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q # Same key for all hosts initially
+          - *dell1564
 
-  # MacBook Pro 2011 secrets
-  - path_regex: hosts/mac2011/secrets/mac2011\.yaml$
-    encrypted_regex: '^(data|stringData)$'
-    age: age13ggsqwyzrherf2pxg8ur99df8f7axnc0zr96nyfwxp9d9tpzspwq7xumza
+  - path_regex: hosts/mac2011/secrets/mac2011\.ya?ml$
     key_groups:
       - age:
-        - age13ggsqwyzrherf2pxg8ur99df8f7axnc0zr96nyfwxp9d9tpzspwq7xumza
+          - *mac2011
 
-  # Mac UTM VM secrets
-  - path_regex: hosts/macutm/secrets/macutm\.yaml$
-    encrypted_regex: '^(data|stringData)$'
-    age: age1dk5mht8sj9z08w4thvn8kqq0c8qz3nuxhym6vlusu6rf9mj873wqsetycx
+  - path_regex: hosts/macutm/secrets/macutm\.ya?ml$
     key_groups:
       - age:
-        - age1dk5mht8sj9z08w4thvn8kqq0c8qz3nuxhym6vlusu6rf9mj873wqsetycx
+          - *macutm
 
-  # Mac VMware Fusion VM secrets
-  - path_regex: hosts/macvmf/secrets/macvmf\.yaml$
-    encrypted_regex: '^(data|stringData)$'
-    age: age14ptfmtfh5j0qmk465znct92qclcwz46e3w3r2px6aph5na55afrqz33hgk
+  - path_regex: hosts/macvmf/secrets/macvmf\.ya?ml$
     key_groups:
       - age:
-        - age14ptfmtfh5j0qmk465znct92qclcwz46e3w3r2px6aph5na55afrqz33hgk
+          - *macvmf
