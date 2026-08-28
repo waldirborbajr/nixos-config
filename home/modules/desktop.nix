@@ -4,9 +4,33 @@
 # niri/waybar/wlr-which-key comum a todos os hosts (overrides por host
 # ficam em hosts/<host>/default.nix). Extraído 1:1 de home/default.nix
 # (split cirúrgico, sem mudança de comportamento).
-{...}: let
+{pkgs, ...}: let
   configs = ../configs;
 in {
+  # ==================== GTK / ÍCONES (sessão real, não o greeter) ====================
+  # O Papirus-Dark em modules/nixos/desktop-niri.nix só é usado pelo regreet
+  # (tela de login) — a sessão niri em si não tinha NENHUM tema de ícones
+  # apontado, então apps GTK (Nemo, etc.) e o Vicinae caíam no ícone
+  # genérico "?" por falta de XDG icon theme. Mesma combinação
+  # Papirus + overlay Catppuccin usada no regreet, só que instalada/mapeada
+  # aqui pra sessão do usuário via home-manager.
+  gtk = {
+    enable = true;
+    iconTheme = {
+      name = "Papirus-Dark";
+      package = pkgs.symlinkJoin {
+        name = "papirus-catppuccin-mauve";
+        paths = [
+          pkgs.papirus-icon-theme
+          (pkgs.catppuccin-papirus-folders.override {
+            accent = "mauve";
+            flavor = "mocha";
+          })
+        ];
+      };
+    };
+  };
+
   services.mako = {
     enable = true;
     settings = {
