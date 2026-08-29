@@ -22,6 +22,21 @@ in {
   programs.lazygit.enable = true;
   programs.yazi.enable = true;
 
+  # nh — wrapper mais amigável pra nixos-rebuild / home-manager switch /
+  # nix-collect-garbage, com diff bonito das mudanças (via nvd) e output
+  # via nix-output-monitor. `flake` aponta pro clone local do repo
+  # (mesmo caminho que nixos-manager.sh usa/espera em todo host), então
+  # `nh os switch` e `nh home switch` funcionam sem precisar passar
+  # --flake toda vez.
+  programs.nh = {
+    enable = true;
+    flake = "${config.home.homeDirectory}/nixos-config";
+    clean = {
+      enable = true;
+      extraArgs = "--keep-since 4d --keep 3";
+    };
+  };
+
   # Pacotes sem módulo HM (ou cujo módulo geraria config própria em conflito
   # com o xdg.configFile abaixo). Só o binário — config via xdg.
   home.packages = with pkgs; [
