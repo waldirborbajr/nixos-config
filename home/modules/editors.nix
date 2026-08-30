@@ -33,6 +33,11 @@ in {
       recursive = true;
     };
 
+    "helix" =  {
+      source = "${configs}/helix";
+      recursive = true;
+    };
+
     "nvim" = {
       source = "${configs}/nvim";
       recursive = true;

@@ -1,0 +1,190 @@
+
+####################################################################################################
+# Helix languages.toml - Unified Balanced Config (2026) + LLM Integration
+####################################################################################################
+
+# ================================================================================================
+# LANGUAGE SERVERS GLOBAIS (LLM + Utilities)
+# ================================================================================================
+[language-server.llm-suggest]
+command = "llm-suggest-lsp"  # ou o binário que você usa (ex: llm-suggest)
+
+[language-server.colors]
+command = "uwu-colors"  # ou o binário equivalente do Misterio77
+
+[language-server.scls]
+command = "simple-completion-language-server"  # útil para completions gerais
+
+# ================================================================================================
+# GO
+# ================================================================================================
+[language-server.gopls]
+command = "gopls"
+[language-server.gopls.config]
+gofumpt = true
+staticcheck = true
+semanticTokens = true
+usePlaceholders = true
+completeUnimported = true
+vulncheck = "Imports"
+
+[language-server.gopls.config.hints]
+compositeLiteralFields = true
+parameterNames = true
+rangeVariableTypes = true
+
+[language-server.golangci-lint-lsp]
+command = "golangci-lint-langserver"
+
+[[language]]
+name = "go"
+scope = "source.go"
+file-types = ["go"]
+roots = ["go.work", "go.mod"]
+auto-format = true
+formatter = { command = "goimports", args = ["-"] }
+language-servers = ["gopls", "golangci-lint-lsp", "llm-suggest", "colors", "scls"]
+indent = { tab-width = 4, unit = "\t" }
+
+# ================================================================================================
+# RUST
+# ================================================================================================
+[language-server.rust-analyzer]
+command = "rust-analyzer"
+[language-server.rust-analyzer.config]
+checkOnSave = true
+check.command = "clippy"
+cargo.allFeatures = true
+procMacro.enable = true
+files.excludeDirs = [".git", "target", "node_modules"]
+
+[language-server.rust-analyzer.config.inlayHints]
+enable = true
+parameterHints.enable = true
+typeHints.enable = true
+chainingHints.enable = true
+closureReturnTypeHints.enable = "with_block"
+
+[[language]]
+name = "rust"
+scope = "source.rust"
+file-types = ["rs"]
+roots = ["Cargo.toml"]
+auto-format = true
+formatter = { command = "rustfmt", args = ["--emit=stdout"] }
+language-servers = ["rust-analyzer", "llm-suggest", "colors", "scls"]
+indent = { tab-width = 4, unit = "\t" }
+
+# ================================================================================================
+# LUA
+# ================================================================================================
+[language-server.lua-language-server]
+command = "lua-language-server"
+
+[[language]]
+name = "lua"
+scope = "source.lua"
+file-types = ["lua"]
+roots = ["init.lua", ".luarc.json"]
+auto-format = true
+formatter = { command = "stylua", args = ["--stdin-filepath", "x.lua", "-"] }
+language-servers = ["lua-language-server", "llm-suggest", "colors", "scls"]
+indent = { tab-width = 2, unit = " " }
+
+# ================================================================================================
+# TYPESCRIPT / JAVASCRIPT
+# ================================================================================================
+[language-server.typescript-language-server]
+command = "typescript-language-server"
+args = ["--stdio"]
+
+[[language]]
+name = "typescript"
+scope = "source.ts"
+file-types = ["ts", "tsx"]
+roots = ["package.json", "tsconfig.json"]
+auto-format = true
+formatter = { command = "prettier", args = ["--parser", "typescript"] }
+language-servers = ["typescript-language-server", "llm-suggest", "colors", "scls"]
+indent = { tab-width = 2, unit = " " }
+
+[[language]]
+name = "javascript"
+scope = "source.js"
+file-types = ["js", "jsx"]
+roots = ["package.json"]
+auto-format = true
+formatter = { command = "prettier", args = ["--parser", "babel"] }
+language-servers = ["typescript-language-server", "llm-suggest", "colors", "scls"]
+indent = { tab-width = 2, unit = " " }
+
+# ================================================================================================
+# PYTHON
+# ================================================================================================
+[language-server.pylsp]
+command = "pylsp"
+
+[[language]]
+name = "python"
+scope = "source.python"
+file-types = ["py", "pyi"]
+roots = ["pyproject.toml", "setup.py"]
+auto-format = true
+formatter = { command = "black", args = ["-"] }
+language-servers = ["pylsp", "llm-suggest", "colors", "scls"]
+indent = { tab-width = 4, unit = " " }
+
+# ================================================================================================
+# NIX (melhorado com o padrão do Misterio77)
+# ================================================================================================
+[language-server.nixd]
+command = "nixd"
+
+[language-server.nil]
+command = "nil"
+
+[[language]]
+name = "nix"
+scope = "source.nix"
+file-types = ["nix"]
+roots = ["flake.nix", "shell.nix", "default.nix"]
+auto-format = true
+formatter = { command = "alejandra" }
+language-servers = ["nixd", "nil", "llm-suggest", "colors", "scls"]
+indent = { tab-width = 2, unit = " " }
+
+# ================================================================================================
+# Outros (TOML, JSON, YAML, etc.) — mantidos com pequenas melhorias
+# ================================================================================================
+
+[language-server.taplo]
+command = "taplo"
+args = ["lsp", "stdio"]
+
+[[language]]
+name = "toml"
+scope = "source.toml"
+file-types = ["toml", "Cargo.lock"]
+auto-format = true
+formatter = { command = "taplo", args = ["fmt", "-"] }
+language-servers = ["taplo", "llm-suggest", "colors", "scls"]
+indent = { tab-width = 2, unit = " " }
+
+# JSON / JSONC / YAML / XML / Docker / Markdown / Shell ... (mantidos iguais, só limpei um pouco)
+
+[language-server.vscode-json-language-server]
+command = "vscode-json-language-server"
+args = ["--stdio"]
+
+[[language]]
+name = "json"
+scope = "source.json"
+file-types = ["json"]
+auto-format = true
+formatter = { command = "prettier", args = ["--parser", "json"] }
+language-servers = ["vscode-json-language-server", "llm-suggest", "colors", "scls"]
+indent = { tab-width = 2, unit = " " }
+
+# ... (YAML, Markdown, Shell, etc. ficam como estavam — lembre-se de adicionar `scope`
+# e, se quiser os LSPs globais, incluir "llm-suggest", "colors", "scls" na lista de
+# language-servers de cada um deles também)
