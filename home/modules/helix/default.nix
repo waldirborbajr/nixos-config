@@ -429,8 +429,8 @@ in {
     # programs.helix owns the generated config.toml. We only attach an
     # onChange hook so running `home-manager switch` reloads open Helix
     # instances without replacing the generated file with an external one.
-    "helix/config.toml".onChange = ''
-      ${pkill} -u $USER -USR1 hx || true
-    '';
+"helix/config.toml".onChange = ''
+  ${pkill} -USR1 -x hx 2>/dev/null || true
+'';
   };
 }
