@@ -129,14 +129,4 @@ in {
     package = pkgs.firefox-devedition;
   };
 
-  # ==================== VICINAE (launcher, mac2011 + VMs) ====================
-  # Raycast-like launcher for Linux, native C++/Qt. Only wired here — this
-  # file is shared by mac2011/macutm/macvmf, and NOT imported by dell1564.
-  home-manager.users.${username} = {
-    imports = [inputs.vicinae.homeManagerModules.default];
-    programs.vicinae = {
-      enable = true;
-      systemd.enable = true;
-    };
-  };
 }
