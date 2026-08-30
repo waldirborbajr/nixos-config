@@ -19,10 +19,10 @@
     };
 
     # 🚀 Vicinae — Raycast-like launcher (mac2011 + VMs only, see mac-workstation.nix)
-    vicinae = {
-      url = "github:vicinaehq/vicinae";
-      # inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # vicinae = {
+    #   url = "github:vicinaehq/vicinae";
+    #   # inputs.nixpkgs.follows = "nixpkgs";
+    # };
 
     # 🔎 nix-index-database — prebuilt "command not found" DB (all hosts)
     nix-index-database = {
