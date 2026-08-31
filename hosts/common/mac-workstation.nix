@@ -50,9 +50,9 @@ in {
       flameshot
       vlc
 
-      emacs
-      emacsPackages.vterm
-      emacsPackages.pbcopy
+      # emacs
+      # emacsPackages.vterm
+      # emacsPackages.pbcopy
 
       dex
       autorandr
@@ -128,5 +128,4 @@ in {
     enable = true;
     package = pkgs.firefox-devedition;
   };
-
 }
