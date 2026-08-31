@@ -1,0 +1,108 @@
+# themes/onenord.toml
+#
+# Tema OneNord (Nord + Atom One Dark), mesma estrutura de mapeamento de
+# https://github.com/Misterio77/Foundry/blob/main/home/gabriel/features/helix/theme.nix
+# convertida pra TOML puro (era home/modules/helix/theme.nix, agora obsoleto —
+# ver default.nix).
+#
+# Paleta: https://github.com/NvChad/base46/blob/v2.5/lua/base46/themes/onenord.lua
+# bg        = #2a303c
+# bg_alt    = #3B4252  (base01 — containers / linha selecionada)
+# bg_alt2   = #434C5E  (base02 — seleção / popup)
+# bg_alt3   = #4C566A  (base03 — guides / linhas sutis)
+# muted     = #566074  (base04 — comentários, texto apagado)
+# fg        = #bfc5d0  (base05)
+# red       = #d57780  (base08)
+# orange    = #e39a83  (base09)
+# yellow    = #EBCB8B  (base0A)
+# green     = #A3BE8C  (base0B)
+# cyan      = #97b7d7  (base0C)
+# blue      = #81A1C1  (base0D)
+# magenta   = #B48EAD  (base0E)
+
+"attributes" = "#e39a83"
+
+"comment" = { fg = "#566074", modifiers = ["italic"] }
+
+"constant" = "#e39a83"
+"constant.character.escape" = "#97b7d7"
+"constant.numeric" = "#e39a83"
+"constructor" = "#81A1C1"
+"debug" = "#566074"
+
+"diagnostic" = { modifiers = ["underlined"] }
+"diagnostic.error" = { underline = { style = "curl" } }
+"diagnostic.hint" = { underline = { style = "curl" } }
+"diagnostic.info" = { underline = { style = "curl" } }
+"diagnostic.warning" = { underline = { style = "curl" } }
+
+"diff.delta" = "#e39a83"
+"diff.minus" = "#d57780"
+"diff.plus" = "#A3BE8C"
+
+"error" = "#d57780"
+"function" = "#81A1C1"
+"hint" = "#566074"
+"info" = "#81A1C1"
+"keyword" = "#B48EAD"
+"label" = "#B48EAD"
+
+"markup.bold" = { fg = "#EBCB8B", modifiers = ["bold"] }
+"markup.heading" = "#81A1C1"
+"markup.italic" = { fg = "#B48EAD", modifiers = ["italic"] }
+"markup.link.text" = "#d57780"
+"markup.link.url" = { fg = "#e39a83", modifiers = ["underlined"] }
+"markup.list" = "#d57780"
+"markup.quote" = "#97b7d7"
+"markup.raw" = "#A3BE8C"
+"markup.strikethrough" = { modifiers = ["crossed_out"] }
+
+"namespace" = "#B48EAD"
+"operator" = "#bfc5d0"
+"special" = "#81A1C1"
+"string" = "#A3BE8C"
+"type" = "#EBCB8B"
+
+"ui.background" = { bg = "#2a303c" }
+"ui.bufferline" = { fg = "#bfc5d0", bg = "#3B4252" }
+"ui.bufferline.active" = { fg = "#2a303c", bg = "#566074", modifiers = ["bold"] }
+
+"ui.cursor" = { fg = "#bfc5d0", modifiers = ["reversed"] }
+"ui.cursor.insert" = { fg = "#EBCB8B", modifiers = ["underlined"] }
+"ui.cursor.match" = { fg = "#EBCB8B", modifiers = ["underlined"] }
+"ui.cursor.select" = { fg = "#EBCB8B", modifiers = ["underlined"] }
+"ui.cursorline.primary" = { fg = "#bfc5d0", bg = "#434C5E" }
+
+"ui.gutter" = { bg = "#2a303c" }
+"ui.help" = { fg = "#bfc5d0", bg = "#434C5E" }
+
+"ui.linenr" = { fg = "#566074", bg = "#2a303c" }
+"ui.linenr.selected" = { fg = "#bfc5d0", bg = "#434C5E", modifiers = ["bold"] }
+
+"ui.menu" = { fg = "#bfc5d0", bg = "#434C5E" }
+"ui.menu.scroll" = { fg = "#566074", bg = "#434C5E" }
+"ui.menu.selected" = { fg = "#434C5E", bg = "#bfc5d0" }
+
+"ui.popup" = { bg = "#434C5E" }
+
+"ui.selection" = { bg = "#3B4252", fg = "#bfc5d0" }
+"ui.selection.primary" = { bg = "#3B4252", fg = "#bfc5d0" }
+
+"ui.statusline" = { fg = "#bfc5d0", bg = "#3B4252" }
+"ui.statusline.inactive" = { bg = "#434C5E", fg = "#566074" }
+"ui.statusline.insert" = { fg = "#2a303c", bg = "#A3BE8C" }
+"ui.statusline.normal" = { fg = "#2a303c", bg = "#81A1C1" }
+"ui.statusline.select" = { fg = "#2a303c", bg = "#B48EAD" }
+
+"ui.text" = "#bfc5d0"
+"ui.text.focus" = "#bfc5d0"
+
+"ui.virtual.indent-guide" = { fg = "#4C566A" }
+"ui.virtual.ruler" = { bg = "#434C5E" }
+"ui.virtual.whitespace" = { fg = "#434C5E" }
+
+"ui.window" = { bg = "#434C5E" }
+
+"variable" = "#d57780"
+"variable.other.member" = "#d57780"
+"warning" = "#e39a83"
