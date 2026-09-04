@@ -102,11 +102,41 @@ git-exclude = true
   ":redraw",
 ]
 
-# for Rust
+# ====================== RUST ======================
+
 [keys.normal.r]
+
+# Run current project
 r = ":sh cargo run 2>&1 || true"
+
+# Check entire project
 c = ":sh cargo check 2>&1 || true"
+
+# Build entire project
+b = ":sh cargo build 2>&1 || true"
+
+# Test entire project
 t = ":sh cargo test 2>&1 || true"
+
+# Test with output
+T = ":sh cargo test -- --nocapture 2>&1 || true"
+
+# Clippy
+l = ":sh cargo clippy --all-targets --all-features 2>&1 || true"
+
+# Format current project
+f = ":sh cargo fmt 2>&1 || true"
+
+# Format check
+F = ":sh cargo fmt -- --check 2>&1 || true"
+
+# Documentation
+d = ":sh cargo doc --no-deps 2>&1 || true"
+
+# Clean build artifacts
+x = ":sh cargo clean 2>&1 || true"
+
+# Git status
 g = ":echo %sh{git status --short}"
 
 # ====================== GO ======================
