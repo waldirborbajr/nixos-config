@@ -1,0 +1,305 @@
+# ====================== THEME ======================
+theme = "onenord"
+
+# ====================== EDITOR ======================
+[editor]
+true-color = true
+auto-format = true
+bufferline = "multiple"
+mouse = true
+line-number = "relative"
+cursorline = true
+color-modes = true
+idle-timeout = 50
+scroll-lines = 3
+scrolloff = 8
+text-width = 100
+gutters = ["diff", "diagnostics", "line-numbers", "spacer"]
+end-of-line-diagnostics = "hint"
+trim-trailing-whitespace = true
+trim-final-newlines = true
+continue-comments = false
+completion-trigger-len = 1
+completion-replace = true
+
+[editor.auto-save]
+focus-lost = true
+
+[editor.auto-save.after-delay]
+enable = true
+timeout = 1500
+
+[editor.inline-diagnostics]
+cursor-line = "error"
+other-lines = "warning"
+
+[editor.cursor-shape]
+insert = "bar"
+normal = "block"
+select = "underline"
+
+[editor.statusline]
+left = ["mode", "spinner", "version-control", "file-name"]
+center = [
+  "file-base-name",
+  "read-only-indicator",
+  "file-modification-indicator",
+]
+right = [
+  "diagnostics",
+  "selections",
+  "primary-selection-length",
+  "position-percentage",
+  "position",
+  "total-line-numbers",
+  "file-encoding",
+  "file-type",
+]
+separator = "│"
+
+[editor.lsp]
+enable = true
+display-messages = true
+display-inlay-hints = true
+snippets = true
+auto-signature-help = true
+goto-reference-include-declaration = true
+
+[editor.soft-wrap]
+enable = true
+max-wrap = 25
+max-indent-retain = 0
+wrap-indicator = "↪ "
+
+[editor.indent-guides]
+render = true
+character = "▏"
+
+[editor.file-picker]
+hidden = true
+parents = true
+git-ignore = true
+git-global = true
+git-exclude = true
+
+# ====================== KEYBINDINGS ======================
+
+[keys.normal]
+"U" = "redo"
+
+# LazyGit em nova janela WezTerm
+"C-g" = ":sh wezterm cli spawn --new-window lazygit"
+
+# Yazi file chooser
+"C-y" = [
+  ":sh rm -f /tmp/helix-yazi-chooser",
+  ":insert-output yazi %{buffer_name} --chooser-file=/tmp/helix-yazi-chooser",
+  ":open %sh{cat /tmp/helix-yazi-chooser}",
+  ":redraw",
+]
+
+# Comandos gerais
+"<space>" = {
+  # Limpar buffers temporários
+  z = ":sh rm -f /tmp/helix-*.txt"
+  
+  # Git status
+  s = ":echo %sh{git status --short}"
+  
+  # Git log (últimos 5 commits)
+  l = [
+    ":sh git log --oneline -5 > /tmp/helix-git-log.txt || true",
+    ":new /tmp/helix-git-log.txt",
+    ":set-option buffer-type scratch",
+    ":set-option readonly true"
+  ]
+  
+  # Git diff
+  d = [
+    ":sh git diff > /tmp/helix-git-diff.txt || true",
+    ":new /tmp/helix-git-diff.txt",
+    ":set-option buffer-type scratch",
+    ":set-option readonly true"
+  ]
+}
+
+# ====================== RUST ======================
+
+[keys.normal.r]
+
+# Run current project (em buffer)
+r = [
+  ":sh cargo run 2>&1 > /tmp/helix-rust-output.txt || true",
+  ":new /tmp/helix-rust-output.txt",
+  ":set-option buffer-type scratch",
+  ":set-option readonly true"
+]
+
+# Check entire project (em buffer)
+c = [
+  ":sh cargo check 2>&1 > /tmp/helix-rust-output.txt || true",
+  ":new /tmp/helix-rust-output.txt",
+  ":set-option buffer-type scratch",
+  ":set-option readonly true"
+]
+
+# Build entire project (em buffer)
+b = [
+  ":sh cargo build 2>&1 > /tmp/helix-rust-output.txt || true",
+  ":new /tmp/helix-rust-output.txt",
+  ":set-option buffer-type scratch",
+  ":set-option readonly true"
+]
+
+# Test entire project (em buffer)
+t = [
+  ":sh cargo test 2>&1 > /tmp/helix-rust-output.txt || true",
+  ":new /tmp/helix-rust-output.txt",
+  ":set-option buffer-type scratch",
+  ":set-option readonly true"
+]
+
+# Test with output (em buffer)
+T = [
+  ":sh cargo test -- --nocapture 2>&1 > /tmp/helix-rust-output.txt || true",
+  ":new /tmp/helix-rust-output.txt",
+  ":set-option buffer-type scratch",
+  ":set-option readonly true"
+]
+
+# Clippy (em buffer)
+l = [
+  ":sh cargo clippy --all-targets --all-features 2>&1 > /tmp/helix-rust-output.txt || true",
+  ":new /tmp/helix-rust-output.txt",
+  ":set-option buffer-type scratch",
+  ":set-option readonly true"
+]
+
+# Format current project
+f = ":sh cargo fmt 2>&1 || true"
+
+# Format check
+F = ":sh cargo fmt -- --check 2>&1 || true"
+
+# Documentation (em buffer)
+d = [
+  ":sh cargo doc --no-deps 2>&1 > /tmp/helix-rust-output.txt || true",
+  ":new /tmp/helix-rust-output.txt",
+  ":set-option buffer-type scratch",
+  ":set-option readonly true"
+]
+
+# Clean build artifacts
+x = ":sh cargo clean 2>&1 || true"
+
+# Test watch (requer cargo-watch)
+w = [
+  ":sh cargo watch -x test 2>&1 > /tmp/helix-rust-output.txt || true",
+  ":new /tmp/helix-rust-output.txt",
+  ":set-option buffer-type scratch",
+  ":set-option readonly true"
+]
+
+# Run em nova janela WezTerm (para comandos interativos)
+n = ":sh wezterm cli spawn --new-window cargo run"
+
+# Run com less (paginação)
+m = ":sh wezterm cli spawn --new-window cargo run 2>&1 | less"
+
+# Git status
+g = ":echo %sh{git status --short}"
+
+# ====================== GO ======================
+
+[keys.normal.g]
+
+# Run current Go package (em buffer)
+r = [
+  ":sh go run . 2>&1 > /tmp/helix-go-output.txt || true",
+  ":new /tmp/helix-go-output.txt",
+  ":set-option buffer-type scratch",
+  ":set-option readonly true"
+]
+
+# Build entire module (em buffer)
+b = [
+  ":sh go build ./... 2>&1 > /tmp/helix-go-output.txt || true",
+  ":new /tmp/helix-go-output.txt",
+  ":set-option buffer-type scratch",
+  ":set-option readonly true"
+]
+
+# Test current package (em buffer)
+p = [
+  ":sh go test 2>&1 > /tmp/helix-go-output.txt || true",
+  ":new /tmp/helix-go-output.txt",
+  ":set-option buffer-type scratch",
+  ":set-option readonly true"
+]
+
+# Test entire module (em buffer)
+t = [
+  ":sh go test ./... 2>&1 > /tmp/helix-go-output.txt || true",
+  ":new /tmp/helix-go-output.txt",
+  ":set-option buffer-type scratch",
+  ":set-option readonly true"
+]
+
+# Test with race detector (em buffer)
+d = [
+  ":sh go test -race ./... 2>&1 > /tmp/helix-go-output.txt || true",
+  ":new /tmp/helix-go-output.txt",
+  ":set-option buffer-type scratch",
+  ":set-option readonly true"
+]
+
+# Static analysis (em buffer)
+v = [
+  ":sh go vet ./... 2>&1 > /tmp/helix-go-output.txt || true",
+  ":new /tmp/helix-go-output.txt",
+  ":set-option buffer-type scratch",
+  ":set-option readonly true"
+]
+
+# Format current file
+f = ":sh gofmt -w %{buffer_name}"
+
+# Generate code
+x = ":sh go generate ./... 2>&1 || true"
+
+# Module maintenance
+m = ":sh go mod tidy 2>&1 || true"
+
+# Run em nova janela WezTerm
+n = ":sh wezterm cli spawn --new-window go run ."
+
+# Git status
+g = ":echo %sh{git status --short}"
+
+# ====================== UNIVERSAL RUNNER ======================
+
+[keys.normal.R]  # Shift+R
+
+# Detecta o tipo de projeto e executa o comando apropriado
+R = [
+  ":sh if [ -f Cargo.toml ]; then cargo run; elif [ -f go.mod ]; then go run .; else echo 'No project detected'; fi 2>&1 > /tmp/helix-universal-output.txt || true",
+  ":new /tmp/helix-universal-output.txt",
+  ":set-option buffer-type scratch",
+  ":set-option readonly true"
+]
+
+# ====================== SCRATCH BUFFER UTILITY ======================
+
+[keys.normal.s]
+
+# Fechar buffer de saída (scratch)
+q = ":buffer-close! /tmp/helix-*-output.txt"
+
+# Fechar todos os buffers scratch
+Q = [
+  ":buffer-close! /tmp/helix-rust-output.txt",
+  ":buffer-close! /tmp/helix-go-output.txt",
+  ":buffer-close! /tmp/helix-universal-output.txt",
+  ":buffer-close! /tmp/helix-git-log.txt",
+  ":buffer-close! /tmp/helix-git-diff.txt"
+]
