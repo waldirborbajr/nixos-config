@@ -15,11 +15,11 @@
   # ==================== PROGRAMS ====================
   nixpkgs.config.allowUnfree = true;
 
-  environment.shellAliases = {
-    vi = "hx";
-    vim = "hx";
-    nvim = "hx";
-  };
+  # environment.shellAliases = {
+  #   vi = "hx";
+  #   vim = "hx";
+  #   nvim = "hx";
+  # };
 
   # ==================== PACKAGES ====================
   environment.systemPackages =
