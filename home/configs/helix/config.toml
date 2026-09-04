@@ -111,8 +111,8 @@ g = ":echo %sh{git status --short}"
 
 # for GO
 [keys.normal.g]
-r = ":sh go run %{buffer_name}"
-b = ":sh go build ./..."
-t = ":sh go test ./..."
-f = ":sh gofmt -w %{buffer_name}"
+r = ":sh go run %{buffer_name} 2>&1 || true"
+b = ":sh go build ./... 2>&1 || true"
+t = ":sh go test ./... 2>&1 || true"
+f = ":sh gofmt -w %{buffer_name} 2>&1 || true"
 g = ":echo %sh{git status --short}"
