@@ -16,8 +16,15 @@
 #   tmux-devshell                # menu interativo, a partir do projeto atual
 #   tmux-devshell --clean        # mata sessão existente antes de criar
 #   tmux-devshell go+maria       # pula o menu, usa o profile direto
+#   tmux-devshell --no-watch     # não abre o pane de watch (bacon/watchexec)
 #   tmux-devshell --destroy      # mata sessão(ões) de devshell (qualquer projeto), sem recriar
 #   tmux-devshell --destroy --gc # idem, e já roda `nix store gc` sem perguntar
+#
+# Pane de watch: pra devshells em WATCH_CMDS (go, rust, rust-nightly), abre
+# um segundo pane embaixo do pane principal já rodando o watcher (bacon pro
+# Rust, watchexec pro Go) dentro do mesmo `nix develop` — o equivalente a um
+# compile-mode/compilation-buffer do Emacs ao lado do editor. --no-watch
+# desliga isso pra essa execução.
 #
 set -euo pipefail
 
@@ -47,6 +54,16 @@ SESSION_PREFIX="${SESSION_PREFIX:-dev}"
 CLEAN=false
 DESTROY=false
 GC=false
+NO_WATCH=false
+
+# Comando de watch por devshell — roda num pane à parte, dentro do mesmo
+# `nix develop`, tipo compile-mode do Emacs. Devshell sem entrada aqui não
+# ganha pane extra. Edite/adicione conforme os devshells foram evoluindo.
+declare -A WATCH_CMDS=(
+  ["go"]="watchexec -e go --clear -r -- go build ./..."
+  ["rust"]="bacon"
+  ["rust-nightly"]="bacon"
+)
 
 # Profiles pré-definidos: "nome" => "devshell1 devshell2 ..."
 # Edite/adicione livremente conforme suas pastas em devshells/
@@ -67,6 +84,7 @@ for arg in "$@"; do
     --clean) CLEAN=true ;;
     --destroy) DESTROY=true ;;
     --gc) GC=true ;;
+    --no-watch) NO_WATCH=true ;;
     *) PROFILE_ARG="$arg" ;;
   esac
 done
@@ -269,13 +287,31 @@ if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
   fi
 fi
 
+# Abre o pane de watch (bacon/watchexec) embaixo do pane principal de uma
+# window já criada, se o devshell tiver comando em WATCH_CMDS. Roda dentro
+# do mesmo `nix develop` do devshell (senão a ferramenta não está no PATH).
+# Se o watcher sair/crashar, cai num $SHELL puro fora do devshell — mesmo
+# comportamento de "sessão ficou stale" que o pane principal já tem, e que
+# o --clean já existe pra resolver.
+open_watch_pane() {
+  local shell="$1" window="$2" wc
+  [[ "$NO_WATCH" == true ]] && return 0
+  wc="${WATCH_CMDS[$shell]:-}"
+  [[ -z "$wc" ]] && return 0
+  tmux split-window -v -l 30% -t "$window" \
+    "cd '$PROJECT_DIR' && nix develop '$DEVSHELLS_DIR/$shell' --command bash -c '$wc; exec \$SHELL'"
+  tmux select-pane -t "${window}.0"
+}
+
 FIRST="${SELECTED[0]}"
 tmux new-session -d -s "$SESSION_NAME" -n "$FIRST" \
   "cd '$PROJECT_DIR' && nix develop '$DEVSHELLS_DIR/$FIRST'; exec \$SHELL"
+open_watch_pane "$FIRST" "${SESSION_NAME}:${FIRST}"
 
 for shell in "${SELECTED[@]:1}"; do
   tmux new-window -t "$SESSION_NAME" -n "$shell" \
     "cd '$PROJECT_DIR' && nix develop '$DEVSHELLS_DIR/$shell'; exec \$SHELL"
+  open_watch_pane "$shell" "${SESSION_NAME}:${shell}"
 done
 
 tmux select-window -t "${SESSION_NAME}:1"
