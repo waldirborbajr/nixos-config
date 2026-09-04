@@ -102,7 +102,17 @@ git-exclude = true
   ":redraw",
 ]
 
-[keys.normal.g]
+# for Rust
+[keys.normal.r]
 r = ":sh cargo run 2>&1 || true"
 c = ":sh cargo check 2>&1 || true"
 t = ":sh cargo test 2>&1 || true"
+g = ":echo %sh{git status --short}"
+
+# for GO
+[keys.normal.g]
+r = ":sh go run %{buffer_name}"
+b = ":sh go build ./..."
+t = ":sh go test ./..."
+f = ":sh gofmt -w %{buffer_name}"
+g = ":echo %sh{git status --short}"
