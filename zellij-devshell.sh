@@ -24,8 +24,16 @@
 #   zellij-devshell                # menu interativo, a partir do projeto atual
 #   zellij-devshell --clean        # mata sessão existente antes de criar
 #   zellij-devshell go+maria       # pula o menu, usa o profile direto
+#   zellij-devshell --no-watch     # não abre o pane de watch (bacon/watchexec)
 #   zellij-devshell --destroy      # mata sessão(ões) de devshell (qualquer projeto), sem recriar
 #   zellij-devshell --destroy --gc # idem, e já roda `nix store gc` sem perguntar
+#
+# Pane de watch: pra devshells em WATCH_CMDS (go, rust, rust-nightly), a tab
+# nasce com um segundo pane embaixo do principal já rodando o watcher (bacon
+# pro Rust, watchexec pro Go) dentro do mesmo `nix develop` — o equivalente
+# a um compile-mode/compilation-buffer do Emacs ao lado do editor.
+# --no-watch desliga isso pra essa execução. Mantido idêntico ao
+# tmux-devshell.sh de propósito — edite os dois juntos.
 #
 set -euo pipefail
 
@@ -55,6 +63,16 @@ SESSION_PREFIX="${SESSION_PREFIX:-dev}"
 CLEAN=false
 DESTROY=false
 GC=false
+NO_WATCH=false
+
+# Comando de watch por devshell — roda num pane à parte, dentro do mesmo
+# `nix develop`, tipo compile-mode do Emacs. Devshell sem entrada aqui não
+# ganha pane extra. Mantido idêntico ao tmux-devshell.sh de propósito.
+declare -A WATCH_CMDS=(
+  ["go"]="watchexec -e go --clear -r -- go build ./..."
+  ["rust"]="bacon"
+  ["rust-nightly"]="bacon"
+)
 
 # Profiles pré-definidos: "nome" => "devshell1 devshell2 ..."
 # Mantido idêntico ao tmux-devshell.sh de propósito — edite os dois juntos
@@ -76,6 +94,7 @@ for arg in "$@"; do
     --clean) CLEAN=true ;;
     --destroy) DESTROY=true ;;
     --gc) GC=true ;;
+    --no-watch) NO_WATCH=true ;;
     *) PROFILE_ARG="$arg" ;;
   esac
 done
@@ -319,13 +338,35 @@ HEADER
     shell="${SELECTED[$i]}"
     focus_attr=""
     [[ "$i" -eq 0 ]] && focus_attr=' focus=true'
-    cat <<EOF
+
+    wc=""
+    [[ "$NO_WATCH" == false ]] && wc="${WATCH_CMDS[$shell]:-}"
+
+    if [[ -n "$wc" ]]; then
+      # split_direction="horizontal" empilha os panes filhos de cima pra
+      # baixo (linha divisória horizontal) — devshell em cima (maior),
+      # watch (bacon/watchexec) embaixo (menor).
+      cat <<EOF
+    tab name="$shell"$focus_attr {
+        pane split_direction="horizontal" {
+            pane command="bash" cwd="$PROJECT_DIR" size="70%" {
+                args "-c" "cd '$PROJECT_DIR' && nix develop '$DEVSHELLS_DIR/$shell'; exec \$SHELL"
+            }
+            pane command="bash" cwd="$PROJECT_DIR" size="30%" {
+                args "-c" "cd '$PROJECT_DIR' && nix develop '$DEVSHELLS_DIR/$shell' --command bash -c '$wc; exec \$SHELL'"
+            }
+        }
+    }
+EOF
+    else
+      cat <<EOF
     tab name="$shell"$focus_attr {
         pane command="bash" cwd="$PROJECT_DIR" {
             args "-c" "cd '$PROJECT_DIR' && nix develop '$DEVSHELLS_DIR/$shell'; exec \$SHELL"
         }
     }
 EOF
+    fi
   done
   echo "}"
 } > "$LAYOUT_FILE"
