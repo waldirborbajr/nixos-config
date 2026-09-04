@@ -24,8 +24,8 @@
 #   zellij-devshell                # menu interativo, a partir do projeto atual
 #   zellij-devshell --clean        # mata sessão existente antes de criar
 #   zellij-devshell go+maria       # pula o menu, usa o profile direto
-#   zellij-devshell --destroy      # mata sessão(ões) de devshell do projeto atual, sem recriar
-#   zellij-devshell --destroy --gc # idem, e ainda roda `nix store gc` (pede confirmação)
+#   zellij-devshell --destroy      # mata sessão(ões) de devshell (qualquer projeto), sem recriar
+#   zellij-devshell --destroy --gc # idem, e já roda `nix store gc` sem perguntar
 #
 set -euo pipefail
 
@@ -89,14 +89,16 @@ fi
 # --- Destroy: mata sessão(ões) de devshell do projeto atual, sem recriar --
 # Diferente do --clean (mata e recria na hora), --destroy só limpa. Não dá
 # pra reconstruir o nome de uma sessão "custom-X-Y" a partir de um profile
-# arbitrário, então lista as sessões do projeto atual (prefixo determinístico
-# dev-<projeto>-) e deixa escolher qual(is) matar.
+# arbitrário — e a sessão pode ter sido criada em outro diretório, dias
+# atrás, de um projeto já entregue. Por isso lista TODAS as sessões de
+# devshell (prefixo SESSION_PREFIX, ex. "dev-"), não só as do $PWD atual,
+# e deixa escolher qual(is) matar.
 if [[ "$DESTROY" == true ]]; then
-  prefix="${SESSION_PREFIX}-$(basename "$PROJECT_DIR")-"
+  prefix="${SESSION_PREFIX}-"
   mapfile -t matches < <(zellij list-sessions --no-formatting 2>/dev/null | awk '{print $1}' | grep -F "$prefix" || true)
 
   if [[ ${#matches[@]} -eq 0 ]]; then
-    echo -e "${C_YELLOW}Nenhuma sessão de devshell encontrada para ${PROJECT_DIR} (prefixo ${prefix}).${C_RESET}"
+    echo -e "${C_YELLOW}Nenhuma sessão de devshell encontrada (prefixo ${prefix}).${C_RESET}"
     exit 0
   fi
 
@@ -136,16 +138,20 @@ if [[ "$DESTROY" == true ]]; then
     zellij delete-session "$t" 2>/dev/null || true
   done
 
+  # As sessões mortas não seguram mais os pacotes no store — mas eles só
+  # saem do disco de fato com um GC. --gc pula a pergunta (assume sim);
+  # sem a flag, pergunta (a sessão já morreu de qualquer forma, então o
+  # padrão é perguntar em vez de deixar lixo acumulado por padrão).
+  echo -e "${C_PEACH}Isso roda GC no Nix store inteiro (não só nos pacotes deste devshell) — outras gerações/paths não referenciados também são removidos.${C_RESET}"
   if [[ "$GC" == true ]]; then
-    echo -e "${C_PEACH}Isso roda GC no Nix store inteiro (não só nos pacotes deste devshell) — outros geracões/paths não referenciados também são removidos.${C_RESET}"
-    read -rp "Confirma o nix store gc? [y/N] " confirm
+    nix store gc
+  else
+    read -rp "Rodar 'nix store gc' agora pra liberar o espaço? [y/N] " confirm
     if [[ "$confirm" =~ ^[Yy]$ ]]; then
       nix store gc
     else
-      echo -e "${C_OVERLAY}GC cancelado.${C_RESET}"
+      echo -e "${C_OVERLAY}GC pulado. Os pacotes ficam no store até você rodar 'nix store gc' manualmente (ou --destroy --gc na próxima).${C_RESET}"
     fi
-  else
-    echo -e "${C_OVERLAY}Sessão(ões) encerrada(s). Os pacotes do devshell continuam no Nix store até um GC (rode com --destroy --gc, ou 'nix store gc' manualmente).${C_RESET}"
   fi
 
   exit 0
