@@ -55,6 +55,7 @@
             cargo-watch
             cargo-make
             cargo-nextest
+            bacon
             clang
             llvmPackages.bintools
             mold
@@ -76,6 +77,7 @@
             echo "Available tools:"
             echo "  - cargo-edit, cargo-watch, cargo-make, cargo-nextest"
             echo "  - clippy, rustfmt, rust-analyzer"
+            echo "  - bacon (watch + check contínuo, tipo compile-mode do Emacs)"
             echo "  - mold (linker) + sccache (compile cache) ativos via RUSTFLAGS/RUSTC_WRAPPER"
           '';
         };
@@ -93,6 +95,7 @@
             cargo-watch
             cargo-make
             cargo-nextest
+            bacon
             clang
             llvmPackages.bintools
             mold
@@ -110,6 +113,7 @@
             echo "🦀 Rust Development Environment (nightly)"
             echo "Rust version: $(rustc --version)"
             echo "Cargo version: $(cargo --version)"
+            echo "  - bacon (watch + check contínuo, tipo compile-mode do Emacs)"
             echo "  - mold (linker) + sccache (compile cache) ativos via RUSTFLAGS/RUSTC_WRAPPER"
           '';
         };
