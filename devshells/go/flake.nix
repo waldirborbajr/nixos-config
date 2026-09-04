@@ -30,6 +30,7 @@
             golangci-lint-langserver # wrapper LSP, equivalente ao que existia no sistema
             go-task
             air
+            watchexec
           ];
 
           shellHook = ''
@@ -42,6 +43,7 @@
             echo "Available tools:"
             echo "  - gopls, delve, gofumpt, golangci-lint"
             echo "  - go-task (task runner), air (hot reload)"
+            echo "  - watchexec (watch + rebuild, tipo compile-mode do Emacs)"
           '';
         };
       in
