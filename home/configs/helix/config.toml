@@ -109,10 +109,36 @@ c = ":sh cargo check 2>&1 || true"
 t = ":sh cargo test 2>&1 || true"
 g = ":echo %sh{git status --short}"
 
-# for GO
+# ====================== GO ======================
+
 [keys.normal.g]
-r = ":sh go run %{buffer_name} 2>&1 || true"
+
+# Run current Go package
+r = ":sh go run . 2>&1 || true"
+
+# Build entire module
 b = ":sh go build ./... 2>&1 || true"
+
+# Test current package
+p = ":sh go test 2>&1 || true"
+
+# Test entire module
 t = ":sh go test ./... 2>&1 || true"
-f = ":sh gofmt -w %{buffer_name} 2>&1 || true"
+
+# Test with race detector
+d = ":sh go test -race ./... 2>&1 || true"
+
+# Static analysis
+v = ":sh go vet ./... 2>&1 || true"
+
+# Format current file
+f = ":sh gofmt -w %{buffer_name}"
+
+# Generate code
+x = ":sh go generate ./... 2>&1 || true"
+
+# Module maintenance
+m = ":sh go mod tidy 2>&1 || true"
+
+# Git status
 g = ":echo %sh{git status --short}"
