@@ -2,8 +2,22 @@
 #
 # Git, bat e neovim. Helix fica isolado em home/modules/helix/ para seguir
 # a estrutura modular do Foundry/Misterio77.
-{pkgs-unstable, ...}: let
+{
+  pkgs-unstable,
+  inputs,
+  ...
+}: let
   configs = ../configs;
+
+  system = pkgs-unstable.stdenv.hostPlatform.system;
+
+  # Troque para `true` no(s) host(s) onde quiser testar a 0.13-dev
+  useNightlyNeovim = false;
+
+  nvimPkg =
+    if useNightlyNeovim
+    then inputs.neovim-nightly-overlay.packages.${system}.default
+    else pkgs-unstable.neovim;
 in {
   imports = [
     ./helix
@@ -14,7 +28,7 @@ in {
     settings = {
       user.name = "Waldir Borba Junior";
       user.email = "wborbajr@gmail.com";
-      core.editor = "nvim";
+      core.editor = "hx";
       core.pager = "bat";
       init.defaultBranch = "main";
       pull.rebase = true;
@@ -23,9 +37,7 @@ in {
 
   programs.bat.enable = true;
 
-  # neovim — declarado aqui porque este módulo é importado por todos os
-  # hosts (NixOS + macOS standalone).
-  home.packages = [pkgs-unstable.neovim];
+  home.packages = [nvimPkg];
 
   xdg.configFile = {
     "bat" = {
@@ -33,7 +45,7 @@ in {
       recursive = true;
     };
 
-    "helix" =  {
+    "helix" = {
       source = "${configs}/helix";
       recursive = true;
     };
