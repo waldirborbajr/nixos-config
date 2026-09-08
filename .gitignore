@@ -64,3 +64,10 @@ result*
 .vscode/
 .idea/
 /devshells/rust/flake.lock
+/devshells/arduino/flake.lock
+/devshells/ferretdb/flake.lock
+/devshells/mariadb/flake.lock
+/devshells/mongodb/flake.lock
+/devshells/postgresql/flake.lock
+/devshells/python/flake.lock
+/devshells/sqlite/flake.lock

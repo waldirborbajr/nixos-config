@@ -988,6 +988,15 @@ clean_cache() {
       ;;
   esac
 
+  # --- ADIÇÕES SOLICITADAS ---
+  log "Running nix store gc (system-wide)..."
+  sudo nix store gc
+
+  log "Removing Nix cache directory (~/.cache/nix)..."
+  rm -rf ~/.cache/nix
+  ok "Cache directory removed."
+  # --- FIM DAS ADIÇÕES ---
+
   log "Optimizing the store (hardlink deduplication)..."
   sudo nix-store --optimise
   ok "Store cleanup complete."
@@ -1100,6 +1109,15 @@ clean_cache_macbook() {
       return 1
       ;;
   esac
+
+  # --- ADIÇÕES SOLICITADAS (macbook, sem sudo) ---
+  log "Running nix store gc (user profile)..."
+  nix store gc
+
+  log "Removing Nix cache directory (~/.cache/nix)..."
+  rm -rf ~/.cache/nix
+  ok "Cache directory removed."
+  # --- FIM DAS ADIÇÕES ---
 
   log "Optimizing the store (hardlink deduplication)..."
   # 'nix store optimise' (new CLI) if available, else the classic command.
