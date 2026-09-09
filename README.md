@@ -503,6 +503,9 @@ nix develop ./devshells/sqlite
 
 # MongoDB
 nix develop ./devshells/mongodb
+
+# Pure Only
+nix develop path:.
 ```
 
 ### Usage notes
