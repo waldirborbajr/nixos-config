@@ -188,3 +188,36 @@ indent = { tab-width = 2, unit = " " }
 # ... (YAML, Markdown, Shell, etc. ficam como estavam — lembre-se de adicionar `scope`
 # e, se quiser os LSPs globais, incluir "llm-suggest", "colors", "scls" na lista de
 # language-servers de cada um deles também)
+
+# ================================================================================================
+# LATEX
+# ================================================================================================
+[language-server.texlab]
+command = "texlab"
+
+[[language]]
+name = "latex"
+scope = "source.tex"
+file-types = ["tex", "cls", "sty"]
+roots = ["*.tex"]
+auto-format = true
+formatter = { command = "latexindent", args = ["-"] }
+language-servers = ["texlab", "llm-suggest", "colors", "scls"]
+indent = { tab-width = 2, unit = " " }
+
+# ================================================================================================
+# TYPST
+# ================================================================================================
+[language-server.tinymist]
+command = "tinymist"
+
+[[language]]
+name = "typst"
+scope = "source.typst"
+file-types = ["typ"]
+roots = ["*.typ"]
+auto-format = true
+formatter = { command = "typstyle" }
+language-servers = ["tinymist", "llm-suggest", "colors", "scls"]
+indent = { tab-width = 2, unit = " " }
+
