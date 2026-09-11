@@ -3,9 +3,7 @@
   lib,
   pkgs,
   ...
-}:
-
-{
+}: {
   config = lib.mkIf config.development.languages.rust.enable {
   # Somente Rust e ferramentas específicas do ecossistema Rust.
   # As ferramentas comuns (clang, pkg-config, openssl, zlib, git, gdb,

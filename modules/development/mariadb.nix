@@ -3,8 +3,7 @@
   lib,
   pkgs,
   ...
-}:
-{
+}: {
   config = lib.mkIf config.development.languages.mariadb.enable {
     # Ferramentas MariaDB. O serviço fica desativado por padrão para não
     # transformar o módulo de desenvolvimento em um daemon de sistema.

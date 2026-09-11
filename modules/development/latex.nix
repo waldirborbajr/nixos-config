@@ -3,8 +3,7 @@
   lib,
   pkgs,
   ...
-}:
-{
+}: {
   config = lib.mkIf config.development.languages.latex.enable {
     # Toolchain LaTeX/Typst e utilitários específicos desse fluxo.
     environment.systemPackages = with pkgs; [

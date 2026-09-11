@@ -3,8 +3,7 @@
   lib,
   pkgs,
   ...
-}:
-{
+}: {
   config = lib.mkIf config.development.languages.postgresql.enable {
     # Ferramentas PostgreSQL. O serviço permanece desativado por padrão:
     # o módulo pode ser habilitado explicitamente quando um host realmente

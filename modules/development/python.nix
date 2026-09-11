@@ -3,9 +3,7 @@
   lib,
   pkgs,
   ...
-}:
-
-{
+}: {
   config = lib.mkIf config.development.languages.python.enable {
   # Somente Python e ferramentas específicas do ecossistema Python.
   # uv2nix/pyproject-nix continua sendo responsabilidade dos devshells

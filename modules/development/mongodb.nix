@@ -3,8 +3,7 @@
   lib,
   pkgs,
   ...
-}:
-{
+}: {
   config = lib.mkIf config.development.languages.mongodb.enable {
     services.mongodb = {
       enable = lib.mkDefault false;

@@ -3,9 +3,7 @@
   lib,
   pkgs,
   ...
-}:
-
-{
+}: {
   config = lib.mkIf config.development.languages.lua.enable {
   environment.systemPackages = with pkgs; [
     lua5_4
