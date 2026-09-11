@@ -6,7 +6,13 @@
 }:
 
 {
+  # Ferramentas comuns a todos os ambientes de desenvolvimento.
+  #
+  # Regra: ferramentas compartilhadas entre linguagens/devshells ficam aqui.
+  # Os módulos de linguagem/serviço devem declarar somente o que é específico
+  # daquele ambiente.
   environment.systemPackages = with pkgs; [
+    # C/C++ / build foundation
     gcc
     glibc
     clang
@@ -14,6 +20,35 @@
     libtool
     gnumake
     sdbus-cpp
+
+    # Build/development helpers
+    pkg-config
+    openssl
+    zlib
+    jq
+
+    # Source/code navigation
+    git
+    ripgrep
+    fd
+    tree
+
+    # Debugging
+    gdb
+
+    # File watching / automation
+    watchexec
+
+    # SQLite is shared by several development environments.
+    sqlite
+    sqlite-analyzer
+
+    # Editor used by the development environments.
+    # Home Manager also configures Helix; NixOS owns the development
+    # availability here and the Home Manager module owns its configuration.
+    helix
+
+    # Hardware information useful during development.
     pciutils
   ];
 }

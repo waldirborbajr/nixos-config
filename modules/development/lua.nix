@@ -5,7 +5,6 @@
   ...
 }:
 
-# Convertido de devshells/lua (nix develop).
 {
   environment.systemPackages = with pkgs; [
     lua5_4

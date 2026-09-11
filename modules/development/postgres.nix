@@ -4,17 +4,21 @@
   pkgs,
   ...
 }:
+
 {
+  # Ferramentas PostgreSQL. O serviço permanece desativado por padrão:
+  # o módulo pode ser habilitado explicitamente quando um host realmente
+  # precisar do servidor.
   services.postgresql = {
-    enable = true;
+    enable = lib.mkDefault false;
     package = pkgs.postgresql_16;
     ensureDatabases = [
       "dev"
-      "joshua"
+      "borba"
     ];
     ensureUsers = [
       {
-        name = "joshua";
+        name = "borba";
         ensureDBOwnership = true;
         ensureClauses.superuser = true;
       }
@@ -23,24 +27,20 @@
       local all all trust
       host all all 127.0.0.1/32 trust
     '';
-
-    # Dev-optimized settings
     settings = {
-      log_statement = "all"; # See every query
-      fsync = false; # Dangerous in prod
+      log_statement = "all";
+      fsync = false;
       synchronous_commit = false;
     };
-
     extensions =
       ps: with ps; [
-        pgvector # Embeddings
+        pgvector
         pg_uuidv7
       ];
   };
 
-  # devshells/postgresql tinha postgresql + pgcli nos buildInputs; o
-  # services.postgresql acima já cuida do servidor/psql, faltava só o pgcli.
   environment.systemPackages = with pkgs; [
+    postgresql
     pgcli
   ];
 }

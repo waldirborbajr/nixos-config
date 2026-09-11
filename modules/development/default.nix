@@ -1,21 +1,25 @@
 { config, pkgs, ... }:
 {
   imports = [
+    # Base compartilhada por todos os ambientes de desenvolvimento.
     ./base.nix
-    ./go.nix
-    # ./postgres.nix
-    ./python.nix
-    ./rust.nix
 
-    # Convertidos de devshells/ — comentados de propósito, descomente o que
-    # for usar. Cada um só traz pacotes (ou serviço, no caso de maria/mongo)
-    # pro sistema inteiro; nada disso é ativado por padrão.
-    # ./arduino.nix
-    # ./ferretdb.nix
-    # ./latex.nix
+    # Linguagens.
+    ./go.nix
+    # ./python.nix
+    ./rust.nix
     # ./lua.nix
+    ./nix.nix
+
+    # Toolchains/ambientes especializados.
+    # ./arduino.nix
+    # ./latex.nix
+
+    # Bancos e ferramentas de banco.
+    # ./postgres.nix
     # ./mariadb.nix
     # ./mongodb.nix
-     ./sqlite.nix
+    # ./ferretdb.nix
+    ./sqlite.nix
   ];
 }

@@ -82,8 +82,6 @@ in {
   # yazi, lazygit → home/modules/cli-and-terminal.nix (fonte única + config)
   environment.systemPackages = with pkgs; [
     # Terminal & shell utilities
-    jq
-    just
     duf
     psmisc
     asciinema
@@ -101,7 +99,6 @@ in {
     # Hardware & multimedia
     brightnessctl
     playerctl
-    pciutils
     pavucontrol
 
     # Broadcom wireless debug/config tools
@@ -109,8 +106,6 @@ in {
     wirelesstools
 
     # Basic build tools
-    gdb
-    glibc
     libcxx
     libgcc
   ];

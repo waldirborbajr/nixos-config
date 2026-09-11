@@ -5,13 +5,11 @@
   ...
 }:
 
-# Convertido de devshells/arduino (nix develop). O devshell original usa um
-# overlay (arduino-nix) para montar um arduino-cli com pacotes de placas
-# (arduinoPackages.platforms.arduino.avr) já embutidos; aqui, pra manter o
-# módulo simples e sem depender de inputs extras no flake, instalamos o
-# arduino-cli "puro" do nixpkgs + avrdude. As placas AVR podem ser instaladas
-# em runtime com `arduino-cli core install arduino:avr`.
 {
+  # Ferramentas Arduino do devshell. O devshell original usava arduino-nix
+  # para empacotar o core AVR dentro do arduino-cli. No módulo NixOS mantemos
+  # os binários disponíveis; cores/boards podem ser instalados com
+  # `arduino-cli core install arduino:avr` conforme o hardware/projeto.
   environment.systemPackages = with pkgs; [
     arduino-cli
     avrdude

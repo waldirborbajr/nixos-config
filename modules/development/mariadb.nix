@@ -5,19 +5,13 @@
   ...
 }:
 
-# Convertido de devshells/mariadb (nix develop). O devshell original subia
-# um mysqld_safe standalone em $HOME/.local/mariadb (start/stop manual via
-# mariadb-start/mariadb-stop). Aqui usamos o módulo services.mysql do NixOS
-# (mesma ideia do modules/development/postgres.nix) — o systemd cuida do
-# start/stop, mas ainda assim é um serviço de sistema, então fica comentado
-# no default.nix até você decidir ativar.
 {
+  # Ferramentas MariaDB. O serviço fica desativado por padrão para não
+  # transformar o módulo de desenvolvimento em um daemon de sistema.
   services.mysql = {
-    enable = true;
+    enable = lib.mkDefault false;
     package = pkgs.mariadb;
-
-    # Dev: sem senha, acesso local livre (não use isso em produção)
-    ensureDatabases = ["dev"];
+    ensureDatabases = [ "dev" ];
     ensureUsers = [
       {
         name = "root";
@@ -26,7 +20,6 @@
         };
       }
     ];
-
     settings = {
       mysqld = {
         skip-networking = false;
