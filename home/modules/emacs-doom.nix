@@ -17,7 +17,7 @@ in {
   programs.doom-emacs = {
     enable = true;
     doomDir = ../configs/doom;   # espera init.el / config.el / packages.el aqui
-    emacsPackage = pkgs.emacs;
+    emacs = pkgs.emacs;
     extraConfig = ''
       ;; hook extra, se precisar de algo específico da máquina
     '';
