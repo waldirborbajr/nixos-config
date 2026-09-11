@@ -54,6 +54,11 @@
       # fits a minimal niri/waybar setup better than file-roller
       # (avoids pulling in heavy GNOME dependencies)
 
+      # --- asciinema
+      asciinema
+      asciinema-agg
+      asciinema-scenario
+
       # ---- System monitoring / info ----
       htop
       fastfetch
