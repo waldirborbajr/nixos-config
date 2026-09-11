@@ -39,10 +39,6 @@
     # File watching / automation
     watchexec
 
-    # SQLite is shared by several development environments.
-    sqlite
-    sqlite-analyzer
-
     # Editor/tooling available to every development environment.
     # Home Manager owns the Helix configuration; this module owns the
     # development-time package availability.

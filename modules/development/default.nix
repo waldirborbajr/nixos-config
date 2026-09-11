@@ -13,6 +13,7 @@
     ./mariadb.nix
     ./mongodb.nix
     ./ferretdb.nix
+    ./sqlite.nix
   ];
 
   options.development.languages = {
@@ -27,5 +28,6 @@
     mariadb.enable = lib.mkEnableOption "MariaDB development tooling";
     mongodb.enable = lib.mkEnableOption "MongoDB development tooling";
     ferretdb.enable = lib.mkEnableOption "FerretDB development tooling";
+    sqlite.enable = lib.mkEnableOption "SQLite development tooling";
   };
 }

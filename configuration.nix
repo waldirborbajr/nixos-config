@@ -53,6 +53,7 @@ in {
     mariadb.enable = false;
     mongodb.enable = false;
     ferretdb.enable = false;
+    sqlite.enable = false;
   };
 
   # ==================== STATE VERSION ====================
