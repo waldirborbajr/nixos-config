@@ -14,7 +14,6 @@
   pkgs,
   pkgs-unstable,
   common,
-  inputs,
   ...
 }: let
   inherit (common) username;

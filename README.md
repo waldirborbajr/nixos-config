@@ -351,7 +351,7 @@ NIXOS_FLAKE_ATTR=dell ./nixos-manager.sh flake   # força o host via env var
 
 | Flake attr | Hostname | Label |
 |---|---|---|
-| `macbook2011` | `mac2011` | MacBook Pro 13in (2011) |
+| `mac2011` | `mac2011` | MacBook Pro 13in (2011) |
 | `dell` | `dell1564` (alias legado: `dell1456`) | Dell Inspiron 1564 |
 | `m2utm` | `macutm` | MacBook M2 - UTM |
 | `macvmf` | `macvmf` | MacBook M2 - VMware Fusion |

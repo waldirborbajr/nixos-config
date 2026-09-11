@@ -4,7 +4,6 @@
 # Programas / browsers / teclado / boot EFI → hosts/common/mac-workstation.nix
 # Aqui só o que é específico deste hardware (Wi-Fi + niri/waybar físicos).
 {
-  config,
   lib,
   pkgs,
   common,
@@ -32,7 +31,9 @@ in {
   # ---- broadcom-sta (proprietário) — DESATIVADO ----
   # Falha ao compilar contra kernel 7.1.6 (incompatible pointer types no cfg80211).
   # Descomente apenas se precisar voltar ao wl e pinando um kernel mais antigo
-  # (ex.: linuxPackages_6_12).
+  # (ex.: linuxPackages_6_12). NOTE: precisa devolver `config,` no cabeçalho
+  # da função acima (foi removido por estar sem uso enquanto este bloco
+  # fica comentado).
   #
   # nixpkgs.config.permittedInsecurePackages = [
   #   "broadcom-sta-6.30.223.271-59-7.1.6"   # ajuste a string se o Nix reclamar

@@ -1,4 +1,4 @@
-# hosts/dell/default.nix
+# hosts/dell1564/default.nix
 # Dell-specific configuration (legacy BIOS machine)
 {
   lib,
@@ -15,7 +15,7 @@ in {
   # Assumes legacy BIOS + GRUB (older Dell hardware).
   # TODO: confirm with `ls /sys/firmware/efi` — if that path exists, this
   # machine actually boots via UEFI and should use systemd-boot instead,
-  # like m2utm/macbook2011.
+  # like m2utm/mac2011.
   boot.loader.systemd-boot.enable = lib.mkForce false;
   boot.loader.efi.canTouchEfiVariables = lib.mkForce false;
   boot.loader.grub = {

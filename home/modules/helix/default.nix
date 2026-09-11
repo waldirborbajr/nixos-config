@@ -9,8 +9,7 @@
 # formato de atributos do Nix.
 #
 # home/configs/helix/themes/onenord.toml é a conversão TOML do tema que
-# tínhamos em home/modules/helix/theme.nix (agora obsoleto/sem uso — pode
-# ser removido do repo).
+# tínhamos antes em home/modules/helix/theme.nix (já removido do repo).
 {pkgs, ...}: let
   pkill =
     if pkgs.stdenv.isLinux
