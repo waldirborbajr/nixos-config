@@ -30,6 +30,10 @@
 ;; .rs aberto, que causava "No LSP client named nil".
 (setq rustic-lsp-client 'lsp-mode)
 
+;; Se o primeiro .rs aberto na sessão vier sem highlight (corrida entre o
+;; autoload de `rustic` e a ativação do modo no mesmo buffer), descomente:
+;; (add-hook 'doom-first-file-hook (lambda () (require 'rustic nil t)))
+
 (after! rustic
   (setq rustic-format-on-save t          ; usa rustfmt (ou o que seu devshell expõe)
         rustic-cargo-use-last-stored-arguments t))
