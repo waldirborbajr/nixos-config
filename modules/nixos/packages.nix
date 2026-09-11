@@ -46,6 +46,11 @@
       kdlfmt
       taplo
 
+      # ASCIINema
+      asciinema
+      asciinema-agg
+      asciinema-scenario
+
       # ---- Archive / compression ----
       unzip
       zip
