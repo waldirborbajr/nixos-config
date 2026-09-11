@@ -10,6 +10,17 @@
     # nixd
     # pyright
     # alejandra   # já usado pelo nix-mode do doom-config.el
+
+    aspell
+    aspellDicts.en   # :checkers spell precisa de um spellchecker de verdade no PATH
+
+    (pkgs.emacsPackages.treesit-grammars.with-grammars (grammars:
+      with grammars; [
+        tree-sitter-rust
+        tree-sitter-go
+        tree-sitter-python
+        tree-sitter-nix
+      ]))
   ];
 in {
   imports = [inputs.nix-doom-emacs-unstraightened.hmModule];
@@ -21,4 +32,9 @@ in {
   };
 
   home.packages = doomExtraPackages;
+
+  # referenciado no config.el via `treesit-extra-load-path`
+  home.sessionVariables = {
+    EMACS_TREESIT_GRAMMAR_PATH = "${pkgs.emacsPackages.treesit-grammars.with-grammars (g: with g; [tree-sitter-rust tree-sitter-go tree-sitter-python tree-sitter-nix])}/lib";
+  };
 }

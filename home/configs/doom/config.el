@@ -15,11 +15,23 @@
   (direnv-mode +1))
 
 ;; ---------------------------------------------------------------------------
+;; Tree-sitter — grammars pré-compiladas pelo Nix (emacs-doom.nix), nunca
+;; compiladas em runtime.
+;; ---------------------------------------------------------------------------
+(let ((grammar-path (getenv "EMACS_TREESIT_GRAMMAR_PATH")))
+  (when grammar-path
+    (setq treesit-extra-load-path (list grammar-path))))
+
+;; ---------------------------------------------------------------------------
 ;; Rust
 ;; ---------------------------------------------------------------------------
+;; Fixado ANTES de `rustic` carregar (defcustom simples, não precisa do
+;; `after!`) — evita corrida com `rustic-mode-local-vars-hook` no primeiro
+;; .rs aberto, que causava "No LSP client named nil".
+(setq rustic-lsp-client 'lsp-mode)
+
 (after! rustic
-  (setq rustic-lsp-client 'lsp-mode
-        rustic-format-on-save t          ; usa rustfmt (ou o que seu devshell expõe)
+  (setq rustic-format-on-save t          ; usa rustfmt (ou o que seu devshell expõe)
         rustic-cargo-use-last-stored-arguments t))
 
 (after! lsp-rust
