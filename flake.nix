@@ -154,16 +154,5 @@ formatter = nixpkgs.lib.genAttrs supportedSystems (
   in
     (inputs.treefmt-nix.lib.evalModule pkgs ./treefmt.nix).config.build.wrapper
 );
-
-# `nix flake check` — verifies the repo is formatted (fails CI/local check if not).
-checks = nixpkgs.lib.genAttrs supportedSystems (
-  system:
-    let
-      pkgs = nixpkgs.legacyPackages.${system};
-      treefmt = inputs.treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
-    in {
-      format = treefmt.config.build.check self;
-    }
-);
   };
 }

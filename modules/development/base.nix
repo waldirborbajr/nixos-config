@@ -1,6 +1,4 @@
-{pkgs, ...}:
-
-{
+{pkgs, ...}: {
   # Ferramentas comuns a todos os ambientes de desenvolvimento.
   #
   # Regra: ferramentas compartilhadas entre linguagens/devshells ficam aqui.

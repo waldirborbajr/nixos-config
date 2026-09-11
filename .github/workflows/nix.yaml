@@ -20,7 +20,12 @@ jobs:
             experimental-features = nix-command flakes
       - name: Enable Nix cache
         uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Check formatting
+        run: |
+          nix fmt
+          if ! git diff --exit-code; then
+            echo "::error::Repo not formatted. Run 'nix fmt' locally, review the diff above, and commit it."
+            exit 1
+          fi
       - name: Check flake
         run: nix flake check
-      - name: Check formatting
-        run: nix fmt -- --fail-on-change
