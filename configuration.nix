@@ -33,6 +33,13 @@ in {
     # ./modules/nixos/containers-docker.nix
     # ./modules/nixos/containers-podman.nix
     # ./modules/nixos/kubernetes-dev.nix
+
+    # ==================== DEVELOPMENT (sob demanda) ====================
+    # modules/development/ (toolchains go/python/rust/postgres + os
+    # convertidos de devshells/) ainda não estava importado em lugar
+    # nenhum — descomente pra ativar. Dentro dele, cada linguagem/serviço
+    # tem seu próprio comentário liga/desliga em modules/development/default.nix.
+    ./modules/development/default.nix
   ];
 
   # ==================== STATE VERSION ====================

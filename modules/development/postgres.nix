@@ -37,4 +37,10 @@
         pg_uuidv7
       ];
   };
+
+  # devshells/postgresql tinha postgresql + pgcli nos buildInputs; o
+  # services.postgresql acima já cuida do servidor/psql, faltava só o pgcli.
+  environment.systemPackages = with pkgs; [
+    pgcli
+  ];
 }
