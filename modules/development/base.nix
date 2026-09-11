@@ -33,8 +33,13 @@
     fd
     tree
 
-    # Debugging
+    # Debugging / tracing
     gdb
+    lldb
+    valgrind
+    strace
+    ltrace
+    graphviz
 
     # File watching / automation
     watchexec

@@ -14,11 +14,11 @@
     package = pkgs.postgresql_16;
     ensureDatabases = [
       "dev"
-      "borba"
+      "joshua"
     ];
     ensureUsers = [
       {
-        name = "borba";
+        name = "joshua";
         ensureDBOwnership = true;
         ensureClauses.superuser = true;
       }

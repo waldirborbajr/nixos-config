@@ -1,25 +1,26 @@
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 {
   imports = [
-    # Base compartilhada por todos os ambientes de desenvolvimento.
     ./base.nix
-
-    # Linguagens.
     ./go.nix
-    # ./python.nix
+    ./python.nix
     ./rust.nix
-    # ./lua.nix
+    ./lua.nix
     ./nix.nix
-
-    # Toolchains/ambientes especializados.
-    # ./arduino.nix
-    # ./latex.nix
-
-    # Bancos e ferramentas de banco.
-    # ./postgres.nix
-    # ./mariadb.nix
-    # ./mongodb.nix
-    # ./ferretdb.nix
+    ./arduino.nix
+    ./latex.nix
+    ./postgres.nix
+    ./mariadb.nix
+    ./mongodb.nix
+    ./ferretdb.nix
     ./sqlite.nix
   ];
+
+  options.development.languages = {
+    nix.enable = lib.mkEnableOption "Nix development tooling";
+    go.enable = lib.mkEnableOption "Go development tooling";
+    python.enable = lib.mkEnableOption "Python development tooling";
+    rust.enable = lib.mkEnableOption "Rust development tooling";
+    lua.enable = lib.mkEnableOption "Lua development tooling";
+  };
 }

@@ -34,13 +34,19 @@ in {
     # ./modules/nixos/containers-podman.nix
     # ./modules/nixos/kubernetes-dev.nix
 
-    # ==================== DEVELOPMENT (sob demanda) ====================
-    # modules/development/ (toolchains go/python/rust/postgres + os
-    # convertidos de devshells/) ainda não estava importado em lugar
-    # nenhum — descomente pra ativar. Dentro dele, cada linguagem/serviço
-    # tem seu próprio comentário liga/desliga em modules/development/default.nix.
+    # ==================== DEVELOPMENT ====================
+    # Base comum + linguagens explicitamente habilitadas abaixo.
     ./modules/development/default.nix
   ];
+
+  # Linguagens de desenvolvimento explicitamente habilitadas.
+  development.languages = {
+    nix.enable = true;
+    go.enable = true;
+    python.enable = true;
+    rust.enable = true;
+    lua.enable = true;
+  };
 
   # ==================== STATE VERSION ====================
   system.stateVersion = "26.05";

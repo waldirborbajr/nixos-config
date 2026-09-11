@@ -6,6 +6,7 @@
 }:
 
 {
+  config = lib.mkIf config.development.languages.go.enable {
   # Somente ferramentas específicas do ecossistema Go.
   environment.systemPackages = with pkgs; [
     go_1_25
@@ -23,4 +24,5 @@
     impl
     delve
   ];
+  };
 }

@@ -6,6 +6,7 @@
 }:
 
 {
+  config = lib.mkIf config.development.languages.python.enable {
   # Somente Python e ferramentas específicas do ecossistema Python.
   # uv2nix/pyproject-nix continua sendo responsabilidade dos devshells
   # por projeto; aqui instalamos as ferramentas que precisam estar
@@ -17,4 +18,5 @@
     black
     ruff
   ];
+  };
 }

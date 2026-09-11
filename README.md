@@ -565,3 +565,7 @@ troubleshooting (reset do teclado, reconexão manual via
 ```text
 https://git.voidarc.co.uk/voidarc/nixos
 ```
+
+## Arquitetura
+
+Consulte `docs/architecture.md` para a separação entre sistema, development, devshells e Home Manager.

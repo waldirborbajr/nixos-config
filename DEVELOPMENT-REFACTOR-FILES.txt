@@ -1,0 +1,25 @@
+Modified files
+==============
+
+modules/development/base.nix
+modules/development/default.nix
+modules/development/go.nix
+modules/development/rust.nix
+modules/development/python.nix
+modules/development/lua.nix
+modules/development/arduino.nix
+modules/development/latex.nix
+modules/development/postgres.nix
+modules/development/mariadb.nix
+modules/development/mongodb.nix
+modules/development/ferretdb.nix
+modules/development/sqlite.nix
+modules/nixos/packages.nix
+hosts/common/mac-workstation.nix
+hosts/dell1564/default.nix
+
+Created files
+=============
+
+DEVELOPMENT-REFACTOR.md
+DEVELOPMENT-REFACTOR-FILES.txt
