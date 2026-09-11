@@ -43,9 +43,9 @@ in {
   development.languages = {
     nix.enable = true;
     go.enable = true;
-    python.enable = true;
     rust.enable = true;
-    lua.enable = true;
+    python.enable = false;
+    lua.enable = false;
   };
 
   # ==================== STATE VERSION ====================
