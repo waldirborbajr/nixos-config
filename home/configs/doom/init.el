@@ -1,6 +1,6 @@
 ;;; init.el -*- lexical-binding: t; -*-
 
-doom! :input
+(doom! :input
 
      :completion
      (company +childframe)     ; autocompletar
@@ -71,4 +71,4 @@ doom! :input
      (json +lsp)
 
      :config
-     (default +bindings +smartparens)
+     (default +bindings +smartparens))
