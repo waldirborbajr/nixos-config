@@ -7,6 +7,9 @@ alias ll='eza -lh --icons --git'
 # Detailed listing including hidden files
 alias la='eza -lah --icons --git'
 
+# emacs
+alias emacs='emacs -nw'
+
 # Tree view
 alias tree='eza --tree --icons'
 
