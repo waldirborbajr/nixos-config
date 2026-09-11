@@ -7,6 +7,6 @@
 # Wi-Fi físico e não devem herdar isso — por isso este módulo é
 # importado individualmente por dell1564 e mac2011, não pela cadeia
 # mac-workstation/mac-vm-workstation.
-{...}: {
+_: {
   hardware.enableRedistributableFirmware = true;
 }
