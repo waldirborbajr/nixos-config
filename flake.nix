@@ -146,18 +146,24 @@
       };
     };
 
-    # `nix fmt` — same formatter regardless of which host you're on
-    # (dell1564/mac2011 = x86_64-linux, macutm/macvmf = aarch64-linux).
-    formatter = nixpkgs.lib.genAttrs supportedSystems (
-      system: let
-        pkgs = nixpkgs.legacyPackages.${system};
-      in
-        (inputs.treefmt-nix.lib.evalModule pkgs ./treefmt.nix).config.build.wrapper
-    );
+# `nix fmt` — same formatter regardless of which host you're on
+# (dell1564/mac2011 = x86_64-linux, macutm/macvmf = aarch64-linux).
+formatter = nixpkgs.lib.genAttrs supportedSystems (
+  system: let
+    pkgs = nixpkgs.legacyPackages.${system};
+  in
+    (inputs.treefmt-nix.lib.evalModule pkgs ./treefmt.nix).config.build.wrapper
+);
 
-    # `nix flake check` — verifies the repo is formatted (fails CI/local check if not).
-    checks = nixpkgs.lib.genAttrs supportedSystems (system: {
-      format = self.formatter.${system}.check ./.;
-    });
+# `nix flake check` — verifies the repo is formatted (fails CI/local check if not).
+checks = nixpkgs.lib.genAttrs supportedSystems (
+  system:
+    let
+      pkgs = nixpkgs.legacyPackages.${system};
+      treefmt = inputs.treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
+    in {
+      format = treefmt.config.build.check self;
+    }
+);
   };
 }
