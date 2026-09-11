@@ -1,9 +1,4 @@
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{pkgs, ...}:
 
 {
   # Ferramentas comuns a todos os ambientes de desenvolvimento.
@@ -48,9 +43,9 @@
     sqlite
     sqlite-analyzer
 
-    # Editor used by the development environments.
-    # Home Manager also configures Helix; NixOS owns the development
-    # availability here and the Home Manager module owns its configuration.
+    # Editor/tooling available to every development environment.
+    # Home Manager owns the Helix configuration; this module owns the
+    # development-time package availability.
     helix
 
     # Hardware information useful during development.

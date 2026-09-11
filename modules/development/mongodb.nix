@@ -4,21 +4,18 @@
   pkgs,
   ...
 }:
-
 {
-  # MongoDB é unfree (SSPL). O allowUnfree é limitado ao pacote necessário
-  # pelo módulo de desenvolvimento.
-  nixpkgs.config.allowUnfree = true;
+  config = lib.mkIf config.development.languages.mongodb.enable {
+    services.mongodb = {
+      enable = lib.mkDefault false;
+      package = pkgs.mongodb;
+      bind_ip = "127.0.0.1";
+      dbpath = "/var/lib/mongodb";
+    };
 
-  services.mongodb = {
-    enable = lib.mkDefault false;
-    package = pkgs.mongodb;
-    bind_ip = "127.0.0.1";
-    dbpath = "/var/lib/mongodb";
+    environment.systemPackages = with pkgs; [
+      mongosh
+      mongodb
+    ];
   };
-
-  environment.systemPackages = with pkgs; [
-    mongosh
-    mongodb
-  ];
 }

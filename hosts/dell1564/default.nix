@@ -84,7 +84,6 @@ in {
     # Terminal & shell utilities
     duf
     psmisc
-    asciinema
 
     # Version control
     jujutsu

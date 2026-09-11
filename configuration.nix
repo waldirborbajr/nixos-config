@@ -44,8 +44,15 @@ in {
     nix.enable = true;
     go.enable = true;
     rust.enable = true;
+
     python.enable = false;
     lua.enable = false;
+    arduino.enable = false;
+    latex.enable = false;
+    postgresql.enable = false;
+    mariadb.enable = false;
+    mongodb.enable = false;
+    ferretdb.enable = false;
   };
 
   # ==================== STATE VERSION ====================

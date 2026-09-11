@@ -40,7 +40,6 @@ in {
     [
       duf
       psmisc
-      asciinema
       jujutsu
       lazyjj
       nitch
@@ -67,7 +66,6 @@ in {
       libgcc
       libcxx
 
-      taplo
       marksman
     ]
     # ---- Áudio (pulseaudio/DAW) — confirmados em nixpkgs ----

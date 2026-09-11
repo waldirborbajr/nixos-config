@@ -38,11 +38,11 @@ in {
   };
 
   # Pacotes sem módulo HM (ou cujo módulo geraria config própria em conflito
-  # com o xdg.configFile abaixo). Só o binário — config via xdg.
+  # com o xdg.configFile abaixo). Ferramentas de desenvolvimento compartilhadas
+  # (como ripgrep) são fornecidas por modules/development/base.nix.
   home.packages = with pkgs; [
     wezterm
     zellij
-    ripgrep
     oh-my-posh
     atuin
   ];

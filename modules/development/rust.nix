@@ -27,7 +27,6 @@
     cargo-audit
     cargo-outdated
     llvmPackages.bintools
-    lldb
   ];
   };
 }

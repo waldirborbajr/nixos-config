@@ -35,21 +35,21 @@
       fzf
 
       # ---- Version control ----
+      # Git itself is owned by modules/development/base.nix.
       gh # GitHub CLI
       gh-dash # GitHub CLI TUI dashboard
       delta # git diff pager
+
+      # ---- Terminal recording ----
+      asciinema
+      asciinema-agg
+      asciinema-scenario
 
       # ---- Document viewers ----
       mupdf # lightweight PDF renderer/tools
 
       # ---- Config file linters/formatters (KDL, TOML — niri/waybar configs, Cargo.toml, etc.) ----
       kdlfmt
-      taplo
-
-      # ASCIINema
-      asciinema
-      asciinema-agg
-      asciinema-scenario
 
       # ---- Archive / compression ----
       unzip
