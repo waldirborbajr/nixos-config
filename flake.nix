@@ -9,6 +9,10 @@
     #   url = "github:marienz/nix-doom-emacs-unstraightened";
     #   inputs.nixpkgs.follows = "nixpkgs";
     # };
+    emacs-overlay = {
+      url = "github:nix-community/emacs-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     neovim-nightly-overlay = {
       url = "github:nix-community/neovim-nightly-overlay";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
