@@ -2,7 +2,7 @@
 #
 # PipeWire (substitui pulseaudio) + rtkit. Extraído 1:1 de
 # configuration.nix (split cirúrgico, sem mudança de comportamento).
-{...}: {
+_: {
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
 
