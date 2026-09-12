@@ -28,6 +28,7 @@
     epkgs.cape
     epkgs.helpful
     epkgs.markdown-mode
+    epkgs.apheleia
 
     # eglot só fornece `completion-at-point-functions`, sem UI nenhuma —
     # sem isso não existe popup de autocomplete em NENHUMA linguagem
@@ -59,11 +60,16 @@ in {
     # Instalando global aqui funciona como fallback; projetos com devshell
     # continuam pegando a versão pinada de lá via direnv normalmente.
     pkgs.rust-analyzer
+    pkgs.rustfmt
     pkgs.gopls
+    pkgs.go
     pkgs.lua-language-server
+    pkgs.stylua
     pkgs.nixd
     pkgs.nil # init.el chama o server do nix pelo nome "nil", não "nixd"
     pkgs.pyright
+    pkgs.black
+    pkgs.alejandra
   ];
 
   xdg.configFile."emacs" = {

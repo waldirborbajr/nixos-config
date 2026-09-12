@@ -33,8 +33,15 @@
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'forward
       indent-tabs-mode nil
-      tab-width 4
+  tab-width 2
+  standard-indent 2
       custom-file (expand-file-name "custom.el" user-emacs-directory))
+
+(add-hook 'prog-mode-hook
+      (lambda ()
+    (setq-local indent-tabs-mode nil)
+    (setq-local tab-width 2)
+    (setq-local standard-indent 2)))
 
 (electric-pair-mode 1)
 (show-paren-mode 1)
@@ -137,12 +144,30 @@
 (when (fboundp 'rust-ts-mode)
   (add-to-list 'major-mode-remap-alist '(rust-mode . rust-ts-mode)))
 
-(use-package go-mode
-  :mode "\\.go\\'"
-  :hook (before-save . gofmt-before-save))
+(use-package go-mode :mode "\\.go\\'")
 
 (use-package nix-mode :mode "\\.nix\\'")
 (use-package lua-mode :mode "\\.lua\\'")
+
+(use-package apheleia
+  :config
+  (setf (alist-get 'rust-mode apheleia-mode-alist) 'rustfmt
+        (alist-get 'rust-ts-mode apheleia-mode-alist) 'rustfmt
+        (alist-get 'go-mode apheleia-mode-alist) 'gofmt
+        (alist-get 'go-ts-mode apheleia-mode-alist) 'gofmt
+        (alist-get 'nix-mode apheleia-mode-alist) 'alejandra
+        (alist-get 'nix-ts-mode apheleia-mode-alist) 'alejandra
+        (alist-get 'lua-mode apheleia-mode-alist) 'stylua
+        (alist-get 'lua-ts-mode apheleia-mode-alist) 'stylua
+        (alist-get 'python-mode apheleia-mode-alist) 'black
+        (alist-get 'python-ts-mode apheleia-mode-alist) 'black)
+  (setf (alist-get 'rustfmt apheleia-formatters) '("rustfmt" "--emit" "stdout")
+        (alist-get 'gofmt apheleia-formatters) '("gofmt")
+        (alist-get 'alejandra apheleia-formatters) '("alejandra" "--quiet" "-")
+        (alist-get 'stylua apheleia-formatters)
+        '("stylua" "--stdin-filepath" filepath "-")
+        (alist-get 'black apheleia-formatters) '("black" "--quiet" "-"))
+  (apheleia-global-mode 1))
 
 (use-package markdown-mode
   :mode ("README\\.md\\'" . gfm-mode)
