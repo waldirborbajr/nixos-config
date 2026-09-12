@@ -1,4 +1,4 @@
-# hosts/dell/default.nix
+# hosts/dell1564/default.nix
 # Dell-specific configuration (legacy BIOS machine)
 {
   lib,
@@ -15,7 +15,7 @@ in {
   # Assumes legacy BIOS + GRUB (older Dell hardware).
   # TODO: confirm with `ls /sys/firmware/efi` — if that path exists, this
   # machine actually boots via UEFI and should use systemd-boot instead,
-  # like m2utm/macbook2011.
+  # like m2utm/mac2011.
   boot.loader.systemd-boot.enable = lib.mkForce false;
   boot.loader.efi.canTouchEfiVariables = lib.mkForce false;
   boot.loader.grub = {
@@ -82,11 +82,8 @@ in {
   # yazi, lazygit → home/modules/cli-and-terminal.nix (fonte única + config)
   environment.systemPackages = with pkgs; [
     # Terminal & shell utilities
-    jq
-    just
     duf
     psmisc
-    asciinema
 
     # Version control
     jujutsu
@@ -101,7 +98,6 @@ in {
     # Hardware & multimedia
     brightnessctl
     playerctl
-    pciutils
     pavucontrol
 
     # Broadcom wireless debug/config tools
@@ -109,8 +105,6 @@ in {
     wirelesstools
 
     # Basic build tools
-    gdb
-    glibc
     libcxx
     libgcc
   ];

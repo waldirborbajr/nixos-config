@@ -3,38 +3,44 @@
   lib,
   pkgs,
   ...
-}:
-{
-  services.postgresql = {
-    enable = true;
-    package = pkgs.postgresql_16;
-    ensureDatabases = [
-      "dev"
-      "joshua"
-    ];
-    ensureUsers = [
-      {
-        name = "joshua";
-        ensureDBOwnership = true;
-        ensureClauses.superuser = true;
-      }
-    ];
-    authentication = ''
-      local all all trust
-      host all all 127.0.0.1/32 trust
-    '';
-
-    # Dev-optimized settings
-    settings = {
-      log_statement = "all"; # See every query
-      fsync = false; # Dangerous in prod
-      synchronous_commit = false;
+}: {
+  config = lib.mkIf config.development.languages.postgresql.enable {
+    # Ferramentas PostgreSQL. O serviço permanece desativado por padrão:
+    # o módulo pode ser habilitado explicitamente quando um host realmente
+    # precisar do servidor.
+    services.postgresql = {
+      enable = lib.mkDefault false;
+      package = pkgs.postgresql_16;
+      ensureDatabases = [
+        "dev"
+        "joshua"
+      ];
+      ensureUsers = [
+        {
+          name = "joshua";
+          ensureDBOwnership = true;
+          ensureClauses.superuser = true;
+        }
+      ];
+      authentication = ''
+        local all all trust
+        host all all 127.0.0.1/32 trust
+      '';
+      settings = {
+        log_statement = "all";
+        fsync = false;
+        synchronous_commit = false;
+      };
+      extensions =
+        ps: with ps; [
+          pgvector
+          pg_uuidv7
+        ];
     };
 
-    extensions =
-      ps: with ps; [
-        pgvector # Embeddings
-        pg_uuidv7
-      ];
+    environment.systemPackages = with pkgs; [
+      postgresql
+      pgcli
+    ];
   };
 }

@@ -45,10 +45,10 @@ in {
       recursive = true;
     };
 
-    "helix" = {
-      source = "${configs}/helix";
-      recursive = true;
-    };
+    # Helix NÃO é linkado aqui: home/modules/helix/default.nix já linka
+    # cada arquivo individualmente (config.toml, languages.toml, tema,
+    # yazi-picker.sh) com onChange/executable próprios. Um link recursivo
+    # da pasta inteira aqui colidiria com esses mesmos alvos.
 
     "nvim" = {
       source = "${configs}/nvim";

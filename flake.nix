@@ -4,11 +4,10 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    # uncoment for Doom Emacs
-    # nix-doom-emacs-unstraightened = {
-    #   url = "github:marienz/nix-doom-emacs-unstraightened";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
+    nix-doom-emacs-unstraightened = {
+      url = "github:marienz/nix-doom-emacs-unstraightened";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     emacs-overlay = {
       url = "github:nix-community/emacs-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -147,18 +146,13 @@
       };
     };
 
-    # `nix fmt` — same formatter regardless of which host you're on
-    # (dell1564/mac2011 = x86_64-linux, macutm/macvmf = aarch64-linux).
-    formatter = nixpkgs.lib.genAttrs supportedSystems (
-      system: let
-        pkgs = nixpkgs.legacyPackages.${system};
-      in
-        (inputs.treefmt-nix.lib.evalModule pkgs ./treefmt.nix).config.build.wrapper
-    );
-
-    # `nix flake check` — verifies the repo is formatted (fails CI/local check if not).
-    checks = nixpkgs.lib.genAttrs supportedSystems (system: {
-      format = self.formatter.${system}.check ./.;
-    });
+# `nix fmt` — same formatter regardless of which host you're on
+# (dell1564/mac2011 = x86_64-linux, macutm/macvmf = aarch64-linux).
+formatter = nixpkgs.lib.genAttrs supportedSystems (
+  system: let
+    pkgs = nixpkgs.legacyPackages.${system};
+  in
+    (inputs.treefmt-nix.lib.evalModule pkgs ./treefmt.nix).config.build.wrapper
+);
   };
 }

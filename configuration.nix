@@ -33,7 +33,28 @@ in {
     # ./modules/nixos/containers-docker.nix
     # ./modules/nixos/containers-podman.nix
     # ./modules/nixos/kubernetes-dev.nix
+
+    # ==================== DEVELOPMENT ====================
+    # Base comum + linguagens explicitamente habilitadas abaixo.
+    ./modules/development/default.nix
   ];
+
+  # Linguagens de desenvolvimento explicitamente habilitadas.
+  development.languages = {
+    nix.enable = true;
+    go.enable = true;
+    rust.enable = true;
+
+    python.enable = false;
+    lua.enable = false;
+    arduino.enable = false;
+    latex.enable = false;
+    postgresql.enable = false;
+    mariadb.enable = false;
+    mongodb.enable = false;
+    ferretdb.enable = false;
+    sqlite.enable = false;
+  };
 
   # ==================== STATE VERSION ====================
   system.stateVersion = "26.05";

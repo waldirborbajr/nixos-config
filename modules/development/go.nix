@@ -3,18 +3,24 @@
   lib,
   pkgs,
   ...
-}:
-
-{
-  environment.systemPackages = with pkgs; [
-    godef
-    go
-    gopls # LSP server
-    gotools # Includes goimports, guru, etc.
-    gomodifytags # For struct tag manipulation
-    gotests # Test generation
-    gore # Go REPL (if you actually use it)
-    golangci-lint # Linting
-    delve # Debugger
-  ];
+}: {
+  config = lib.mkIf config.development.languages.go.enable {
+    # Somente ferramentas específicas do ecossistema Go.
+    environment.systemPackages = with pkgs; [
+      go_1_25
+      gopls
+      gotools
+      gomodifytags
+      gotests
+      gore
+      gofumpt
+      golangci-lint
+      golangci-lint-langserver
+      go-task
+      air
+      goreleaser
+      impl
+      delve
+    ];
+  };
 }

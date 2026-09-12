@@ -14,7 +14,6 @@
   pkgs,
   pkgs-unstable,
   common,
-  inputs,
   ...
 }: let
   inherit (common) username;
@@ -38,11 +37,8 @@ in {
   # zellij, yazi, lazygit → home/modules/cli-and-terminal.nix (fonte única + config)
   environment.systemPackages = with pkgs;
     [
-      jq
-      just
       duf
       psmisc
-      asciinema
       jujutsu
       lazyjj
       nitch
@@ -60,24 +56,15 @@ in {
 
       brightnessctl
       playerctl
-      pciutils
       pavucontrol
       ffmpeg
 
       # build / containers CLI (o daemon podman em si só nas VMs)
       podman
       lazydocker
-      gcc
-      gnumake
-      cmake
-      gdb
-      glibc
       libgcc
       libcxx
 
-      lua-language-server
-      stylua
-      taplo
       marksman
     ]
     # ---- Áudio (pulseaudio/DAW) — confirmados em nixpkgs ----

@@ -25,7 +25,7 @@
   environment.systemPackages =
     (with pkgs; [
       # ---- Shell & CLI core (fetch, files, search) ----
-      # atuin, ripgrep, tmux, btop, oh-my-posh, wezterm → home/modules/cli-and-terminal.nix
+      # atuin, tmux, btop, oh-my-posh, wezterm → home/modules/cli-and-terminal.nix
       wget
       curl
       expect
@@ -35,18 +35,21 @@
       fzf
 
       # ---- Version control ----
-      git
+      # Git itself is owned by modules/development/base.nix.
       gh # GitHub CLI
       gh-dash # GitHub CLI TUI dashboard
       delta # git diff pager
 
+      # ---- Terminal recording ----
+      asciinema
+      asciinema-agg
+      asciinema-scenario
+
       # ---- Document viewers ----
-      zathura # PDF/document viewer
       mupdf # lightweight PDF renderer/tools
 
       # ---- Config file linters/formatters (KDL, TOML — niri/waybar configs, Cargo.toml, etc.) ----
       kdlfmt
-      taplo
 
       # ---- Archive / compression ----
       unzip
@@ -63,10 +66,6 @@
       # ---- Shell / prompt / terminal ----
       zsh
       # alacritty
-
-      # ---- Nix tooling ----
-      nixd # Nix language server
-      alejandra # Nix formatter (also wired into `nix fmt` via treefmt.nix)
 
       # ---- Secrets ----
       age
@@ -93,14 +92,6 @@
       capitaine-cursors
       qt6Packages.qt6ct # Qt theming control panel
       seahorse # GNOME Keyring GUI
-    ])
-    ++ (with pkgs-unstable; [
-      # neovim → home/modules/editors.nix (home.packages), não mais aqui.
-      # Motivo: aquele módulo é importado por TODOS os hosts (4 NixOS +
-      # macbook standalone), então uma declaração só já cobre todo mundo —
-      # antes tinha nvim aqui (systemPackages, só hosts NixOS) e de novo
-      # em hosts/macbook/home.nix, duplicado e ainda faltando no macbook.
-      helix
     ])
     ++ [
       (pkgs.writeShellScriptBin "noctalia" ''

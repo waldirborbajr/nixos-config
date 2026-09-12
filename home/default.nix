@@ -13,7 +13,8 @@
     ./modules/identity.nix
     ./modules/shell.nix
     ./modules/editors.nix
-    # ./modules/emacs-doom.nix
+    ./modules/emacs-doom.nix
+    # ./modules/emacs-vanilla.nix
     ./modules/cli-and-terminal.nix
     ./modules/desktop.nix
   ];
