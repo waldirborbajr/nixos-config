@@ -71,3 +71,4 @@ result*
 /devshells/postgresql/flake.lock
 /devshells/python/flake.lock
 /devshells/sqlite/flake.lock
+/\#configuration.nix#

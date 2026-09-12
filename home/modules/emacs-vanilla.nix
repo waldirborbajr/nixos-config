@@ -38,12 +38,17 @@ in {
     myEmacs
     treesitGrammars
 
-    # Descomente para ter os LSPs disponíveis fora de devshells/:
-    # pkgs.rust-analyzer
-    # pkgs.gopls
-    # pkgs.lua-language-server
-    # pkgs.nixd
-    # pkgs.pyright
+    # Sem `.envrc`/devshell (ex: pastas soltas tipo aoc-tasks, sem flake
+    # próprio), o `direnv`/`envrc-mode` não injeta nada no PATH e o eglot
+    # não acha o LSP — falha calada dentro do hook `eglot-ensure`, sem
+    # avisar, e sem LSP não tem autocomplete nem diagnóstico de erro.
+    # Instalando global aqui funciona como fallback; projetos com devshell
+    # continuam pegando a versão pinada de lá via direnv normalmente.
+    pkgs.rust-analyzer
+    pkgs.gopls
+    pkgs.lua-language-server
+    pkgs.nixd
+    pkgs.pyright
   ];
 
   xdg.configFile."emacs" = {
