@@ -13,8 +13,11 @@
     ./modules/identity.nix
     ./modules/shell.nix
     ./modules/editors.nix
-    ./modules/emacs-doom.nix
-    # ./modules/emacs-vanilla.nix
+    # Teste temporário: vanilla ligado, doom desligado (não dá pra ter os
+    # dois ao mesmo tempo — ambos instalam um binário `emacs`, colidem no
+    # perfil). Reverter pra voltar ao Doom.
+    # ./modules/emacs-doom.nix
+    ./modules/emacs-vanilla.nix
     ./modules/cli-and-terminal.nix
     ./modules/desktop.nix
   ];
