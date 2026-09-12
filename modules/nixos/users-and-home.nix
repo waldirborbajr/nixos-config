@@ -43,7 +43,7 @@ in {
   # disponibiliza pkgs.emacsPgtk também dentro dos módulos de home-manager
   # (ver home/modules/emacs-doom.nix).
   # Emacs desativado (voltando pro Helix) — overlay não usado por mais nada.
-  # nixpkgs.overlays = [inputs.emacs-overlay.overlays.default];
+  nixpkgs.overlays = [inputs.emacs-overlay.overlays.default];
 
   # ==================== HOME MANAGER ====================
   home-manager = {
