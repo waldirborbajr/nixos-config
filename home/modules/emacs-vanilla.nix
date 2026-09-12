@@ -1,4 +1,8 @@
-{pkgs, ...}: let
+{
+  pkgs,
+  lib,
+  ...
+}: let
   configs = ../configs;
 
   myEmacs = pkgs.emacs.pkgs.withPackages (epkgs: [
@@ -83,4 +87,21 @@ in {
   home.sessionVariables = {
     EMACS_TREESIT_GRAMMAR_PATH = "${treesitGrammars}/lib";
   };
+
+  # ---------------------------------------------------------------------
+  # Numa instalação nova, `~/.emacs`/`~/.emacs.el` têm prioridade MAIOR que
+  # `~/.config/emacs/init.el` na busca do Emacs — se algum arquivo desses
+  # existir (de uma instalação manual anterior, ou de outra máquina restaurada
+  # via backup/dotfiles antigos), o Emacs ignora silenciosamente TUDO que
+  # gerenciamos aqui, sem erro nenhum. Foi exatamente isso que consumiu uma
+  # sessão inteira de debug. Move qualquer um desses de lado (se não for já
+  # um symlink nosso) antes de cada ativação.
+  # ---------------------------------------------------------------------
+  home.activation.removeLegacyEmacsInit = lib.hm.dag.entryBefore ["writeBoundary"] ''
+    for f in "$HOME/.emacs" "$HOME/.emacs.el"; do
+      if [ -e "$f" ] && [ ! -L "$f" ]; then
+        $DRY_RUN_CMD mv $VERBOSE_ARG "$f" "$f.pre-nix-backup"
+      fi
+    done
+  '';
 }

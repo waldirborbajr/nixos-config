@@ -1,6 +1,7 @@
 {
   inputs,
   pkgs,
+  lib,
   ...
 }: let
   # emacs-pgtk = build nativa GTK (ícones, transparência, melhor suporte a
@@ -72,5 +73,20 @@ in {
   home.file.".config/doom/nix-treesit-grammars.el".text = ''
     ;; Gerado por home/modules/emacs-doom.nix — não edite à mão.
     (add-to-list 'treesit-extra-load-path "${treesitGrammars}/lib")
+  '';
+
+  # O nix-doom-emacs-unstraightened provavelmente já usa `--init-directory`
+  # (Emacs 29+) apontando pro doomDir empacotado, o que ignora ~/.emacs por
+  # conta própria — mas manter esse guard aqui também não custa nada e evita
+  # surpresa se isso mudar. Mesmo motivo/mesmo código do emacs-vanilla.nix:
+  # `~/.emacs`/`~/.emacs.el` têm prioridade sobre qualquer init gerenciado
+  # pelo Nix e um leftover de instalação manual anterior é ignorado em
+  # silêncio, sem erro nenhum.
+  home.activation.removeLegacyEmacsInit = lib.hm.dag.entryBefore ["writeBoundary"] ''
+    for f in "$HOME/.emacs" "$HOME/.emacs.el"; do
+      if [ -e "$f" ] && [ ! -L "$f" ]; then
+        $DRY_RUN_CMD mv $VERBOSE_ARG "$f" "$f.pre-nix-backup"
+      fi
+    done
   '';
 }
