@@ -75,11 +75,18 @@
   (add-hook 'prog-mode-hook
             (lambda ()
               (add-hook 'completion-at-point-functions #'cape-dabbrev nil t)
-              (add-hook 'completion-at-point-functions #'cape-file nil t)))
-  :config
-  ;; A MÁGICA: faz o Eglot atualizar as sugestões a cada tecla.
-  ;; Sem isso, o Corfu pode mostrar uma lista desatualizada.
-  (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster))
+              (add-hook 'completion-at-point-functions #'cape-file nil t))))
+;; REMOVIDO: (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
+;; Essa linha travava o carregamento do resto do init.el inteiro: `cape-wrap-buster`
+;; não existe de verdade no pacote `cape` (os wrappers reais são cape-wrap-silent,
+;; cape-wrap-predicate, cape-wrap-nonexclusive etc.), e mesmo que existisse,
+;; `eglot-completion-at-point` ainda não está carregado nesse ponto do arquivo
+;; (eglot é `:commands`, carregamento adiado) — `advice-add` em símbolo sem
+;; função definida dá erro `void-function` na hora, na carga do init.el, e tudo
+;; que vem depois no arquivo (eglot, rust-mode, go-mode, markdown-mode, helpful,
+;; magit) nunca chegava a ser avaliado. Se quiser resolver completions "grudadas"
+;; do eglot no futuro, isso se resolve de outra forma (ex: `eglot-booster` ou
+;; simplesmente confiando no cache normal do capf), não com essa advice.
 
 ;;; --- Eglot ---
 ;; Garante que o Eglot seja carregado e configure os hooks manualmente.
