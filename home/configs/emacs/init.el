@@ -29,6 +29,24 @@
 (global-treesit-auto-mode 1)
 
 ;; ---------------------------------------------------------------------------
+;; Completion popup (corfu) — eglot fornece só `completion-at-point-functions`,
+;; nenhuma UI. Sem isso não tem autocomplete visual em nenhuma linguagem,
+;; não é algo específico do Rust: precisa disso antes do `require 'eglot`
+;; pra já estar disponível quando o primeiro LSP conectar.
+;; ---------------------------------------------------------------------------
+(require 'corfu)
+(setq corfu-auto t
+      corfu-auto-delay 0.15
+      corfu-auto-prefix 1
+      corfu-cycle t)
+(global-corfu-mode 1)
+
+;; child-frame do corfu não funciona em `emacs -nw` — cai pro corfu-terminal
+(unless (display-graphic-p)
+  (require 'corfu-terminal)
+  (corfu-terminal-mode 1))
+
+;; ---------------------------------------------------------------------------
 ;; direnv — pega o PATH/env de cada `nix develop` automaticamente
 ;; ---------------------------------------------------------------------------
 (require 'envrc)

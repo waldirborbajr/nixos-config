@@ -16,6 +16,13 @@
 
     # opcional, combina com o resto do repo
     epkgs.magit
+
+    # eglot só fornece `completion-at-point-functions`, sem UI nenhuma —
+    # sem isso não existe popup de autocomplete em NENHUMA linguagem
+    # (rust/go/nix/python/lua sofrem igual, não é específico do Rust).
+    epkgs.corfu
+    epkgs.corfu-terminal # fallback pro corfu quando roda `emacs -nw` (sem child-frame)
+    epkgs.popon # dependência do corfu-terminal
   ]);
 
   treesitGrammars = pkgs.emacsPackages.treesit-grammars.with-grammars (grammars:
