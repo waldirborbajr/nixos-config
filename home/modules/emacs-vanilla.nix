@@ -67,10 +67,14 @@ in {
     source = "${configs}/emacs";
     recursive = true;
   };
-
-  # Alguns lançadores gráficos não preservam XDG_CONFIG_HOME; o fallback
-  # garante que o Emacs encontre o mesmo init.el em qualquer sessão.
-  home.file.".emacs.d/init.el".source = "${configs}/emacs/init.el";
+  # REMOVIDO: home.file.".emacs.d/init.el".source = ...
+  # Criar ~/.emacs.d/init.el faz o Emacs tratar ~/.emacs.d/ como o
+  # user-emacs-directory (tem prioridade sobre ~/.config/emacs/ na busca
+  # padrão do Emacs) — só que apenas o init.el foi linkado pra lá, não o
+  # early-init.el, que só existe em ~/.config/emacs/. Resultado: o
+  # early-init.el (package-enable-at-startup nil, frame-alist, etc.) para
+  # de carregar silenciosamente. xdg.configFile."emacs" acima já linka o
+  # diretório inteiro corretamente — não precisa de fallback nenhum.
 
   # grammars pré-compiladas pelo nix — sem precisar de gcc/libtool em runtime.
   # referenciado no init.el via:
