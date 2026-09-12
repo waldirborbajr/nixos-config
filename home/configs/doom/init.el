@@ -65,7 +65,13 @@
      (nix +tree-sitter)        ; nix-mode, formata com nixpkgs-fmt/alejandra
      org
      (python +lsp +tree-sitter +pyright)
-     (rust +lsp +tree-sitter)
+     ;; +tree-sitter removido: bug conhecido do Doom (doomemacs/core#8473)
+     ;; troca o major-mode pra `rust-ts-mode` via major-mode-remap-alist
+     ;; mesmo quando a gramática nativa não carrega (nosso caso — ver
+     ;; comentário em config.el), deixando o buffer sem highlight nenhum
+     ;; e sem os keybindings do `rustic-mode`. `rustic-mode` clássico não
+     ;; depende de gramática tree-sitter pra ter font-lock.
+     (rust +lsp)
      sh
      (yaml +lsp)
      (json +lsp)

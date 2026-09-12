@@ -16,6 +16,21 @@
   # mais lento porém mais rápido em uso).
   doomEmacs = pkgs.emacs-pgtk;
 
+  # Gramáticas nativas do treesit (Emacs 29+) usadas por go/python/nix
+  # (rust não usa mais +tree-sitter, ver init.el). Calculado uma vez só
+  # e reaproveitado abaixo — antes esse mesmo `with-grammars` estava
+  # duplicado (uma vez em home.packages, outra em sessionVariables) e
+  # podia divergir.
+  treesitGrammars = pkgs.emacsPackages.treesit-grammars.with-grammars (
+    grammars:
+      with grammars; [
+        tree-sitter-rust
+        tree-sitter-go
+        tree-sitter-python
+        tree-sitter-nix
+      ]
+  );
+
   # LSP servers e formatters usados pelo Doom init.el/config.el gerados antes.
   # Deixe comentado se preferir depender só dos devshells/ + direnv (o config.el
   # já ativa `direnv-mode`, então dentro de um projeto com `.envrc` o Doom pega
@@ -31,13 +46,7 @@
     aspell
     aspellDicts.en # :checkers spell precisa de um spellchecker de verdade no PATH
 
-    (pkgs.emacsPackages.treesit-grammars.with-grammars (grammars:
-      with grammars; [
-        tree-sitter-rust
-        tree-sitter-go
-        tree-sitter-python
-        tree-sitter-nix
-      ]))
+    treesitGrammars
   ];
 in {
   imports = [inputs.nix-doom-emacs-unstraightened.hmModule];
@@ -50,8 +59,18 @@ in {
 
   home.packages = doomExtraPackages;
 
-  # referenciado no config.el via `treesit-extra-load-path`
-  home.sessionVariables = {
-    EMACS_TREESIT_GRAMMAR_PATH = "${pkgs.emacsPackages.treesit-grammars.with-grammars (g: with g; [tree-sitter-rust tree-sitter-go tree-sitter-python tree-sitter-nix])}/lib";
-  };
+  # ANTES: path do grammar ia via `home.sessionVariables` (env var lida em
+  # config.el com `getenv`). Isso é frágil pra um Emacs gráfico disparado
+  # direto pelo niri (exec/keybinding), que NÃO passa por um shell de
+  # login/interativo e portanto não herda variáveis exportadas via
+  # home-manager — resultado: `treesit-extra-load-path` ficava vazio e a
+  # gramática nunca era encontrada.
+  #
+  # AGORA: o path do Nix store fica embutido direto num arquivo elisp
+  # gerado pelo home-manager, que config.el carrega incondicionalmente
+  # (sem depender de nenhuma env var estar presente no processo do Emacs).
+  home.file.".config/doom/nix-treesit-grammars.el".text = ''
+    ;; Gerado por home/modules/emacs-doom.nix — não edite à mão.
+    (add-to-list 'treesit-extra-load-path "${treesitGrammars}/lib")
+  '';
 }

@@ -16,11 +16,20 @@
 
 ;; ---------------------------------------------------------------------------
 ;; Tree-sitter — grammars pré-compiladas pelo Nix (emacs-doom.nix), nunca
-;; compiladas em runtime.
+;; compiladas em runtime. O path do Nix store vem embutido num arquivo
+;; gerado pelo home-manager (nix-treesit-grammars.el), não por env var —
+;; env var setada via `home.sessionVariables` não chega num Emacs disparado
+;; direto pelo niri (não passa por shell de login), o que fazia a gramática
+;; nunca ser encontrada. Ainda usado por go/python/nix (rust não usa mais
+;; +tree-sitter, ver init.el).
+;;
+;; NOTA: não usar `doom-user-dir` aqui — o nix-doom-emacs-unstraightened
+;; empacota o `doomDir` inteiro (init.el/config.el/packages.el) dentro do
+;; Nix store e é ESSE path read-only que vira `doom-user-dir` em runtime,
+;; não `~/.config/doom`. O arquivo gerado pelo home-manager (home.file)
+;; fica de fato em `~/.config/doom/`, então referenciamos via $HOME.
 ;; ---------------------------------------------------------------------------
-(let ((grammar-path (getenv "EMACS_TREESIT_GRAMMAR_PATH")))
-  (when grammar-path
-    (setq treesit-extra-load-path (list grammar-path))))
+(load (expand-file-name "~/.config/doom/nix-treesit-grammars.el") t)
 
 ;; ---------------------------------------------------------------------------
 ;; Rust
