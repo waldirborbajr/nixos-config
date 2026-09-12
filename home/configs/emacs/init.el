@@ -1,218 +1,128 @@
-;;; init.el --- Emacs configuration -*- lexical-binding: t -*-
+;;; init.el --- Development environment -*- lexical-binding: t; -*-
 
-;;; Commentary:
+(setq gc-cons-threshold (* 256 1024 1024)
+      read-process-output-max (* 4 1024 1024)
+      process-adaptive-read-buffering nil)
 
-;; Save the contents of this file to ~/.config/emacs/init.el and
-;; you're ready to boot up Emacs.
+(add-hook 'emacs-startup-hook
+          (lambda () (setq gc-cons-threshold (* 32 1024 1024))))
 
-;; Hack this file! One of the best ways to get started with Emacs is
-;; to look at other peoples' configurations and extract the pieces
-;; that work for you. That's where this configuration started. I
-;; encourage you to read through the code in this file and explore the
-;; functions and variables using the built-in help system (details
-;; below). Happy hacking!
+(require 'package)
+(setq package-archives
+      '(("gnu" . "https://elpa.gnu.org/packages/")
+        ("nongnu" . "https://elpa.nongnu.org/nongnu/")
+        ("melpa" . "https://melpa.org/packages/")))
+(package-initialize)
+(unless package-archive-contents (package-refresh-contents))
+(unless (package-installed-p 'use-package) (package-install 'use-package))
+(require 'use-package)
+(setq use-package-always-ensure t)
 
-;; "C-<chr>  means hold the CONTROL key while typing the character <chr>.
-;; Thus, C-f would be: hold the CONTROL key and type f." (Emacs tutorial)
-;;
-;; - C-h t: Start the Emacs tutorial
-;; - C-h o some-symbol: Describe symbol
-;; - C-h C-q: Pull up the quick-help cheatsheet
-
-;;; Code:
-
-;; Performance tweaks for modern machines
-(setq gc-cons-threshold 100000000) ; 100 mb
-(setq read-process-output-max (* 1024 1024)) ; 1mb
-
-;; Remove extra UI clutter by hiding the scrollbar, menubar, and toolbar.
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 
-;; Set the font. Note: height = px * 100
-(set-face-attribute 'default nil :font "Courier New" :height 120)
+(set-face-attribute 'default nil :family "JetBrainsMono Nerd Font" :height 120)
+(unless (find-font (font-spec :name "JetBrainsMono Nerd Font"))
+  (set-face-attribute 'default nil :family "JetBrains Mono"))
 
-;; Add unique buffer names in the minibuffer where there are many
-;; identical files. This is super useful if you rely on folders for
-;; organization and have lots of files with the same name,
-;; e.g. foo/index.ts and bar/index.ts.
+(use-package catppuccin-theme
+  :config
+  (setq catppuccin-flavor 'mocha)
+  (load-theme 'catppuccin t))
+
 (require 'uniquify)
-
-;; Automatically insert closing parens
-(electric-pair-mode t)
-
-;; Visualize matching parens
-(show-paren-mode 1)
-
-;; Prefer spaces to tabs
-(setq-default indent-tabs-mode nil)
-
-;; Automatically save your place in files
-(save-place-mode t)
-
-;; Save history in minibuffer to keep recent commands easily accessible
-(savehist-mode t)
-
-;; Keep track of open files
-(recentf-mode t)
-
-;; Keep files up-to-date when they change outside Emacs
-(global-auto-revert-mode t)
-
-;; Display line numbers only when in programming modes
-(add-hook 'prog-mode-hook 'display-line-numbers-mode)
-
-;; The `setq' special form is used for setting variables. Remember
-;; that you can look up these variables with "C-h v variable-name".
 (setq uniquify-buffer-name-style 'forward
-      window-resize-pixelwise t
-      frame-resize-pixelwise t
-      load-prefer-newer t
-      backup-by-copying t
-      ;; Backups are placed into your Emacs directory, e.g. ~/.config/emacs/backups
-      backup-directory-alist `(("." . ,(concat user-emacs-directory "backups")))
-      ;; I'll add an extra note here since user customizations are important.
-      ;; Emacs actually offers a UI-based customization menu, "M-x customize".
-      ;; You can use this menu to change variable values across Emacs. By default,
-      ;; changing a variable will write to your init.el automatically, mixing
-      ;; your hand-written Emacs Lisp with automatically-generated Lisp from the
-      ;; customize menu. The following setting instead writes customizations to a
-      ;; separate file, custom.el, to keep your init.el clean.
+      indent-tabs-mode nil
+      tab-width 4
       custom-file (expand-file-name "custom.el" user-emacs-directory))
 
-;; Bring in package utilities so we can install packages from the web.
-(require 'package)
+(electric-pair-mode 1)
+(show-paren-mode 1)
+(save-place-mode 1)
+(savehist-mode 1)
+(recentf-mode 1)
+(global-auto-revert-mode 1)
+(add-hook 'prog-mode-hook #'display-line-numbers-mode)
+(add-hook 'text-mode-hook #'visual-line-mode)
 
-;; Add MELPA, an unofficial (but well-curated) package registry to the
-;; list of accepted package registries. By default Emacs only uses GNU
-;; ELPA and NonGNU ELPA, https://elpa.gnu.org/ and
-;; https://elpa.nongnu.org/ respectively.
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+(use-package vertico :init (vertico-mode 1))
 
-;; Unless we've already fetched (and cached) the package archives,
-;; refresh them.
-(unless package-archive-contents
-  (package-refresh-contents))
-
-;; Add the :vc keyword to use-package, making it easy to install
-;; packages directly from git repositories.
-(unless (package-installed-p 'vc-use-package)
-  (package-vc-install "https://github.com/slotThe/vc-use-package"))
-(require 'vc-use-package)
-
-;; A quick primer on the `use-package' function (refer to
-;; "C-h f use-package" for the full details).
-;;
-;; (use-package my-package-name
-;;   :ensure t    ; Ensure my-package is installed
-;;   :after foo   ; Load my-package after foo is loaded (seldom used)
-;;   :init        ; Run this code before my-package is loaded
-;;   :bind        ; Bind these keys to these functions
-;;   :custom      ; Set these variables
-;;   :config      ; Run this code after my-package is loaded
-
-;; A package with a great selection of themes:
-;; https://protesilaos.com/emacs/ef-themes
-(use-package ef-themes
-  :ensure t
-  :config
-  (ef-themes-select 'ef-autumn))
-
-;; Minibuffer completion is essential to your Emacs workflow and
-;; Vertico is currently one of the best out there. There's a lot to
-;; dive in here so I recommend checking out the documentation for more
-;; details: https://elpa.gnu.org/packages/vertico.html. The short and
-;; sweet of it is that you search for commands with "M-x do-thing" and
-;; the minibuffer will show you a filterable list of matches.
-(use-package vertico
-  :ensure t
+(use-package orderless
   :custom
-  (vertico-cycle t)
-  (read-buffer-completion-ignore-case t)
-  (read-file-name-completion-ignore-case t)
-  (completion-styles '(basic substring partial-completion flex))
-  :init
-  (vertico-mode))
+  (completion-styles '(orderless basic))
+  (completion-category-defaults nil)
+  (completion-category-overrides
+   '((file (styles partial-completion basic)))))
 
-;; Improve the accessibility of Emacs documentation by placing
-;; descriptions directly in your minibuffer. Give it a try:
-;; "M-x find-file".
-(use-package marginalia
-  :after vertico
-  :ensure t
-  :init
-  (marginalia-mode))
+(use-package marginalia :init (marginalia-mode 1))
 
-;; Adds intellisense-style code completion at point that works great
-;; with LSP via Eglot. You'll likely want to configure this one to
-;; match your editing preferences, there's no one-size-fits-all
-;; solution.
 (use-package corfu
-  :ensure t
-  :init
-  (global-corfu-mode)
   :custom
   (corfu-auto t)
-  ;; You may want to play with delay/prefix/styles to suit your preferences.
-  (corfu-auto-delay 0)
-  (corfu-auto-prefix 0)
-  (completion-styles '(basic)))
-
-;; Adds LSP support. Note that you must have the respective LSP
-;; server installed on your machine to use it with Eglot. e.g.
-;; rust-analyzer to use Eglot with `rust-mode'.
-(use-package eglot
-  :ensure t
-  :bind (("s-<mouse-1>" . eglot-find-implementation)
-         ("C-c ." . eglot-code-action-quickfix))
-  ;; Add your programming modes here to automatically start Eglot,
-  ;; assuming you have the respective LSP server installed.
-  :hook ((go-mode . eglot-ensure)
-         (rust-mode . eglot-ensure)))
-
-;; Add extra context to Emacs documentation to help make it easier to
-;; search and understand. This configuration uses the keybindings 
-;; recommended by the package author.
-(use-package helpful
-  :ensure t
-  :bind (("C-h f" . #'helpful-callable)
-         ("C-h v" . #'helpful-variable)
-         ("C-h k" . #'helpful-key)
-         ("C-c C-d" . #'helpful-at-point)
-         ("C-h F" . #'helpful-function)
-         ("C-h C" . #'helpful-command)))
-
-;; An extremely feature-rich git client. Activate it with "C-c g".
-(use-package magit
-  :ensure t
-  :bind (("C-c g" . magit-status)))
-
-(use-package go-mode
-  :ensure t
-  :bind (:map go-mode-map
-	      ("C-c C-f" . 'gofmt))
-  :hook (before-save . gofmt-before-save))
-
-(use-package lua-mode
-  :ensure t)
-
-(use-package markdown-mode
-  :ensure t
-  ;; These extra modes help clean up the Markdown editing experience.
-  ;; `visual-line-mode' turns on word wrap and helps editing commands
-  ;; work with paragraphs of text. `flyspell-mode' turns on an
-  ;; automatic spell checker.
-  :hook ((markdown-mode . visual-line-mode)
-         (markdown-mode . flyspell-mode))
+  (corfu-auto-delay 0.15)
+  (corfu-auto-prefix 1)
+  (corfu-cycle t)
+  (corfu-preselect 'prompt)
   :init
-  (setq markdown-command "multimarkdown"))
+  (global-corfu-mode 1))
+
+(use-package cape
+  :init
+  (add-hook 'prog-mode-hook
+            (lambda ()
+              (add-hook 'completion-at-point-functions #'cape-dabbrev nil t)
+              (add-hook 'completion-at-point-functions #'cape-file nil t))))
+
+(use-package eglot
+  :ensure nil
+  :custom
+  (eglot-autoshutdown t)
+  (eglot-sync-connect 0)
+  :config
+  (add-to-list 'eglot-server-programs '((rust-mode rust-ts-mode) . ("rust-analyzer")))
+  (add-to-list 'eglot-server-programs '(go-mode . ("gopls")))
+  (add-to-list 'eglot-server-programs '((nix-mode nix-ts-mode) . ("nil")))
+  (add-to-list 'eglot-server-programs '(lua-mode . ("lua-language-server")))
+  :hook
+  ((rust-mode rust-ts-mode go-mode nix-mode nix-ts-mode lua-mode) . eglot-ensure))
 
 (use-package rust-mode
-  :ensure t
-  :bind (:map rust-mode-map
-	      ("C-c C-r" . 'rust-run)
-	      ("C-c C-c" . 'rust-compile)
-	      ("C-c C-f" . 'rust-format-buffer)
-	      ("C-c C-t" . 'rust-test))
+  :mode "\\.rs\\'"
   :hook (rust-mode . prettify-symbols-mode))
+
+(when (fboundp 'rust-ts-mode)
+  (add-to-list 'major-mode-remap-alist '(rust-mode . rust-ts-mode)))
+
+(use-package go-mode
+  :mode "\\.go\\'"
+  :hook (before-save . gofmt-before-save))
+
+(use-package nix-mode :mode "\\.nix\\'")
+(use-package lua-mode :mode "\\.lua\\'")
+
+(use-package markdown-mode
+  :mode ("README\\.md\\'" . gfm-mode)
+  :mode ("\\.md\\'" . markdown-mode)
+  :init (setq markdown-fontify-code-blocks-natively t)
+  :hook ((markdown-mode . visual-line-mode)
+         (gfm-mode . visual-line-mode)))
+
+(use-package helpful
+  :bind (("C-h f" . helpful-callable)
+         ("C-h v" . helpful-variable)
+         ("C-h k" . helpful-key)))
+
+(use-package magit :bind (("C-c g" . magit-status)))
+
+(defun borba/format-buffer ()
+  "Format the current buffer."
+  (interactive)
+  (if (bound-and-true-p eglot--managed-mode)
+      (eglot-format-buffer)
+    (message "No Eglot formatter is active.")))
+
+(global-set-key (kbd "C-c f") #'borba/format-buffer)
+
+(when (file-exists-p custom-file)
+  (load custom-file nil 'nomessage))
