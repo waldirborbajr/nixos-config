@@ -70,6 +70,11 @@ in {
     source = "${configs}/emacs";
     recursive = true;
   };
+
+  # Alguns lançadores gráficos não preservam XDG_CONFIG_HOME; o fallback
+  # garante que o Emacs encontre o mesmo init.el em qualquer sessão.
+  home.file.".emacs.d/init.el".source = "${configs}/emacs/init.el";
+
   # REMOVIDO: home.file.".emacs.d/init.el".source = ...
   # Criar ~/.emacs.d/init.el faz o Emacs tratar ~/.emacs.d/ como o
   # user-emacs-directory (tem prioridade sobre ~/.config/emacs/ na busca
