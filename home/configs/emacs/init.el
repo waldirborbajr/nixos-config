@@ -63,6 +63,9 @@
   (corfu-auto-prefix 1)
   (corfu-cycle t)
   (corfu-preselect 'prompt)
+  :bind ("C-c y" . completion-at-point) ; disparo manual — M-TAB costuma ser
+                                          ; capturado pelo WM (niri usa
+                                          ; Alt+Tab pra trocar de janela)
   :init
   (global-corfu-mode 1))
 
@@ -78,6 +81,9 @@
   :custom
   (eglot-autoshutdown t)
   (eglot-sync-connect 0)
+  (eglot-report-progress t) ; mostra "Indexing..." etc na área de eco —
+                             ; sem isso a conexão é 100% silenciosa e
+                             ; parece que não fez nada enquanto conecta
   :config
   (add-to-list 'eglot-server-programs '((rust-mode rust-ts-mode) . ("rust-analyzer")))
   (add-to-list 'eglot-server-programs '(go-mode . ("gopls")))
