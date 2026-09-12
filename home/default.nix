@@ -13,6 +13,7 @@
     ./modules/identity.nix
     ./modules/shell.nix
     ./modules/editors.nix
+    # Emacs desativado — voltando pro Helix.
     # ./modules/emacs-doom.nix
     # ./modules/emacs-vanilla.nix
     ./modules/cli-and-terminal.nix
