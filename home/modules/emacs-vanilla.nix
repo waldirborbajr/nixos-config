@@ -17,6 +17,15 @@
     # opcional, combina com o resto do repo
     epkgs.magit
 
+    # usados pelo init.el atual (use-package), fora do que já tínhamos
+    epkgs.catppuccin-theme
+    epkgs.vertico
+    epkgs.orderless
+    epkgs.marginalia
+    epkgs.cape
+    epkgs.helpful
+    epkgs.markdown-mode
+
     # eglot só fornece `completion-at-point-functions`, sem UI nenhuma —
     # sem isso não existe popup de autocomplete em NENHUMA linguagem
     # (rust/go/nix/python/lua sofrem igual, não é específico do Rust).
@@ -48,6 +57,7 @@ in {
     pkgs.gopls
     pkgs.lua-language-server
     pkgs.nixd
+    pkgs.nil # init.el chama o server do nix pelo nome "nil", não "nixd"
     pkgs.pyright
   ];
 

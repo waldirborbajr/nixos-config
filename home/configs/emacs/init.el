@@ -7,16 +7,15 @@
 (add-hook 'emacs-startup-hook
           (lambda () (setq gc-cons-threshold (* 32 1024 1024))))
 
-(require 'package)
-(setq package-archives
-      '(("gnu" . "https://elpa.gnu.org/packages/")
-        ("nongnu" . "https://elpa.nongnu.org/nongnu/")
-        ("melpa" . "https://melpa.org/packages/")))
-(package-initialize)
-(unless package-archive-contents (package-refresh-contents))
-(unless (package-installed-p 'use-package) (package-install 'use-package))
+;; Pacotes vêm 100% do Nix (emacs-vanilla.nix, epkgs.withPackages) — já
+;; ficam no load-path, sem precisar de `package-initialize`/MELPA em
+;; runtime. Ter DOIS gerenciadores de pacote ativos (Nix + package.el
+;; baixando pra ~/.emacs.d/elpa) deixa a ordem do load-path
+;; imprevisível — um pacote baixado ali pode sombrear silenciosamente
+;; algo embutido do Emacs 30 (o `eglot`, por exemplo) sem erro nenhum
+;; aparecer, o que bate com o `:hook` do eglot não disparar sozinho.
 (require 'use-package)
-(setq use-package-always-ensure t)
+(setq use-package-always-ensure nil)
 
 (menu-bar-mode -1)
 (tool-bar-mode -1)
