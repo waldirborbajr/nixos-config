@@ -70,14 +70,22 @@
   (global-corfu-mode 1))
 
 (use-package cape
+  :demand t
   :init
   (add-hook 'prog-mode-hook
             (lambda ()
               (add-hook 'completion-at-point-functions #'cape-dabbrev nil t)
-              (add-hook 'completion-at-point-functions #'cape-file nil t))))
+              (add-hook 'completion-at-point-functions #'cape-file nil t)))
+  :config
+  ;; A MÁGICA: faz o Eglot atualizar as sugestões a cada tecla.
+  ;; Sem isso, o Corfu pode mostrar uma lista desatualizada.
+  (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster))
 
+;;; --- Eglot ---
+;; Garante que o Eglot seja carregado e configure os hooks manualmente.
 (use-package eglot
   :ensure nil
+  :commands (eglot eglot-ensure)
   :custom
   (eglot-autoshutdown t)
   (eglot-sync-connect 0)
@@ -85,12 +93,24 @@
                              ; sem isso a conexão é 100% silenciosa e
                              ; parece que não fez nada enquanto conecta
   :config
+  ;; Define os servidores LSP para cada modo.
   (add-to-list 'eglot-server-programs '((rust-mode rust-ts-mode) . ("rust-analyzer")))
   (add-to-list 'eglot-server-programs '(go-mode . ("gopls")))
   (add-to-list 'eglot-server-programs '((nix-mode nix-ts-mode) . ("nil")))
-  (add-to-list 'eglot-server-programs '(lua-mode . ("lua-language-server")))
-  :hook
-  ((rust-mode rust-ts-mode go-mode nix-mode nix-ts-mode lua-mode) . eglot-ensure))
+  (add-to-list 'eglot-server-programs '(lua-mode . ("lua-language-server"))))
+
+;; Adiciona os hooks de forma explícita para cada modo.
+;; Isso é mais confiável do que a sintaxe :hook do use-package.
+(add-hook 'rust-mode-hook #'eglot-ensure)
+(add-hook 'rust-ts-mode-hook #'eglot-ensure)
+(add-hook 'go-mode-hook #'eglot-ensure)
+(add-hook 'nix-mode-hook #'eglot-ensure)
+(add-hook 'nix-ts-mode-hook #'eglot-ensure)
+(add-hook 'lua-mode-hook #'eglot-ensure)
+
+;;; --- Flymake (para exibir erros) ---
+;; Ativa o Flymake em todos os buffers de programação.
+(add-hook 'prog-mode-hook #'flymake-mode)
 
 (use-package rust-mode
   :mode "\\.rs\\'"
@@ -131,3 +151,5 @@
 
 (when (file-exists-p custom-file)
   (load custom-file nil 'nomessage))
+
+;;; init.el ends here

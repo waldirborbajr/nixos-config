@@ -1,7 +1,4 @@
-{
-  pkgs,
-  ...
-}: {
+{pkgs, ...}: {
   imports = [../common/mac-vm-workstation.nix];
 
   environment.systemPackages = [pkgs.spice-vdagent];
