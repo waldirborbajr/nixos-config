@@ -45,7 +45,10 @@
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
 (add-hook 'text-mode-hook #'visual-line-mode)
 
-(use-package vertico :init (vertico-mode 1))
+(use-package vertico
+  :demand t
+  :config
+  (vertico-mode 1))
 
 (use-package orderless
   :custom
@@ -54,9 +57,13 @@
   (completion-category-overrides
    '((file (styles partial-completion basic)))))
 
-(use-package marginalia :init (marginalia-mode 1))
+(use-package marginalia
+  :demand t
+  :config
+  (marginalia-mode 1))
 
 (use-package corfu
+  :demand t
   :custom
   (corfu-auto t)
   (corfu-auto-delay 0.15)
@@ -66,7 +73,7 @@
   :bind ("C-c y" . completion-at-point) ; disparo manual — M-TAB costuma ser
                                           ; capturado pelo WM (niri usa
                                           ; Alt+Tab pra trocar de janela)
-  :init
+  :config
   (global-corfu-mode 1))
 
 (use-package cape
@@ -92,7 +99,7 @@
 ;; Garante que o Eglot seja carregado e configure os hooks manualmente.
 (use-package eglot
   :ensure nil
-  :commands (eglot eglot-ensure)
+  :demand t
   :custom
   (eglot-autoshutdown t)
   (eglot-sync-connect 0)
@@ -102,18 +109,24 @@
   :config
   ;; Define os servidores LSP para cada modo.
   (add-to-list 'eglot-server-programs '((rust-mode rust-ts-mode) . ("rust-analyzer")))
-  (add-to-list 'eglot-server-programs '(go-mode . ("gopls")))
+  (add-to-list 'eglot-server-programs '((go-mode go-ts-mode) . ("gopls")))
   (add-to-list 'eglot-server-programs '((nix-mode nix-ts-mode) . ("nil")))
-  (add-to-list 'eglot-server-programs '(lua-mode . ("lua-language-server"))))
+  (add-to-list 'eglot-server-programs '((lua-mode lua-ts-mode) . ("lua-language-server")))
+  (add-to-list 'eglot-server-programs
+               '((python-mode python-ts-mode) . ("pyright-langserver" "--stdio"))))
 
 ;; Adiciona os hooks de forma explícita para cada modo.
 ;; Isso é mais confiável do que a sintaxe :hook do use-package.
 (add-hook 'rust-mode-hook #'eglot-ensure)
 (add-hook 'rust-ts-mode-hook #'eglot-ensure)
 (add-hook 'go-mode-hook #'eglot-ensure)
+(add-hook 'go-ts-mode-hook #'eglot-ensure)
 (add-hook 'nix-mode-hook #'eglot-ensure)
 (add-hook 'nix-ts-mode-hook #'eglot-ensure)
 (add-hook 'lua-mode-hook #'eglot-ensure)
+(add-hook 'lua-ts-mode-hook #'eglot-ensure)
+(add-hook 'python-mode-hook #'eglot-ensure)
+(add-hook 'python-ts-mode-hook #'eglot-ensure)
 
 ;;; --- Flymake (para exibir erros) ---
 ;; Ativa o Flymake em todos os buffers de programação.
