@@ -3,7 +3,7 @@
 # Identidade do usuário Home Manager, nix-index-database e o índice de
 # home.packages. Extraído 1:1 de home/default.nix (split cirúrgico, sem
 # mudança de comportamento).
-{...}: let
+_: let
   username = "borba";
 in {
   home.username = username;

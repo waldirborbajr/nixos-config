@@ -50,7 +50,6 @@
   };
 
   outputs = {
-    self,
     nixpkgs,
     nixpkgs-unstable,
     sops-nix,
@@ -92,7 +91,6 @@
     # afetam mac2011, dell1564, macutm nem macvmf.
     mkMacHome = {
       hostname,
-      username ? "borba",
       system ? "aarch64-darwin",
     }:
       home-manager.lib.homeManagerConfiguration {
@@ -146,13 +144,13 @@
       };
     };
 
-# `nix fmt` — same formatter regardless of which host you're on
-# (dell1564/mac2011 = x86_64-linux, macutm/macvmf = aarch64-linux).
-formatter = nixpkgs.lib.genAttrs supportedSystems (
-  system: let
-    pkgs = nixpkgs.legacyPackages.${system};
-  in
-    (inputs.treefmt-nix.lib.evalModule pkgs ./treefmt.nix).config.build.wrapper
-);
+    # `nix fmt` — same formatter regardless of which host you're on
+    # (dell1564/mac2011 = x86_64-linux, macutm/macvmf = aarch64-linux).
+    formatter = nixpkgs.lib.genAttrs supportedSystems (
+      system: let
+        pkgs = nixpkgs.legacyPackages.${system};
+      in
+        (inputs.treefmt-nix.lib.evalModule pkgs ./treefmt.nix).config.build.wrapper
+    );
   };
 }

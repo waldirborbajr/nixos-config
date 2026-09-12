@@ -1,5 +1,4 @@
-{lib, ...}:
-{
+{lib, ...}: {
   imports = [
     ./base.nix
     ./go.nix

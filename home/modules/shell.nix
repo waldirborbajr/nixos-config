@@ -7,10 +7,7 @@
 # zoxide / eza / fzf: binários partilhados por todos os hosts via HM.
 # A init do zoxide continua em home/configs/zsh/zoxide.zsh (não usar
 # programs.zoxide.enable para não duplicar o eval).
-{
-  pkgs,
-  ...
-}: let
+{pkgs, ...}: let
   configs = ../configs;
 in {
   # .zshenv must live outside ZDOTDIR.

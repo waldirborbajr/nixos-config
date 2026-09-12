@@ -524,6 +524,13 @@ git_commit_if_dirty() {
     return 0
   fi
 
+  log "Running 'nix fmt' before commit..."
+  if nix fmt; then
+    ok "Formatting applied (alejandra/deadnix/statix via treefmt-nix)."
+  else
+    warn "'nix fmt' failed — continuing with commit as-is (check formatter output above)."
+  fi
+
   git add -A
   read -r -p "$(echo -e "${C_SKY}?${C_RESET} Commit message ${C_DIM}[lock: update]${C_RESET}: ")" msg
   msg="${msg:-lock: update}"

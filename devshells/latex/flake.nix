@@ -6,14 +6,15 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs =
-    { nixpkgs, flake-utils, ... }:
+  outputs = {
+    nixpkgs,
+    flake-utils,
+    ...
+  }:
     flake-utils.lib.eachDefaultSystem (
-      system:
-      let
+      system: let
         pkgs = nixpkgs.legacyPackages.${system};
-      in
-      {
+      in {
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
             # LaTeX toolchain
@@ -24,21 +25,21 @@
 
             # Typst toolchain
             typst
-            tinymist  # Language server for Typst
+            tinymist # Language server for Typst
 
             # Editors
             helix
 
             # Preview tools
-            zathura  # PDF viewer with auto-reload
-            sioyek   # Alternative PDF viewer with synctex support
+            zathura # PDF viewer with auto-reload
+            sioyek # Alternative PDF viewer with synctex support
 
             # Utilities
-            watchexec  # For auto-compilation
-            entr       # Alternative for file watching
+            watchexec # For auto-compilation
+            entr # Alternative for file watching
 
             # Build tools
-            just       # Command runner
+            just # Command runner
           ];
 
           shellHook = ''

@@ -134,7 +134,7 @@
               echo "⚠️  uv.lock não encontrado!"
               echo "Execute os comandos abaixo para configurar o projeto:"
               echo ""
-              echo "   uv init --app --name ${name:-meu-projeto} --packages"
+              echo "   uv init --app --name ${"name:-meu-projeto"} --packages"
               echo "   uv add <dependências>"
               echo "   uv lock"
               echo ""

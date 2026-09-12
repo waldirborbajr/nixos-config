@@ -1,4 +1,4 @@
-{...}: let
+_: let
   username = "borba";
 
   # Shared values for host modules (username mainly).

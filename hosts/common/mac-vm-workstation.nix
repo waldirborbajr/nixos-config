@@ -8,7 +8,6 @@
 {
   lib,
   pkgs,
-  pkgs-unstable,
   common,
   ...
 }: let

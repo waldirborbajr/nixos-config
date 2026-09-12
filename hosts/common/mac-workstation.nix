@@ -10,14 +10,11 @@
 # hardware físico (Broadcom wl, insecure packages) ficam nos módulos
 # filhos — assim uma novidade de programa se configura uma única vez.
 {
-  lib,
   pkgs,
   pkgs-unstable,
   common,
   ...
-}: let
-  inherit (common) username;
-in {
+}: {
   # ==================== BOOT (EFI comum a 2011 + VMs) ====================
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;

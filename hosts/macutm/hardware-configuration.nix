@@ -1,8 +1,6 @@
 # hosts/m2utm/hardware-configuration.nix
 {
-  config,
   lib,
-  pkgs,
   modulesPath,
   ...
 }: {

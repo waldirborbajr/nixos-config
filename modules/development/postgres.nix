@@ -31,8 +31,8 @@
         fsync = false;
         synchronous_commit = false;
       };
-      extensions =
-        ps: with ps; [
+      extensions = ps:
+        with ps; [
           pgvector
           pg_uuidv7
         ];

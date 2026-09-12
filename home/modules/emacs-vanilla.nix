@@ -5,8 +5,8 @@
     # major-modes que o Emacs core não traz
     epkgs.nix-mode
     epkgs.lua-mode
-    epkgs.go-mode      # fallback caso não use go-ts-mode
-    epkgs.rust-mode    # fallback caso não use rust-ts-mode
+    epkgs.go-mode # fallback caso não use go-ts-mode
+    epkgs.rust-mode # fallback caso não use rust-ts-mode
 
     # sua stack de eglot
     epkgs.treesit-auto

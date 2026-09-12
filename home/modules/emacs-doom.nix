@@ -1,4 +1,8 @@
-{inputs, pkgs, ...}: let
+{
+  inputs,
+  pkgs,
+  ...
+}: let
   # emacs-pgtk = build nativa GTK (ícones, transparência, melhor suporte a
   # Wayland/X11), vinda do overlay nix-community/emacs-overlay aplicado
   # globalmente em modules/nixos/users-and-home.nix (nixpkgs.overlays) —
@@ -25,7 +29,7 @@
     # alejandra   # já usado pelo nix-mode do doom-config.el
 
     aspell
-    aspellDicts.en   # :checkers spell precisa de um spellchecker de verdade no PATH
+    aspellDicts.en # :checkers spell precisa de um spellchecker de verdade no PATH
 
     (pkgs.emacsPackages.treesit-grammars.with-grammars (grammars:
       with grammars; [
@@ -40,7 +44,7 @@ in {
 
   programs.doom-emacs = {
     enable = true;
-    doomDir = ../configs/doom;   # espera init.el / config.el / packages.el aqui
+    doomDir = ../configs/doom; # espera init.el / config.el / packages.el aqui
     emacs = doomEmacs;
   };
 

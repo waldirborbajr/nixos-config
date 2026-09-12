@@ -6,16 +6,13 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs =
-    {
-      self,
-      nixpkgs,
-      flake-utils,
-      ...
-    }:
+  outputs = {
+    nixpkgs,
+    flake-utils,
+    ...
+  }:
     flake-utils.lib.eachDefaultSystem (
-      system:
-      let
+      system: let
         pkgs = nixpkgs.legacyPackages.${system};
         luaShell = pkgs.mkShell {
           name = "lua-dev";
@@ -43,8 +40,7 @@
             echo "  - luarocks (package manager)"
           '';
         };
-      in
-      {
+      in {
         devShells = {
           default = luaShell;
           lua = luaShell;
