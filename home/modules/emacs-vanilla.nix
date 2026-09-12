@@ -68,6 +68,10 @@ in {
     recursive = true;
   };
 
+  # Alguns lançadores gráficos não preservam XDG_CONFIG_HOME; o fallback
+  # garante que o Emacs encontre o mesmo init.el em qualquer sessão.
+  home.file.".emacs.d/init.el".source = "${configs}/emacs/init.el";
+
   # grammars pré-compiladas pelo nix — sem precisar de gcc/libtool em runtime.
   # referenciado no init.el via:
   #   (setq treesit-extra-load-path
