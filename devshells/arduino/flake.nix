@@ -35,9 +35,7 @@
           libraries = [];
           packages = let
             inherit (pkgs.arduinoPackages) platforms;
-            latestAvr = builtins.head (
-              builtins.sort (a: b: a > b) (builtins.attrNames platforms.arduino.avr)
-            );
+            latestAvr = builtins.head (builtins.sort (a: b: a > b) (builtins.attrNames platforms.arduino.avr));
           in [platforms.arduino.avr.${latestAvr}];
         };
       in {

@@ -31,7 +31,10 @@ in {
   # ==================== GRAPHICS (VM / virtio-gpu) ====================
   # Required for niri (Wayland) under UTM / Fusion — avoids black screen after login.
   hardware.graphics.enable = true;
-  boot.kernelModules = ["virtio_gpu" "virtio_pci"];
+  boot.kernelModules = [
+    "virtio_gpu"
+    "virtio_pci"
+  ];
 
   # cage/regreet e niri via virtio-gpu geralmente precisam de renderer por
   # software (a aceleração 3D do virtio-gpu costuma ser instável nesses

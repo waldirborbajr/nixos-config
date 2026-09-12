@@ -25,6 +25,7 @@ Rodar em **cada host**, sempre que a chave for gerada ou trocada:
 ```
 
 O script imprime:
+
 - a chave pública (só pra conferência, pode ser vista por qualquer um)
 - o conteúdo completo de `keys.txt` (segredo — é isso que vai pro backup)
 
@@ -33,12 +34,13 @@ em uma nota segura por host — por exemplo:
 
 | Entrada no gerenciador | Conteúdo |
 |---|---|
-| `age-key-macutm`      | conteúdo de `keys.txt` da MacBook M2 - UTM |
-| `age-key-dell1564`    | conteúdo de `keys.txt` do Dell Inspiron 1456 |
-| `age-key-mac2011`     | conteúdo de `keys.txt` do MacBook Pro 2011 |
-| `age-key-macvmf`      | conteúdo de `keys.txt` da MacBook M2 - VMware Fusion |
+| `age-key-macutm` | conteúdo de `keys.txt` da MacBook M2 - UTM |
+| `age-key-dell1564` | conteúdo de `keys.txt` do Dell Inspiron 1456 |
+| `age-key-mac2011` | conteúdo de `keys.txt` do MacBook Pro 2011 |
+| `age-key-macvmf` | conteúdo de `keys.txt` da MacBook M2 - VMware Fusion |
 
 **Nunca:**
+
 - commitar esse conteúdo no git (nem em repo privado)
 - colar em chat, issue, ticket ou qualquer lugar que logue texto
 - salvar em arquivo `.txt` sem criptografia em outro disco
@@ -46,25 +48,25 @@ em uma nota segura por host — por exemplo:
 ## Procedimento de restauração (reinstalação de um host)
 
 1. Instalar o NixOS do zero e clonar `nixos-config`.
-2. **Antes do primeiro `nixos-rebuild`**, restaurar a chave:
+1. **Antes do primeiro `nixos-rebuild`**, restaurar a chave:
    ```bash
    mkdir -p ~/.config/sops/age
    # colar o conteúdo salvo no gerenciador de senhas em:
    nano ~/.config/sops/age/keys.txt
    chmod 600 ~/.config/sops/age/keys.txt
    ```
-3. Rodar o rebuild normalmente:
+1. Rodar o rebuild normalmente:
    ```bash
    sudo nixos-rebuild switch --flake .#<host>
    ```
    O sops-nix decifra `hosts/<host>/secrets/<host>.yaml` com a chave
    restaurada e recoloca as mesmas chaves SSH de antes.
-4. Conferir que a chave pública bate com a de antes:
+1. Conferir que a chave pública bate com a de antes:
    ```bash
    age-keygen -y ~/.config/sops/age/keys.txt
    ```
    (deve ser idêntica à que está anotada junto do backup)
-5. Confirmar acesso ao GitHub sem precisar reautorizar nada:
+1. Confirmar acesso ao GitHub sem precisar reautorizar nada:
    ```bash
    ssh -T git@github.com -i ~/.ssh/id_ed25519_github
    ```
@@ -81,7 +83,7 @@ chave pública no GitHub e em qualquer `authorized_keys` da infra.
 - [ ] `age-key-mac2011` salva no gerenciador de senhas
 - [ ] `age-key-macvmf` salva no gerenciador de senhas
 - [ ] Testado ao menos um restore (mesmo que num host de teste) para
-      validar que o procedimento funciona antes de precisar dele de verdade
+  validar que o procedimento funciona antes de precisar dele de verdade
 
 ## Melhoria futura (opcional): chave admin como recipient extra
 

@@ -34,14 +34,16 @@
     epkgs.popon # dependência do corfu-terminal
   ]);
 
-  treesitGrammars = pkgs.emacsPackages.treesit-grammars.with-grammars (grammars:
-    with grammars; [
-      tree-sitter-nix
-      tree-sitter-lua
-      tree-sitter-go
-      tree-sitter-rust
-      tree-sitter-python
-    ]);
+  treesitGrammars = pkgs.emacsPackages.treesit-grammars.with-grammars (
+    grammars:
+      with grammars; [
+        tree-sitter-nix
+        tree-sitter-lua
+        tree-sitter-go
+        tree-sitter-rust
+        tree-sitter-python
+      ]
+  );
 in {
   home.packages = [
     myEmacs

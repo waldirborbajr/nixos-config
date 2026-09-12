@@ -25,7 +25,7 @@ set -euo pipefail
 age_key_file="$HOME/.config/sops/age/keys.txt"
 hostname_now="$(hostname)"
 
-if [[ ! -f "$age_key_file" ]]; then
+if [[ ! -f $age_key_file ]]; then
   echo "No age key found at $age_key_file on this host ($hostname_now)." >&2
   echo "Nothing to back up yet — run manage-ssh-sops.sh first to generate one." >&2
   exit 1

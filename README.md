@@ -25,6 +25,7 @@ e [`REFACTOR-NOTES.md`](REFACTOR-NOTES.md) para o split do antigo
 > (ver seções `NIRI`, `GREETD + REGREET` em `configuration.nix`).
 
 ### 🍎 MacBook Pro 13" (2011) — `mac2011`
+
 - Architecture: x86_64
 - RAM: 16 GB
 - Storage: 500 GB SSD
@@ -42,6 +43,7 @@ e [`REFACTOR-NOTES.md`](REFACTOR-NOTES.md) para o split do antigo
 - Launcher: [Vicinae](https://github.com/vicinaehq/vicinae) (Raycast-like)
 
 ### 💻 Dell Inspiron 1564 — `dell1564`
+
 - Architecture: x86_64
 - RAM: 4 GB
 - Storage: 120 GB SSD
@@ -62,6 +64,7 @@ e [`REFACTOR-NOTES.md`](REFACTOR-NOTES.md) para o split do antigo
   dois um typo.
 
 ### 🍏 Apple Silicon VM (UTM) — `macutm`
+
 - Architecture: aarch64
 - Role: workstation em VM (UTM), perfil `qemu-guest.nix`
 - Desktop: niri + waybar (Wayland, via greetd/regreet — renderer por
@@ -72,6 +75,7 @@ e [`REFACTOR-NOTES.md`](REFACTOR-NOTES.md) para o split do antigo
 - `boot.kernelParams = [ "mitigations=off" ]` — ganho de performance em VM
 
 ### 🍏 Apple Silicon VM (VMware Fusion) — `macvmf`
+
 - Architecture: aarch64
 - Role: workstation em VM (VMware Fusion), guest agent
   `virtualisation.vmware.guest.enable`
@@ -80,6 +84,7 @@ e [`REFACTOR-NOTES.md`](REFACTOR-NOTES.md) para o split do antigo
 - Containers: `podman` com `dockerCompat = true`
 
 ### 🍏 MacBook M2 (físico) — `macbook` (Home Manager standalone)
+
 - Architecture: aarch64-darwin
 - Role: instalador de apps no dia a dia — **não** é uma
   `nixosConfiguration`, é uma entrada `homeConfigurations."borba@macbook"`
@@ -111,7 +116,7 @@ Edition) usados por `mac2011`, `macutm` e `macvmf` vivem num único módulo
 comum, para não repetir 3x. `dell1564` **não** importa esse módulo — segue
 com sua própria lista de pacotes, mais enxuta, e Firefox estável.
 
----
+______________________________________________________________________
 
 ## 🧩 Módulos compartilhados (`modules/nixos/`)
 
@@ -140,7 +145,7 @@ organizado por tópico. Detalhes de como o split foi feito e como validar
 Pra editar algo, vá direto no arquivo do tópico — não precisa mais
 navegar um `configuration.nix` de 500+ linhas pra achar uma seção.
 
----
+______________________________________________________________________
 
 ## 🐳 Containers / Kubernetes (opt-in, desligado por padrão)
 
@@ -182,7 +187,7 @@ deixa serviço rodando à toa nesse estado desligado.
 > quebra nada (Nix deduplica o pacote) — só passa a ligar o
 > `dockerCompat`/rede default que o pacote cru sozinho não configura.
 
----
+______________________________________________________________________
 
 ## 🚀 Recreating a host from scratch (order matters)
 
@@ -216,85 +221,97 @@ exactly what breaks if you jump straight to step 4 below.
 The steps must run in this order:
 
 **1. Install base NixOS** (via the official ISO / installer), with flakes
-   enabled. At this point you just need a working system with `git`,
-   `openssh`, and internet access — the full flake config isn't applied yet.
+enabled. At this point you just need a working system with `git`,
+`openssh`, and internet access — the full flake config isn't applied yet.
 
 **2. Clone this repo** to the fixed path every host expects:
-   ```bash
-   git clone git@github.com:waldirborbajr/nixos-config.git ~/nixos-config
-   ```
-   (If you don't have an SSH key registered with GitHub yet on this fresh
-   machine, clone via HTTPS first — `https://github.com/waldirborbajr/nixos-config.git`
-   — you can switch the remote to SSH later once your GitHub key exists,
-   which happens in step 3.)
+
+```bash
+git clone git@github.com:waldirborbajr/nixos-config.git ~/nixos-config
+```
+
+(If you don't have an SSH key registered with GitHub yet on this fresh
+machine, clone via HTTPS first — `https://github.com/waldirborbajr/nixos-config.git`
+— you can switch the remote to SSH later once your GitHub key exists,
+which happens in step 3.)
 
 **3. Bootstrap SSH keys + SOPS secrets — BEFORE the first real rebuild.**
-   The tools this needs (`sops`, `age-keygen`, `jq`, `ssh-keygen`) aren't
-   installed by the system yet, so run them from a temporary ad-hoc shell:
-   ```bash
-   cd ~/nixos-config
-   nix shell nixpkgs#sops nixpkgs#age nixpkgs#jq nixpkgs#openssh
-   ./scripts/manage-ssh-sops.sh <host> --clean
-   ```
-   Replace `<host>` with one of: `dell1564`, `mac2011`, `macutm` (aliases
-   like `dell`, `mac`, `m2utm` also work — see the script header).
+The tools this needs (`sops`, `age-keygen`, `jq`, `ssh-keygen`) aren't
+installed by the system yet, so run them from a temporary ad-hoc shell:
 
-   Always use `--clean` the **first** time you set up a host — it builds a
-   correct, complete encrypted YAML from scratch. Without `--clean`, the
-   script does incremental `sops set` updates on an existing file, which
-   assumes the file is already in a valid state.
+```bash
+cd ~/nixos-config
+nix shell nixpkgs#sops nixpkgs#age nixpkgs#jq nixpkgs#openssh
+./scripts/manage-ssh-sops.sh <host> --clean
+```
 
-   This step generates and encrypts:
-   - `borba_ssh_infra_private_key` / `_public_key` — SSH identity for
-     server-to-server access
-   - `borba_ssh_github_private_key` / `_public_key` — SSH identity for
-     GitHub/GitLab/Forgejo
-   - `ssh_host_ed25519_key` — this machine's own SSH host key
+Replace `<host>` with one of: `dell1564`, `mac2011`, `macutm` (aliases
+like `dell`, `mac`, `m2utm` also work — see the script header).
 
-   Commit and push the resulting `hosts/<host>/secrets/<host>.yaml` (it's
-   encrypted — safe to commit, contains no plaintext):
-   ```bash
-   git add hosts/<host>/secrets/<host>.yaml
-   git commit -m "secrets: bootstrap <host>"
-   git push origin main
-   ```
+Always use `--clean` the **first** time you set up a host — it builds a
+correct, complete encrypted YAML from scratch. Without `--clean`, the
+script does incremental `sops set` updates on an existing file, which
+assumes the file is already in a valid state.
+
+This step generates and encrypts:
+
+- `borba_ssh_infra_private_key` / `_public_key` — SSH identity for
+  server-to-server access
+- `borba_ssh_github_private_key` / `_public_key` — SSH identity for
+  GitHub/GitLab/Forgejo
+- `ssh_host_ed25519_key` — this machine's own SSH host key
+
+Commit and push the resulting `hosts/<host>/secrets/<host>.yaml` (it's
+encrypted — safe to commit, contains no plaintext):
+
+```bash
+git add hosts/<host>/secrets/<host>.yaml
+git commit -m "secrets: bootstrap <host>"
+git push origin main
+```
 
 **4. Point `/etc/nixos` at the repo and run the real rebuild:**
-   ```bash
-   ./nixos-manager.sh setup      # symlinks /etc/nixos -> ~/nixos-config
-   ./nixos-manager.sh flake      # select branch + host, then rebuild
-   ```
-   Note: `nixos-manager.sh`, `tmux-devshell.sh` and `zellij-devshell.sh`
-   live at the **repo root**, not under `scripts/` — only
-   `manage-ssh-sops.sh` and `backup-age-key.sh` live in `scripts/`. The two
-   devshell launchers are also installed as commands
-   (`tmux-devshell`/`zellij-devshell` in `~/.local/bin`, see the section
-   below) so they work from inside any project, not just the repo root.
 
-   This is the first rebuild that can actually succeed, because the age key
-   and encrypted secrets from step 3 already exist on disk. From here on,
-   `sops`/`age`/`jq` are installed system-wide, Home Manager takes over the
-   user environment, and dotfiles for zsh, git, helix, tmux, niri, waybar,
-   wezterm, zellij, bat, btop, lazygit, atuin, oh-my-posh, ripgrep, and
-   wlr-which-key are applied automatically from `home/configs/` — either
-   via native `programs.*` modules or `xdg.configFile` (see
-   `home/default.nix`). No external `~/dotfiles` repo and no manual `stow`
-   are needed anymore.
+```bash
+./nixos-manager.sh setup      # symlinks /etc/nixos -> ~/nixos-config
+./nixos-manager.sh flake      # select branch + host, then rebuild
+```
+
+Note: `nixos-manager.sh`, `tmux-devshell.sh` and `zellij-devshell.sh`
+live at the **repo root**, not under `scripts/` — only
+`manage-ssh-sops.sh` and `backup-age-key.sh` live in `scripts/`. The two
+devshell launchers are also installed as commands
+(`tmux-devshell`/`zellij-devshell` in `~/.local/bin`, see the section
+below) so they work from inside any project, not just the repo root.
+
+This is the first rebuild that can actually succeed, because the age key
+and encrypted secrets from step 3 already exist on disk. From here on,
+`sops`/`age`/`jq` are installed system-wide, Home Manager takes over the
+user environment, and dotfiles for zsh, git, helix, tmux, niri, waybar,
+wezterm, zellij, bat, btop, lazygit, atuin, oh-my-posh, ripgrep, and
+wlr-which-key are applied automatically from `home/configs/` — either
+via native `programs.*` modules or `xdg.configFile` (see
+`home/default.nix`). No external `~/dotfiles` repo and no manual `stow`
+are needed anymore.
 
 **5. Back up the age key** (do this once, right after step 3):
-   ```bash
-   ./scripts/backup-age-key.sh
-   ```
-   Prints the key and its public fingerprint so you can paste it into a
-   password manager. Never commit this output anywhere.
+
+```bash
+./scripts/backup-age-key.sh
+```
+
+Prints the key and its public fingerprint so you can paste it into a
+password manager. Never commit this output anywhere.
 
 **6. Re-running the SSH/SOPS script later** (e.g. adding a new key,
-   rotating an existing one) uses the same script *without* `--clean`:
-   ```bash
-   ./scripts/manage-ssh-sops.sh <host>
-   ```
-   This updates individual keys via `sops set`, preserving any other
-   secret already present in the file — safe to re-run anytime.
+rotating an existing one) uses the same script *without* `--clean`:
+
+```bash
+./scripts/manage-ssh-sops.sh <host>
+```
+
+This updates individual keys via `sops set`, preserving any other
+secret already present in the file — safe to re-run anytime.
 
 ### Quick reference
 
@@ -308,7 +325,7 @@ The steps must run in this order:
 | 5 | `./scripts/backup-age-key.sh` — save output in a password manager | age key exists (step 3) |
 | 6+ | `./scripts/manage-ssh-sops.sh <host>` (no `--clean`) | system already built |
 
----
+______________________________________________________________________
 
 ## 🧰 `nixos-manager.sh` — rebuilds, cache, and updates
 
@@ -375,11 +392,10 @@ NIXOS_FLAKE_ATTR=dell ./nixos-manager.sh flake   # força o host via env var
   — em todo `flake`/`update`, nunca só na primeira vez.
 - **Dell (baixa RAM)**: builds forçadamente seriais para evitar OOM killer,
   via flags extras aplicadas por `rebuild_extra_flags()`.
-- **Clean cache** sempre oferece sincronizar o bootloader (`nixos-rebuild
-  boot`) depois de remover gerações antigas — sem isso, o menu de boot
+- **Clean cache** sempre oferece sincronizar o bootloader (`nixos-rebuild boot`) depois de remover gerações antigas — sem isso, o menu de boot
   continua listando entradas para gerações que não existem mais.
 
----
+______________________________________________________________________
 
 ## 🪟 `tmux-devshell` / `zellij-devshell` — profiles de devshell em qualquer projeto
 
@@ -465,7 +481,7 @@ dedicado — só via custom).
 | `PROJECT_DIR` | `$(pwd)` no momento em que o comando é chamado | Vira o `cwd` real de cada window/tab — normalmente o projeto em `$HOME/prj/<algo>` |
 | `SESSION_PREFIX` | `dev` | Prefixo do nome da sessão (ex: `dev-minha-api-go+maria` — inclui o nome do projeto, pra não colidir entre projetos diferentes usando o mesmo profile) |
 
----
+______________________________________________________________________
 
 ## 🛠️ Development Shells
 
@@ -516,12 +532,13 @@ nix develop path:.
 - This keeps each environment isolated and easier to maintain.
 
 **Advantages:**
+
 - ✅ Isolated environments per stack
 - ✅ Specific tool versions per language/database
 - ✅ Reproducible across machines
 - ✅ No need to modify the main flake for day-to-day use
 
----
+______________________________________________________________________
 
 ## ⌨️ Logitech K380 Bluetooth pairing (Linux)
 
@@ -545,10 +562,9 @@ troubleshooting (reset do teclado, reconexão manual via
 
 > Este fix trata do handshake de pareamento em si. Para o comportamento
 > específico do controlador Bluetooth do `mac2011` (Broadcom BR/EDR
-> clássico) dentro do NixOS, ver `hardware.bluetooth.settings.General.
-> ControllerMode = lib.mkForce "bredr"` em `hosts/mac2011/default.nix`.
+> clássico) dentro do NixOS, ver `hardware.bluetooth.settings.General. ControllerMode = lib.mkForce "bredr"` em `hosts/mac2011/default.nix`.
 
----
+______________________________________________________________________
 
 ## 📚 Other docs in this repo
 
@@ -560,7 +576,7 @@ troubleshooting (reset do teclado, reconexão manual via
   — passo a passo de backup/restauração da chave age (complementa
   `scripts/backup-age-key.sh`).
 
----
+______________________________________________________________________
 
 ```text
 https://git.voidarc.co.uk/voidarc/nixos

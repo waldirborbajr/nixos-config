@@ -35,12 +35,12 @@ always the same as the machine's real hostname. Source of truth is
 `flake.nix`; `nixos-manager.sh` reads it at runtime (`nix eval` + `jq`)
 rather than hardcoding it.
 
-| flake attr | real hostname | arch            | role                          |
+| flake attr | real hostname | arch | role |
 |------------|----------------|------------------|--------------------------------|
-| `dell`     | `dell1564`     | x86_64-linux     | Dell Inspiron 1564 (weakest box) |
-| `mac2011`  | `mac2011`      | x86_64-linux     | MacBook Pro 13" (2011), main workstation |
-| `m2utm`    | `macutm`       | aarch64-linux    | Apple Silicon VM (UTM)        |
-| `macvmf`   | `macvmf`       | aarch64-linux    | Apple Silicon VM (VMware Fusion) |
+| `dell` | `dell1564` | x86_64-linux | Dell Inspiron 1564 (weakest box) |
+| `mac2011` | `mac2011` | x86_64-linux | MacBook Pro 13" (2011), main workstation |
+| `m2utm` | `macutm` | aarch64-linux | Apple Silicon VM (UTM) |
+| `macvmf` | `macvmf` | aarch64-linux | Apple Silicon VM (VMware Fusion) |
 | `borba@macbook` (homeConfigurations, not nixosConfigurations) | — | aarch64-darwin | MacBook M2 físico, home-manager standalone only |
 
 `dell1456` is a legacy/pre-rename alias for `dell1564` — kept in
@@ -118,8 +118,7 @@ If a stricter convention is wanted later, mirror Foundry's
   - Feature modules that need conditional inclusion should use a boolean
     `enable`-style option; most current modules are unconditionally
     imported (no feature-flag pattern in place yet, unlike Foundry).
-  - Home-manager dotfile content: prefer `xdg.configFile.<name> = { source
-    = "${configs}/<name>"; recursive = true; }` pointing at `home/configs/`
+  - Home-manager dotfile content: prefer `xdg.configFile.<name> = { source = "${configs}/<name>"; recursive = true; }` pointing at `home/configs/`
     over inline heredocs, so the raw dotfile stays diffable/portable.
 
 ## Secrets
@@ -166,7 +165,7 @@ available as a lighter-weight alternative for ad-hoc `nh os switch` /
 fails loudly on OOM-kill or activation mismatch. For a manual check:
 
 1. `ssh <host> -- readlink -f /run/current-system`
-2. Compare against the expected generation shown by
+1. Compare against the expected generation shown by
    `./nixos-manager.sh g` (list generations).
 
 ## Nix eval

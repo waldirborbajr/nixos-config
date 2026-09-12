@@ -3,7 +3,7 @@
 > Opinionated tmux setup focused on **productivity, performance, persistence and low friction**.
 > Designed to work seamlessly with **Alacritty**, **WezTerm**, **Neovim**, and modern DevOps workflows.
 
----
+______________________________________________________________________
 
 ## ✨ Highlights
 
@@ -17,7 +17,7 @@
 - **Startup:** Auto-restore sessions on tmux initialization (zero friction)
 - **Compatibility:** Linux, macOS, NixOS
 
----
+______________________________________________________________________
 
 ## 📦 Requirements
 
@@ -26,13 +26,14 @@
 - zsh (optional but recommended)
 
 **Terminal Compatibility:**
+
 - ✅ Alacritty
 - ✅ WezTerm
 - ✅ kitty
 - ✅ iTerm2
 - ✅ Windows Terminal (WSL2)
 
----
+______________________________________________________________________
 
 ## 🔧 Installation
 
@@ -69,11 +70,12 @@ tmux source-file ~/.config/tmux/tmux.conf
 ```
 
 Or inside tmux:
+
 ```
 Prefix + r
 ```
 
----
+______________________________________________________________________
 
 ## 🔌 Plugins (TPM)
 
@@ -101,17 +103,19 @@ Prefix + I
 ```
 
 This will:
-1. Clone all plugins from GitHub
-2. Initialize plugin scripts
-3. Auto-generate `~/.config/tmux/plugins/` directory
 
----
+1. Clone all plugins from GitHub
+1. Initialize plugin scripts
+1. Auto-generate `~/.config/tmux/plugins/` directory
+
+______________________________________________________________________
 
 ## ♻️ Session Persistence
 
 ### tmux-resurrect
 
 **Saves on demand:**
+
 - Sessions, windows, panes
 - Layouts and working directories
 - Running processes (ssh, kubectl, helm, terraform, nvim, vim)
@@ -127,16 +131,18 @@ This will:
 ### tmux-continuum
 
 **Automatic operation:**
+
 - ✅ Auto-saves every 10 minutes
 - ✅ Auto-restores on tmux startup
 - ✅ Zero user interaction required
 
 **Benefits:**
+
 - Never lose context after crashes or reboots
 - Persistent workspace state across logins
 - Perfect for long-running DevOps workflows (kubectl, terraform, ssh tunnels)
 
----
+______________________________________________________________________
 
 ## 🧭 Keybindings
 
@@ -147,7 +153,7 @@ This will:
 | `Ctrl-a` | Prefix (send with `Ctrl-a Ctrl-a`) |
 | `Prefix + r` | Reload config (displays confirmation) |
 
----
+______________________________________________________________________
 
 ### Pane Navigation (Vim-style, fastest)
 
@@ -170,10 +176,11 @@ This will:
 | `Prefix + l` | Move right |
 
 **Neovim integration** (works with `vim-tmux-navigator` plugin):
+
 - Same bindings work seamlessly between Neovim and tmux panes
 - One muscle memory for pane navigation across editor and terminal
 
----
+______________________________________________________________________
 
 ### Pane Resizing (repeatable = hold key)
 
@@ -186,7 +193,7 @@ This will:
 
 *Keybindings are repeatable (`-r` flag) — hold after first press for continuous resize*
 
----
+______________________________________________________________________
 
 ### Splits (path-aware — opens in current directory)
 
@@ -198,13 +205,14 @@ This will:
 | `Prefix + s` | Split vertically (alternative) |
 
 **Example workflow:**
+
 ```
 $ cd /home/user/projects
 $ tmux new-session -s dev
 $ Prefix + v    # New pane opens in /home/user/projects, not ~
 ```
 
----
+______________________________________________________________________
 
 ### Windows Management
 
@@ -235,11 +243,12 @@ $ Prefix + v    # New pane opens in /home/user/projects, not ~
 |----|--------|
 | `Prefix + m` | Toggle pane zoom |
 
----
+______________________________________________________________________
 
 ### Copy Mode (vi keybindings)
 
 **Enter copy mode:**
+
 ```
 Prefix + [
 ```
@@ -255,17 +264,19 @@ Prefix + [
 | `q` | Quit copy mode (without copy) |
 
 **Clipboard integration:**
+
 - Uses OSC 52 for SSH clipboard support
 - Falls back to system clipboard locally
 - `tmux-yank` plugin handles the heavy lifting
 
----
+______________________________________________________________________
 
 ## 🎨 Visual Theme
 
 ### Tokyo Night Moon (Hardcoded)
 
 Why hardcoded instead of plugin:
+
 - ✅ **Performance:** No plugin overhead on every keystroke
 - ✅ **Consistency:** Single source of truth for colors
 - ✅ **Reliability:** No dependency on external plugin updates
@@ -289,34 +300,40 @@ Red/Pink:    #ff757f (accent red)
 **Left side:** Empty (minimal visual clutter)
 
 **Right side displays:**
+
 - Current window name (`#W`)
 - Session name (`#S`)
 - Prefix indicator (changes color when Ctrl-a pressed)
 
 **Active window indicator:**
+
 - Shows window index + checkmark + current directory
 
 **Inactive windows:**
+
 - Show index + window name
 
----
+______________________________________________________________________
 
 ## 🔄 Terminal Color Support
 
 ### RGB (24-bit True Color) — Default
 
 **Current setting:**
+
 ```tmux
 set -ag terminal-overrides ",*:RGB"
 ```
 
 **Why RGB?**
+
 - ✅ 16.7 million colors (accurate theme rendering)
 - ✅ Supported by all modern terminals
 - ✅ Tokyo Night theme needs precise colors
 - ✅ No performance penalty (~3% bandwidth, imperceptible)
 
 **Supported terminals:**
+
 - Alacritty, WezTerm, kitty, iTerm2
 - Gnome Terminal, KDE Konsole (recent versions)
 - Windows Terminal, ConEmu
@@ -330,7 +347,7 @@ If connecting to very old servers (pre-2015):
 set -ag terminal-overrides ",*:RGB:TC"
 ```
 
----
+______________________________________________________________________
 
 ## 🧠 Design Philosophy
 
@@ -341,30 +358,30 @@ set -ag terminal-overrides ",*:RGB:TC"
 - **Performance-optimized:** No unnecessary overhead
 - **DevOps-friendly:** Designed for long-running processes and SSH tunnels
 
----
+______________________________________________________________________
 
 ## 📋 Configuration Structure
 
 Config is organized into **14 logical sections:**
 
 1. **Terminal & Display Core** — Color, focus, status bar
-2. **Behavior & Performance** — Shell, history, mouse, timing
-3. **Indexing & Window Management** — Base index, renumbering, auto-rename
-4. **Key Bindings - Prefix & Core** — Ctrl-a setup, reload
-5. **Pane Navigation** — Vim-style hjkl (with/without prefix)
-6. **Pane Resizing** — Repeatable resize bindings
-7. **Window Management** — Splits, new windows, zoom
-8. **Window Switching** — Fast horizontal navigation
-9. **Copy Mode** — Vi keybindings, selection, yank
-10. **Color Theme** — Tokyo Night Moon palette
-11. **Status Bar Styling** — Statusline configuration
-12. **Plugins** — TPM + included plugins
-13. **Session Persistence** — tmux-resurrect + tmux-continuum
-14. **TPM Bootstrap** — Auto-install on first run
+1. **Behavior & Performance** — Shell, history, mouse, timing
+1. **Indexing & Window Management** — Base index, renumbering, auto-rename
+1. **Key Bindings - Prefix & Core** — Ctrl-a setup, reload
+1. **Pane Navigation** — Vim-style hjkl (with/without prefix)
+1. **Pane Resizing** — Repeatable resize bindings
+1. **Window Management** — Splits, new windows, zoom
+1. **Window Switching** — Fast horizontal navigation
+1. **Copy Mode** — Vi keybindings, selection, yank
+1. **Color Theme** — Tokyo Night Moon palette
+1. **Status Bar Styling** — Statusline configuration
+1. **Plugins** — TPM + included plugins
+1. **Session Persistence** — tmux-resurrect + tmux-continuum
+1. **TPM Bootstrap** — Auto-install on first run
 
 Each section is clearly marked with visual separators and inline comments explaining "why" not just "what."
 
----
+______________________________________________________________________
 
 ## 🚀 Recommended Setup
 
@@ -390,13 +407,14 @@ shell:
 
 This auto-launches tmux with session persistence.
 
----
+______________________________________________________________________
 
 ## 🔍 Troubleshooting
 
 ### Colors look wrong
 
 **Check terminal supports RGB:**
+
 ```bash
 echo $TERM
 # Should output: xterm-256color, alacritty, wezterm, etc
@@ -411,6 +429,7 @@ tmux info | grep RGB
 ### Plugins not loading
 
 Inside tmux:
+
 ```
 Prefix + I    # Install plugins
 Prefix + U    # Update plugins
@@ -418,6 +437,7 @@ Prefix + Alt-u  # Uninstall (remove) plugins
 ```
 
 Check plugin directory exists:
+
 ```bash
 ls -la ~/.config/tmux/plugins/
 # Should list: tpm/, tmux-sensible/, vim-tmux-navigator/, etc
@@ -426,12 +446,14 @@ ls -la ~/.config/tmux/plugins/
 ### Session not restoring
 
 Check tmux-continuum is saving:
+
 ```bash
 ls -la ~/.local/share/tmux/resurrect/
 # Should show recent checkpoint files
 ```
 
 Manually restore:
+
 ```
 Prefix + Ctrl-r  # (inside tmux)
 ```
@@ -439,13 +461,14 @@ Prefix + Ctrl-r  # (inside tmux)
 ### Keybindings not working
 
 Reload config:
+
 ```
 Prefix + r
 ```
 
 Verify in config file that binding exists and is not commented out.
 
----
+______________________________________________________________________
 
 ## 📝 Common Customizations
 
@@ -481,7 +504,7 @@ Replace the color variables in section 10 (Color Theme) with your own hex codes.
 set -g mouse off
 ```
 
----
+______________________________________________________________________
 
 ## 🧑‍💻 Maintenance
 
@@ -495,6 +518,7 @@ tmux -V
 ### Update plugins
 
 Inside tmux:
+
 ```
 Prefix + U
 ```
@@ -512,11 +536,12 @@ tmux attach-session -t session_name
 ```
 
 Or use numbered quick-access (inside tmux):
+
 ```
 Alt + 1-9  # Jump to window 1-9
 ```
 
----
+______________________________________________________________________
 
 ## 🎓 Learning Resources
 
@@ -524,25 +549,25 @@ Alt + 1-9  # Jump to window 1-9
 - **Keybindings reference:** `Prefix + ?` (inside tmux)
 - **Vim-tmux integration:** https://github.com/joshmedeski/vim-tmux-navigator
 
----
+______________________________________________________________________
 
 ## 📌 Performance Notes
 
 - **Config load time:** ~50-100ms (one-time at session start)
-- **Keypress latency:** <5ms (unnoticeable)
+- **Keypress latency:** \<5ms (unnoticeable)
 - **Memory footprint:** ~15-20MB per session
-- **CPU:** Negligible (<1% idle)
+- **CPU:** Negligible (\<1% idle)
 - **No impact on SSH latency** when using standard terminal multiplexing
 
----
+______________________________________________________________________
 
 ## 🧑‍💻 Author & Maintenance
 
-**Original:** Inspired by modern tmux best practices  
-**Refactored for:** DevOps, SRE, and modern development workflows  
+**Original:** Inspired by modern tmux best practices\
+**Refactored for:** DevOps, SRE, and modern development workflows\
 **Optimized for:** Performance, clarity, and zero manual session management
 
----
+______________________________________________________________________
 
 ## 🔗 Related Projects
 
@@ -551,17 +576,18 @@ Alt + 1-9  # Jump to window 1-9
 - [tmux-continuum](https://github.com/tmux-plugins/tmux-continuum)
 - [TPM](https://github.com/tmux-plugins/tpm)
 
----
+______________________________________________________________________
 
 ## 📄 License
 
 MIT
 
----
+______________________________________________________________________
 
 ## Quick Reference Card
 
 ### Installation Checklist
+
 - [ ] Install tmux (≥3.2)
 - [ ] Clone/download config
 - [ ] Create symlink to `~/.config/tmux/tmux.conf`
@@ -571,6 +597,7 @@ MIT
 - [ ] Restart tmux: `tmux kill-server && tmux new-session`
 
 ### Essential Keybindings
+
 ```
 Navigation:     Alt+hjkl or Prefix+hjkl
 New pane:       Prefix+| (horizontal) or Prefix+_ (vertical)
@@ -580,6 +607,7 @@ Reload config:  Prefix+r
 ```
 
 ### Persistence (Automatic)
+
 ```
 Sessions auto-save:    Every 10 minutes
 Sessions auto-restore: On tmux startup

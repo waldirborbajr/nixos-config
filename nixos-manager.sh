@@ -102,34 +102,48 @@ FLAKE_ATTR=""
 # Same palette as devshell.sh, so both tools look consistent across
 # macutm, dell1564, mac2011 and macvmf.
 if [ -t 1 ]; then
-  C_RESET='\033[0m'; C_BOLD='\033[1m'; C_DIM='\033[2m'
+  C_RESET='\033[0m'
+  C_BOLD='\033[1m'
+  C_DIM='\033[2m'
 
-  C_MAUVE='\033[38;2;203;166;247m'    # accent / headers
-  C_BLUE='\033[38;2;137;180;250m'     # info
-  C_SKY='\033[38;2;137;220;235m'      # prompts (replaces plain cyan)
-  C_GREEN='\033[38;2;166;227;161m'    # success
-  C_YELLOW='\033[38;2;249;226;175m'   # warnings / menu numbers
-  C_PEACH='\033[38;2;250;179;135m'    # step markers
-  C_RED='\033[38;2;243;139;168m'      # errors / destructive actions
-  C_TEAL='\033[38;2;148;226;213m'     # secondary info
-  C_TEXT='\033[38;2;205;214;244m'     # default foreground
-  C_OVERLAY='\033[38;2;108;112;134m'  # dim / gray
+  C_MAUVE='\033[38;2;203;166;247m'   # accent / headers
+  C_BLUE='\033[38;2;137;180;250m'    # info
+  C_SKY='\033[38;2;137;220;235m'     # prompts (replaces plain cyan)
+  C_GREEN='\033[38;2;166;227;161m'   # success
+  C_YELLOW='\033[38;2;249;226;175m'  # warnings / menu numbers
+  C_PEACH='\033[38;2;250;179;135m'   # step markers
+  C_RED='\033[38;2;243;139;168m'     # errors / destructive actions
+  C_TEAL='\033[38;2;148;226;213m'    # secondary info
+  C_TEXT='\033[38;2;205;214;244m'    # default foreground
+  C_OVERLAY='\033[38;2;108;112;134m' # dim / gray
 
   # kept for backward compatibility with the rest of the script
   C_CYAN="$C_SKY"
   C_MAGENTA="$C_MAUVE"
   C_GRAY="$C_OVERLAY"
 else
-  C_RESET=''; C_BOLD=''; C_DIM=''
-  C_MAUVE=''; C_BLUE=''; C_SKY=''; C_GREEN=''; C_YELLOW=''
-  C_PEACH=''; C_RED=''; C_TEAL=''; C_TEXT=''; C_OVERLAY=''
-  C_CYAN=''; C_MAGENTA=''; C_GRAY=''
+  C_RESET=''
+  C_BOLD=''
+  C_DIM=''
+  C_MAUVE=''
+  C_BLUE=''
+  C_SKY=''
+  C_GREEN=''
+  C_YELLOW=''
+  C_PEACH=''
+  C_RED=''
+  C_TEAL=''
+  C_TEXT=''
+  C_OVERLAY=''
+  C_CYAN=''
+  C_MAGENTA=''
+  C_GRAY=''
 fi
 
-log()  { echo -e "${C_BLUE}${C_BOLD}==>${C_RESET} $*"; }
-ok()   { echo -e "${C_GREEN}✓${C_RESET} $*"; }
+log() { echo -e "${C_BLUE}${C_BOLD}==>${C_RESET} $*"; }
+ok() { echo -e "${C_GREEN}✓${C_RESET} $*"; }
 warn() { echo -e "${C_YELLOW}⚠${C_RESET} $*"; }
-err()  { echo -e "${C_RED}✗${C_RESET} $*" >&2; }
+err() { echo -e "${C_RED}✗${C_RESET} $*" >&2; }
 step() {
   # step <current> <total> <description>
   echo
@@ -145,10 +159,10 @@ load_flake_hosts() {
 
   if [ -d "$NIXOS_DIR" ] && command -v nix >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
     json="$(
-      cd "$NIXOS_DIR" 2>/dev/null \
-        && nix eval --json ".#nixosConfigurations" \
-             --apply 'builtins.mapAttrs (_: v: v.config.networking.hostName)' \
-             2>/dev/null
+      cd "$NIXOS_DIR" 2>/dev/null &&
+        nix eval --json ".#nixosConfigurations" \
+          --apply 'builtins.mapAttrs (_: v: v.config.networking.hostName)' \
+          2>/dev/null
     )" || json=""
   fi
 
@@ -165,7 +179,8 @@ load_flake_hosts() {
       HOST_ATTR_TO_MACHINE[$attr]="${HOST_ATTR_TO_MACHINE_FALLBACK[$attr]}"
       FLAKE_ATTRS+=("$attr")
     done
-    IFS=$'\n' FLAKE_ATTRS=($(sort <<<"${FLAKE_ATTRS[*]}")); unset IFS
+    IFS=$'\n' FLAKE_ATTRS=($(sort <<<"${FLAKE_ATTRS[*]}"))
+    unset IFS
   fi
 }
 
@@ -199,7 +214,7 @@ confirm() {
   # confirm "question" -> returns 0 if yes
   local prompt="$1"
   read -r -p "$(echo -e "${C_SKY}?${C_RESET} ${prompt} ${C_DIM}[y/N]${C_RESET} ")" reply
-  [[ "$reply" =~ ^[YySs]$ ]]
+  [[ $reply =~ ^[YySs]$ ]]
 }
 
 # ----- initial setup (fresh machine) -----
@@ -265,10 +280,10 @@ detect_home_attr() {
   [ -z "$machine" ] && return 1
 
   case "$(printf '%s' "$machine" | tr '[:upper:]' '[:lower:]')" in
-    *macbook*)
-      echo "macbook"
-      return 0
-      ;;
+  *macbook*)
+    echo "macbook"
+    return 0
+    ;;
   esac
   return 1
 }
@@ -304,7 +319,7 @@ prompt_flake_attr() {
   done
   local choice
   read -r -p "$(echo -e "${C_SKY}?${C_RESET} Choose a host [1-${#FLAKE_ATTRS[@]}]: ")" choice
-  if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le "${#FLAKE_ATTRS[@]}" ]; then
+  if [[ $choice =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le "${#FLAKE_ATTRS[@]}" ]; then
     echo "${FLAKE_ATTRS[$((choice - 1))]}"
     return 0
   fi
@@ -406,7 +421,7 @@ select_git_branch() {
     return 0
   fi
 
-  if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le "${#branches[@]}" ]; then
+  if [[ $choice =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le "${#branches[@]}" ]; then
     GIT_BRANCH="${branches[$((choice - 1))]}"
     return 0
   fi
@@ -586,12 +601,12 @@ git_push_if_ahead() {
 rebuild_extra_flags() {
   local attr="${1:-${FLAKE_ATTR:-}}"
   case "$attr" in
-    dell)
-      echo "--max-jobs 1 --cores 1"
-      ;;
-    *)
-      echo ""
-      ;;
+  dell)
+    echo "--max-jobs 1 --cores 1"
+    ;;
+  *)
+    echo ""
+    ;;
   esac
 }
 
@@ -615,7 +630,7 @@ run_nixos_rebuild() {
   flags_str="$(rebuild_extra_flags "${FLAKE_ATTR:-}")"
   # shellcheck disable=SC2206
   if [ -n "$flags_str" ]; then
-    extra_flags=( $flags_str )
+    extra_flags=($flags_str)
   fi
 
   local before_gen="" after_gen=""
@@ -661,42 +676,42 @@ run_nixos_rebuild() {
   after_gen="$(readlink -f /run/current-system 2>/dev/null || true)"
 
   case "$action" in
-    switch|test)
-      if [ -n "$before_gen" ] && [ -n "$after_gen" ] && [ "$before_gen" = "$after_gen" ]; then
-        # Same path can be legitimate if the config produced an identical
-        # toplevel (no-op rebuild).  Check whether a newer profile link exists.
-        local newest
-        newest="$(readlink -f /nix/var/nix/profiles/system 2>/dev/null || true)"
-        if [ -n "$newest" ] && [ "$newest" != "$before_gen" ]; then
-          # Profile advanced but /run/current-system did not — activation issue.
-          err "A new system generation was built (${newest})"
-          err "but /run/current-system is still ${after_gen}."
-          err "Activation may have failed. Inspect ${logfile}."
-          return 1
-        fi
-        warn "System generation unchanged (config produced the same toplevel — no-op is OK)."
-      else
-        ok "System generation updated."
-        echo -e "  ${C_OVERLAY}before: ${before_gen}${C_RESET}"
-        echo -e "  ${C_OVERLAY}after:  ${after_gen}${C_RESET}"
-      fi
-      ;;
-    boot)
+  switch | test)
+    if [ -n "$before_gen" ] && [ -n "$after_gen" ] && [ "$before_gen" = "$after_gen" ]; then
+      # Same path can be legitimate if the config produced an identical
+      # toplevel (no-op rebuild).  Check whether a newer profile link exists.
       local newest
       newest="$(readlink -f /nix/var/nix/profiles/system 2>/dev/null || true)"
-      if [ -n "$before_gen" ] && [ -n "$newest" ] && [ "$newest" = "$before_gen" ]; then
-        warn "system profile unchanged after 'boot' (identical toplevel — no-op is OK)."
-      else
-        ok "New generation registered for next boot: ${newest}"
+      if [ -n "$newest" ] && [ "$newest" != "$before_gen" ]; then
+        # Profile advanced but /run/current-system did not — activation issue.
+        err "A new system generation was built (${newest})"
+        err "but /run/current-system is still ${after_gen}."
+        err "Activation may have failed. Inspect ${logfile}."
+        return 1
       fi
-      ;;
-    build)
-      if [ -e ./result ]; then
-        ok "Build result: $(readlink -f ./result 2>/dev/null || echo ./result)"
-      else
-        warn "Build reported success but ./result is missing."
-      fi
-      ;;
+      warn "System generation unchanged (config produced the same toplevel — no-op is OK)."
+    else
+      ok "System generation updated."
+      echo -e "  ${C_OVERLAY}before: ${before_gen}${C_RESET}"
+      echo -e "  ${C_OVERLAY}after:  ${after_gen}${C_RESET}"
+    fi
+    ;;
+  boot)
+    local newest
+    newest="$(readlink -f /nix/var/nix/profiles/system 2>/dev/null || true)"
+    if [ -n "$before_gen" ] && [ -n "$newest" ] && [ "$newest" = "$before_gen" ]; then
+      warn "system profile unchanged after 'boot' (identical toplevel — no-op is OK)."
+    else
+      ok "New generation registered for next boot: ${newest}"
+    fi
+    ;;
+  build)
+    if [ -e ./result ]; then
+      ok "Build result: $(readlink -f ./result 2>/dev/null || echo ./result)"
+    else
+      warn "Build reported success but ./result is missing."
+    fi
+    ;;
   esac
 
   ok "nixos-rebuild ${action} finished successfully (log: ${logfile})."
@@ -732,7 +747,7 @@ run_nh_os() {
   flags_str="$(rebuild_extra_flags "${FLAKE_ATTR:-}")"
   # shellcheck disable=SC2206
   if [ -n "$flags_str" ]; then
-    extra_flags=( $flags_str )
+    extra_flags=($flags_str)
   fi
 
   local before_gen="" after_gen=""
@@ -778,39 +793,39 @@ run_nh_os() {
   after_gen="$(readlink -f /run/current-system 2>/dev/null || true)"
 
   case "$action" in
-    switch|test)
-      if [ -n "$before_gen" ] && [ -n "$after_gen" ] && [ "$before_gen" = "$after_gen" ]; then
-        local newest
-        newest="$(readlink -f /nix/var/nix/profiles/system 2>/dev/null || true)"
-        if [ -n "$newest" ] && [ "$newest" != "$before_gen" ]; then
-          err "A new system generation was built (${newest})"
-          err "but /run/current-system is still ${after_gen}."
-          err "Activation may have failed. Inspect ${logfile}."
-          return 1
-        fi
-        warn "System generation unchanged (config produced the same toplevel — no-op is OK)."
-      else
-        ok "System generation updated."
-        echo -e "  ${C_OVERLAY}before: ${before_gen}${C_RESET}"
-        echo -e "  ${C_OVERLAY}after:  ${after_gen}${C_RESET}"
-      fi
-      ;;
-    boot)
+  switch | test)
+    if [ -n "$before_gen" ] && [ -n "$after_gen" ] && [ "$before_gen" = "$after_gen" ]; then
       local newest
       newest="$(readlink -f /nix/var/nix/profiles/system 2>/dev/null || true)"
-      if [ -n "$before_gen" ] && [ -n "$newest" ] && [ "$newest" = "$before_gen" ]; then
-        warn "system profile unchanged after 'boot' (identical toplevel — no-op is OK)."
-      else
-        ok "New generation registered for next boot: ${newest}"
+      if [ -n "$newest" ] && [ "$newest" != "$before_gen" ]; then
+        err "A new system generation was built (${newest})"
+        err "but /run/current-system is still ${after_gen}."
+        err "Activation may have failed. Inspect ${logfile}."
+        return 1
       fi
-      ;;
-    build)
-      if [ -e ./result ]; then
-        ok "Build result: $(readlink -f ./result 2>/dev/null || echo ./result)"
-      else
-        warn "Build reported success but ./result is missing (nh may name the out-link differently — check ${logfile})."
-      fi
-      ;;
+      warn "System generation unchanged (config produced the same toplevel — no-op is OK)."
+    else
+      ok "System generation updated."
+      echo -e "  ${C_OVERLAY}before: ${before_gen}${C_RESET}"
+      echo -e "  ${C_OVERLAY}after:  ${after_gen}${C_RESET}"
+    fi
+    ;;
+  boot)
+    local newest
+    newest="$(readlink -f /nix/var/nix/profiles/system 2>/dev/null || true)"
+    if [ -n "$before_gen" ] && [ -n "$newest" ] && [ "$newest" = "$before_gen" ]; then
+      warn "system profile unchanged after 'boot' (identical toplevel — no-op is OK)."
+    else
+      ok "New generation registered for next boot: ${newest}"
+    fi
+    ;;
+  build)
+    if [ -e ./result ]; then
+      ok "Build result: $(readlink -f ./result 2>/dev/null || echo ./result)"
+    else
+      warn "Build reported success but ./result is missing (nh may name the out-link differently — check ${logfile})."
+    fi
+    ;;
   esac
 
   ok "nh os ${action} finished successfully (log: ${logfile})."
@@ -936,7 +951,7 @@ show_generation() {
     # Fallback: read the profile symlink target
     local link
     link="$(readlink -f /nix/var/nix/profiles/system 2>/dev/null || true)"
-    if [[ "$link" =~ -([0-9]+)-link$ ]]; then
+    if [[ $link =~ -([0-9]+)-link$ ]]; then
       current_id="${BASH_REMATCH[1]}"
     fi
     ok "Last generation listed: ${C_BOLD}${current_id}${C_RESET}  ${C_OVERLAY}(${current_date})${C_RESET}"
@@ -978,21 +993,21 @@ clean_cache() {
   fi
 
   case "$mode" in
-    1)
-      sudo nix-collect-garbage --delete-older-than 14d
-      ;;
-    2)
-      if [ -n "$mode_arg" ] || confirm "This removes ALL old generations, including rollback. Confirm?"; then
-        sudo nix-collect-garbage -d
-      else
-        warn "Cancelled."
-        return 0
-      fi
-      ;;
-    *)
-      err "Invalid option."
-      return 1
-      ;;
+  1)
+    sudo nix-collect-garbage --delete-older-than 14d
+    ;;
+  2)
+    if [ -n "$mode_arg" ] || confirm "This removes ALL old generations, including rollback. Confirm?"; then
+      sudo nix-collect-garbage -d
+    else
+      warn "Cancelled."
+      return 0
+    fi
+    ;;
+  *)
+    err "Invalid option."
+    return 1
+    ;;
   esac
 
   # --- ADIÇÕES SOLICITADAS ---
@@ -1100,21 +1115,21 @@ clean_cache_macbook() {
   fi
 
   case "$mode" in
-    1)
-      nix-collect-garbage --delete-older-than 14d
-      ;;
-    2)
-      if [ -n "$mode_arg" ] || confirm "This removes ALL old home-manager generations. Confirm?"; then
-        nix-collect-garbage -d
-      else
-        warn "Cancelled."
-        return 0
-      fi
-      ;;
-    *)
-      err "Invalid option."
-      return 1
-      ;;
+  1)
+    nix-collect-garbage --delete-older-than 14d
+    ;;
+  2)
+    if [ -n "$mode_arg" ] || confirm "This removes ALL old home-manager generations. Confirm?"; then
+      nix-collect-garbage -d
+    else
+      warn "Cancelled."
+      return 0
+    fi
+    ;;
+  *)
+    err "Invalid option."
+    return 1
+    ;;
   esac
 
   # --- ADIÇÕES SOLICITADAS (macbook, sem sudo) ---
@@ -1138,7 +1153,6 @@ clean_cache_macbook() {
   log "Current disk usage:"
   df -h /nix/store 2>/dev/null || df -h /
 }
-
 
 list_hosts() {
   echo -e "${C_BOLD}${C_SKY}Hosts configured in the flake:${C_RESET}"
@@ -1197,10 +1211,10 @@ print_banner() {
   local inner_width=38
 
   local title="NixOS Manager"
-  local pad_title=$(( inner_width - 2 - ${#title} ))
+  local pad_title=$((inner_width - 2 - ${#title}))
 
   local label2="this machine: "
-  local pad2=$(( inner_width - 2 - ${#label2} - ${#machine_label} ))
+  local pad2=$((inner_width - 2 - ${#label2} - ${#machine_label}))
 
   echo
   echo -e "${C_MAUVE}╭──────────────────────────────────────╮${C_RESET}"
@@ -1238,22 +1252,25 @@ run_choice() {
   local choice="$1"
   local extra_arg="${2:-}"
   case "$choice" in
-    0|setup) setup_machine ;;
-    1|legacy) build_legacy ;;
-    2|flake) build_flake "$extra_arg" ;;
-    3|clean) clean_cache "$extra_arg" ;;
-    4|update) update_system "$extra_arg" ;;
-    5|dry) build_flake_dry "$extra_arg" ;;
-    6|rollback) rollback_system ;;
-    7|check) check_flake "$extra_arg" ;;
-    8|hosts) list_hosts ;;
-    9|branches) list_branches_cmd ;;
-    m|M|home|macbook) build_home_macbook ;;
-    c|C|cleanmac|macclean) clean_cache_macbook "$extra_arg" ;;
-    a|A|prune) prune_local_branches ;;
-    g|G|generation|generations) show_generation ;;
-    q|quit|exit) exit 0 ;;
-    *) err "Invalid option: $choice"; return 1 ;;
+  0 | setup) setup_machine ;;
+  1 | legacy) build_legacy ;;
+  2 | flake) build_flake "$extra_arg" ;;
+  3 | clean) clean_cache "$extra_arg" ;;
+  4 | update) update_system "$extra_arg" ;;
+  5 | dry) build_flake_dry "$extra_arg" ;;
+  6 | rollback) rollback_system ;;
+  7 | check) check_flake "$extra_arg" ;;
+  8 | hosts) list_hosts ;;
+  9 | branches) list_branches_cmd ;;
+  m | M | home | macbook) build_home_macbook ;;
+  c | C | cleanmac | macclean) clean_cache_macbook "$extra_arg" ;;
+  a | A | prune) prune_local_branches ;;
+  g | G | generation | generations) show_generation ;;
+  q | quit | exit) exit 0 ;;
+  *)
+    err "Invalid option: $choice"
+    return 1
+    ;;
   esac
 }
 

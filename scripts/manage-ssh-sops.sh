@@ -39,25 +39,25 @@ CLEAN=false
 host_arg=""
 for arg in "$@"; do
   case "$arg" in
-    --clean) CLEAN=true ;;
-    *) host_arg="$arg" ;;
+  --clean) CLEAN=true ;;
+  *) host_arg="$arg" ;;
   esac
 done
 
 hostname_now="$(hostname)"
 case "${host_arg:-$hostname_now}" in
-  dell|dell1564)
-    host="dell1564"
-    ;;
-  mac|mac2011|macbook2011)
-    host="mac2011"
-    ;;
-  m2utm|macutm)
-    host="macutm"
-    ;;
-  *)
-    host="${host_arg:-$hostname_now}"
-    ;;
+dell | dell1564)
+  host="dell1564"
+  ;;
+mac | mac2011 | macbook2011)
+  host="mac2011"
+  ;;
+m2utm | macutm)
+  host="macutm"
+  ;;
+*)
+  host="${host_arg:-$hostname_now}"
+  ;;
 esac
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -83,7 +83,7 @@ for tool in ssh-keygen age-keygen sops jq; do
 done
 
 if $missing_tool; then
-  if [[ -n "${MANAGE_SSH_SOPS_NIX_SHELL_WRAPPED:-}" ]]; then
+  if [[ -n ${MANAGE_SSH_SOPS_NIX_SHELL_WRAPPED:-} ]]; then
     echo "Required tool(s) still missing even inside 'nix shell' (age/sops/jq/openssh). Aborting." >&2
     exit 1
   fi
@@ -97,7 +97,7 @@ chmod 700 "$HOME/.ssh"
 age_key_file="$HOME/.config/sops/age/keys.txt"
 export SOPS_AGE_KEY_FILE="$age_key_file"
 
-if [[ ! -f "$age_key_file" ]]; then
+if [[ ! -f $age_key_file ]]; then
   age-keygen -o "$age_key_file" >/dev/null
   chmod 600 "$age_key_file"
 fi
@@ -115,7 +115,7 @@ fi
 # ----- Generate SSH keypairs (idempotent: skips if already present) -----
 for kind in infra github; do
   key_path="$HOME/.ssh/id_ed25519_${kind}"
-  if [[ ! -f "$key_path" ]]; then
+  if [[ ! -f $key_path ]]; then
     ssh-keygen -q -t ed25519 -C "${kind}@${host}" -N "" -f "$key_path"
   fi
 done
@@ -124,7 +124,7 @@ done
 # Normally created by the ssh-hostkey-bootstrap systemd service on first
 # activation, but generating it here too makes this script fully
 # self-sufficient during initial setup, before the first rebuild has run.
-if [[ ! -f "$host_key_path" ]]; then
+if [[ ! -f $host_key_path ]]; then
   echo "Host key not found at $host_key_path — generating now (requires sudo)..."
   sudo mkdir -p /etc/ssh
   sudo ssh-keygen -q -t ed25519 -N "" -f "$host_key_path"
@@ -146,16 +146,16 @@ if $CLEAN; then
     echo "borba_ssh_github_public_key: $(cat "$HOME/.ssh/id_ed25519_github.pub")"
     echo "ssh_host_ed25519_key: |"
     sudo sed 's/^/  /' "$host_key_path"
-  } > "$tmp_file"
+  } >"$tmp_file"
 
-  sops --encrypt --input-type yaml --output-type yaml --age "$age_recipient" "$tmp_file" > "$secrets_file"
+  sops --encrypt --input-type yaml --output-type yaml --age "$age_recipient" "$tmp_file" >"$secrets_file"
   chmod 600 "$secrets_file"
 
   echo "Secrets file rebuilt from scratch: $secrets_file"
 else
   # ----- Incremental mode: sops set per key, preserves unrelated secrets -----
-  if [[ ! -f "$secrets_file" ]]; then
-    echo "{}" | sops --encrypt --input-type json --output-type yaml --age "$age_recipient" /dev/stdin > "$secrets_file"
+  if [[ ! -f $secrets_file ]]; then
+    echo "{}" | sops --encrypt --input-type json --output-type yaml --age "$age_recipient" /dev/stdin >"$secrets_file"
     chmod 600 "$secrets_file"
     echo "Created new empty secrets file: $secrets_file"
   fi
@@ -165,11 +165,11 @@ else
     sops set "$secrets_file" "[\"${key}\"]" "$value_json"
   }
 
-  set_key "borba_ssh_infra_private_key"  "$(jq -Rs . < "$HOME/.ssh/id_ed25519_infra")"
-  set_key "borba_ssh_infra_public_key"   "$(jq -Rs . < "$HOME/.ssh/id_ed25519_infra.pub")"
-  set_key "borba_ssh_github_private_key" "$(jq -Rs . < "$HOME/.ssh/id_ed25519_github")"
-  set_key "borba_ssh_github_public_key"  "$(jq -Rs . < "$HOME/.ssh/id_ed25519_github.pub")"
-  set_key "ssh_host_ed25519_key"         "$(sudo cat "$host_key_path" | jq -Rs .)"
+  set_key "borba_ssh_infra_private_key" "$(jq -Rs . <"$HOME/.ssh/id_ed25519_infra")"
+  set_key "borba_ssh_infra_public_key" "$(jq -Rs . <"$HOME/.ssh/id_ed25519_infra.pub")"
+  set_key "borba_ssh_github_private_key" "$(jq -Rs . <"$HOME/.ssh/id_ed25519_github")"
+  set_key "borba_ssh_github_public_key" "$(jq -Rs . <"$HOME/.ssh/id_ed25519_github.pub")"
+  set_key "ssh_host_ed25519_key" "$(sudo cat "$host_key_path" | jq -Rs .)"
 
   chmod 600 "$secrets_file"
   echo "Secrets file updated (existing unrelated keys preserved): $secrets_file"

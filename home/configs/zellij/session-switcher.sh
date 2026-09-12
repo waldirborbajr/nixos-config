@@ -21,12 +21,13 @@ if [ -z "$SESSION_LIST" ] && [ -z "$DIRS_WITHOUT_SESSION" ]; then
 fi
 
 CHOICE=$(
-  { printf "%s\n" $SESSION_LIST
+  {
+    printf "%s\n" $SESSION_LIST
     printf "%s" "$DIRS_WITHOUT_SESSION"
   } | fzf --reverse \
-          --info inline \
-          --bind "ctrl-d:execute-silent(zellij delete-session -f {})+abort" \
-          --header="Enter: switch, Ctrl-D: delete"
+    --info inline \
+    --bind "ctrl-d:execute-silent(zellij delete-session -f {})+abort" \
+    --header="Enter: switch, Ctrl-D: delete"
 )
 
 if [ -z "$CHOICE" ]; then

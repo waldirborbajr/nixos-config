@@ -113,7 +113,10 @@
 
   # nix.settings.experimental-features = ["nix-command" "flakes"];
   nix.settings = {
-    experimental-features = ["nix-command" "flakes"];
+    experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
     extra-substituters = [
       # "https://vicinae.cachix.org"
       "https://nix-community.cachix.org"

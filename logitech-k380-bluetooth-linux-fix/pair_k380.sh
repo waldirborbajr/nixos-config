@@ -4,10 +4,10 @@
 echo "🔵 Preparando para parear o Logitech K380..."
 
 # Verifica se o expect está instalado
-if ! command -v expect &> /dev/null; then
-    echo "❌ 'expect' não encontrado! Instale com:"
-    echo "   nix-shell -p expect"
-    exit 1
+if ! command -v expect &>/dev/null; then
+  echo "❌ 'expect' não encontrado! Instale com:"
+  echo "   nix-shell -p expect"
+  exit 1
 fi
 
 # Coloca o teclado em modo de pareamento
@@ -17,7 +17,7 @@ echo "   PRESSIONE ENTER QUANDO O TECLADO ESTIVER PISCANDO"
 read -p ""
 
 # Inicia o processo com expect
-expect << 'EOF'
+expect <<'EOF'
 set timeout 60
 
 # Inicia o bluetoothctl

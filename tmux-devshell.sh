@@ -81,11 +81,11 @@ declare -A PROFILES=(
 PROFILE_ARG=""
 for arg in "$@"; do
   case "$arg" in
-    --clean) CLEAN=true ;;
-    --destroy) DESTROY=true ;;
-    --gc) GC=true ;;
-    --no-watch) NO_WATCH=true ;;
-    *) PROFILE_ARG="$arg" ;;
+  --clean) CLEAN=true ;;
+  --destroy) DESTROY=true ;;
+  --gc) GC=true ;;
+  --no-watch) NO_WATCH=true ;;
+  *) PROFILE_ARG="$arg" ;;
   esac
 done
 
@@ -96,7 +96,7 @@ done
 # atrás, de um projeto já entregue. Por isso lista TODAS as sessões de
 # devshell (prefixo SESSION_PREFIX, ex. "dev-"), não só as do $PWD atual,
 # e deixa escolher qual(is) matar.
-if [[ "$DESTROY" == true ]]; then
+if [[ $DESTROY == true ]]; then
   prefix="${SESSION_PREFIX}-"
   mapfile -t matches < <(tmux list-sessions -F '#{session_name}' 2>/dev/null | grep -F "$prefix" || true)
 
@@ -120,11 +120,11 @@ if [[ "$DESTROY" == true ]]; then
       ((i++))
     done
     read -rp $'\n'"Numeros separados por espaco (ex: 1 3), ou 'all': " -a nums
-    if [[ "${nums[0]:-}" == "all" ]]; then
+    if [[ ${nums[0]:-} == "all" ]]; then
       TARGETS=("${matches[@]}")
     else
       for n in "${nums[@]}"; do
-        idx=$((n-1))
+        idx=$((n - 1))
         [[ $idx -ge 0 && $idx -lt ${#matches[@]} ]] && TARGETS+=("${matches[$idx]}")
       done
     fi
@@ -145,11 +145,11 @@ if [[ "$DESTROY" == true ]]; then
   # sem a flag, pergunta (a sessão já morreu de qualquer forma, então o
   # padrão é perguntar em vez de deixar lixo acumulado por padrão).
   echo -e "${C_PEACH}Isso roda GC no Nix store inteiro (não só nos pacotes deste devshell) — outras gerações/paths não referenciados também são removidos.${C_RESET}"
-  if [[ "$GC" == true ]]; then
+  if [[ $GC == true ]]; then
     nix store gc
   else
     read -rp "Rodar 'nix store gc' agora pra liberar o espaço? [y/N] " confirm
-    if [[ "$confirm" =~ ^[Yy]$ ]]; then
+    if [[ $confirm =~ ^[Yy]$ ]]; then
       nix store gc
     else
       echo -e "${C_OVERLAY}GC pulado. Os pacotes ficam no store até você rodar 'nix store gc' manualmente (ou --destroy --gc na próxima).${C_RESET}"
@@ -159,7 +159,7 @@ if [[ "$DESTROY" == true ]]; then
   exit 0
 fi
 
-if [[ ! -d "$DEVSHELLS_DIR" ]]; then
+if [[ ! -d $DEVSHELLS_DIR ]]; then
   echo -e "${C_RED}Erro: diretório de devshells não encontrado: ${DEVSHELLS_DIR}${C_RESET}"
   echo -e "${C_OVERLAY}Confira se o nixos-config está clonado em ${NIXOS_CONFIG_DIR}, ou defina NIXOS_CONFIG_DIR.${C_RESET}"
   exit 1
@@ -179,7 +179,8 @@ PROFILE_NAME=""
 
 pick_profile_menu() {
   local names=("${!PROFILES[@]}" "custom")
-  IFS=$'\n' names=($(sort <<<"${names[*]}")); unset IFS
+  IFS=$'\n' names=($(sort <<<"${names[*]}"))
+  unset IFS
 
   if command -v fzf &>/dev/null; then
     # Mapa profile→devshells num arquivo temporário: o preview do fzf roda no
@@ -204,7 +205,7 @@ pick_profile_menu() {
     echo -e "${C_YELLOW}fzf não encontrado, usando fallback numerado${C_RESET}" >&2
     local i=1
     for n in "${names[@]}"; do
-      if [[ "$n" == "custom" ]]; then
+      if [[ $n == "custom" ]]; then
         printf "${C_TEAL}%2d)${C_TEXT} %s ${C_OVERLAY}(selecionar manualmente)${C_RESET}\n" "$i" "$n" >&2
       else
         printf "${C_TEAL}%2d)${C_TEXT} %-16s ${C_OVERLAY}%s${C_RESET}\n" "$i" "$n" "${PROFILES[$n]}" >&2
@@ -212,7 +213,7 @@ pick_profile_menu() {
       ((i++))
     done
     read -rp $'\n'"Numero do profile: " num
-    echo "${names[$((num-1))]}"
+    echo "${names[$((num - 1))]}"
   fi
 }
 
@@ -226,11 +227,11 @@ pick_custom_shells() {
     echo -e "${C_YELLOW}fzf não encontrado, usando fallback numerado${C_RESET}" >&2
     local i
     for i in "${!AVAILABLE_SHELLS[@]}"; do
-      printf "${C_TEAL}%2d)${C_TEXT} %s${C_RESET}\n" "$((i+1))" "${AVAILABLE_SHELLS[$i]}" >&2
+      printf "${C_TEAL}%2d)${C_TEXT} %s${C_RESET}\n" "$((i + 1))" "${AVAILABLE_SHELLS[$i]}" >&2
     done
     read -rp $'\n'"Numeros separados por espaco (ex: 1 3): " -a nums
     for n in "${nums[@]}"; do
-      local idx=$((n-1))
+      local idx=$((n - 1))
       [[ $idx -ge 0 && $idx -lt ${#AVAILABLE_SHELLS[@]} ]] && out+=("${AVAILABLE_SHELLS[$idx]}")
     done
   fi
@@ -238,21 +239,24 @@ pick_custom_shells() {
 }
 
 # --- Resolve seleção ----------------------------------------------------
-if [[ -n "$PROFILE_ARG" && -n "${PROFILES[$PROFILE_ARG]+x}" ]]; then
+if [[ -n $PROFILE_ARG && -n ${PROFILES[$PROFILE_ARG]+x} ]]; then
   PROFILE_NAME="$PROFILE_ARG"
-  read -ra SELECTED <<< "${PROFILES[$PROFILE_NAME]}"
+  read -ra SELECTED <<<"${PROFILES[$PROFILE_NAME]}"
 else
   PROFILE_NAME=$(pick_profile_menu)
-  if [[ -z "$PROFILE_NAME" ]]; then
+  if [[ -z $PROFILE_NAME ]]; then
     echo -e "${C_RED}Nenhuma opção selecionada. Abortando.${C_RESET}"
     exit 1
   fi
 
-  if [[ "$PROFILE_NAME" == "custom" ]]; then
+  if [[ $PROFILE_NAME == "custom" ]]; then
     mapfile -t SELECTED < <(pick_custom_shells)
-    PROFILE_NAME="custom-$(IFS=-; echo "${SELECTED[*]}")"
+    PROFILE_NAME="custom-$(
+      IFS=-
+      echo "${SELECTED[*]}"
+    )"
   else
-    read -ra SELECTED <<< "${PROFILES[$PROFILE_NAME]}"
+    read -ra SELECTED <<<"${PROFILES[$PROFILE_NAME]}"
   fi
 fi
 
@@ -276,7 +280,7 @@ SESSION_NAME="${SESSION_PREFIX}-$(basename "$PROJECT_DIR")-${PROFILE_NAME}"
 
 # --- Tmux session ---------------------------------------------------------
 if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
-  if [[ "$CLEAN" == true ]]; then
+  if [[ $CLEAN == true ]]; then
     echo -e "${C_YELLOW}Matando sessão existente '${SESSION_NAME}'...${C_RESET}"
     tmux kill-session -t "$SESSION_NAME"
   else
@@ -295,9 +299,9 @@ fi
 # o --clean já existe pra resolver.
 open_watch_pane() {
   local shell="$1" window="$2" wc
-  [[ "$NO_WATCH" == true ]] && return 0
+  [[ $NO_WATCH == true ]] && return 0
   wc="${WATCH_CMDS[$shell]:-}"
-  [[ -z "$wc" ]] && return 0
+  [[ -z $wc ]] && return 0
   tmux split-window -v -l 30% -t "$window" \
     "cd '$PROJECT_DIR' && nix develop '$DEVSHELLS_DIR/$shell' --command bash -c '$wc; exec \$SHELL'"
   tmux select-pane -t "${window}.0"
@@ -316,7 +320,7 @@ done
 
 tmux select-window -t "${SESSION_NAME}:1"
 
-if [[ -n "${TMUX:-}" ]]; then
+if [[ -n ${TMUX:-} ]]; then
   tmux switch-client -t "$SESSION_NAME"
 else
   tmux attach -t "$SESSION_NAME"

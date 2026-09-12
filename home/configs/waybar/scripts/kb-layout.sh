@@ -6,7 +6,7 @@
 idx=$(niri msg -j keyboard-layouts | jq -r '.current_idx')
 
 case "$idx" in
-    0) echo "US" ;;
-    1) echo "INTL" ;;
-    *) echo "?$idx" ;;
+0) echo "US" ;;
+1) echo "INTL" ;;
+*) echo "?$idx" ;;
 esac

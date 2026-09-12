@@ -8,23 +8,23 @@ DIR="${HOME}/dotfiles/niri/.config/niri"
 cd "$DIR"
 
 case "$(hostname)" in
-  dell1564)
-    target="input-dell.kdl"
-    ;;
-  mac2011)
-    target="input-mac2011.kdl"
-    ;;
-  macutm|macvmf)
-    target="input-mac.kdl"
-    ;;
-  *)
-    # fallback seguro
-    target="input-mac.kdl"
-    echo "select-input: hostname '$(hostname)' desconhecido, usando $target" >&2
-    ;;
+dell1564)
+  target="input-dell.kdl"
+  ;;
+mac2011)
+  target="input-mac2011.kdl"
+  ;;
+macutm | macvmf)
+  target="input-mac.kdl"
+  ;;
+*)
+  # fallback seguro
+  target="input-mac.kdl"
+  echo "select-input: hostname '$(hostname)' desconhecido, usando $target" >&2
+  ;;
 esac
 
-if [[ ! -f "$target" ]]; then
+if [[ ! -f $target ]]; then
   echo "select-input: arquivo $DIR/$target não encontrado" >&2
   exit 1
 fi

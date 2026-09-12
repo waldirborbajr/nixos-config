@@ -21,11 +21,20 @@ in {
     isNormalUser = true;
     home = "/home/${username}";
     description = "borba jr, w";
-    extraGroups = ["networkmanager" "wheel" "podman" "dialout"]; # dialout: cabo serial do CHIRP
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "podman"
+      "dialout"
+    ]; # dialout: cabo serial do CHIRP
     shell = pkgs.zsh;
   };
 
-  users.users.greeter.extraGroups = ["video" "input" "render"];
+  users.users.greeter.extraGroups = [
+    "video"
+    "input"
+    "render"
+  ];
 
   # ==================== OVERLAYS ====================
   # emacs-overlay não expõe emacsPgtk/emacsGit/emacsUnstable como saída de

@@ -4,7 +4,14 @@
 {lib, ...}: {
   imports = [];
 
-  boot.initrd.availableKernelModules = ["ehci_pci" "ahci" "xhci_pci" "nvme" "usbhid" "sr_mod"];
+  boot.initrd.availableKernelModules = [
+    "ehci_pci"
+    "ahci"
+    "xhci_pci"
+    "nvme"
+    "usbhid"
+    "sr_mod"
+  ];
   boot.initrd.kernelModules = [];
   boot.kernelModules = [];
   boot.extraModulePackages = [];
@@ -17,7 +24,10 @@
   fileSystems."/boot" = {
     device = "/dev/disk/by-uuid/A2CB-2F3E";
     fsType = "vfat";
-    options = ["fmask=0077" "dmask=0077"];
+    options = [
+      "fmask=0077"
+      "dmask=0077"
+    ];
   };
 
   swapDevices = [];

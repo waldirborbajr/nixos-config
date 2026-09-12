@@ -4,22 +4,11 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    # nix-doom-emacs-unstraightened = {
-    #   url = "github:marienz/nix-doom-emacs-unstraightened";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
-    # emacs-overlay = {
-    #   url = "github:nix-community/emacs-overlay";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
+
     neovim-nightly-overlay = {
       url = "github:nix-community/neovim-nightly-overlay";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
-    #noctalia = {
-    #  url = "github:noctalia-dev/noctalia";
-    #  inputs.nixpkgs.follows = "nixpkgs"; # this line is optional, prevents downloading two versions of nixpkgs but disables cache
-    #};
 
     # 🔐 secrets management
     sops-nix.url = "github:Mic92/sops-nix";
@@ -30,19 +19,13 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # 🚀 Vicinae — Raycast-like launcher (mac2011 + VMs only, see mac-workstation.nix)
-    # vicinae = {
-    #   url = "github:vicinaehq/vicinae";
-    #   # inputs.nixpkgs.follows = "nixpkgs";
-    # };
-
     # 🔎 nix-index-database — prebuilt "command not found" DB (all hosts)
     nix-index-database = {
       url = "github:nix-community/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # 🎨 treefmt-nix — repo-wide formatter, exposed via `nix fmt` (all hosts)
+    # 🎨 treefmt-nix — repo-wide formatter, exposto via `nix fmt`
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -54,8 +37,10 @@
     nixpkgs-unstable,
     sops-nix,
     home-manager,
+    treefmt-nix,
     ...
   } @ inputs: let
+    # 🖥️  Hosts NixOS (gerenciam sistema + home-manager embutido)
     mkHost = {
       hostname,
       system,
@@ -86,9 +71,7 @@
       };
 
     # 🍎 home-manager standalone (macOS físico) — sem gerenciar o sistema,
-    # só pacotes + dotfiles (zsh, git, helix, tmux, wezterm, etc). Cada host
-    # aqui é isolado: pacotes declarados em hosts/<hostname>/home.nix não
-    # afetam mac2011, dell1564, macutm nem macvmf.
+    # só pacotes + dotfiles (zsh, git, helix, tmux, wezterm, etc).
     mkMacHome = {
       hostname,
       system ? "aarch64-darwin",
@@ -113,7 +96,21 @@
         ];
       };
 
-    supportedSystems = ["x86_64-linux" "aarch64-linux"];
+    # 🧩 Sistemas suportados pelo formatter/treefmt.
+    # Inclui aarch64-darwin para o `nix fmt` funcionar também no MacBook M2.
+    supportedSystems = [
+      "x86_64-linux"
+      "aarch64-linux"
+      "aarch64-darwin"
+    ];
+
+    # 🌳 Instancia o treefmt para um sistema.
+    # A RECURSÃO pelos .nix vem do arquivo ./treefmt.nix — não daqui.
+    # Aqui só montamos o wrapper que o `nix fmt` executa.
+    treefmtFor = system: let
+      pkgs = nixpkgs.legacyPackages.${system};
+    in
+      (treefmt-nix.lib.evalModule pkgs ./treefmt.nix).config.build.wrapper;
   in {
     nixosConfigurations = {
       dell = mkHost {
@@ -144,13 +141,13 @@
       };
     };
 
-    # `nix fmt` — same formatter regardless of which host you're on
-    # (dell1564/mac2011 = x86_64-linux, macutm/macvmf = aarch64-linux).
-    formatter = nixpkgs.lib.genAttrs supportedSystems (
-      system: let
-        pkgs = nixpkgs.legacyPackages.${system};
-      in
-        (inputs.treefmt-nix.lib.evalModule pkgs ./treefmt.nix).config.build.wrapper
-    );
+    # `nix fmt` — mesmo formatter em qualquer host (Linux ou Darwin).
+    formatter = nixpkgs.lib.genAttrs supportedSystems treefmtFor;
+
+    # `nix flake check` agora também valida formatação.
+    checks = nixpkgs.lib.genAttrs supportedSystems (system: {
+      formatting =
+        (treefmt-nix.lib.evalModule nixpkgs.legacyPackages.${system} ./treefmt.nix).config.build.check;
+    });
   };
 }

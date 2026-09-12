@@ -11,7 +11,10 @@
 }: let
   inherit (common) username;
 in {
-  imports = [../common/mac-workstation.nix ../common/broadcom-wifi.nix];
+  imports = [
+    ../common/mac-workstation.nix
+    ../common/broadcom-wifi.nix
+  ];
 
   # O módulo hardware.bluetooth do NixOS força General.ControllerMode =
   # "dual" como default (sempre, mesmo sem configurar nada) — em
@@ -61,17 +64,20 @@ in {
 
   # Ferramentas de debug wireless (úteis só com o chip físico) +
   # Spotify: só neste host (não disponível p/ aarch64-linux das VMs UTM/Fusion)
-  environment.systemPackages = lib.mkAfter (with pkgs; [
-    iw
-    wirelesstools
-    spotify
-    chirp
-  ]);
+  environment.systemPackages = lib.mkAfter (
+    with pkgs; [
+      iw
+      wirelesstools
+      spotify
+      chirp
+    ]
+  );
 
   # ==================== HOME MANAGER (niri/waybar do hardware físico) ====================
   home-manager.users.${username} = {
     xdg.configFile."niri/config/input.kdl".source = ../../home/configs/niri/config/input-mac2011.kdl;
-    xdg.configFile."niri/config/outputs.kdl".source = ../../home/configs/niri/config/outputs-mac2011.kdl;
+    xdg.configFile."niri/config/outputs.kdl".source =
+      ../../home/configs/niri/config/outputs-mac2011.kdl;
     xdg.configFile."waybar/output.jsonc".source = ../../home/configs/waybar/output-mac2011.jsonc;
   };
 }

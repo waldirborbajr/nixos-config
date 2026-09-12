@@ -12,7 +12,6 @@
 {
   pkgs,
   pkgs-unstable,
-  common,
   ...
 }: {
   # ==================== BOOT (EFI comum a 2011 + VMs) ====================

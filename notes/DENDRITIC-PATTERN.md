@@ -56,6 +56,7 @@ category.module.enable = true;
 ### 3. Aggregator Pattern
 
 Each category has a `default.nix` that:
+
 - Imports all submodules
 - Defines options for each
 - Acts as a catalog/index
@@ -166,6 +167,7 @@ Each layer has distinct responsibilities:
 ### 1. Self-Documenting
 
 Options show available features:
+
 ```nix
 # What can I enable?
 options.apps = {
@@ -179,6 +181,7 @@ options.apps = {
 ### 2. Composable
 
 Build complex configs from simple parts:
+
 ```nix
 # Start small
 imports = [ ./profiles/minimal.nix ];
@@ -193,6 +196,7 @@ imports = [ ./profiles/developer.nix ];  # includes desktop + minimal
 ### 3. Testable
 
 Toggle features easily:
+
 ```nix
 # Disable to test
 apps.yazi.enable = false;
@@ -204,6 +208,7 @@ apps.yazi.enable = true;
 ### 4. Maintainable
 
 Changes are isolated:
+
 ```
 modules/apps/shell.nix      # Only shell config
 modules/apps/default.nix    # Only shell option
@@ -333,31 +338,37 @@ home.nix → apps.newtool.enable = true
 ### DO:
 
 ✅ **Use options for all modules**
+
 ```nix
 config = lib.mkIf config.apps.zsh.enable { ... };
 ```
 
 ✅ **Create aggregators for categories**
+
 ```nix
 modules/apps/default.nix  # Defines options.apps.*
 ```
 
 ✅ **Compose profiles from profiles**
+
 ```nix
 imports = [ ./minimal.nix ];  # Inherit lower profile
 ```
 
 ✅ **Keep core.nix minimal**
+
 ```nix
 # Only absolute essentials (themes, features)
 ```
 
 ✅ **Document options**
+
 ```nix
 description = "Enable shell configuration (ZSH + FZF + bat)";
 ```
 
 ✅ **Test incrementally**
+
 ```nix
 # Toggle one module at a time
 apps.shell.enable = false;  # Test without shell
@@ -366,6 +377,7 @@ apps.shell.enable = false;  # Test without shell
 ### DON'T:
 
 ❌ **Force imports without options**
+
 ```nix
 # Bad: Always active
 imports = [ ./module.nix ];
@@ -376,6 +388,7 @@ config = lib.mkIf config.module.enable { ... };
 ```
 
 ❌ **Put logic in core.nix**
+
 ```nix
 # Bad: core.nix has services
 services.something.enable = true;
@@ -385,6 +398,7 @@ imports = [ ./modules/themes ];
 ```
 
 ❌ **Duplicate config in profiles**
+
 ```nix
 # Bad: Repeat config in each profile
 profiles/desktop.nix → system-config.base.enable = true
@@ -396,6 +410,7 @@ profiles/desktop.nix → imports = [ ./minimal.nix ];
 ```
 
 ❌ **Skip aggregators**
+
 ```nix
 # Bad: Options scattered everywhere
 modules/apps/zsh.nix → options.apps.zsh.enable
@@ -416,6 +431,7 @@ modules/apps/default.nix → options.apps = { shell, tmux, ... }
 ### Migration Path
 
 **From Monolithic:**
+
 ```nix
 # Before: One big file
 { config, pkgs, ... }: {
@@ -428,6 +444,7 @@ apps.zsh.enable = true;
 ```
 
 **From Modular:**
+
 ```nix
 # Before: Direct imports
 imports = [
@@ -472,8 +489,8 @@ waldirborbajr/nixos-config
 - [README.md](./README.md) - Repository overview
 - [NixOS Module System Manual](https://nixos.org/manual/nixos/stable/#sec-writing-modules)
 
----
+______________________________________________________________________
 
-**Pattern Version:** 1.0  
-**Implementation:** waldirborbajr/nixos-config  
+**Pattern Version:** 1.0\
+**Implementation:** waldirborbajr/nixos-config\
 **Date:** 2026-01-29
