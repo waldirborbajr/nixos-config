@@ -21,7 +21,7 @@
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 
-(set-face-attribute 'default nil :family "JetBrainsMono Nerd Font" :height 100)
+(set-face-attribute 'default nil :family "JetBrainsMono Nerd Font" :height 090)
 (unless (find-font (font-spec :name "JetBrainsMono Nerd Font"))
   (set-face-attribute 'default nil :family "JetBrains Mono"))
 
