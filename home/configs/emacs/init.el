@@ -153,8 +153,8 @@
   :config
   (setf (alist-get 'rust-mode apheleia-mode-alist) 'rustfmt
         (alist-get 'rust-ts-mode apheleia-mode-alist) 'rustfmt
-        (alist-get 'go-mode apheleia-mode-alist) 'gofmt
-        (alist-get 'go-ts-mode apheleia-mode-alist) 'gofmt
+        (alist-get 'go-mode apheleia-mode-alist) 'goimports
+        (alist-get 'go-ts-mode apheleia-mode-alist) 'goimports
         (alist-get 'nix-mode apheleia-mode-alist) 'alejandra
         (alist-get 'nix-ts-mode apheleia-mode-alist) 'alejandra
         (alist-get 'lua-mode apheleia-mode-alist) 'stylua
@@ -162,7 +162,7 @@
         (alist-get 'python-mode apheleia-mode-alist) 'black
         (alist-get 'python-ts-mode apheleia-mode-alist) 'black)
   (setf (alist-get 'rustfmt apheleia-formatters) '("rustfmt" "--emit" "stdout")
-        (alist-get 'gofmt apheleia-formatters) '("gofmt")
+        (alist-get 'goimports apheleia-formatters) '("goimports")
         (alist-get 'alejandra apheleia-formatters) '("alejandra" "--quiet" "-")
         (alist-get 'stylua apheleia-formatters)
         '("stylua" "--stdin-filepath" filepath "-")

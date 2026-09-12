@@ -63,6 +63,7 @@ in {
     pkgs.rustfmt
     pkgs.gopls
     pkgs.go
+    pkgs.gotools
     pkgs.lua-language-server
     pkgs.stylua
     pkgs.nixd
