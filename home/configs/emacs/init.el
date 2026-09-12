@@ -70,11 +70,10 @@
   (corfu-auto-prefix 1)
   (corfu-cycle t)
   (corfu-preselect 'prompt)
-  :bind ("C-c y" . completion-at-point) ; disparo manual — M-TAB costuma ser
-                                          ; capturado pelo WM (niri usa
-                                          ; Alt+Tab pra trocar de janela)
   :config
   (global-corfu-mode 1))
+
+(global-set-key (kbd "C-c y") #'completion-at-point)
 
 (use-package cape
   :demand t
@@ -115,18 +114,17 @@
   (add-to-list 'eglot-server-programs
                '((python-mode python-ts-mode) . ("pyright-langserver" "--stdio"))))
 
-;; Adiciona os hooks de forma explícita para cada modo.
-;; Isso é mais confiável do que a sintaxe :hook do use-package.
-(add-hook 'rust-mode-hook #'eglot-ensure)
-(add-hook 'rust-ts-mode-hook #'eglot-ensure)
-(add-hook 'go-mode-hook #'eglot-ensure)
-(add-hook 'go-ts-mode-hook #'eglot-ensure)
-(add-hook 'nix-mode-hook #'eglot-ensure)
-(add-hook 'nix-ts-mode-hook #'eglot-ensure)
-(add-hook 'lua-mode-hook #'eglot-ensure)
-(add-hook 'lua-ts-mode-hook #'eglot-ensure)
-(add-hook 'python-mode-hook #'eglot-ensure)
-(add-hook 'python-ts-mode-hook #'eglot-ensure)
+;; Inicia o Eglot automaticamente somente nos modos com servidor configurado.
+(defun borba/eglot-ensure-for-supported-mode ()
+  (when (memq major-mode
+              '(rust-mode rust-ts-mode
+                go-mode go-ts-mode
+                nix-mode nix-ts-mode
+                lua-mode lua-ts-mode
+                python-mode python-ts-mode))
+    (eglot-ensure)))
+
+(add-hook 'prog-mode-hook #'borba/eglot-ensure-for-supported-mode)
 
 ;;; --- Flymake (para exibir erros) ---
 ;; Ativa o Flymake em todos os buffers de programação.
