@@ -4,6 +4,9 @@
       read-process-output-max (* 4 1024 1024)
       process-adaptive-read-buffering nil)
 
+(require 'ansi-color)
+(add-hook 'compilation-filter-hook #'ansi-color-compilation-filter)
+
 (add-hook 'emacs-startup-hook
           (lambda () (setq gc-cons-threshold (* 32 1024 1024))))
 
