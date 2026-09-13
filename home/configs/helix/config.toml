@@ -1,6 +1,13 @@
+# ══════════════════════════════════════════════════════════════════════
+#  Helix Configuration
+#  Nord theme — Linux x86_64 + macOS Apple Silicon (M2)
+#  Fonte controlada pelo WezTerm (não pelo Helix)
+# ══════════════════════════════════════════════════════════════════════
+
 # ====================== THEME ======================
 
 theme = "onenord"
+
 
 # ====================== EDITOR ======================
 
@@ -157,7 +164,6 @@ git-exclude = true
 
 # Shift+R
 # Detecta automaticamente Rust ou Go
-
 "R" = [
   ":sh if [ -f Cargo.toml ]; then cargo run; elif [ -f go.mod ]; then go run .; else echo 'No project detected'; fi > /tmp/helix-universal-output.txt 2>&1 || true",
   ":open /tmp/helix-universal-output.txt",
@@ -203,14 +209,12 @@ d = [
 
 [keys.normal.r]
 
-
 # r + r
 # Cargo run
 r = [
   ":sh cargo run > /tmp/helix-rust-output.txt 2>&1 || true",
   ":open /tmp/helix-rust-output.txt",
 ]
-
 
 # r + c
 # Cargo check
@@ -219,14 +223,12 @@ c = [
   ":open /tmp/helix-rust-output.txt",
 ]
 
-
 # r + b
 # Cargo build
 b = [
   ":sh cargo build > /tmp/helix-rust-output.txt 2>&1 || true",
   ":open /tmp/helix-rust-output.txt",
 ]
-
 
 # r + t
 # Cargo test
@@ -235,14 +237,12 @@ t = [
   ":open /tmp/helix-rust-output.txt",
 ]
 
-
 # r + T
 # Cargo test com output
 T = [
   ":sh cargo test -- --nocapture > /tmp/helix-rust-output.txt 2>&1 || true",
   ":open /tmp/helix-rust-output.txt",
 ]
-
 
 # r + l
 # Cargo clippy
@@ -251,16 +251,13 @@ l = [
   ":open /tmp/helix-rust-output.txt",
 ]
 
-
 # r + f
 # Cargo fmt
 f = ":sh cargo fmt > /tmp/helix-rust-output.txt 2>&1 || true"
 
-
 # r + F
 # Cargo fmt check
 F = ":sh cargo fmt -- --check > /tmp/helix-rust-output.txt 2>&1 || true"
-
 
 # r + d
 # Cargo documentation
@@ -269,11 +266,9 @@ d = [
   ":open /tmp/helix-rust-output.txt",
 ]
 
-
 # r + x
 # Cargo clean
 x = ":sh cargo clean > /tmp/helix-rust-output.txt 2>&1 || true"
-
 
 # r + w
 # Cargo watch test
@@ -283,16 +278,13 @@ w = [
   ":open /tmp/helix-rust-output.txt",
 ]
 
-
 # r + n
 # Cargo run em nova janela WezTerm
 n = ":sh wezterm cli spawn --new-window cargo run"
 
-
 # r + m
 # Cargo run com less
 m = ":sh wezterm cli spawn --new-window 'cargo run 2>&1 | less'"
-
 
 # r + g
 # Git status
@@ -306,14 +298,12 @@ g = ":echo %sh{git status --short}"
 
 [keys.normal.g]
 
-
 # g + r
 # Go run
 r = [
   ":sh go run . > /tmp/helix-go-output.txt 2>&1 || true",
   ":open /tmp/helix-go-output.txt",
 ]
-
 
 # g + b
 # Go build
@@ -322,14 +312,12 @@ b = [
   ":open /tmp/helix-go-output.txt",
 ]
 
-
 # g + p
 # Go test current package
 p = [
   ":sh go test > /tmp/helix-go-output.txt 2>&1 || true",
   ":open /tmp/helix-go-output.txt",
 ]
-
 
 # g + t
 # Go test entire module
@@ -338,14 +326,12 @@ t = [
   ":open /tmp/helix-go-output.txt",
 ]
 
-
 # g + d
 # Go test with race detector
 d = [
   ":sh go test -race ./... > /tmp/helix-go-output.txt 2>&1 || true",
   ":open /tmp/helix-go-output.txt",
 ]
-
 
 # g + v
 # Go vet
@@ -354,26 +340,21 @@ v = [
   ":open /tmp/helix-go-output.txt",
 ]
 
-
 # g + f
 # Format current file
 f = ":sh gofmt -w %{buffer_name}"
-
 
 # g + x
 # Go generate
 x = ":sh go generate ./... > /tmp/helix-go-output.txt 2>&1 || true"
 
-
 # g + m
 # Go mod tidy
 m = ":sh go mod tidy > /tmp/helix-go-output.txt 2>&1 || true"
 
-
 # g + n
 # Go run em nova janela WezTerm
 n = ":sh wezterm cli spawn --new-window 'go run .'"
-
 
 # g + g
 # Git status
@@ -387,11 +368,9 @@ g = ":echo %sh{git status --short}"
 
 [keys.normal.s]
 
-
 # s + q
 # Fecha o buffer atual
 q = ":buffer-close!"
-
 
 # s + Q
 # Remove os arquivos temporários de saída
