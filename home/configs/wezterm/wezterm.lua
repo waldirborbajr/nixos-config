@@ -1,6 +1,7 @@
 -- ══════════════════════════════════════════════════════════════════════
 --  WezTerm Configuration
 --  Nord theme — Linux x86_64 + macOS Apple Silicon (M2)
+--  Font: JetBrainsMono Nerd Font @ 8.0
 -- ══════════════════════════════════════════════════════════════════════
 local wezterm = require("wezterm")
 local act = wezterm.action
@@ -14,9 +15,20 @@ config.color_scheme = "nord"
 config.default_cursor_style = "SteadyBar"
 config.force_reverse_video_cursor = true
 
-config.font = wezterm.font("JetBrainsMono Nerd Font")
-config.font_size = IS_MACOS and 13.5 or 8.5
-config.line_height = 1.2
+-- ── FONTE (JetBrainsMono Nerd Font @ 8.0) ─────────────────────────────
+config.font = wezterm.font_with_fallback({
+	{ family = "JetBrainsMono Nerd Font", weight = "Regular" },
+	"Symbols Nerd Font Mono",
+	"Noto Color Emoji",
+})
+
+config.font_size = 8.0
+config.line_height = 1.15
+config.cell_width = 1.0
+
+-- Melhora renderização em fontes pequenas
+config.freetype_load_target = "Light"
+config.freetype_render_target = "HorizontalLcd"
 
 config.window_decorations = IS_MACOS and "RESIZE" or "NONE"
 config.window_padding = { left = 6, right = 6, top = 4, bottom = 4 }
@@ -35,8 +47,8 @@ config.background = {
 
 -- ── BEHAVIOR ──────────────────────────────────────────────────────────
 
-config.initial_cols = 120
-config.initial_rows = 40
+config.initial_cols = 140
+config.initial_rows = 45
 config.automatically_reload_config = true
 config.window_close_confirmation = "NeverPrompt"
 config.adjust_window_size_when_changing_font_size = false
@@ -80,102 +92,67 @@ end)
 -- ── STATUS BAR (leader indicator + git branch + workspace + hora) ────
 -- Cache for git branch (avoids spawning git on every status update)
 local _git_cache = { path = nil, branch = nil, ts = 0 }
-local GIT_CACHE_TTL = 3  -- seconds
+local GIT_CACHE_TTL = 3 -- seconds
 
 local function get_git_branch(path)
-  local now = os.time()
-  if _git_cache.path == path and (now - _git_cache.ts) < GIT_CACHE_TTL then
-    return _git_cache.branch
-  end
-  local ok, stdout = wezterm.run_child_process({
-    "git", "-C", path, "rev-parse", "--abbrev-ref", "HEAD",
-  })
-  local branch = nil
-  if ok and stdout then
-    branch = stdout:gsub("%s+$", "")
-    if branch == "" then
-      branch = nil
-    end
-  end
-  _git_cache = { path = path, branch = branch, ts = now }
-  return branch
+	local now = os.time()
+	if _git_cache.path == path and (now - _git_cache.ts) < GIT_CACHE_TTL then
+		return _git_cache.branch
+	end
+	local ok, stdout = wezterm.run_child_process({
+		"git",
+		"-C",
+		path,
+		"rev-parse",
+		"--abbrev-ref",
+		"HEAD",
+	})
+	local branch = nil
+	if ok and stdout then
+		branch = stdout:gsub("%s+$", "")
+		if branch == "" then
+			branch = nil
+		end
+	end
+	_git_cache = { path = path, branch = branch, ts = now }
+	return branch
 end
 
 wezterm.on("update-status", function(window, pane)
-  local cells = {}
+	local cells = {}
 
-  -- indicador visual quando o leader (Ctrl+A) está ativo
-  if window:leader_is_active() then
-    table.insert(cells, { Foreground = { Color = "#2e3440" } })
-    table.insert(cells, { Background = { Color = "#88c0d0" } })
-    table.insert(cells, { Text = " LEADER " })
-    table.insert(cells, "ResetAttributes")
-  end
+	-- indicador visual quando o leader (Ctrl+A) está ativo
+	if window:leader_is_active() then
+		table.insert(cells, { Foreground = { Color = "#2e3440" } })
+		table.insert(cells, { Background = { Color = "#88c0d0" } })
+		table.insert(cells, { Text = " LEADER " })
+		table.insert(cells, "ResetAttributes")
+	end
 
-  -- nome do workspace atual
-  table.insert(cells, { Text = " " .. window:active_workspace() .. " " })
+	-- nome do workspace atual
+	table.insert(cells, { Text = " " .. window:active_workspace() .. " " })
 
-  -- se estiver numa sessão remota (SSH), mostra o domínio
-  local domain = pane:get_domain_name()
-  if domain and domain ~= "local" then
-    table.insert(cells, { Text = " 🌐 " .. domain .. " " })
-  end
+	-- se estiver numa sessão remota (SSH), mostra o domínio
+	local domain = pane:get_domain_name()
+	if domain and domain ~= "local" then
+		table.insert(cells, { Text = " 🌐 " .. domain .. " " })
+	end
 
-  -- branch git do diretório atual do painel (com cache de 3s)
-  local cwd = pane:get_current_working_dir()
-  if cwd then
-    local path = cwd.file_path or tostring(cwd)
-    local branch = get_git_branch(path)
-    if branch then
-      table.insert(cells, { Text = " 🌿 " .. branch .. " " })
-    end
-  end
+	-- branch git do diretório atual do painel (com cache de 3s)
+	local cwd = pane:get_current_working_dir()
+	if cwd then
+		local path = cwd.file_path or tostring(cwd)
+		local branch = get_git_branch(path)
+		if branch then
+			table.insert(cells, { Text = " 🌿 " .. branch .. " " })
+		end
+	end
 
-  -- hora
-  table.insert(cells, { Text = " " .. wezterm.strftime("%H:%M") .. " " })
+	-- hora
+	table.insert(cells, { Text = " " .. wezterm.strftime("%H:%M") .. " " })
 
-  window:set_right_status(wezterm.format(cells))
+	window:set_right_status(wezterm.format(cells))
 end)
-
--- ── STATUS BAR (leader indicator + git branch + workspace + hora) ────
--- wezterm.on("update-status", function(window, pane)
--- 	local cells = {}
-
--- 	-- indicador visual quando o leader (Ctrl+A) está ativo, esperando o próximo comando
--- 	if window:leader_is_active() then
--- 		table.insert(cells, { Foreground = { Color = "#2e3440" } })
--- 		table.insert(cells, { Background = { Color = "#88c0d0" } })
--- 		table.insert(cells, { Text = " LEADER " })
--- 		table.insert(cells, "ResetAttributes")
--- 	end
-
--- 	-- nome do workspace atual
--- 	table.insert(cells, { Text = " " .. window:active_workspace() .. " " })
-
--- 	-- se estiver numa sessão remota (SSH), mostra o domínio
--- 	local domain = pane:get_domain_name()
--- 	if domain and domain ~= "local" then
--- 		table.insert(cells, { Text = " 🌐 " .. domain .. " " })
--- 	end
-
--- 	-- branch git do diretório atual do painel
--- 	local cwd = pane:get_current_working_dir()
--- 	if cwd then
--- 		local path = cwd.file_path or tostring(cwd)
--- 		local ok, stdout = wezterm.run_child_process({ "git", "-C", path, "rev-parse", "--abbrev-ref", "HEAD" })
--- 		if ok and stdout then
--- 			local branch = stdout:gsub("%s+$", "")
--- 			if branch ~= "" then
--- 				table.insert(cells, { Text = " 🌿 " .. branch .. " " })
--- 			end
--- 		end
--- 	end
-
--- 	-- hora
--- 	table.insert(cells, { Text = " " .. wezterm.strftime("%H:%M") .. " " })
-
--- 	window:set_right_status(wezterm.format(cells))
--- end)
 
 -- ── TAB BAR ───────────────────────────────────────────────────────────
 
@@ -197,33 +174,33 @@ config.colors = {
 
 -- ── Quick Select patterns ────────────────────────────────────────────
 config.quick_select_patterns = {
-  -- Go: path com .go (relativo ou absoluto)
-  [[(?:[./\w-]+/)?[\w-]+\.go(?::\d+)?]],
+	-- Go: path com .go (relativo ou absoluto)
+	[[(?:[./\w-]+/)?[\w-]+\.go(?::\d+)?]],
 
-  -- Go: package path estilo module (github.com/foo/bar/...)
-  [[(?:[a-z0-9.-]+\.)+[a-z0-9-]+(?:/[\w.-]+)+]],
+	-- Go: package path estilo module (github.com/foo/bar/...)
+	[[(?:[a-z0-9.-]+\.)+[a-z0-9-]+(?:/[\w.-]+)+]],
 
-  -- Git: hash curto/longo (já existe no default, mas reforça)
-  [[\b[0-9a-f]{7,40}\b]],
+	-- Git: hash curto/longo (já existe no default, mas reforça)
+	[[\b[0-9a-f]{7,40}\b]],
 
-  -- Git: branch comum (feature/..., fix/..., main, master, develop)
-  [[\b(?:main|master|develop|dev|staging|prod|feature|fix|hotfix|release)/[\w./-]+\b]],
-  [[\b(?:feature|fix|hotfix|release)/[\w./-]+\b]],
+	-- Git: branch comum (feature/..., fix/..., main, master, develop)
+	[[\b(?:main|master|develop|dev|staging|prod|feature|fix|hotfix|release)/[\w./-]+\b]],
+	[[\b(?:feature|fix|hotfix|release)/[\w./-]+\b]],
 
-  -- Git: ref estilo origin/main
-  [[\b[\w.-]+/[\w./-]+\b]],
+	-- Git: ref estilo origin/main
+	[[\b[\w.-]+/[\w./-]+\b]],
 
-  -- Docker image:tag
-  [[\b[\w./-]+:[\w.-]+\b]],
+	-- Docker image:tag
+	[[\b[\w./-]+:[\w.-]+\b]],
 
-  -- UUID
-  [[\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b]],
+	-- UUID
+	[[\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b]],
 
-  -- Jira / ticket (PROJ-123)
-  [[\b[A-Z]{2,10}-\d+\b]],
+	-- Jira / ticket (PROJ-123)
+	[[\b[A-Z]{2,10}-\d+\b]],
 
-  -- Hex color
-  [[#[0-9a-fA-F]{3,8}\b]],
+	-- Hex color
+	[[#[0-9a-fA-F]{3,8}\b]],
 }
 
 -- ── SSH ───────────────────────────────────────────────────────────────
@@ -325,7 +302,10 @@ local function project_launcher()
 			end
 			for _, p in ipairs(projects) do -- projects already in scope — no second scan
 				if p.id == id then
-					window:perform_action(act.SwitchToWorkspace({ name = p.id, spawn = { cwd = p.path } }), pane)
+					window:perform_action(
+						act.SwitchToWorkspace({ name = p.id, spawn = { cwd = p.path } }),
+						pane
+					)
 					return
 				end
 			end
@@ -342,12 +322,10 @@ end
 --   LEADER+n            → new/switch workspace by name
 --   LEADER+t            → new tab
 --   LEADER+1..9         → jump to tab by number
---   LEADER+a            → removed (was Ctrl+A passthrough; tmux uses Ctrl+B)
 
 config.leader = { key = "a", mods = "CTRL", timeout_milliseconds = 800 }
 
 config.keys = {
-
 	-- ── Global (no leader) ──────────────────────────────────────────
 	{ key = "F11", mods = "NONE", action = act.ToggleFullScreen },
 	{
@@ -359,9 +337,7 @@ config.keys = {
 	},
 
 	-- ── Splits ──────────────────────────────────────────────────────
-	-- \ = vertical split (new pane to the right)
 	{ key = "\\", mods = "LEADER", action = act.SplitPane({ direction = "Right", size = { Percent = 50 } }) },
-	-- -  = horizontal split (new pane below)
 	{ key = "-", mods = "LEADER", action = act.SplitPane({ direction = "Down", size = { Percent = 40 } }) },
 
 	-- ── Pane navigation (LEADER+hjkl) ───────────────────────────────
@@ -385,11 +361,11 @@ config.keys = {
 			pane:move_to_new_window()
 		end),
 	},
-	
+
 	-- ── Tabs (LEADER+t / LEADER+x / LEADER+X / LEADER+[ / LEADER+]) ──
 	{ key = "t", mods = "LEADER", action = act.SpawnTab("CurrentPaneDomain") },
-	{ key = "x", mods = "LEADER", action = act.CloseCurrentPane({ confirm = false }) }, -- fecha só o painel
-	{ key = "X", mods = "LEADER|SHIFT", action = act.CloseCurrentTab({ confirm = false }) }, -- fecha a aba inteira
+	{ key = "x", mods = "LEADER", action = act.CloseCurrentPane({ confirm = false }) },
+	{ key = "X", mods = "LEADER|SHIFT", action = act.CloseCurrentTab({ confirm = false }) },
 	{ key = "[", mods = "LEADER", action = act.ActivateTabRelative(-1) },
 	{ key = "]", mods = "LEADER", action = act.ActivateTabRelative(1) },
 
@@ -419,32 +395,19 @@ config.keys = {
 	{ key = "q", mods = "LEADER", action = act.QuickSelect },
 	{ key = "s", mods = "LEADER", action = act.ShowLauncher },
 
-	-- ── Lazygit (LEADER+g) ────────────────────────────────────────────
-	-- {
-	-- 	key = "g",
-	-- 	mods = "LEADER",
-	-- 	action = act.SpawnCommandInNewTab({
-	-- 		args = { "lazygit" },
-	-- 		cwd = wezterm.home_dir, -- ou remova essa linha pra abrir no cwd do pane atual
-	-- 	}),
-	-- },	
-
-	-- LEADER+Q → só coisas git (hash + branch)
+	-- LEADER+g → só coisas git (hash + branch)
 	{
-	  key = "g",
-	  mods = "LEADER", -- |SHIFT
-	  action = act.QuickSelectArgs({
-	    label = "git",
-	    patterns = {
-	      [[\b[0-9a-f]{7,40}\b]],
-	      [[\b(?:main|master|develop|feature|fix|hotfix|release)/[\w./-]+\b]],
-	      [[\b(?:feature|fix|hotfix|release)/[\w./-]+\b]],
-	    },
-	  }),
+		key = "g",
+		mods = "LEADER",
+		action = act.QuickSelectArgs({
+			label = "git",
+			patterns = {
+				[[\b[0-9a-f]{7,40}\b]],
+				[[\b(?:main|master|develop|feature|fix|hotfix|release)/[\w./-]+\b]],
+				[[\b(?:feature|fix|hotfix|release)/[\w./-]+\b]],
+			},
+		}),
 	},
-	
-	-- LEADER+G → só paths Go / module paths (se quiser separado do lazygit)
-	-- (cuidado: você já usa LEADER+g pro lazygit)	
 
 	-- ── Ir para dotfiles (LEADER+c) ──────────────────────────────────
 	{
@@ -453,7 +416,7 @@ config.keys = {
 		action = act.SpawnCommandInNewTab({
 			cwd = wezterm.home_dir .. "/dotfiles",
 		}),
-	},	
+	},
 }
 
 -- ── Trocar de aba por número (LEADER + 1..9) ────────────────────────
@@ -461,7 +424,7 @@ for i = 1, 9 do
 	table.insert(config.keys, {
 		key = tostring(i),
 		mods = "LEADER",
-		action = act.ActivateTab(i - 1), -- índice começa em 0
+		action = act.ActivateTab(i - 1),
 	})
 end
 
