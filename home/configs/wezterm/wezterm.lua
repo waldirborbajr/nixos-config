@@ -24,7 +24,7 @@ config.font = wezterm.font_with_fallback({
 	"Noto Color Emoji",
 })
 
-config.font_size = IS_MACOS and 13.5 or 8.0
+config.font_size = IS_MACOS and 13.5 or 9.0
 config.line_height = IS_MACOS and 1.2 or 1.15
 config.cell_width = 1.0
 
