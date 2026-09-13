@@ -201,7 +201,6 @@ d = [
   ":open /tmp/helix-git-diff.txt",
 ]
 
-
 # ==========================================================
 # RUST
 # Prefix: r
@@ -209,85 +208,82 @@ d = [
 
 [keys.normal.r]
 
-# r + r
-# Cargo run
+# r + r → Cargo run (saída em novo buffer)
 r = [
   ":sh cargo run > /tmp/helix-rust-output.txt 2>&1 || true",
   ":open /tmp/helix-rust-output.txt",
 ]
 
-# r + c
-# Cargo check
+# r + R → Cargo run --release (saída em novo buffer)
+R = [
+  ":sh cargo run --release > /tmp/helix-rust-output.txt 2>&1 || true",
+  ":open /tmp/helix-rust-output.txt",
+]
+
+# r + a → Cargo run com argumentos (saída em novo buffer)
+a = [
+  ":sh read -p 'Args: ' args; cargo run -- $args > /tmp/helix-rust-output.txt 2>&1 || true",
+  ":open /tmp/helix-rust-output.txt",
+]
+
+# r + c → Cargo check (saída em novo buffer)
 c = [
   ":sh cargo check > /tmp/helix-rust-output.txt 2>&1 || true",
   ":open /tmp/helix-rust-output.txt",
 ]
 
-# r + b
-# Cargo build
+# r + b → Cargo build (saída em novo buffer)
 b = [
   ":sh cargo build > /tmp/helix-rust-output.txt 2>&1 || true",
   ":open /tmp/helix-rust-output.txt",
 ]
 
-# r + t
-# Cargo test
+# r + t → Cargo test (saída em novo buffer)
 t = [
   ":sh cargo test > /tmp/helix-rust-output.txt 2>&1 || true",
   ":open /tmp/helix-rust-output.txt",
 ]
 
-# r + T
-# Cargo test com output
+# r + T → Cargo test --nocapture (saída em novo buffer)
 T = [
   ":sh cargo test -- --nocapture > /tmp/helix-rust-output.txt 2>&1 || true",
   ":open /tmp/helix-rust-output.txt",
 ]
 
-# r + l
-# Cargo clippy
+# r + l → Cargo clippy (saída em novo buffer)
 l = [
   ":sh cargo clippy --all-targets --all-features > /tmp/helix-rust-output.txt 2>&1 || true",
   ":open /tmp/helix-rust-output.txt",
 ]
 
-# r + f
-# Cargo fmt
+# r + f → Cargo fmt
 f = ":sh cargo fmt > /tmp/helix-rust-output.txt 2>&1 || true"
 
-# r + F
-# Cargo fmt check
+# r + F → Cargo fmt --check
 F = ":sh cargo fmt -- --check > /tmp/helix-rust-output.txt 2>&1 || true"
 
-# r + d
-# Cargo documentation
+# r + d → Cargo doc (saída em novo buffer)
 d = [
   ":sh cargo doc --no-deps > /tmp/helix-rust-output.txt 2>&1 || true",
   ":open /tmp/helix-rust-output.txt",
 ]
 
-# r + x
-# Cargo clean
+# r + x → Cargo clean
 x = ":sh cargo clean > /tmp/helix-rust-output.txt 2>&1 || true"
 
-# r + w
-# Cargo watch test
-# Requer: cargo install cargo-watch
+# r + w → Cargo watch test (saída em novo buffer)
 w = [
   ":sh cargo watch -x test > /tmp/helix-rust-output.txt 2>&1 || true",
   ":open /tmp/helix-rust-output.txt",
 ]
 
-# r + n
-# Cargo run em nova janela WezTerm
+# r + n → Cargo run em nova janela WezTerm (interativo)
 n = ":sh wezterm cli spawn --new-window cargo run"
 
-# r + m
-# Cargo run com less
+# r + m → Cargo run com less (nova janela WezTerm)
 m = ":sh wezterm cli spawn --new-window 'cargo run 2>&1 | less'"
 
-# r + g
-# Git status
+# r + g → Git status
 g = ":echo %sh{git status --short}"
 
 
@@ -298,67 +294,69 @@ g = ":echo %sh{git status --short}"
 
 [keys.normal.g]
 
-# g + r
-# Go run
+# g + r → Go run (saída em novo buffer)
 r = [
   ":sh go run . > /tmp/helix-go-output.txt 2>&1 || true",
   ":open /tmp/helix-go-output.txt",
 ]
 
-# g + b
-# Go build
+# g + R → Go run com argumentos (saída em novo buffer)
+R = [
+  ":sh read -p 'Args: ' args; go run . $args > /tmp/helix-go-output.txt 2>&1 || true",
+  ":open /tmp/helix-go-output.txt",
+]
+
+# g + B → Go build + run binário (saída em novo buffer)
+B = [
+  ":sh go build -o /tmp/go-run-bin . && /tmp/go-run-bin > /tmp/helix-go-output.txt 2>&1 || true",
+  ":open /tmp/helix-go-output.txt",
+]
+
+# g + b → Go build (saída em novo buffer)
 b = [
   ":sh go build ./... > /tmp/helix-go-output.txt 2>&1 || true",
   ":open /tmp/helix-go-output.txt",
 ]
 
-# g + p
-# Go test current package
+# g + p → Go test current package (saída em novo buffer)
 p = [
   ":sh go test > /tmp/helix-go-output.txt 2>&1 || true",
   ":open /tmp/helix-go-output.txt",
 ]
 
-# g + t
-# Go test entire module
+# g + t → Go test entire module (saída em novo buffer)
 t = [
   ":sh go test ./... > /tmp/helix-go-output.txt 2>&1 || true",
   ":open /tmp/helix-go-output.txt",
 ]
 
-# g + d
-# Go test with race detector
+# g + d → Go test -race (saída em novo buffer)
 d = [
   ":sh go test -race ./... > /tmp/helix-go-output.txt 2>&1 || true",
   ":open /tmp/helix-go-output.txt",
 ]
 
-# g + v
-# Go vet
+# g + v → Go vet (saída em novo buffer)
 v = [
   ":sh go vet ./... > /tmp/helix-go-output.txt 2>&1 || true",
   ":open /tmp/helix-go-output.txt",
 ]
 
-# g + f
-# Format current file
+# g + f → Format current file
 f = ":sh gofmt -w %{buffer_name}"
 
-# g + x
-# Go generate
+# g + x → Go generate
 x = ":sh go generate ./... > /tmp/helix-go-output.txt 2>&1 || true"
 
-# g + m
-# Go mod tidy
+# g + m → Go mod tidy
 m = ":sh go mod tidy > /tmp/helix-go-output.txt 2>&1 || true"
 
-# g + n
-# Go run em nova janela WezTerm
+# g + n → Go run em nova janela WezTerm (interativo)
 n = ":sh wezterm cli spawn --new-window 'go run .'"
 
-# g + g
-# Git status
+# g + g → Git status
 g = ":echo %sh{git status --short}"
+
 
 
 # ==========================================================
