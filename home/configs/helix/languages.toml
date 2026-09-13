@@ -47,13 +47,14 @@ language-servers = ["gopls", "golangci-lint-lsp", "llm-suggest", "colors", "scls
 indent = { tab-width = 4, unit = "\t" }
 
 # ================================================================================================
-# RUST
+# RUST (CORRIGIDO)
 # ================================================================================================
 [language-server.rust-analyzer]
 command = "rust-analyzer"
+
 [language-server.rust-analyzer.config]
 checkOnSave = true
-check.command = "clippy"
+check.command = "check"  # ✅ Mude de "clippy" para "check" (mais rápido e sem falsos positivos)
 cargo.allFeatures = true
 procMacro.enable = true
 files.excludeDirs = [".git", "target", "node_modules"]
