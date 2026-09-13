@@ -1,7 +1,8 @@
 -- ══════════════════════════════════════════════════════════════════════
 --  WezTerm Configuration
 --  Nord theme — Linux x86_64 + macOS Apple Silicon (M2)
---  Font: JetBrainsMono Nerd Font @ 8.0
+--  Font: JetBrainsMono Nerd Font
+--        macOS → 13.5  |  Linux → 8.0
 -- ══════════════════════════════════════════════════════════════════════
 local wezterm = require("wezterm")
 local act = wezterm.action
@@ -15,20 +16,23 @@ config.color_scheme = "nord"
 config.default_cursor_style = "SteadyBar"
 config.force_reverse_video_cursor = true
 
--- ── FONTE (JetBrainsMono Nerd Font @ 8.0) ─────────────────────────────
+-- ── FONTE (JetBrainsMono Nerd Font) ───────────────────────────────────
+-- macOS: 13.5  |  Linux: 8.0
 config.font = wezterm.font_with_fallback({
 	{ family = "JetBrainsMono Nerd Font", weight = "Regular" },
 	"Symbols Nerd Font Mono",
 	"Noto Color Emoji",
 })
 
-config.font_size = 8.0
-config.line_height = 1.15
+config.font_size = IS_MACOS and 13.5 or 8.0
+config.line_height = IS_MACOS and 1.2 or 1.15
 config.cell_width = 1.0
 
--- Melhora renderização em fontes pequenas
-config.freetype_load_target = "Light"
-config.freetype_render_target = "HorizontalLcd"
+-- Melhora renderização em fontes pequenas (só faz diferença no Linux)
+if not IS_MACOS then
+	config.freetype_load_target = "Light"
+	config.freetype_render_target = "HorizontalLcd"
+end
 
 config.window_decorations = IS_MACOS and "RESIZE" or "NONE"
 config.window_padding = { left = 6, right = 6, top = 4, bottom = 4 }
@@ -47,8 +51,11 @@ config.background = {
 
 -- ── BEHAVIOR ──────────────────────────────────────────────────────────
 
-config.initial_cols = 140
-config.initial_rows = 45
+-- Ajusta tamanho inicial da janela conforme plataforma
+-- (fonte menor no Linux → mais colunas/linhas cabem)
+config.initial_cols = IS_MACOS and 120 or 140
+config.initial_rows = IS_MACOS and 40 or 45
+
 config.automatically_reload_config = true
 config.window_close_confirmation = "NeverPrompt"
 config.adjust_window_size_when_changing_font_size = false
