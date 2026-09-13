@@ -17,6 +17,10 @@
     # opcional, combina com o resto do repo
     epkgs.magit
 
+    # terminal real (não shell-mode/eshell) — só assim escapes ANSI de
+    # cor E hyperlinks OSC 8 (tipo os do `cargo`) renderizam certo
+    epkgs.eat
+
     # usados pelo init.el atual (use-package), fora do que já tínhamos
     epkgs.catppuccin-theme
     epkgs.vertico
