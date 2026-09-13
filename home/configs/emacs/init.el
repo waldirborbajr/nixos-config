@@ -121,7 +121,12 @@
   (add-to-list 'eglot-server-programs
                '((python-mode python-ts-mode) . ("pyright-langserver" "--stdio"))))
 
-;; Inicia o Eglot automaticamente somente nos modos com servidor configurado.
+;; Inicia o Eglot automaticamente somente nos modos com servidor configurado
+;; e dentro de um projeto que o servidor consegue descobrir.
+(defun borba/rust-workspace-p ()
+  (and (derived-mode-p 'rust-mode 'rust-ts-mode)
+       (locate-dominating-file default-directory "Cargo.toml")))
+
 (defun borba/eglot-ensure-for-supported-mode ()
   (when (memq major-mode
               '(rust-mode rust-ts-mode
@@ -129,7 +134,9 @@
                 nix-mode nix-ts-mode
                 lua-mode lua-ts-mode
                 python-mode python-ts-mode))
-    (eglot-ensure)))
+    (when (or (not (derived-mode-p 'rust-mode 'rust-ts-mode))
+              (borba/rust-workspace-p))
+      (eglot-ensure))))
 
 (add-hook 'prog-mode-hook #'borba/eglot-ensure-for-supported-mode)
 
@@ -140,9 +147,6 @@
 (use-package rust-mode
   :mode "\\.rs\\'"
   :hook (rust-mode . prettify-symbols-mode))
-
-(when (fboundp 'rust-ts-mode)
-  (add-to-list 'major-mode-remap-alist '(rust-mode . rust-ts-mode)))
 
 (use-package go-mode :mode "\\.go\\'")
 

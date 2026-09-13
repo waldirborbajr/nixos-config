@@ -44,7 +44,6 @@
         tree-sitter-nix
         tree-sitter-lua
         tree-sitter-go
-        tree-sitter-rust
         tree-sitter-python
       ]
   );
