@@ -21,6 +21,38 @@
     # cor E hyperlinks OSC 8 (tipo os do `cargo`) renderizam certo
     epkgs.eat
 
+    # busca/navegação (usa o mesmo vertico/orderless de cima) + ações
+    # contextuais sobre o resultado
+    epkgs.consult
+    epkgs.embark
+    epkgs.embark-consult
+
+    # mostra os bindings disponíveis depois de um prefixo (C-c, C-x...)
+    epkgs.which-key
+
+    # sinaliza mudanças de git na fringe enquanto edita (complementa o magit)
+    epkgs.diff-hl
+
+    # destaca TODO/FIXME/HACK/XXX nos comentários
+    epkgs.hl-todo
+
+    # highlight/indentação pra Cargo.toml, CI yaml, sops secrets.yaml etc.
+    epkgs.yaml-mode
+    epkgs.toml-mode
+
+    # colore parênteses/chaves por nível de aninhamento
+    epkgs.rainbow-delimiters
+
+    # pula o cursor pra qualquer ponto visível na tela com poucas teclas
+    epkgs.avy
+
+    # snippets minimalistas que já usam completion-at-point (mesmo
+    # pipeline do cape/corfu, sem motor de template separado)
+    epkgs.tempel
+
+    # debugger (Debug Adapter Protocol) integrado ao eglot
+    epkgs.dape
+
     # usados pelo init.el atual (use-package), fora do que já tínhamos
     epkgs.catppuccin-theme
     epkgs.vertico
