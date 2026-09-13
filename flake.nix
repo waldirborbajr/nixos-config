@@ -37,6 +37,14 @@
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # 🦀 rust-overlay — fornece `pkgs.rust-bin` (toolchain unificado,
+    #    com rustc/cargo/rust-analyzer/rustfmt/clippy SEMPRE sincronizados).
+    #    Sem isso, `rust-bin` fica undefined nos módulos.
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -45,6 +53,7 @@
     sops-nix,
     home-manager,
     treefmt-nix,
+    rust-overlay,
     ...
   } @ inputs: let
     # 🖥️  Hosts NixOS (gerenciam sistema + home-manager embutido)
@@ -71,6 +80,14 @@
           # 🏠 Home Manager (fase 2)
           home-manager.nixosModules.home-manager
 
+          # 🦀 rust-overlay — torna `pkgs.rust-bin` disponível em
+          #    todos os módulos do sistema (incluindo development/rust.nix).
+          {
+            nixpkgs.overlays = [
+              rust-overlay.overlays.default
+            ];
+          }
+
           ./configuration.nix
           ./hosts/${hostname}/default.nix # ← macutm ou macvmf, nunca os dois juntos
           ./hosts/${hostname}/hardware-configuration.nix # ← idem
@@ -87,6 +104,12 @@
         pkgs = import nixpkgs {
           inherit system;
           config.allowUnfree = true;
+
+          # 🦀 rust-overlay também no macOS físico, para o toolchain
+          #    Rust ficar sincronizado via home-manager.
+          overlays = [
+            rust-overlay.overlays.default
+          ];
         };
 
         extraSpecialArgs = {
