@@ -187,6 +187,88 @@
 
 (use-package magit :bind (("C-c g" . magit-status)))
 
+;; `M-x shell`/`eshell` não interpretam escapes ANSI de cor nem os
+;; hyperlinks OSC 8 que o `cargo` emite (o `^[[...`/`^[]8;;...` cru que
+;; apareceu na tela). `eat` é um emulador de terminal de verdade — usa
+;; `M-x eat` e roda `cargo run` lá dentro.
+(use-package eat :bind (("C-c t" . eat)))
+
+;; consult: comandos de busca/navegação (linha, buffer, ripgrep, imenu,
+;; histórico do kill-ring) que usam o mesmo vertico/orderless de cima
+;; pra filtrar — é o "verbo" que faltava pro vertico já instalado.
+(use-package consult
+  :bind (("C-s" . consult-line)
+         ("C-x b" . consult-buffer)
+         ("M-y" . consult-yank-pop)
+         ("C-c i" . consult-imenu)
+         ("C-c r" . consult-ripgrep)))
+
+;; embark: ações contextuais sobre o que estiver sob o cursor ou
+;; selecionado no minibuffer (abrir, matar buffer, exportar um resultado
+;; de busca pra um grep-edit editável). embark-consult conecta os dois.
+(use-package embark
+  :bind (("C-." . embark-act)
+         ("C-;" . embark-dwim)))
+(use-package embark-consult
+  :after (embark consult)
+  :hook (embark-collect-mode . consult-preview-at-point-mode))
+
+;; which-key: depois de apertar um prefixo (C-c, C-x...) mostra num
+;; popup os bindings disponíveis, em vez de precisar decorar tudo.
+(use-package which-key
+  :demand t
+  :config
+  (which-key-mode 1))
+
+;; diff-hl: marca na fringe quais linhas mudaram/foram adicionadas/
+;; removidas em relação ao git enquanto você edita — complementa o
+;; magit, que só mostra isso no status/diff.
+(use-package diff-hl
+  :demand t
+  :config
+  (global-diff-hl-mode 1)
+  (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
+
+;; hl-todo: destaca TODO/FIXME/HACK/XXX nos comentários com cor, pra não
+;; passar batido lendo o código.
+(use-package hl-todo
+  :demand t
+  :config
+  (global-hl-todo-mode 1))
+
+;; yaml-mode/toml-mode: highlight e indentação decentes pros arquivos
+;; que você mais mexe fora de código de verdade (Cargo.toml, CI yaml,
+;; sops secrets.yaml).
+(use-package yaml-mode)
+(use-package toml-mode)
+
+;; rainbow-delimiters: colore parênteses/colchetes/chaves por nível de
+;; aninhamento — ajuda em Rust e principalmente em elisp/nix.
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
+
+;; avy: pula o cursor pra qualquer palavra/caractere visível na tela com
+;; 2-3 teclas, sem contar linhas nem soltar o teclado.
+(use-package avy
+  :bind (("C-'" . avy-goto-char-timer)))
+
+;; tempel: snippets minimalistas (sintaxe é só lista de Emacs Lisp, sem
+;; linguagem de template própria) que entram no mesmo
+;; completion-at-point-functions do cape/corfu — não é mais um motor de
+;; completion rodando em paralelo.
+(use-package tempel
+  :bind (("M-+" . tempel-complete)
+         ("M-*" . tempel-insert))
+  :init
+  (add-hook 'completion-at-point-functions #'tempel-expand))
+
+;; dape: debugger integrado (Debug Adapter Protocol), mesmo ecossistema
+;; do eglot. Já vem com config pronta pra Go (usa `delve`, incluso no
+;; home.packages de emacs-vanilla.nix). Rust precisa de um adapter
+;; separado (`codelldb`, não empacotado aqui por padrão) — quando for
+;; configurar, veja `M-x customize-variable RET dape-configs`.
+(use-package dape)
+
 (defun borba/format-buffer ()
   "Format the current buffer."
   (interactive)
