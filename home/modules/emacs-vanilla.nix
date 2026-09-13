@@ -55,7 +55,6 @@ in {
     # avisar, e sem LSP não tem autocomplete nem diagnóstico de erro.
     # Instalando global aqui funciona como fallback; projetos com devshell
     # continuam pegando a versão pinada de lá via direnv normalmente.
-    pkgs.rust-analyzer
     pkgs.rustfmt
     pkgs.gopls
     pkgs.go
