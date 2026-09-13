@@ -1,4 +1,4 @@
-# modules/nixos/users-and-home.nix
+# modules/system/users-and-home.nix
 #
 # Shell padrão, usuário principal, greeter, wiring do home-manager e
 # regra de sudo NOPASSWD. Extraído 1:1 de configuration.nix (split

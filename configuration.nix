@@ -12,15 +12,15 @@ in {
   imports = [
     # hardware-configuration.nix is imported per-host via flake.nix
 
-    ./modules/nixos/system-base.nix
-    ./modules/nixos/fonts.nix
-    ./modules/nixos/users-and-home.nix
-    ./modules/nixos/desktop-niri.nix
-    ./modules/nixos/audio.nix
-    ./modules/nixos/hardware-quirks.nix
-    ./modules/nixos/packages.nix
-    ./modules/nixos/ssh.nix
-    ./modules/nixos/sops.nix
+    ./modules/system/system-base.nix
+    ./modules/system/fonts.nix
+    ./modules/system/users-and-home.nix
+    ./modules/system/desktop-niri.nix
+    ./modules/system/audio.nix
+    ./modules/system/hardware-quirks.nix
+    ./modules/system/packages.nix
+    ./modules/system/ssh.nix
+    ./modules/system/sops.nix
 
     # ==================== CONTAINERS / K8S (sob demanda) ====================
     # Docker, Podman e Kubernetes local são usados só em projetos
@@ -30,9 +30,9 @@ in {
     # containers-podman.nix são independentes (pode ligar só um, ou os
     # dois); kubernetes-dev.nix (k3d+kubectl+k9s) precisa de um dos dois
     # ligado junto, já que o k3d cria os nodes do cluster como containers.
-    # ./modules/nixos/containers-docker.nix
-    # ./modules/nixos/containers-podman.nix
-    # ./modules/nixos/kubernetes-dev.nix
+    # ./modules/system/containers-docker.nix
+    # ./modules/system/containers-podman.nix
+    # ./modules/system/kubernetes-dev.nix
 
     # ==================== DEVELOPMENT ====================
     # Base comum + linguagens explicitamente habilitadas abaixo.

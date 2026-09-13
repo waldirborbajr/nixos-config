@@ -1,4 +1,4 @@
-# modules/nixos/containers-docker.nix
+# modules/system/containers-docker.nix
 #
 # Docker Engine — desligado por padrão. Import comentado em
 # configuration.nix; descomente, rode o rebuild, use; comente de novo e

@@ -8,7 +8,7 @@
   configs = ../configs;
 in {
   # ==================== GTK / ÍCONES (sessão real, não o greeter) ====================
-  # O Papirus-Dark em modules/nixos/desktop-niri.nix só é usado pelo regreet
+  # O Papirus-Dark em modules/system/desktop-niri.nix só é usado pelo regreet
   # (tela de login) — a sessão niri em si não tinha NENHUM tema de ícones
   # apontado, então apps GTK (Nemo, etc.) e o Vicinae caíam no ícone
   # genérico "?" por falta de XDG icon theme. Mesma combinação

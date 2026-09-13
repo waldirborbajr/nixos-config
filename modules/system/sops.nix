@@ -1,4 +1,4 @@
-# modules/nixos/sops.nix
+# modules/system/sops.nix
 #
 # sops-nix: arquivo/segredos padrão + bootstrap zero-touch da chave de
 # host SSH. Extraído 1:1 de configuration.nix (split cirúrgico, sem

@@ -1,4 +1,4 @@
-# modules/nixos/desktop-niri.nix
+# modules/system/desktop-niri.nix
 #
 # Sessão niri: compositor, greetd/regreet, display manager, portal XDG,
 # dconf e direnv. Extraído 1:1 de configuration.nix (split cirúrgico,

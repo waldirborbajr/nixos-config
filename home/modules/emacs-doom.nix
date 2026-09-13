@@ -6,7 +6,7 @@
 }: let
   # emacs-pgtk = build nativa GTK (ícones, transparência, melhor suporte a
   # Wayland/X11), vinda do overlay nix-community/emacs-overlay aplicado
-  # globalmente em modules/nixos/users-and-home.nix (nixpkgs.overlays) —
+  # globalmente em modules/system/users-and-home.nix (nixpkgs.overlays) —
   # o emacs-overlay NÃO expõe essas variantes como saída de flake
   # (`packages.${system}.emacs-pgtk` não existe), só via overlay em cima do
   # pkgs normal. Nome do atributo mudou de emacsPgtk (camelCase, deprecado)

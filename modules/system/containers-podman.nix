@@ -1,4 +1,4 @@
-# modules/nixos/containers-podman.nix
+# modules/system/containers-podman.nix
 #
 # Podman — desligado por padrão. Import comentado em configuration.nix;
 # descomente, rode o rebuild, use; comente de novo e rebuild quando não

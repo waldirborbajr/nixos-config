@@ -1,4 +1,4 @@
-# modules/nixos/hardware-quirks.nix
+# modules/system/hardware-quirks.nix
 #
 # nix-ld (binários dinâmicos genéricos) e bluetooth. Extraído 1:1 de
 # configuration.nix (split cirúrgico, sem mudança de comportamento) —

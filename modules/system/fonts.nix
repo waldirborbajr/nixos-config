@@ -1,4 +1,4 @@
-# modules/nixos/fonts.nix
+# modules/system/fonts.nix
 #
 # Extraído 1:1 de configuration.nix (split cirúrgico, sem mudança de
 # comportamento).

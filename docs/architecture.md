@@ -11,7 +11,7 @@ no Home Manager.
 flake.nix
 ├── nixosConfigurations
 │   └── hosts/<host>/
-├── modules/nixos/             # sistema e infraestrutura
+├── modules/system/            # sistema e infraestrutura
 ├── modules/development/       # ferramentas e ambientes de desenvolvimento
 ├── devshells/                 # shells de projeto especializados
 └── home/                      # usuário e dotfiles
@@ -47,7 +47,7 @@ para o módulo de desenvolvimento perca funcionalidades.
 ## Sistema global
 
 Ferramentas de desenvolvimento não devem ser colocadas em
-`modules/nixos/packages.nix`. O pacote global deve ser reservado para
+`modules/system/packages.nix`. O pacote global deve ser reservado para
 funcionalidade necessária ao sistema, desktop, infraestrutura e ferramentas
 que não são específicas de desenvolvimento.
 
