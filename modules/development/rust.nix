@@ -46,6 +46,13 @@
       RUSTFLAGS = "-C link-arg=-fuse-ld=mold";
       RUSTC_WRAPPER = "${pkgs.sccache}/bin/sccache";
       CARGO_TERM_COLOR = "always";
+      # O cargo emite hyperlinks OSC 8 (ex: no link do `dev profile` do
+      # `cargo run`) quando acha que o terminal suporta. `ansi-color.el`
+      # do Emacs só entende/remove escapes SGR (cor) — OSC 8 é outro tipo
+      # de sequência e fica cru em qualquer buffer (compile, shell, eat
+      # sem term real). Mais simples desligar na fonte do que tentar
+      # filtrar isso no Emacs.
+      CARGO_TERM_HYPERLINKS = "false";
     };
   };
 }
