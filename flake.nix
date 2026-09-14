@@ -48,6 +48,7 @@
   };
 
   outputs = {
+    self,
     nixpkgs,
     nixpkgs-unstable,
     sops-nix,
@@ -176,8 +177,12 @@
 
     # `nix flake check` agora também valida formatação.
     checks = nixpkgs.lib.genAttrs supportedSystems (system: {
+      # `config.build.check` é uma FUNÇÃO (self: derivation), não a
+      # derivation em si — usa `self` (o flake) como `src` do check.
+      # Sem passar `self` aqui, o output vira uma função e o
+      # `nix flake check` falha com "is not a derivation".
       formatting =
-        (treefmt-nix.lib.evalModule nixpkgs.legacyPackages.${system} ./treefmt.nix).config.build.check;
+        (treefmt-nix.lib.evalModule nixpkgs.legacyPackages.${system} ./treefmt.nix).config.build.check self;
     });
   };
 }
