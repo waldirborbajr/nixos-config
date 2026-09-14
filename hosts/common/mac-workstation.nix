@@ -38,13 +38,12 @@
       jujutsu
       lazyjj
       nitch
+      leaf
+      ghgrab
+      kew
 
       flameshot
       vlc
-
-      # emacs
-      # emacsPackages.vterm
-      # emacsPackages.pbcopy
 
       dex
       autorandr
@@ -95,6 +94,7 @@
     ++ (with pkgs-unstable; [
       diskonaut-ng # TUI de espaço em disco
       handy # speech to text (app tauri/rust)
+      lazyrsync
     ])
     # ---- Browsers (família Mac) ----
     ++ [
