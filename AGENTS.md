@@ -5,8 +5,8 @@
 Flake multi-host NixOS + Home Manager config for 4 physical/VM hosts plus
 one standalone macOS home-manager profile:
 
-- `configuration.nix` — thin index, imports topic modules from `modules/nixos/`.
-- `modules/nixos/` — system-level modules split by topic (system-base, fonts,
+- `configuration.nix` — thin index, imports topic modules from `modules/system/`.
+- `modules/system/` — system-level modules split by topic (system-base, fonts,
   users-and-home, desktop-niri, audio, hardware-quirks, packages, ssh, sops,
   containers-docker, containers-podman, kubernetes-dev).
 - `home/` — Home Manager config. `home/default.nix` is a thin index importing
@@ -58,8 +58,8 @@ If a stricter convention is wanted later, mirror Foundry's
 
 ```
 .
-├── configuration.nix          # thin index -> modules/nixos/
-├── modules/nixos/             # system-level modules by topic
+├── configuration.nix          # thin index -> modules/system/
+├── modules/system/            # system-level modules by topic
 │   ├── system-base.nix
 │   ├── fonts.nix
 │   ├── users-and-home.nix

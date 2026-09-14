@@ -1,4 +1,4 @@
-# modules/nixos/packages.nix
+# modules/system/packages.nix
 #
 # allowUnfree, aliases de shell, lista de pacotes do sistema e
 # configuração do Nix (gc/optimise/settings). Extraído 1:1 de

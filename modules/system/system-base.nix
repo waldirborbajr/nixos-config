@@ -1,4 +1,4 @@
-# modules/nixos/system-base.nix
+# modules/system/system-base.nix
 #
 # Kernel, tmpfiles (ssh dir + regreet), política de sleep,
 # segurança/sessão, rede e timezone/locale. Base comum a todos os hosts.

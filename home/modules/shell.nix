@@ -40,7 +40,7 @@ in {
   ];
 
   # Editor padrão da sessão — única fonte de verdade agora (antes também
-  # estava em modules/nixos/packages.nix como environment.variables;
+  # estava em modules/system/packages.nix como environment.variables;
   # removido de lá porque isso é preferência de usuário, não algo que
   # outras contas da máquina precisem herdar).
   home.sessionVariables = {

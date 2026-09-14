@@ -1,4 +1,4 @@
-# modules/nixos/audio.nix
+# modules/system/audio.nix
 #
 # PipeWire (substitui pulseaudio) + rtkit. Extraído 1:1 de
 # configuration.nix (split cirúrgico, sem mudança de comportamento).

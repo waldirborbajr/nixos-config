@@ -6,7 +6,7 @@ NixOS - BORBA JR, W - Configuration
 </h1>
 
 Flake multi-host (`flake.nix` → `configuration.nix` como índice fino,
-importando módulos por tópico em `modules/nixos/` → `hosts/<host>/default.nix`,
+importando módulos por tópico em `modules/system/` → `hosts/<host>/default.nix`,
 com `hosts/common/*.nix` para a família Mac), com
 [Home Manager](https://github.com/nix-community/home-manager) cuidando
 do usuário (`home/default.nix` + `home/configs/`) e
@@ -14,7 +14,7 @@ do usuário (`home/default.nix` + `home/configs/`) e
 host. Ver [`AUDIT-REPORT.md`](AUDIT-REPORT.md) para o histórico de
 correções aplicadas à árvore real (bugs de duplicação, docs desalinhadas)
 e [`REFACTOR-NOTES.md`](REFACTOR-NOTES.md) para o split do antigo
-`configuration.nix` monolítico em `modules/nixos/`.
+`configuration.nix` monolítico em `modules/system/`.
 
 ## 🖥️ Supported Hardware
 
@@ -102,7 +102,7 @@ e [`REFACTOR-NOTES.md`](REFACTOR-NOTES.md) para o split do antigo
 - Primeira ativação usa `home.backupFileExtension = "hm-backup"` —
   dotfile pré-existente e não gerido pelo Nix vira `<arquivo>.hm-backup`
   em vez de ser sobrescrito sem cópia
-- **Pacotes das VMs (`macutm`/`macvmf`) ou de `modules/nixos/packages.nix`
+- **Pacotes das VMs (`macutm`/`macvmf`) ou de `modules/system/packages.nix`
   não chegam aqui** — são `nixosConfigurations` completamente separadas;
   só o que está em `home/modules/{identity,shell,editors,cli-and-terminal}.nix`
   ou direto em `hosts/macbook/home.nix` é compartilhado com este host
@@ -118,7 +118,7 @@ com sua própria lista de pacotes, mais enxuta, e Firefox estável.
 
 ______________________________________________________________________
 
-## 🧩 Módulos compartilhados (`modules/nixos/`)
+## 🧩 Módulos compartilhados (`modules/system/`)
 
 `configuration.nix` é hoje só um índice: `imports = [ ... ]` apontando pros
 arquivos abaixo, aplicados a **todos** os hosts. Split puramente
@@ -155,9 +155,9 @@ o import comentado** em `configuration.nix`. Pra usar:
 
 ```bash
 # configuration.nix — descomente a(s) linha(s) relevante(s):
-# ./modules/nixos/containers-docker.nix
-# ./modules/nixos/containers-podman.nix
-# ./modules/nixos/kubernetes-dev.nix
+# ./modules/system/containers-docker.nix
+# ./modules/system/containers-podman.nix
+# ./modules/system/kubernetes-dev.nix
 ```
 
 depois rode o rebuild normal (`./nixos-manager.sh flake` ou `build`).

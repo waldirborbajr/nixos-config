@@ -1,4 +1,4 @@
-# modules/nixos/kubernetes-dev.nix
+# modules/system/kubernetes-dev.nix
 #
 # Kubernetes local, pra quando precisar — desligado por padrão. Import
 # comentado em configuration.nix; descomente, rode o rebuild, use;

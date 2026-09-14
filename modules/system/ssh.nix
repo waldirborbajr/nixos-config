@@ -1,4 +1,4 @@
-# modules/nixos/ssh.nix
+# modules/system/ssh.nix
 #
 # OpenSSH server + client configuration. Private client identities are
 # provisioned by sops-nix and never embedded in the Nix store.
