@@ -1,4 +1,4 @@
-{pkgs, ...}: let
+{pkgs, lib, ...}: let
   configs = ../configs;
 
   myEmacs = pkgs.emacs.pkgs.withPackages (epkgs: [
@@ -129,11 +129,15 @@ in {
   # sessão inteira de debug. Move qualquer um desses de lado (se não for já
   # um symlink nosso) antes de cada ativação.
   # ---------------------------------------------------------------------
-  # home.activation.removeLegacyEmacsInit = lib.hm.dag.entryBefore ["writeBoundary"] ''
-  #   for f in "$HOME/.emacs" "$HOME/.emacs.el"; do
-  #     if [ -e "$f" ] && [ ! -L "$f" ]; then
-  #       $DRY_RUN_CMD mv $VERBOSE_ARG "$f" "$f.pre-nix-backup"
-  #     fi
-  #   done
-  # '';
+  home.activation.removeLegacyEmacsInit = lib.hm.dag.entryBefore ["writeBoundary"] ''
+    for f in "$HOME/.emacs" "$HOME/.emacs.el" "$HOME/.emacs.d"; do
+      if [ -e "$f" ] && [ ! -L "$f" ]; then
+        backup="$f.pre-nix-backup"
+        if [ -e "$backup" ] || [ -L "$backup" ]; then
+          $DRY_RUN_CMD rm -rf "$backup"
+        fi
+        $DRY_RUN_CMD mv $VERBOSE_ARG "$f" "$backup"
+      fi
+    done
+  '';
 }
