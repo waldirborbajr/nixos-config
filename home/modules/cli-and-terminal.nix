@@ -41,7 +41,8 @@ in {
   # com o xdg.configFile abaixo). Ferramentas de desenvolvimento compartilhadas
   # (como ripgrep) são fornecidas por modules/development/base.nix.
   home.packages = with pkgs; [
-    wezterm
+    # wezterm
+    alacritty
     zellij
     oh-my-posh
     atuin
@@ -66,14 +67,15 @@ in {
 
   xdg.configFile = {
     # Terminals
-    # "alacritty" = {
-    #   source = "${configs}/alacritty";
-    #   recursive = true;
-    # };
-    "wezterm" = {
-      source = "${configs}/wezterm";
+    "alacritty" = {
+      source = "${configs}/alacritty";
       recursive = true;
     };
+
+    # "wezterm" = {
+    #   source = "${configs}/wezterm";
+    #   recursive = true;
+    # };
 
     "zellij" = {
       source = "${configs}/zellij";
