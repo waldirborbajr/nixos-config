@@ -54,6 +54,9 @@
     epkgs.dape
 
     # usados pelo init.el atual (use-package), fora do que já tínhamos
+    # `use-package` precisa estar no mesmo conjunto do Emacs para que o
+    # bootstrap do init.el funcione; sem ele o `eglot` não inicia sozinho.
+    epkgs.use-package
     epkgs.catppuccin-theme
     epkgs.vertico
     epkgs.orderless
