@@ -3,7 +3,7 @@
 binds {
     Mod+Shift+Slash { show-hotkey-overlay; }
 
-    Mod+T hotkey-overlay-title="Open a Terminal: Wezterm" { spawn "wezterm"; }
+    Mod+T hotkey-overlay-title="Open a Terminal: Alacritty" { spawn "alacritty"; }
     Mod+D hotkey-overlay-title="Run an Application: fuzzel" { spawn "fuzzel"; }
     Mod+Space hotkey-overlay-title="Launcher: Vicinae" { spawn "vicinae" "toggle"; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "swaylock" "-f"; }
