@@ -1,4 +1,8 @@
-{pkgs, lib, ...}: let
+{
+  pkgs,
+  lib,
+  ...
+}: let
   configs = ../configs;
 
   myEmacs = pkgs.emacs.pkgs.withPackages (epkgs: [

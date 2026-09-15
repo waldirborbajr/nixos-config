@@ -172,56 +172,56 @@ git-exclude = true
 
 # ====================== KAKOUNE-STYLE EXTEND (maiúscula = seleção) ======================
 
-H = "extend_char_left"
-L = "extend_char_right"
-J = ["extend_line_down", "extend_to_line_bounds"]
-K = ["extend_line_up", "extend_to_line_bounds"]
-B = "extend_prev_word_start"
-W = "extend_next_word_start"
-E = "extend_next_word_end"
-T = "extend_till_char"
-F = "extend_next_char"
-N = "extend_search_next"
+# H = "extend_char_left"
+# L = "extend_char_right"
+# J = ["extend_line_down", "extend_to_line_bounds"]
+# K = ["extend_line_up", "extend_to_line_bounds"]
+# B = "extend_prev_word_start"
+# W = "extend_next_word_start"
+# E = "extend_next_word_end"
+# T = "extend_till_char"
+# F = "extend_next_char"
+# N = "extend_search_next"
 
-"A-b" = "move_prev_long_word_start"
-"A-B" = "extend_prev_long_word_start"
-"A-w" = "move_next_long_word_start"
-"A-W" = "extend_next_long_word_start"
-"A-e" = "move_next_long_word_end"
-"A-E" = "extend_next_long_word_end"
-"A-t" = "till_prev_char"
-"A-f" = "find_prev_char"
-"A-T" = "extend_till_prev_char"
-"A-F" = "extend_prev_char"
-"A-l" = "extend_to_line_end"
-"A-h" = "extend_to_line_start"
-"A-d" = "delete_selection"
-"A-n" = "search_prev"
-"A-N" = "extend_search_prev"
-"A-j" = "join_selections"
-"A-k" = "keep_selections"
+# "A-b" = "move_prev_long_word_start"
+# "A-B" = "extend_prev_long_word_start"
+# "A-w" = "move_next_long_word_start"
+# "A-W" = "extend_next_long_word_start"
+# "A-e" = "move_next_long_word_end"
+# "A-E" = "extend_next_long_word_end"
+# "A-t" = "till_prev_char"
+# "A-f" = "find_prev_char"
+# "A-T" = "extend_till_prev_char"
+# "A-F" = "extend_prev_char"
+# "A-l" = "extend_to_line_end"
+# "A-h" = "extend_to_line_start"
+# "A-d" = "delete_selection"
+# "A-n" = "search_prev"
+# "A-N" = "extend_search_prev"
+# "A-j" = "join_selections"
+# "A-k" = "keep_selections"
 
 
 # ====================== EDIÇÃO / NAVEGAÇÃO EXTRA ======================
 
-x = "extend_to_line_bounds"
-c = "change_selection_noyank"
-d = "delete_selection_noyank"
-"#" = "toggle_comments"
-tab = "move_parent_node_end"
-"S-tab" = "move_parent_node_start"
+# x = "extend_to_line_bounds"
+# c = "change_selection_noyank"
+# d = "delete_selection_noyank"
+# "#" = "toggle_comments"
+# tab = "move_parent_node_end"
+# "S-tab" = "move_parent_node_start"
 
 # Setas trocam de buffer em vez de mover o cursor
-left = "goto_previous_buffer"
-right = "goto_next_buffer"
+# left = "goto_previous_buffer"
+# right = "goto_next_buffer"
 
 # Entra em modo de seleção já casando o par de delimitadores
-M = ["select_mode", "match_brackets", "normal_mode"]
+# M = ["select_mode", "match_brackets", "normal_mode"]
 
-"C-d" = ["page_cursor_half_down", "align_view_center"]
-"C-u" = ["page_cursor_half_up", "align_view_center"]
-"C-j" = ["extend_to_line_bounds", "delete_selection", "paste_after"]
-"C-k" = ["extend_to_line_bounds", "delete_selection", "move_line_up", "paste_before"]
+# "C-d" = ["page_cursor_half_down", "align_view_center"]
+# "C-u" = ["page_cursor_half_up", "align_view_center"]
+# "C-j" = ["extend_to_line_bounds", "delete_selection", "paste_after"]
+# "C-k" = ["extend_to_line_bounds", "delete_selection", "move_line_up", "paste_before"]
 
 
 # ==========================================================
