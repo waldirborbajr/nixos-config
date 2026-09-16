@@ -1,0 +1,11 @@
+# Específico macOS (Apple Silicon M2) — fonte maior pro DPI/escala do
+# painel do Mac, decorações nativas mantidas (Buttonless: some com os
+# botões de janela mas preserva a sombra nativa do macOS), Option
+# esquerdo remapeado pra Meta (útil no zsh/nvim/tmux).
+[font]
+size = 12.0
+
+[window]
+padding = { x = 8, y = 8 }
+decorations = "Buttonless"
+option_as_alt = "OnlyLeft"
