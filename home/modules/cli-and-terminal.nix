@@ -67,14 +67,22 @@ in {
 
   xdg.configFile = {
     # Terminals
+    #
+    # alacritty.toml é comum a Linux e macOS e faz `general.import` de
+    # ~/.config/alacritty/os.toml. Esse arquivo NÃO vem do diretório
+    # "alacritty" abaixo — é resolvido aqui via hostPlatform, então o
+    # home-manager symlinka o os-linux.toml ou o os-macos.toml certo pra
+    # cada host, sem qualquer `if` dentro do TOML (que não suporta).
+    # `recursive = true` no bloco "alacritty" é o que permite essa entrada
+    # separada coexistir dentro da mesma pasta ~/.config/alacritty.
     "alacritty" = {
       source = "${configs}/alacritty";
       recursive = true;
     };
-    # "wezterm" = {
-      # source = "${configs}/wezterm";
-      # recursive = true;
-    # };
+    "alacritty/os.toml".source =
+      if pkgs.stdenv.hostPlatform.isDarwin
+      then "${configs}/alacritty-os/macos.toml"
+      else "${configs}/alacritty-os/linux.toml";
 
     # "wezterm" = {
     #   source = "${configs}/wezterm";
