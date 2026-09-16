@@ -71,6 +71,10 @@ in {
       source = "${configs}/alacritty";
       recursive = true;
     };
+    # "wezterm" = {
+      # source = "${configs}/wezterm";
+      # recursive = true;
+    # };
 
     # "wezterm" = {
     #   source = "${configs}/wezterm";
