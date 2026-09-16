@@ -1,0 +1,7 @@
+# Específico Linux — janela sem decoração, zero overhead de WM.
+[font]
+size = 9.0
+
+[window]
+padding = { x = 6, y = 6 }
+decorations = "None"
