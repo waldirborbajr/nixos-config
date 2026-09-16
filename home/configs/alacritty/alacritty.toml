@@ -3,24 +3,19 @@
 # Nord Theme — optimized for speed + security
 # Linux x86_64 + macOS Apple Silicon (M2)
 #
-# HOW TO SWITCH OS:
-#   Linux → keep [linux] block uncommented, comment out [macos] block
-#   macOS → keep [macos] block uncommented, comment out [linux] block
+# Config específica de OS (fonte, padding, decorations, etc.) NÃO fica
+# aqui — vem de ~/.config/alacritty/os.toml, escolhido pelo Nix
+# (home/modules/cli-and-terminal.nix) via pkgs.stdenv.hostPlatform.isDarwin.
 # =============================================================================
 
 [general]
 live_config_reload = true
+import = ["~/.config/alacritty/os.toml"]
 
-# =============================================================================
-# Platform — Linux
-# Comment this entire block when using macOS
-# =============================================================================
 [env]
 TERM = "xterm-256color"
 
 [window]
-padding = { x = 6, y = 6 }
-decorations = "None"                       # No titlebar — zero WM overhead
 opacity = 1.0                              # No alpha blending
 dynamic_title = true
 resize_increments = true
@@ -28,28 +23,9 @@ startup_mode = "Windowed"
 dimensions = { columns = 118, lines = 30 }
 
 # =============================================================================
-# Platform — macOS (Apple Silicon M2)
-# Uncomment this block and comment the Linux block above when on macOS
-# =============================================================================
-# [env]
-# TERM = "xterm-256color"  # the real terminal type; tmux promotes panes to
-#                          # tmux-256color internally via default-terminal
-#
-# [window]
-# padding           = { x = 8, y = 8 }
-# decorations       = "Buttonless"  # Hides buttons, keeps native macOS shadow
-# opacity           = 1.0
-# dynamic_title     = true
-# resize_increments = true
-# startup_mode      = "Windowed"
-# dimensions        = { columns = 118, lines = 30 }
-# option_as_alt     = "OnlyLeft"    # Left Option as Meta (useful for zsh/nvim)
-
-# =============================================================================
-# Font
+# Font — família/estilo comuns; `size` vem do os.toml (9 no Linux, 12 no Mac)
 # =============================================================================
 [font]
-size = 9.0
 builtin_box_drawing = true
 
 normal = { family = "JetBrainsMono Nerd Font", style = "Regular" }
@@ -157,13 +133,6 @@ semantic_escape_chars = ",│`|:\"' ()[]{}<>\\‖"
 [terminal]
 osc52 = "CopyPaste"
 
-# Shell — active (set to your preferred multiplexer below if needed)
-# Linux example with Zellij:
-#   program = "/usr/bin/zellij"
-#   args    = ["attach", "-c", "main"]
-# macOS example with Zellij via Homebrew:
-#   program = "/opt/homebrew/bin/zellij"
-#   args    = ["attach", "-c", "main"]
 [terminal.shell]
 program = "zsh"
 args = ["-l"]
@@ -183,7 +152,7 @@ hide_when_typing = false
 regex = "(ipfs:|ipns:|magnet:|mailto:|gemini://|gopher://|https://|http://|news:|file:|ssh:|git://)[^\\u0000-\\u001F\\u007F-\\u009F<>\"\\\\s{-}\\\\^⟨⟩]+"
 action = "Copy"
 post_processing = true
-mouse.enabled = false                                                                                                                                     # no click-to-open
+mouse.enabled = false
 [hints.enabled.binding]
 key = "U"
 mods = "Control|Shift"
@@ -193,30 +162,22 @@ mods = "Control|Shift"
 # =============================================================================
 [keyboard]
 bindings = [
-  # Clipboard
   { key = "C", mods = "Control|Shift", action = "Copy" },
   { key = "V", mods = "Control|Shift", action = "Paste" },
 
-  # Font size
   { key = "=", mods = "Control", action = "IncreaseFontSize" },
   { key = "+", mods = "Control", action = "IncreaseFontSize" },
   { key = "-", mods = "Control", action = "DecreaseFontSize" },
   { key = "0", mods = "Control", action = "ResetFontSize" },
 
-  # Fullscreen
   { key = "F11", mods = "None", action = "ToggleFullscreen" },
   { key = "F", mods = "Control|Shift", action = "ToggleFullscreen" },
 
-  # Scrollback — note: inside tmux, mouse wheel and copy-mode (prefix+[) take
-  # over scrolling automatically (mouse on, mode-keys vi in tmux.conf).
-  # These bindings only matter outside tmux or as a manual fallback, kept on
-  # keys tmux doesn't reserve so they never get swallowed by the prefix.
   { key = "PageUp", mods = "Shift", action = "ScrollPageUp" },
   { key = "PageDown", mods = "Shift", action = "ScrollPageDown" },
   { key = "Home", mods = "Shift", action = "ScrollToTop" },
   { key = "End", mods = "Shift", action = "ScrollToBottom" },
 
-  # Clear
   { key = "L", mods = "Control", chars = "\u000c" },
   { key = "K", mods = "Control", action = "ClearHistory" },
 ]
