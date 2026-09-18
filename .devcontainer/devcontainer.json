@@ -1,0 +1,39 @@
+{
+  "name": "nixos-config (flake check/build)",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+
+  "features": {
+    "ghcr.io/devcontainers/features/nix:1": {
+      "multiUser": true,
+      "extraNixConfig": "experimental-features = nix-command flakes"
+    }
+  },
+
+  // Sanity check rápido ao criar o Codespace — não builda os hosts
+  // inteiros (demoraria demais no postCreate), só confirma que o
+  // flake avalia e que o Nix está funcionando.
+  "postCreateCommand": "nix --version && nix flake check --no-build",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "jnoortheen.nix-ide",
+        "mkhl.direnv"
+      ],
+      "settings": {
+        "nix.enableLanguageServer": true,
+        "nix.serverPath": "nixd",
+        "nix.serverSettings": {
+          "nixd": {
+            "formatting": { "command": ["alejandra"] }
+          }
+        },
+        "files.associations": {
+          "*.nix": "nix"
+        }
+      }
+    }
+  },
+
+  "remoteUser": "vscode"
+}
