@@ -5,6 +5,9 @@
 # hardware-configuration.nix continuam específicos de cada host.
 #
 # Programas / browsers / teclado → hosts/common/mac-workstation.nix
+# Containers (Docker/Podman/K8s) → containerTools.*.enable no
+# configuration.nix, igual qualquer outro host — não é mais fixado por
+# aqui.
 {
   lib,
   pkgs,
@@ -19,14 +22,6 @@ in {
 
   # ==================== BOOT (extras de VM) ====================
   boot.kernelParams = ["mitigations=off"]; # ajuda em VMs
-
-  # ==================== CONTAINERS ====================
-  virtualisation.podman = {
-    enable = true;
-    dockerCompat = true;
-    defaultNetwork.settings.dns_enabled = true;
-  };
-  virtualisation.containers.enable = true;
 
   # ==================== GRAPHICS (VM / virtio-gpu) ====================
   # Required for niri (Wayland) under UTM / Fusion — avoids black screen after login.

@@ -1,23 +1,23 @@
 # home/modules/editors.nix
 #
-# Git, bat e neovim. Helix fica isolado em home/modules/helix/ para seguir
-# a estrutura modular do Foundry/Misterio77. Emacs vanilla é opcional,
-# controlado por editors.emacs.enable (ver emacs-vanilla.nix).
+# Git, bat, Neovim e Emacs vanilla. Neovim e Emacs seguem o mesmo padrão
+# do resto do repo (containerTools, development.languages): default
+# false, ativado pontualmente na máquina que for usar. Helix continua
+# isolado em home/modules/helix/ e é o editor "core" (git core.editor),
+# sempre instalado, sem toggle.
 {
   pkgs-unstable,
   inputs,
   lib,
+  config,
   ...
 }: let
   configs = ../configs;
 
   system = pkgs-unstable.stdenv.hostPlatform.system;
 
-  # Troque para `true` no(s) host(s) onde quiser testar a 0.13-dev
-  useNightlyNeovim = false;
-
   nvimPkg =
-    if useNightlyNeovim
+    if config.editors.neovim.nightly
     then inputs.neovim-nightly-overlay.packages.${system}.default
     else pkgs-unstable.neovim;
 in {
@@ -25,7 +25,18 @@ in {
     ./helix
   ];
 
-  options.editors.emacs.enable = lib.mkEnableOption "Emacs vanilla (corfu/eglot/eat, ver emacs-vanilla.nix)";
+  options.editors = {
+    emacs.enable = lib.mkEnableOption "Emacs vanilla (corfu/eglot/eat, ver emacs-vanilla.nix)";
+
+    neovim = {
+      enable = lib.mkEnableOption "Neovim";
+      nightly = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Usa o neovim-nightly-overlay em vez do neovim estável do nixpkgs-unstable. Só tem efeito com editors.neovim.enable = true.";
+      };
+    };
+  };
 
   config = {
     programs.git = {
@@ -42,23 +53,25 @@ in {
 
     programs.bat.enable = true;
 
-    home.packages = [nvimPkg];
+    home.packages = lib.optional config.editors.neovim.enable nvimPkg;
 
-    xdg.configFile = {
-      "bat" = {
-        source = "${configs}/bat";
-        recursive = true;
+    xdg.configFile =
+      {
+        "bat" = {
+          source = "${configs}/bat";
+          recursive = true;
+        };
+
+        # Helix NÃO é linkado aqui: home/modules/helix/default.nix já linka
+        # cada arquivo individualmente (config.toml, languages.toml, tema,
+        # yazi-picker.sh) com onChange/executable próprios. Um link
+        # recursivo da pasta inteira aqui colidiria com esses mesmos alvos.
+      }
+      // lib.optionalAttrs config.editors.neovim.enable {
+        "nvim" = {
+          source = "${configs}/nvim";
+          recursive = true;
+        };
       };
-
-      # Helix NÃO é linkado aqui: home/modules/helix/default.nix já linka
-      # cada arquivo individualmente (config.toml, languages.toml, tema,
-      # yazi-picker.sh) com onChange/executable próprios. Um link recursivo
-      # da pasta inteira aqui colidiria com esses mesmos alvos.
-
-      "nvim" = {
-        source = "${configs}/nvim";
-        recursive = true;
-      };
-    };
   };
 }

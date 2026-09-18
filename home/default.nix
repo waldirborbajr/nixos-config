@@ -18,9 +18,11 @@
     ./modules/desktop.nix
   ];
 
-  # Emacs vanilla ligado (Helix continua o editor "core"/git core.editor,
-  # Emacs fica disponível como opção via editors.emacs.enable).
-  editors.emacs.enable = false;
+  # Emacs e Neovim desligados por padrão (mesmo padrão de
+  # containerTools/development.languages) — ative pontualmente na
+  # máquina que for usar, descomentando a linha correspondente:
+  # editors.emacs.enable = true;
+  # editors.neovim.enable = true;   # nasce com nightly = true
 
   home.stateVersion = "26.05";
 }
