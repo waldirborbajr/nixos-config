@@ -20,7 +20,7 @@
 
   # Emacs vanilla ligado (Helix continua o editor "core"/git core.editor,
   # Emacs fica disponível como opção via editors.emacs.enable).
-  editors.emacs.enable = true;
+  editors.emacs.enable = false;
 
   home.stateVersion = "26.05";
 }
