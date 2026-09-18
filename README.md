@@ -5,6 +5,8 @@
 NixOS - BORBA JR, W - Configuration
 </h1>
 
+[![Nix](https://github.com/waldirborbajr/nixos-config/actions/workflows/nix.yaml/badge.svg)](https://github.com/waldirborbajr/nixos-config/actions/workflows/nix.yaml)
+
 Flake multi-host (`flake.nix` → `configuration.nix` como índice fino,
 importando módulos por tópico em `modules/system/` → `hosts/<host>/default.nix`,
 com `hosts/common/*.nix` para a família Mac), com
