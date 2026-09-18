@@ -29,3 +29,75 @@ jobs:
           fi
       - name: Check flake
         run: nix flake check
+
+  eval-only:
+    needs: check
+    strategy:
+      fail-fast: false
+      matrix:
+        attr: [dell, mac2011, m2utm, macvmf]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+        with:
+          extra-conf: |
+            experimental-features = nix-command flakes
+      - name: Enable Nix cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Evaluate ${{ matrix.attr }} toplevel (no download, no build)
+        run: nix eval ".#nixosConfigurations.${{ matrix.attr }}.config.system.build.toplevel.drvPath"
+
+  build-nixos:
+    needs: eval-only
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - attr: dell
+            hostname: dell1564
+            runs-on: ubuntu-latest
+          - attr: mac2011
+            hostname: mac2011
+            runs-on: ubuntu-latest
+          - attr: m2utm
+            hostname: macutm
+            runs-on: ubuntu-24.04-arm
+          - attr: macvmf
+            hostname: macvmf
+            runs-on: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runs-on }}
+    steps:
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache
+          docker system prune -af || true
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+        with:
+          extra-conf: |
+            experimental-features = nix-command flakes
+      - name: Enable Nix cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Build ${{ matrix.hostname }} (${{ matrix.attr }}) — toplevel only, not activated
+        run: nix build ".#nixosConfigurations.${{ matrix.attr }}.config.system.build.toplevel" -L
+
+  build-home-macbook:
+    needs: eval-only
+    runs-on: macos-latest # runner Apple Silicon (aarch64-darwin), bate com o macbook físico
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+        with:
+          extra-conf: |
+            experimental-features = nix-command flakes
+      - name: Enable Nix cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Build borba@macbook home-manager activation package
+        run: nix build '.#homeConfigurations."borba@macbook".activationPackage' -L
