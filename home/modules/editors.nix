@@ -1,10 +1,12 @@
 # home/modules/editors.nix
 #
 # Git, bat e neovim. Helix fica isolado em home/modules/helix/ para seguir
-# a estrutura modular do Foundry/Misterio77.
+# a estrutura modular do Foundry/Misterio77. Emacs vanilla é opcional,
+# controlado por editors.emacs.enable (ver emacs-vanilla.nix).
 {
   pkgs-unstable,
   inputs,
+  lib,
   ...
 }: let
   configs = ../configs;
@@ -22,6 +24,8 @@ in {
   imports = [
     ./helix
   ];
+
+  options.editors.emacs.enable = lib.mkEnableOption "Emacs vanilla (corfu/eglot/eat, ver emacs-vanilla.nix)";
 
   programs.git = {
     enable = true;

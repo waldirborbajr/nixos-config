@@ -13,10 +13,14 @@
     ./modules/identity.nix
     ./modules/shell.nix
     ./modules/editors.nix
-    # ./modules/emacs-vanilla.nix
+    ./modules/emacs-vanilla.nix
     ./modules/cli-and-terminal.nix
     ./modules/desktop.nix
   ];
+
+  # Emacs vanilla ligado (Helix continua o editor "core"/git core.editor,
+  # Emacs fica disponível como opção via editors.emacs.enable).
+  editors.emacs.enable = true;
 
   home.stateVersion = "26.05";
 }
