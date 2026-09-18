@@ -1,8 +1,8 @@
 # modules/system/containers-docker.nix
 #
-# Docker Engine — desligado por padrão. Import comentado em
-# configuration.nix; descomente, rode o rebuild, use; comente de novo e
-# rebuild quando não precisar mais.
+# Docker Engine — desligado por padrão. Controlado por
+# containers.docker.enable (ver modules/system/containers.nix e
+# configuration.nix).
 #
 # enableOnBoot = false: dockerd fica parado até você realmente tocar o
 # socket (ex: `docker ps`) — socket-activated, não sobe sozinho no boot.
@@ -12,18 +12,22 @@
 {
   pkgs,
   common,
+  config,
+  lib,
   ...
 }: let
   inherit (common) username;
 in {
-  virtualisation.docker = {
-    enable = true;
-    enableOnBoot = false;
+  config = lib.mkIf config.containers.docker.enable {
+    virtualisation.docker = {
+      enable = true;
+      enableOnBoot = false;
+    };
+
+    users.users.${username}.extraGroups = ["docker"];
+
+    environment.systemPackages = with pkgs; [
+      docker-compose
+    ];
   };
-
-  users.users.${username}.extraGroups = ["docker"];
-
-  environment.systemPackages = with pkgs; [
-    docker-compose
-  ];
 }

@@ -1,8 +1,7 @@
 # modules/system/containers-podman.nix
 #
-# Podman — desligado por padrão. Import comentado em configuration.nix;
-# descomente, rode o rebuild, use; comente de novo e rebuild quando não
-# precisar mais.
+# Podman — desligado por padrão. Controlado por containers.podman.enable
+# (ver modules/system/containers.nix e configuration.nix).
 #
 # Rootless, sem daemon residente: ao contrário do Docker, não tem
 # serviço pra ficar rodando à toa quando você não está usando — é
@@ -18,15 +17,22 @@
 # qualquer host, não só a família Mac. Habilitar aqui num host Mac não
 # quebra nada (Nix deduplica o pacote), só passa a ligar o compat/rede
 # que o pacote cru sozinho não configura.
-{pkgs, ...}: {
-  virtualisation.podman = {
-    enable = true;
-    dockerCompat = true;
-    defaultNetwork.settings.dns_enabled = true;
-  };
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}: {
+  config = lib.mkIf config.containers.podman.enable {
+    virtualisation.podman = {
+      enable = true;
+      dockerCompat = true;
+      defaultNetwork.settings.dns_enabled = true;
+    };
 
-  environment.systemPackages = with pkgs; [
-    podman-compose
-    lazydocker
-  ];
+    environment.systemPackages = with pkgs; [
+      podman-compose
+      lazydocker
+    ];
+  };
 }

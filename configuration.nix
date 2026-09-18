@@ -23,21 +23,24 @@ in {
     ./modules/system/sops.nix
 
     # ==================== CONTAINERS / K8S (sob demanda) ====================
-    # Docker, Podman e Kubernetes local são usados só em projetos
-    # específicos, não no dia a dia — ficam desligados por padrão.
-    # Descomente a linha relevante, rode o rebuild, use; comente de novo e
-    # rebuild quando não precisar mais. containers-docker.nix e
-    # containers-podman.nix são independentes (pode ligar só um, ou os
-    # dois); kubernetes-dev.nix (k3d+kubectl+k9s) precisa de um dos dois
-    # ligado junto, já que o k3d cria os nodes do cluster como containers.
-    # ./modules/system/containers-docker.nix
-    # ./modules/system/containers-podman.nix
-    # ./modules/system/kubernetes-dev.nix
+    # Sempre importado; Docker, Podman e Kubernetes local são ligados
+    # individualmente via containers.*.enable abaixo (mesmo padrão de
+    # development.languages). docker e podman são independentes (pode
+    # ligar só um, ou os dois); kubernetes precisa de um dos dois ligado
+    # junto, já que o k3d cria os nodes do cluster como containers.
+    ./modules/system/containers.nix
 
     # ==================== DEVELOPMENT ====================
     # Base comum + linguagens explicitamente habilitadas abaixo.
     ./modules/development/default.nix
   ];
+
+  # Containers / Kubernetes local — desligados por padrão.
+  containers = {
+    docker.enable = false;
+    podman.enable = false;
+    kubernetes.enable = false;
+  };
 
   # Linguagens de desenvolvimento explicitamente habilitadas.
   development.languages = {
