@@ -27,36 +27,38 @@ in {
 
   options.editors.emacs.enable = lib.mkEnableOption "Emacs vanilla (corfu/eglot/eat, ver emacs-vanilla.nix)";
 
-  programs.git = {
-    enable = true;
-    settings = {
-      user.name = "Waldir Borba Junior";
-      user.email = "wborbajr@gmail.com";
-      core.editor = "hx";
-      core.pager = "bat";
-      init.defaultBranch = "main";
-      pull.rebase = true;
-    };
-  };
-
-  programs.bat.enable = true;
-
-  home.packages = [nvimPkg];
-
-  xdg.configFile = {
-    "bat" = {
-      source = "${configs}/bat";
-      recursive = true;
+  config = {
+    programs.git = {
+      enable = true;
+      settings = {
+        user.name = "Waldir Borba Junior";
+        user.email = "wborbajr@gmail.com";
+        core.editor = "hx";
+        core.pager = "bat";
+        init.defaultBranch = "main";
+        pull.rebase = true;
+      };
     };
 
-    # Helix NÃO é linkado aqui: home/modules/helix/default.nix já linka
-    # cada arquivo individualmente (config.toml, languages.toml, tema,
-    # yazi-picker.sh) com onChange/executable próprios. Um link recursivo
-    # da pasta inteira aqui colidiria com esses mesmos alvos.
+    programs.bat.enable = true;
 
-    "nvim" = {
-      source = "${configs}/nvim";
-      recursive = true;
+    home.packages = [nvimPkg];
+
+    xdg.configFile = {
+      "bat" = {
+        source = "${configs}/bat";
+        recursive = true;
+      };
+
+      # Helix NÃO é linkado aqui: home/modules/helix/default.nix já linka
+      # cada arquivo individualmente (config.toml, languages.toml, tema,
+      # yazi-picker.sh) com onChange/executable próprios. Um link recursivo
+      # da pasta inteira aqui colidiria com esses mesmos alvos.
+
+      "nvim" = {
+        source = "${configs}/nvim";
+        recursive = true;
+      };
     };
   };
 }
