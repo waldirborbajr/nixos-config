@@ -1,7 +1,7 @@
 # modules/system/containers-docker.nix
 #
 # Docker Engine — desligado por padrão. Controlado por
-# containers.docker.enable (ver modules/system/containers.nix e
+# containerTools.docker.enable (ver modules/system/containers.nix e
 # configuration.nix).
 #
 # enableOnBoot = false: dockerd fica parado até você realmente tocar o
@@ -18,7 +18,7 @@
 }: let
   inherit (common) username;
 in {
-  config = lib.mkIf config.containers.docker.enable {
+  config = lib.mkIf config.containerTools.docker.enable {
     virtualisation.docker = {
       enable = true;
       enableOnBoot = false;

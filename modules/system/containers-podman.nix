@@ -1,7 +1,8 @@
 # modules/system/containers-podman.nix
 #
-# Podman — desligado por padrão. Controlado por containers.podman.enable
-# (ver modules/system/containers.nix e configuration.nix).
+# Podman — desligado por padrão. Controlado por
+# containerTools.podman.enable (ver modules/system/containers.nix e
+# configuration.nix).
 #
 # Rootless, sem daemon residente: ao contrário do Docker, não tem
 # serviço pra ficar rodando à toa quando você não está usando — é
@@ -23,7 +24,7 @@
   lib,
   ...
 }: {
-  config = lib.mkIf config.containers.podman.enable {
+  config = lib.mkIf config.containerTools.podman.enable {
     virtualisation.podman = {
       enable = true;
       dockerCompat = true;

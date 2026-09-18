@@ -1,7 +1,7 @@
 # modules/system/kubernetes-dev.nix
 #
 # Kubernetes local, pra quando precisar — desligado por padrão.
-# Controlado por containers.kubernetes.enable (ver
+# Controlado por containerTools.kubernetes.enable (ver
 # modules/system/containers.nix e configuration.nix).
 #
 # Correção importante (pedido original citava só k9s): k9s sozinho NÃO
@@ -13,7 +13,7 @@
 # só binários; o cluster só existe entre um `k3d cluster create` e um
 # `k3d cluster delete`.
 #
-# Precisa de containers.docker.enable OU containers.podman.enable
+# Precisa de containerTools.docker.enable OU containerTools.podman.enable
 # junto — o k3d cria os "nodes" do cluster como containers (validado
 # via assertion em containers.nix).
 {
@@ -22,7 +22,7 @@
   lib,
   ...
 }: {
-  config = lib.mkIf config.containers.kubernetes.enable {
+  config = lib.mkIf config.containerTools.kubernetes.enable {
     environment.systemPackages = with pkgs; [
       k3d
       kubectl

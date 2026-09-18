@@ -24,7 +24,7 @@ in {
 
     # ==================== CONTAINERS / K8S (sob demanda) ====================
     # Sempre importado; Docker, Podman e Kubernetes local são ligados
-    # individualmente via containers.*.enable abaixo (mesmo padrão de
+    # individualmente via containerTools.*.enable abaixo (mesmo padrão de
     # development.languages). docker e podman são independentes (pode
     # ligar só um, ou os dois); kubernetes precisa de um dos dois ligado
     # junto, já que o k3d cria os nodes do cluster como containers.
@@ -36,7 +36,7 @@ in {
   ];
 
   # Containers / Kubernetes local — desligados por padrão.
-  containers = {
+  containerTools = {
     docker.enable = false;
     podman.enable = false;
     kubernetes.enable = false;
