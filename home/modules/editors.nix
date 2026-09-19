@@ -4,6 +4,13 @@
 # enable=true/false. Helix nasce true (é o "core" de hoje); Neovim e
 # Emacs nascem false, ativados pontualmente na máquina. Git/bat/delta
 # não são editores — moram em home/modules/cli-and-terminal.nix.
+#
+# $EDITOR/$VISUAL são calculados aqui dinamicamente a partir de qual
+# editor está ligado (prioridade: Helix > Neovim > Emacs), em vez de
+# fixados como "hx" espalhado por vários arquivos. O git NÃO tem mais
+# core.editor no home/configs/git/config — sem essa linha, o git cai
+# sozinho no $VISUAL/$EDITOR do ambiente, então também segue essa
+# mesma prioridade automaticamente.
 {
   pkgs-unstable,
   inputs,
@@ -19,6 +26,20 @@
     if config.editors.neovim.nightly
     then inputs.neovim-nightly-overlay.packages.${system}.default
     else pkgs-unstable.neovim;
+
+  cfg = config.editors;
+
+  # Terminal-only pra qualquer um dos três (Emacs sem daemon/GUI, só o
+  # binário `emacs -nw`) — evita abrir GUI no meio de um `git commit`
+  # rodado num terminal puro.
+  activeEditor =
+    if cfg.helix.enable
+    then "hx"
+    else if cfg.neovim.enable
+    then "nvim"
+    else if cfg.emacs.enable
+    then "emacs -nw"
+    else null; # nenhum editor ligado — $EDITOR fica por conta do sistema
 in {
   imports = [
     ./helix
@@ -45,6 +66,11 @@ in {
 
   config = {
     home.packages = lib.optional config.editors.neovim.enable nvimPkg;
+
+    home.sessionVariables = lib.optionalAttrs (activeEditor != null) {
+      EDITOR = activeEditor;
+      VISUAL = activeEditor;
+    };
 
     xdg.configFile = lib.optionalAttrs config.editors.neovim.enable {
       "nvim" = {
