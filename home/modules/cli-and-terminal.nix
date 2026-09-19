@@ -1,8 +1,9 @@
 # home/modules/cli-and-terminal.nix
 #
-# Multiplexers (tmux/zellij), terminal emulator (wezterm) e ferramentas
-# de CLI que precisam de arquivo de config extra (btop, ripgrep,
-# oh-my-posh, lazygit, atuin, yazi, jujutsu).
+# Multiplexers (tmux/zellij), terminal emulator (wezterm), git (+ delta
+# como pager de diff) e ferramentas de CLI que precisam de arquivo de
+# config extra (bat, btop, ripgrep, oh-my-posh, lazygit, atuin, yazi,
+# jujutsu).
 #
 # Fonte ÚNICA dos binários + configs: este módulo é importado por todos
 # os hosts (Linux via home/default.nix, MacBook via hosts/macbook/home.nix).
@@ -21,6 +22,12 @@ in {
   programs.btop.enable = true;
   programs.lazygit.enable = true;
   programs.yazi.enable = true;
+  programs.bat.enable = true;
+
+  # Só liga o programa (garante o pacote `git` no PATH); a config em si
+  # (user, core, pull, delta etc.) vem inteira do link "git" abaixo, não
+  # de programs.git.settings/delta (que brigaria com o arquivo linkado).
+  programs.git.enable = true;
 
   # nh — wrapper mais amigável pra nixos-rebuild / home-manager switch /
   # nix-collect-garbage, com diff bonito das mudanças (via nvd) e output
@@ -52,6 +59,7 @@ in {
     atuin
     jujutsu
     lazyjj
+    delta # binário `delta` — ative em home/configs/git/config (core.pager = delta)
   ];
 
   # tmux-devshell / zellij-devshell viram comando de verdade em qualquer
@@ -133,6 +141,16 @@ in {
 
     "atuin" = {
       source = "${configs}/atuin";
+      recursive = true;
+    };
+
+    "bat" = {
+      source = "${configs}/bat";
+      recursive = true;
+    };
+
+    "git" = {
+      source = "${configs}/git";
       recursive = true;
     };
 
