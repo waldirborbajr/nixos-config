@@ -30,13 +30,11 @@
 
   # ==================== PACKAGES ====================
   # Lista única para a família Mac. Dell continua com a lista própria (mais leve).
-  # zellij, yazi, lazygit → home/modules/cli-and-terminal.nix (fonte única + config)
+  # zellij, yazi, lazygit, jujutsu, lazyjj → home/modules/cli-and-terminal.nix (fonte única + config)
   environment.systemPackages = with pkgs;
     [
       duf
       psmisc
-      jujutsu
-      lazyjj
       nitch
       leaf
       ghgrab
