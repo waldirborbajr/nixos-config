@@ -7,6 +7,7 @@
 # pontualmente na máquina). Helix continua isolado em
 # home/modules/helix/ e é o editor "core", sempre instalado, sem toggle.
 {
+  pkgs,
   pkgs-unstable,
   inputs,
   lib,
@@ -46,7 +47,11 @@ in {
 
     programs.bat.enable = true;
 
-    home.packages = lib.optional config.editors.neovim.enable nvimPkg;
+    home.packages =
+      [
+        pkgs.git-delta # binário `delta` — ative em home/configs/git/config (core.pager = delta)
+      ]
+      ++ lib.optional config.editors.neovim.enable nvimPkg;
 
     xdg.configFile =
       {
