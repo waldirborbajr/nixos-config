@@ -49,7 +49,7 @@ in {
 
     home.packages =
       [
-        pkgs.git-delta # binário `delta` — ative em home/configs/git/config (core.pager = delta)
+        pkgs.delta # binário `delta` — ative em home/configs/git/config (core.pager = delta)
       ]
       ++ lib.optional config.editors.neovim.enable nvimPkg;
 
