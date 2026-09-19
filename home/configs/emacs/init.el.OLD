@@ -188,20 +188,7 @@
          ("C-h v" . helpful-variable)
          ("C-h k" . helpful-key)))
 
-;; magit-log-arguments: log de commits com grafo/decoração/cor por padrão
-;; (é como um `git log --graph --decorate --color` já aberto).
-;; magit-diff-refine-hunk: destaca as palavras que mudaram DENTRO da
-;; linha modificada, não só a linha inteira — bem mais fácil de ler.
-;; magit-process-connection-type nil: evita alocar um pty por subprocesso
-;; git; deixa o Magit visivelmente mais rápido (mais notável em macOS),
-;; só custo é não poder responder prompt de senha interativo do git por
-;; dentro do Magit (uso normal com SSH/credential-helper não é afetado).
-(use-package magit
-  :bind (("C-c g" . magit-status))
-  :custom
-  (magit-log-arguments '("-n256" "--graph" "--decorate" "--color"))
-  (magit-diff-refine-hunk t)
-  (magit-process-connection-type nil))
+(use-package magit :bind (("C-c g" . magit-status)))
 
 ;; `M-x shell`/`eshell` não interpretam escapes ANSI de cor nem os
 ;; hyperlinks OSC 8 que o `cargo` emite (o `^[[...`/`^[]8;;...` cru que
@@ -279,110 +266,11 @@
   (add-hook 'completion-at-point-functions #'tempel-expand))
 
 ;; dape: debugger integrado (Debug Adapter Protocol), mesmo ecossistema
-;; do eglot. Config de Go abaixo usa `dlv` (incluso no home.packages de
-;; emacs-vanilla.nix): go-test/go-run-main rodam local; go-devspace/
-;; go-attach são pra anexar num processo remoto já rodando com
-;; `dlv ... --headless --listen=host:porta` — ajuste host/porta antes de
-;; usar essas duas. Rust precisa de um adapter separado (`codelldb`, não
-;; empacotado aqui por padrão) — quando for configurar, veja
-;; `M-x customize-variable RET dape-configs`.
-(use-package dape
-  :init
-  ;; Layout das janelas do debugger: o painel de Locals (primeiro
-  ;; "dape info buffer") ocupa a maior parte da altura; os outros dois
-  ;; ficam menores, empilhados do lado.
-  (add-to-list 'display-buffer-alist '((category . dape-info-0)
-                                        (display-buffer-in-side-window)
-                                        (window-height . 0.8)
-                                        (window-width . 0.3)))
-  (add-to-list 'display-buffer-alist '((category . dape-info-1)
-                                        (display-buffer-in-side-window)
-                                        (window-height . 0.2)
-                                        (window-width . 0.3)))
-  (add-to-list 'display-buffer-alist '((category . dape-info-2)
-                                        (display-buffer-in-side-window)
-                                        (window-height . 0.1)
-                                        (window-width . 0.3)))
-
-  (setq
-   dape-buffer-window-arrangement 'right
-   dape-info-variable-table-aligned t
-   dape-info-variable-table-row-config '((name . 20) (value . 80) (type . 0))
-   dape-inlay-hints t
-   dape-variable-auto-expand-alist '((0 . 3))) ; 0 é o primeiro buffer (Locals)
-
-  (setq dape-configs
-        '((go-test
-           modes (go-mode go-ts-mode)
-           command "dlv"
-           command-args ("dap" "--listen" "127.0.0.1::autoport")
-           command-cwd dape-command-cwd
-           port :autoport
-           :request "launch"
-           :mode "test"
-           :type "go"
-           :program ".")
-
-          (go-run-main
-           modes (go-mode go-ts-mode)
-           ensure dape-ensure-command
-           command "dlv"
-           command-args ("dap" "--listen" "127.0.0.1::autoport")
-           command-cwd dape-command-cwd
-           command-insert-stderr t
-           port :autoport
-           :args [""] ;; Args pro programa
-           :cwd "."
-           :name "Run Go app"
-           :program "." ;; Usa "./cmd" se o main estiver em ./cmd/main.go
-           :request "launch"
-           :type "go")
-
-          (go-devspace
-           modes (go-mode go-ts-mode)
-           host "127.0.0.1"
-           port 2345 ;; ajustar pra porta real exposta pelo devspace/pod
-           prefix-local (lambda () default-directory)
-           prefix-remote "/workspace/"
-           :name "Debug remote in devspace pod"
-           :request "attach"
-           :mode "remote"
-           :type "go"
-           command "dlv"
-           command-args ("connect" "127.0.0.1:2345"))
-
-          (go-attach
-           modes (go-mode go-ts-mode)
-           host "127.0.0.1"
-           ;; Porta exposta por algo como:
-           ;; dlv attach $(lsof -i TCP -s TCP:LISTEN -nP | awk '/:PORTA/ { print $2 }') --headless --listen=127.0.0.1:5005
-           port 5005 ;; ajustar pra porta real do --listen
-           :name "Attach to running Go process"
-           :type "go"
-           :request "attach"
-           :mode "remote"
-           :cwd (project-root (project-current))
-           command "dlv"
-           command-args ("connect" "127.0.0.1:5005"))))
-
-  (defvar-keymap dape-session-map
-    :doc "Dape keymap for blazingly fast navigation."
-    "b" #'dape-breakpoint-toggle
-    "c" #'dape-continue
-    "i" #'dape-step-in
-    "n" #'dape-next
-    "o" #'dape-step-out
-    "p" #'dape-pause
-    "q" #'dape-quit
-    "r" #'dape-restart)
-
-  :config
-  (add-hook 'dape-start-hook
-            (lambda ()
-              (use-local-map (copy-keymap dape-session-map))))
-  (add-hook 'dape-stopped-hook
-            (lambda ()
-              (use-local-map (default-value 'keymap)))))
+;; do eglot. Já vem com config pronta pra Go (usa `delve`, incluso no
+;; home.packages de emacs-vanilla.nix). Rust precisa de um adapter
+;; separado (`codelldb`, não empacotado aqui por padrão) — quando for
+;; configurar, veja `M-x customize-variable RET dape-configs`.
+(use-package dape)
 
 (defun borba/format-buffer ()
   "Format the current buffer."
