@@ -8,43 +8,53 @@
 # abaixo, então ficam editáveis/diffáveis como Helix config puro, fora do
 # formato de atributos do Nix.
 #
+# Controlado por editors.helix.enable (declarado em ../editors.nix),
+# default true — desligue numa máquina se um dia não quiser Helix nela.
+#
 # home/configs/helix/themes/onenord.toml é a conversão TOML do tema que
 # tínhamos antes em home/modules/helix/theme.nix (já removido do repo).
-{pkgs, ...}: let
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}: let
   pkill =
     if pkgs.stdenv.isLinux
     then "${pkgs.procps}/bin/pkill"
     else "/usr/bin/pkill";
   configs = ../../configs/helix;
 in {
-  home.sessionVariables.EDITOR = "hx";
-  home.sessionVariables.COLORTERM = "truecolor";
+  config = lib.mkIf config.editors.helix.enable {
+    home.sessionVariables.EDITOR = "hx";
+    home.sessionVariables.COLORTERM = "truecolor";
 
-  programs.helix = {
-    enable = true;
-    package = pkgs.helix;
-  };
-
-  xdg.configFile = {
-    "helix/config.toml" = {
-      source = "${configs}/config.toml";
-      onChange = ''
-        ${pkill} -USR1 -x hx 2>/dev/null || true
-      '';
+    programs.helix = {
+      enable = true;
+      package = pkgs.helix;
     };
 
-    "helix/languages.toml" = {
-      source = "${configs}/languages.toml";
-      onChange = ''
-        ${pkill} -USR1 -x hx 2>/dev/null || true
-      '';
-    };
+    xdg.configFile = {
+      "helix/config.toml" = {
+        source = "${configs}/config.toml";
+        onChange = ''
+          ${pkill} -USR1 -x hx 2>/dev/null || true
+        '';
+      };
 
-    "helix/themes/onenord.toml".source = "${configs}/themes/onenord.toml";
+      "helix/languages.toml" = {
+        source = "${configs}/languages.toml";
+        onChange = ''
+          ${pkill} -USR1 -x hx 2>/dev/null || true
+        '';
+      };
 
-    "helix/yazi-picker.sh" = {
-      source = "${configs}/yazi-picker.sh";
-      executable = true;
+      "helix/themes/onenord.toml".source = "${configs}/themes/onenord.toml";
+
+      "helix/yazi-picker.sh" = {
+        source = "${configs}/yazi-picker.sh";
+        executable = true;
+      };
     };
   };
 }
