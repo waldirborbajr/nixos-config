@@ -79,15 +79,11 @@ in {
 
   # ==================== PACKAGES SPECIFIC TO THIS HOST ====================
   # Keep this list light — Dell is the oldest/slowest machine
-  # yazi, lazygit → home/modules/cli-and-terminal.nix (fonte única + config)
+  # yazi, lazygit, jujutsu, lazyjj → home/modules/cli-and-terminal.nix (fonte única + config)
   environment.systemPackages = with pkgs; [
     # Terminal & shell utilities
     duf
     psmisc
-
-    # Version control
-    jujutsu
-    lazyjj
 
     # Desktop utilities
     dex
