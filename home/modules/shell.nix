@@ -8,13 +8,15 @@
 #
 # EDITOR/VISUAL não ficam mais fixos aqui — vêm de home/modules/editors.nix,
 # calculados dinamicamente a partir de qual editor está ligado.
-_: {
+{pkgs, ...}: let
+  configs = ../configs;
+in {
   # .zshenv must live outside ZDOTDIR.
-  home.file.".zshenv".source = ../configs/zshenv;
+  home.file.".zshenv".source = "${configs}/zshenv";
 
   # ZDOTDIR contents (everything except the zshenv file itself)
   xdg.configFile."zsh" = {
-    source = ../configs/zsh;
+    source = "${configs}/zsh";
     recursive = true;
   };
 
@@ -32,7 +34,7 @@ _: {
   };
 
   # Navegação / listagem / fuzzy — usados pelos dotfiles em configs/zsh/
-  home.packages = with pkgs: [
+  home.packages = with pkgs; [
     zoxide
     eza
     fzf
