@@ -2,7 +2,7 @@
 #
 # Multiplexers (tmux/zellij), terminal emulator (wezterm) e ferramentas
 # de CLI que precisam de arquivo de config extra (btop, ripgrep,
-# oh-my-posh, lazygit, atuin, yazi).
+# oh-my-posh, lazygit, atuin, yazi, jujutsu).
 #
 # Fonte ÚNICA dos binários + configs: este módulo é importado por todos
 # os hosts (Linux via home/default.nix, MacBook via hosts/macbook/home.nix).
@@ -40,12 +40,18 @@ in {
   # Pacotes sem módulo HM (ou cujo módulo geraria config própria em conflito
   # com o xdg.configFile abaixo). Ferramentas de desenvolvimento compartilhadas
   # (como ripgrep) são fornecidas por modules/development/base.nix.
+  #
+  # jujutsu/lazyjj estavam soltos em environment.systemPackages por host —
+  # movidos pra cá (config real deles, jujutsu.toml, só existia em
+  # home/configs/jujutsu/ mas nunca era linkada em lugar nenhum).
   home.packages = with pkgs; [
     # wezterm
     alacritty
     zellij
     oh-my-posh
     atuin
+    jujutsu
+    lazyjj
   ];
 
   # tmux-devshell / zellij-devshell viram comando de verdade em qualquer
@@ -128,6 +134,12 @@ in {
     "atuin" = {
       source = "${configs}/atuin";
       recursive = true;
+    };
+
+    # jj procura em $XDG_CONFIG_HOME/jj/config.toml — não em
+    # "jujutsu/", que é só o nome da pasta em home/configs/.
+    "jj/config.toml" = {
+      source = "${configs}/jujutsu/jujutsu.toml";
     };
   };
 
