@@ -1,13 +1,10 @@
 # home/modules/editors.nix
 #
-# Git (config linkado direto de home/configs/git/, já com tudo definido
-# lá — sem passar pelas opções estruturadas programs.git.settings/delta),
-# bat, Neovim e Emacs vanilla. Neovim e Emacs seguem o padrão
-# enable=true/false do resto do repo (default false, ativado
-# pontualmente na máquina). Helix continua isolado em
-# home/modules/helix/ e é o editor "core", sempre instalado, sem toggle.
+# Só editores de texto: Helix (core, sempre instalado, sem toggle),
+# Neovim e Emacs vanilla (enable=true/false, default false, ativado
+# pontualmente na máquina). Git/bat/delta não são editores — moraram
+# em home/modules/cli-and-terminal.nix.
 {
-  pkgs,
   pkgs-unstable,
   inputs,
   lib,
@@ -41,40 +38,13 @@ in {
   };
 
   config = {
-    # Só liga o programa (garante o pacote `git` no PATH); a config em
-    # si (user, core, pull, delta etc.) vem inteira do link abaixo.
-    programs.git.enable = true;
+    home.packages = lib.optional config.editors.neovim.enable nvimPkg;
 
-    programs.bat.enable = true;
-
-    home.packages =
-      [
-        pkgs.delta # binário `delta` — ative em home/configs/git/config (core.pager = delta)
-      ]
-      ++ lib.optional config.editors.neovim.enable nvimPkg;
-
-    xdg.configFile =
-      {
-        "bat" = {
-          source = "${configs}/bat";
-          recursive = true;
-        };
-
-        "git" = {
-          source = "${configs}/git";
-          recursive = true;
-        };
-
-        # Helix NÃO é linkado aqui: home/modules/helix/default.nix já linka
-        # cada arquivo individualmente (config.toml, languages.toml, tema,
-        # yazi-picker.sh) com onChange/executable próprios. Um link
-        # recursivo da pasta inteira aqui colidiria com esses mesmos alvos.
-      }
-      // lib.optionalAttrs config.editors.neovim.enable {
-        "nvim" = {
-          source = "${configs}/nvim";
-          recursive = true;
-        };
+    xdg.configFile = lib.optionalAttrs config.editors.neovim.enable {
+      "nvim" = {
+        source = "${configs}/nvim";
+        recursive = true;
       };
+    };
   };
 }
