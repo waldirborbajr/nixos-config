@@ -1,9 +1,9 @@
 # home/modules/editors.nix
 #
-# Só editores de texto: Helix (core, sempre instalado, sem toggle),
-# Neovim e Emacs vanilla (enable=true/false, default false, ativado
-# pontualmente na máquina). Git/bat/delta não são editores — moraram
-# em home/modules/cli-and-terminal.nix.
+# Só editores de texto: Helix, Neovim e Emacs vanilla — todos com
+# enable=true/false. Helix nasce true (é o "core" de hoje); Neovim e
+# Emacs nascem false, ativados pontualmente na máquina. Git/bat/delta
+# não são editores — moram em home/modules/cli-and-terminal.nix.
 {
   pkgs-unstable,
   inputs,
@@ -25,6 +25,12 @@ in {
   ];
 
   options.editors = {
+    helix.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Helix (config.toml/languages.toml/tema linkados de home/configs/helix/). Editor \"core\" de hoje — default true.";
+    };
+
     emacs.enable = lib.mkEnableOption "Emacs vanilla (corfu/eglot/eat, ver emacs-vanilla.nix)";
 
     neovim = {
