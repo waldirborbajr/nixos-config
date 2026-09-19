@@ -1,10 +1,11 @@
 # home/modules/editors.nix
 #
-# Git, bat, Neovim e Emacs vanilla. Neovim e Emacs seguem o mesmo padrão
-# do resto do repo (containerTools, development.languages): default
-# false, ativado pontualmente na máquina que for usar. Helix continua
-# isolado em home/modules/helix/ e é o editor "core" (git core.editor),
-# sempre instalado, sem toggle.
+# Git (config linkado direto de home/configs/git/, já com tudo definido
+# lá — sem passar pelas opções estruturadas programs.git.settings/delta),
+# bat, Neovim e Emacs vanilla. Neovim e Emacs seguem o padrão
+# enable=true/false do resto do repo (default false, ativado
+# pontualmente na máquina). Helix continua isolado em
+# home/modules/helix/ e é o editor "core", sempre instalado, sem toggle.
 {
   pkgs-unstable,
   inputs,
@@ -39,17 +40,9 @@ in {
   };
 
   config = {
-    programs.git = {
-      enable = true;
-      settings = {
-        user.name = "Waldir Borba Junior";
-        user.email = "wborbajr@gmail.com";
-        core.editor = "hx";
-        core.pager = "bat";
-        init.defaultBranch = "main";
-        pull.rebase = true;
-      };
-    };
+    # Só liga o programa (garante o pacote `git` no PATH); a config em
+    # si (user, core, pull, delta etc.) vem inteira do link abaixo.
+    programs.git.enable = true;
 
     programs.bat.enable = true;
 
@@ -59,6 +52,11 @@ in {
       {
         "bat" = {
           source = "${configs}/bat";
+          recursive = true;
+        };
+
+        "git" = {
+          source = "${configs}/git";
           recursive = true;
         };
 
