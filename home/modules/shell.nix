@@ -1,21 +1,20 @@
 # home/modules/shell.nix
 #
-# ZDOTDIR layout do zsh, direnv e a sessionVariable de editor padrão.
-# Extraído 1:1 de home/default.nix (split cirúrgico, sem mudança de
-# comportamento).
+# ZDOTDIR layout do zsh, direnv e capacidades do terminal.
 #
 # zoxide / eza / fzf: binários partilhados por todos os hosts via HM.
 # A init do zoxide continua em home/configs/zsh/zoxide.zsh (não usar
 # programs.zoxide.enable para não duplicar o eval).
-{pkgs, ...}: let
-  configs = ../configs;
-in {
+#
+# EDITOR/VISUAL não ficam mais fixos aqui — vêm de home/modules/editors.nix,
+# calculados dinamicamente a partir de qual editor está ligado.
+_: {
   # .zshenv must live outside ZDOTDIR.
-  home.file.".zshenv".source = "${configs}/zshenv";
+  home.file.".zshenv".source = ../configs/zshenv;
 
   # ZDOTDIR contents (everything except the zshenv file itself)
   xdg.configFile."zsh" = {
-    source = "${configs}/zsh";
+    source = ../configs/zsh;
     recursive = true;
   };
 
@@ -33,18 +32,13 @@ in {
   };
 
   # Navegação / listagem / fuzzy — usados pelos dotfiles em configs/zsh/
-  home.packages = with pkgs; [
+  home.packages = with pkgs: [
     zoxide
     eza
     fzf
   ];
 
-  # Editor padrão da sessão — única fonte de verdade agora (antes também
-  # estava em modules/system/packages.nix como environment.variables;
-  # removido de lá porque isso é preferência de usuário, não algo que
-  # outras contas da máquina precisem herdar).
-  home.sessionVariables = {
-    EDITOR = "hx";
-    VISUAL = "hx";
-  };
+  # Suporte a cor de 24-bit no terminal — usado por qualquer coisa no
+  # shell (fzf, bat, delta, prompts), não é específico de nenhum editor.
+  home.sessionVariables.COLORTERM = "truecolor";
 }
