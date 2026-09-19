@@ -14,7 +14,7 @@
 #	gpgsign = true
 [core]
 	# neovim btw
-	editor = hx
+	# editor = hx
 	pager = delta
 [interactive]
 	diffFilter = delta --color-only
