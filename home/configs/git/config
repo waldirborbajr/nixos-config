@@ -1,10 +1,43 @@
+[include]
+	path = ~/.config/delta/themes.gitconfig
 [user]
   name = Waldir Borba Junior
   email = wborbajr@gmail.com
-[core]
-	editor = nvim
-	pager = bat
+  signingkey = ~/.ssh/id_ed25519.pub
 [init]
 	defaultBranch = main
+#[gpg]
+#	format = ssh
+#[commit]
+#	gpgsign = true
+#[tag]
+#	gpgsign = true
+[core]
+	# neovim btw
+	editor = hx
+	pager = delta
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	features = mellow-barbet
+	navigate = true
 [pull]
-	rebase = true
+  rebase = true
+[push]
+  autoSetupRemote = true
+[branch]
+	# list branches by most recent commit.
+  sort = -committerdate
+[checkout]
+	defaultRemote = origin
+[fetch]
+  # remove remote-tracking branches that no longer exist upstream
+  prune = true
+[rerere]
+  # reuse recorded conflict resolutions automatically
+  enabled = true
+[merge]
+	# include the common ancestor in conflict markers for easier resolution
+  conflictStyle = zdiff3
+
+
