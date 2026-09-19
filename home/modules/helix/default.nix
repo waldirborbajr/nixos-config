@@ -2,14 +2,12 @@
 #
 # Helix configurado a partir dos arquivos TOML crus em home/configs/helix/
 # (linkados via xdg.configFile), não mais gerado a partir de atributos Nix.
-# Esse é o modelo anterior à experiência de representar tudo em Nix attrset
-# (ver git log) — restaurado a pedido. programs.helix aqui só instala o
-# pacote/binário; toda configuração de verdade mora nos arquivos linkados
-# abaixo, então ficam editáveis/diffáveis como Helix config puro, fora do
-# formato de atributos do Nix.
+# programs.helix aqui só instala o pacote/binário; toda configuração de
+# verdade mora nos arquivos linkados abaixo.
 #
 # Controlado por editors.helix.enable (declarado em ../editors.nix),
-# default true — desligue numa máquina se um dia não quiser Helix nela.
+# default true. $EDITOR/$VISUAL não são setados aqui — editors.nix já
+# calcula isso dinamicamente pra qualquer editor ligado.
 #
 # home/configs/helix/themes/onenord.toml é a conversão TOML do tema que
 # tínhamos antes em home/modules/helix/theme.nix (já removido do repo).
@@ -26,9 +24,6 @@
   configs = ../../configs/helix;
 in {
   config = lib.mkIf config.editors.helix.enable {
-    home.sessionVariables.EDITOR = "hx";
-    home.sessionVariables.COLORTERM = "truecolor";
-
     programs.helix = {
       enable = true;
       package = pkgs.helix;
