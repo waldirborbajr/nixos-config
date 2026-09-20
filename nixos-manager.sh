@@ -1078,17 +1078,32 @@ build_home_macbook() {
   require_dir
   cd "$NIXOS_DIR"
 
-  step 1 4 "Selecting git branch"
+  step 1 5 "Selecting git branch"
   select_git_branch
 
-  step 2 4 "Checking for local changes"
+  step 2 5 "Checking for local changes"
   git_commit_if_dirty
 
-  step 3 4 "Switching to ${C_TEAL}${GIT_BRANCH}${C_RESET} and syncing"
+  step 3 5 "Switching to ${C_TEAL}${GIT_BRANCH}${C_RESET} and syncing"
   git_checkout_branch
   git_sync_pull
 
-  step 4 4 "Applying home-manager config for ${C_TEAL}borba@macbook${C_RESET}"
+  step 4 5 "Updating home-manager input, if requested"
+  # Só o input home-manager — não "nix flake update" geral (isso é o
+  # que a opção 4/update já faz pros hosts NixOS). flake.lock é
+  # compartilhado por TODO o repo, então isso também afeta a próxima
+  # vez que qualquer host NixOS for rebuildado, não só o macbook. Sem
+  # sudo aqui: é só editar um arquivo texto do repo, não mexe em nada
+  # do sistema (diferente do update_system, que roda como root porque
+  # já está no meio de um nixos-rebuild).
+  if confirm "Atualizar o input home-manager (nix flake update home-manager) antes de aplicar?"; then
+    nix flake update home-manager
+    git_commit_if_dirty
+  else
+    log "Pulando update do home-manager — usando a versão já travada no flake.lock."
+  fi
+
+  step 5 5 "Applying home-manager config for ${C_TEAL}borba@macbook${C_RESET}"
   if command -v home-manager >/dev/null 2>&1; then
     home-manager switch --flake ".#borba@macbook"
   else
