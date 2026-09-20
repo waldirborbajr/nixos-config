@@ -17,9 +17,10 @@ export XDG_STATE_HOME=${XDG_STATE_HOME:-$HOME/.local/state}
 export ZDOTDIR=${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}
 
 # ---------- Editor ----------
-# Default editor used by git, crontab, etc.
-export EDITOR="nvim"
-export VISUAL="nvim"
+# $EDITOR/$VISUAL NÃO são fixados aqui — home/modules/editors.nix já
+# calcula isso dinamicamente (home.sessionVariables) a partir de qual
+# editor está ligado (editors.helix/neovim/emacs.enable). Fixar "nvim"
+# aqui pisaria nesse valor antes do resto do zsh carregar.
 
 # History (must be here so it applies everywhere)
 export HISTFILE="$XDG_STATE_HOME/zsh/history"
@@ -43,6 +44,15 @@ export STARSHIP_CONFIG="$ZDOTDIR/starship.toml"
 # ---------- PATH ----------
 
 typeset -U path
+
+# Home Manager / perfil do Nix — expõe home.packages (inclusive o
+# binário `home-manager` em si) no PATH. Sem isso, todo `home-manager
+# switch` cai no fallback `nix run` pra sempre, mesmo depois da
+# primeira aplicação — o perfil nunca fica "lembrado" entre sessões
+# de shell num setup standalone (sem NixOS).
+if [[ -f "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]]; then
+  source "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
+fi
 
 # Personal binaries/scripts
 export PATH="$HOME/.local/bin:$PATH"
