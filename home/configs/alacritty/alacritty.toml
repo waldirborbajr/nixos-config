@@ -16,8 +16,9 @@ import = ["~/.config/alacritty/os.toml"]
 TERM = "xterm-256color"
 
 [window]
-opacity = 1.0                              # No alpha blending
+opacity = 0.975                            # No alpha blending
 dynamic_title = true
+dynamic_padding = false
 resize_increments = true
 startup_mode = "Windowed"
 dimensions = { columns = 118, lines = 30 }
@@ -47,8 +48,8 @@ unfocused_hollow = true
 # Scrolling
 # =============================================================================
 [scrolling]
-history = 12000
-multiplier = 4
+history = 10000
+multiplier = 3
 
 # =============================================================================
 # Colors — Nord (nordtheme/alacritty, official palette)
@@ -164,6 +165,8 @@ mods = "Control|Shift"
 bindings = [
   { key = "C", mods = "Control|Shift", action = "Copy" },
   { key = "V", mods = "Control|Shift", action = "Paste" },
+
+  { key = "N", mods = "Control|Shift", action = "CreateNewWindow" },
 
   { key = "=", mods = "Control", action = "IncreaseFontSize" },
   { key = "+", mods = "Control", action = "IncreaseFontSize" },
