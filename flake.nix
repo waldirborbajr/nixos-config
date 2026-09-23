@@ -84,7 +84,7 @@
           }
 
           ./configuration.nix
-          ./hosts/${hostname}/default.nix # ← macutm ou macvmf, nunca os dois juntos
+          ./hosts/${hostname}/configuration.nix # ← macutm ou macvmf, nunca os dois juntos
           ./hosts/${hostname}/hardware-configuration.nix # ← idem
         ];
       };
@@ -117,7 +117,7 @@
         };
 
         modules = [
-          ./hosts/${hostname}/home.nix
+          ./home/${hostname}.nix
         ];
       };
 

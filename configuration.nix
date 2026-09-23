@@ -1,63 +1,38 @@
 _: let
-  username = "borba";
-
-  # Shared values for host modules (username mainly).
-  # Dotfile contents now live inside the flake under home/configs/ (fase 3).
-  common = {
-    inherit username;
-  };
+  common = import ./global_constants.nix;
 in {
   _module.args.common = common;
 
   imports = [
     # hardware-configuration.nix is imported per-host via flake.nix
 
-    ./modules/system/system-base.nix
-    ./modules/system/fonts.nix
-    ./modules/system/users-and-home.nix
-    ./modules/system/desktop-niri.nix
-    ./modules/system/audio.nix
-    ./modules/system/hardware-quirks.nix
-    ./modules/system/packages.nix
-    ./modules/system/ssh.nix
-    ./modules/system/sops.nix
+    ./modules/base_system.nix
+    ./modules/fonts.nix
+    ./modules/user_borba.nix
+    ./modules/desktop_niri.nix
+    ./modules/audio.nix
+    ./modules/hardware_quirks.nix
+    ./modules/root_pkgs.nix
+    ./modules/ssh.nix
+    ./modules/sops.nix
 
     # ==================== CONTAINERS / K8S (sob demanda) ====================
     # Sempre importado; Docker, Podman e Kubernetes local são ligados
-    # individualmente via containerTools.*.enable abaixo (mesmo padrão de
-    # development.languages). docker e podman são independentes (pode
-    # ligar só um, ou os dois); kubernetes precisa de um dos dois ligado
-    # junto, já que o k3d cria os nodes do cluster como containers.
-    ./modules/system/containers.nix
+    # individualmente via containerTools.*.enable — ver features.nix,
+    # que é o painel único onde cada host liga/desliga isso.
+    ./modules/containers.nix
 
     # ==================== DEVELOPMENT ====================
-    # Base comum + linguagens explicitamente habilitadas abaixo.
-    ./modules/development/default.nix
+    # Base comum + linguagens explicitamente habilitadas — ver
+    # features.nix (o painel) para o que cada host liga.
+    ./modules/dev/default.nix
   ];
 
-  # Containers / Kubernetes local — desligados por padrão.
-  containerTools = {
-    docker.enable = false;
-    podman.enable = false;
-    kubernetes.enable = false;
-  };
-
-  # Linguagens de desenvolvimento explicitamente habilitadas.
-  development.languages = {
-    nix.enable = true;
-    go.enable = true;
-    rust.enable = true;
-
-    python.enable = false;
-    lua.enable = false;
-    arduino.enable = false;
-    latex.enable = false;
-    postgresql.enable = false;
-    mariadb.enable = false;
-    mongodb.enable = false;
-    ferretdb.enable = false;
-    sqlite.enable = false;
-  };
+  # NOTA: os valores de containerTools.* e development.languages.* NÃO
+  # ficam mais fixos aqui (eram idênticos pros 4 hosts). Cada
+  # hosts/<host>/configuration.nix agora aplica o bloco correspondente
+  # de features.nix — esse é o "lugar único pra ligar/desligar" que
+  # antes não existia por host.
 
   # ==================== STATE VERSION ====================
   system.stateVersion = "26.05";

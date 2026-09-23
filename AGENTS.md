@@ -5,18 +5,18 @@
 Flake multi-host NixOS + Home Manager config for 4 physical/VM hosts plus
 one standalone macOS home-manager profile:
 
-- `configuration.nix` — thin index, imports topic modules from `modules/system/`.
-- `modules/system/` — system-level modules split by topic (system-base, fonts,
+- `configuration.nix` — thin index, imports topic modules from `modules/`.
+- `modules/` — system-level modules split by topic (system-base, fonts,
   users-and-home, desktop-niri, audio, hardware-quirks, packages, ssh, sops,
   containers-docker, containers-podman, kubernetes-dev).
 - `home/` — Home Manager config. `home/default.nix` is a thin index importing
-  `home/modules/` (identity, shell, editors, cli-and-terminal, desktop,
+  `home/` (identity, shell, editors, cli-and-terminal, desktop,
   helix/). Dotfile contents live in `home/configs/` inside the flake — no
   external dependency on a separate dotfiles repo.
 - `hosts/<hostname>/` — per-host `default.nix` + `hardware-configuration.nix`.
-  `hosts/common/` holds config shared only by the Mac family
+  `modules/mac_workstation.nix` / `modules/mac_vm.nix` hold config shared only by the Mac family
   (`broadcom-wifi.nix`, `mac-workstation.nix`, `mac-vm-workstation.nix`).
-  `hosts/macbook/home.nix` is the odd one out: standalone home-manager only,
+  `home/macbook.nix` is the odd one out: standalone home-manager only,
   no NixOS module, no `hardware-configuration.nix`.
 - `devshells/` — per-language dev shells (arduino, go, latex, lua, mariadb,
   mongodb, postgresql, python, rust, sqlite), each its own `flake.nix`.
@@ -24,7 +24,7 @@ one standalone macOS home-manager profile:
   into the flake's `formatter` and `checks.format` outputs.
 - `.sops.yaml` / `hosts/<hostname>/secrets/<hostname>.yaml` — per-host
   encrypted secrets, one age key per host, no shared secrets file.
-- `nixos-manager.sh` — the deploy/rebuild wrapper (see "Building and
+- `scripts/nixos-manager.sh` — the deploy/rebuild wrapper (see "Building and
   Deploying" below); replaces raw `nixos-rebuild`/`home-manager` calls for
   day-to-day use.
 
@@ -32,7 +32,7 @@ one standalone macOS home-manager profile:
 
 The flake attr in `nixosConfigurations`/`homeConfigurations` is **not**
 always the same as the machine's real hostname. Source of truth is
-`flake.nix`; `nixos-manager.sh` reads it at runtime (`nix eval` + `jq`)
+`flake.nix`; `scripts/nixos-manager.sh` reads it at runtime (`nix eval` + `jq`)
 rather than hardcoding it.
 
 | flake attr | real hostname | arch | role |
@@ -44,7 +44,7 @@ rather than hardcoding it.
 | `borba@macbook` (homeConfigurations, not nixosConfigurations) | — | aarch64-darwin | MacBook M2 físico, home-manager standalone only |
 
 `dell1456` is a legacy/pre-rename alias for `dell1564` — kept in
-`nixos-manager.sh`'s `HOST_ALIAS_TO_ATTR`, not a typo to "fix".
+`scripts/nixos-manager.sh`'s `HOST_ALIAS_TO_ATTR`, not a typo to "fix".
 
 ## Commit Messages
 
@@ -58,48 +58,65 @@ If a stricter convention is wanted later, mirror Foundry's
 
 ```
 .
-├── configuration.nix          # thin index -> modules/system/
-├── modules/system/            # system-level modules by topic
-│   ├── system-base.nix
+├── global_constants.nix       # { username = "borba"; }
+├── features.nix                # PAINEL: liga/desliga pacotes por host
+├── configuration.nix           # thin index -> modules/
+├── modules/                    # system-level modules, flat, snake_case
+│   ├── base_system.nix
 │   ├── fonts.nix
-│   ├── users-and-home.nix
-│   ├── desktop-niri.nix
+│   ├── user_borba.nix
+│   ├── desktop_niri.nix
 │   ├── audio.nix
-│   ├── hardware-quirks.nix
-│   ├── packages.nix
+│   ├── hardware_quirks.nix
+│   ├── root_pkgs.nix
 │   ├── ssh.nix
 │   ├── sops.nix
-│   ├── containers-docker.nix
-│   ├── containers-podman.nix
-│   └── kubernetes-dev.nix
+│   ├── containers.nix
+│   ├── containers_docker.nix
+│   ├── containers_podman.nix
+│   ├── containers_kubernetes.nix
+│   ├── mac_workstation.nix     # shared ONLY by the Mac family
+│   ├── mac_vm.nix              # layer on top of mac_workstation.nix, for macutm/macvmf
+│   ├── broadcom_wifi.nix       # shared by dell1564 + mac2011
+│   └── dev/
+│       ├── default.nix
+│       ├── base.nix
+│       └── {go,rust,python,lua,nix,...}.nix
 ├── home/
-│   ├── default.nix            # thin index -> home/modules/
-│   ├── modules/
-│   │   ├── identity.nix
-│   │   ├── shell.nix
-│   │   ├── editors.nix
-│   │   ├── cli-and-terminal.nix
-│   │   ├── desktop.nix
-│   │   └── helix/
-│   │       ├── default.nix
-│   │       └── theme.nix      # onenord — ported from Foundry's helix/theme.nix
-│   └── configs/                # raw dotfile contents (zsh, tmux, wezterm, etc.)
+│   ├── home.nix                # base profile: identity/shell/editors/cli-and-terminal
+│   ├── home_niri.nix           # desktop layer (niri/waybar/emacs-vanilla), on top of home.nix
+│   ├── identity.nix
+│   ├── shell.nix
+│   ├── editors.nix
+│   ├── cli-and-terminal.nix
+│   ├── desktop.nix
+│   ├── emacs-vanilla.nix
+│   ├── helix/
+│   │   ├── default.nix
+│   │   └── theme.nix           # onenord — ported from Foundry's helix/theme.nix
+│   ├── dell1564.nix            # thin: imports ./home_niri.nix
+│   ├── mac2011.nix
+│   ├── macutm.nix
+│   ├── macvmf.nix
+│   ├── macbook.nix             # standalone home-manager entry point (no nix-darwin)
+│   └── configs/                # raw dotfile contents (zsh, tmux, wezterm, etc.) — SOURCE OF TRUTH
 ├── hosts/
-│   ├── common/                  # shared ONLY by the Mac family
-│   │   ├── broadcom-wifi.nix
-│   │   ├── mac-workstation.nix
-│   │   └── mac-vm-workstation.nix
 │   ├── dell1564/
+│   │   ├── configuration.nix   # hardware + host overrides + wires home/dell1564.nix
+│   │   └── hardware-configuration.nix
 │   ├── mac2011/
 │   ├── macutm/
-│   ├── macvmf/
-│   └── macbook/
-│       └── home.nix            # standalone home-manager, NOT a nixosConfiguration
+│   └── macvmf/
 ├── devshells/
 │   └── {lang}/flake.nix
+├── scripts/
+│   ├── nixos-manager.sh        # deploy/rebuild wrapper (see below)
+│   ├── tmux-devshell.sh
+│   ├── zellij-devshell.sh
+│   ├── chmox.sh
+│   └── logitech-k380-bluetooth-linux-fix/
 ├── flake.nix
 ├── treefmt.nix
-├── nixos-manager.sh             # deploy/rebuild wrapper (see below)
 └── .sops.yaml
 ```
 
@@ -134,8 +151,8 @@ If a stricter convention is wanted later, mirror Foundry's
 
 ## Building and Deploying
 
-Day-to-day: use **`./nixos-manager.sh`** (interactive menu or
-`./nixos-manager.sh <option> [host]`), not raw `nixos-rebuild`/
+Day-to-day: use **`./scripts/nixos-manager.sh`** (interactive menu or
+`./scripts/nixos-manager.sh <option> [host]`), not raw `nixos-rebuild`/
 `home-manager` — it handles git branch selection, OOM-safe serial builds
 on `dell` (`--max-jobs 1 --cores 1`), generation-change verification, and
 bootloader sync after cleanup. Key options: `flake` (build+switch),
@@ -143,30 +160,30 @@ bootloader sync after cleanup. Key options: `flake` (build+switch),
 `clean` (GC), `rollback`, `check` (`nix flake check`), `m`/`c` for the
 `macbook` home-manager-only host.
 
-`nh` (see `home/modules/cli-and-terminal.nix`, `programs.nh`) is also
+`nh` (see `home/cli-and-terminal.nix`, `programs.nh`) is also
 available as a lighter-weight alternative for ad-hoc `nh os switch` /
 `nh home switch` / `nh clean all` outside the wrapper's git-flow — its
 `flake` is pinned to `$HOME/nixos-config`, the same local clone path
-`nixos-manager.sh` expects.
+`scripts/nixos-manager.sh` expects.
 
 - Format check: `nix fmt` (or `nix flake check`, which includes it).
-- Build a host without activating: `./nixos-manager.sh dry <flake-attr>`
+- Build a host without activating: `./scripts/nixos-manager.sh dry <flake-attr>`
   or `nixos-rebuild build --flake .#<flake-attr>`.
-- Deploy to the current host: `./nixos-manager.sh flake <flake-attr>` or
+- Deploy to the current host: `./scripts/nixos-manager.sh flake <flake-attr>` or
   `sudo nixos-rebuild switch --flake .#<flake-attr>`.
-- Deploy the macOS-only home-manager profile: `./nixos-manager.sh m` or
+- Deploy the macOS-only home-manager profile: `./scripts/nixos-manager.sh m` or
   `home-manager switch --flake .#borba@macbook`.
 - No Hydra/CI auto-upgrade in this repo (unlike Foundry) — every deploy is
-  manual, via `nixos-manager.sh` or direct commands.
+  manual, via `scripts/nixos-manager.sh` or direct commands.
 
 ### Post-deploy verification
 
-`nixos-manager.sh` already checks `/run/current-system` before/after and
+`scripts/nixos-manager.sh` already checks `/run/current-system` before/after and
 fails loudly on OOM-kill or activation mismatch. For a manual check:
 
 1. `ssh <host> -- readlink -f /run/current-system`
 1. Compare against the expected generation shown by
-   `./nixos-manager.sh g` (list generations).
+   `./scripts/nixos-manager.sh g` (list generations).
 
 ## Nix eval
 
