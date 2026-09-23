@@ -60,6 +60,23 @@ in {
     jujutsu
     lazyjj
     delta # binário `delta` — ative em home/configs/git/config (core.pager = delta)
+
+    # ---- Migrados de modules/root_pkgs.nix ----
+    # fastfetch já tinha a config linkada abaixo (xdg.configFile) mas o
+    # binário continuava em environment.systemPackages — dois donos pra
+    # metade da mesma feature. Agora os dois vivem aqui.
+    fastfetch
+    gh # GitHub CLI
+    gh-dash # GitHub CLI TUI dashboard
+    asciinema
+    asciinema-agg
+    asciinema-scenario
+    mupdf # lightweight PDF renderer/tools
+    kdlfmt # formata os .kdl do niri/waybar
+    unzip
+    zip
+    p7zip
+    xarchiver # GUI leve pra zip/7z/tar/rar
   ];
 
   # tmux-devshell / zellij-devshell viram comando de verdade em qualquer

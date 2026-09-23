@@ -37,11 +37,6 @@
     # File watching / automation
     watchexec
 
-    # Editor/tooling available to every development environment.
-    # Home Manager owns the Helix configuration; this module owns the
-    # development-time package availability.
-    helix
-
     # Hardware information useful during development.
     pciutils
   ];

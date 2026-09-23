@@ -71,10 +71,8 @@
 
   programs.dconf.enable = true;
 
-  programs.direnv = {
-    enable = true;
-    nix-direnv.enable = true;
-  };
+  # direnv: só HM (home/shell.nix) — tem nix-direnv + integração com zsh
+  # de verdade. O programs.direnv daqui era redundante (e mais pobre).
 
   # ==================== XDG DESKTOP PORTAL ====================
   # niri não tem DE por trás dele, então precisa de um backend de portal

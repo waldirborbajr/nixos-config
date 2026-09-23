@@ -47,9 +47,8 @@
       autorandr
       xkill
 
-      brightnessctl
-      playerctl
-      pavucontrol
+      # brightnessctl/playerctl/pavucontrol: migrados pro HM
+      # (home/desktop.nix), único dono agora.
       ffmpeg
 
       # build / containers CLI (o daemon podman em si só nas VMs)
@@ -74,13 +73,12 @@
     # ---- Desktop/Wayland extras — confirmados em nixpkgs ----
     ++ [
       loupe # visualizador de imagens (GNOME)
-      grim # screenshots
       grimblast # screenshot helper (originado do Hyprland, mas empacotado standalone)
       libnotify # notificações (notify-send)
       mpvpaper # vídeo como wallpaper
       nemo # gerenciador de arquivos
-      networkmanagerapplet # applet de rede na systray
-      wl-clipboard # clipboard Wayland
+      # grim/networkmanagerapplet/wl-clipboard: migrados pro HM
+      # (home/desktop.nix), único dono agora.
       kooha # gravador de tela
       hyprlax # dynamic/parallax wallpaper daemon (confirmado no nixos-26.05)
       satty # anotação de screenshot

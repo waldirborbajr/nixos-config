@@ -107,10 +107,8 @@ in
       autorandr
       xkill
 
-      # Hardware & multimedia
-      brightnessctl
-      playerctl
-      pavucontrol
+      # brightnessctl/playerctl/pavucontrol: migrados pro HM
+      # (home/desktop.nix), único dono agora — vale pros 4 hosts NixOS.
 
       # Broadcom wireless debug/config tools
       iw
