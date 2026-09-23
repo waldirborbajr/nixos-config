@@ -21,7 +21,7 @@
     if pkgs.stdenv.isLinux
     then "${pkgs.procps}/bin/pkill"
     else "/usr/bin/pkill";
-  configs = ../../configs/helix;
+  configs = ../configs/helix;
 in {
   config = lib.mkIf config.editors.helix.enable {
     programs.helix = {

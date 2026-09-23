@@ -11,9 +11,9 @@
   ...
 }: {
   imports = [
-    ./containers-docker.nix
-    ./containers-podman.nix
-    ./kubernetes-dev.nix
+    ./containers_docker.nix
+    ./containers_podman.nix
+    ./containers_kubernetes.nix
   ];
 
   options.containerTools = {

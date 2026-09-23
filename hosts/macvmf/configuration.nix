@@ -4,7 +4,8 @@
   common,
   hostname,
   ...
-}: {
+}:
+{
   imports = [../../modules/mac_vm.nix];
 
   # ==================== HOME MANAGER (este host) ====================
