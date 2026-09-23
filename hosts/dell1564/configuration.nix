@@ -16,7 +16,16 @@ in
     # ==================== HOME MANAGER (este host) ====================
     # Único lugar que decide qual home/<host>.nix este host carrega —
     # ver home-manager.useGlobalPkgs/extraSpecialArgs em modules/user_borba.nix.
-    home-manager.users.${username} = import ../../home/${hostname}.nix;
+    # Override niri input + outputs for Dell ABNT2 keyboard and internal panel
+    # ficam aqui dentro (imports + opções diretas no MESMO bloco — duas
+    # atribuições separadas a home-manager.users.${username} no mesmo
+    # arquivo dão "dynamic attribute already defined").
+    home-manager.users.${username} = {
+      imports = [../../home/${hostname}.nix];
+      xdg.configFile."niri/config/input.kdl".source = ../../home/configs/niri/config/input-dell.kdl;
+      xdg.configFile."niri/config/outputs.kdl".source = ../../home/configs/niri/config/outputs-dell.kdl;
+      xdg.configFile."waybar/output.jsonc".source = ../../home/configs/waybar/output-dell.jsonc;
+    };
 
     # ==================== BOOTLOADER ====================
     # Assumes legacy BIOS + GRUB (older Dell hardware).
@@ -118,14 +127,6 @@ in
     # Apenas Firefox estável — máquina antiga/lenta. Navegadores ficam por host,
     # não no core (configuration.nix).
     programs.firefox.enable = true;
-
-    # ==================== HOME MANAGER (host-specific, fase 3) ====================
-    # Override niri input + outputs for Dell ABNT2 keyboard and internal panel.
-    home-manager.users.${username} = {
-      xdg.configFile."niri/config/input.kdl".source = ../../home/configs/niri/config/input-dell.kdl;
-      xdg.configFile."niri/config/outputs.kdl".source = ../../home/configs/niri/config/outputs-dell.kdl;
-      xdg.configFile."waybar/output.jsonc".source = ../../home/configs/waybar/output-dell.jsonc;
-    };
   }
   # ==================== PAINEL DE FEATURES ====================
   # Único lugar pra ligar/desligar pacotes deste host: ../../features.nix

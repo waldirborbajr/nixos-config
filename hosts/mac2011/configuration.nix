@@ -19,7 +19,17 @@ in
     ];
 
     # ==================== HOME MANAGER (este host) ====================
-    home-manager.users.${username} = import ../../home/${hostname}.nix;
+    # imports aponta pro home/<host>.nix; overrides de niri/waybar do
+    # hardware físico ficam no MESMO bloco (duas atribuições separadas a
+    # home-manager.users.${username} no mesmo arquivo dão "dynamic
+    # attribute already defined").
+    home-manager.users.${username} = {
+      imports = [../../home/${hostname}.nix];
+      xdg.configFile."niri/config/input.kdl".source = ../../home/configs/niri/config/input-mac2011.kdl;
+      xdg.configFile."niri/config/outputs.kdl".source =
+        ../../home/configs/niri/config/outputs-mac2011.kdl;
+      xdg.configFile."waybar/output.jsonc".source = ../../home/configs/waybar/output-mac2011.jsonc;
+    };
 
     # O módulo hardware.bluetooth do NixOS força General.ControllerMode =
     # "dual" como default (sempre, mesmo sem configurar nada) — em
@@ -77,14 +87,6 @@ in
         chirp
       ]
     );
-
-    # ==================== HOME MANAGER (niri/waybar do hardware físico) ====================
-    home-manager.users.${username} = {
-      xdg.configFile."niri/config/input.kdl".source = ../../home/configs/niri/config/input-mac2011.kdl;
-      xdg.configFile."niri/config/outputs.kdl".source =
-        ../../home/configs/niri/config/outputs-mac2011.kdl;
-      xdg.configFile."waybar/output.jsonc".source = ../../home/configs/waybar/output-mac2011.jsonc;
-    };
   }
   # ==================== PAINEL DE FEATURES ====================
   // (import ../../features.nix).mac2011
