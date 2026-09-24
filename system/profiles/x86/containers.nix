@@ -13,12 +13,11 @@
 # nome quebra o merge de opções.
 {
   pkgs,
-  common,
   config,
   lib,
   ...
 }: let
-  inherit (common) username;
+  username = "borba";
 in {
   options.containerTools = {
     docker.enable = lib.mkEnableOption "Docker Engine (dockerd, socket-activated)";

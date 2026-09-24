@@ -9,10 +9,9 @@
 {
   pkgs,
   hostname,
-  common,
   ...
 }: let
-  inherit (common) username;
+  username = "borba";
   sshKeysDir = "/home/${username}/.ssh";
 in {
   imports = [
