@@ -14,7 +14,7 @@
     # 🔐 secrets management
     sops-nix.url = "github:Mic92/sops-nix";
 
-    # 🏠 home-manager (fase 2)
+    # 🏠 home-manager
     home-manager = {
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -32,9 +32,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # 🦀 rust-overlay — fornece `pkgs.rust-bin` (toolchain unificado,
-    #    com rustc/cargo/rust-analyzer/rustfmt/clippy SEMPRE sincronizados).
-    #    Sem isso, `rust-bin` fica undefined nos módulos.
+    # 🦀 rust-overlay — fornece `pkgs.rust-bin` (toolchain unificado).
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -51,6 +49,8 @@
     rust-overlay,
     ...
   } @ inputs: let
+    username = "borba";
+
     # 🖥️  Hosts NixOS (gerenciam sistema + home-manager embutido)
     mkHost = {
       hostname,
@@ -69,28 +69,28 @@
         };
 
         modules = [
-          # 🔐 SOPS module (global)
           sops-nix.nixosModules.sops
-
-          # 🏠 Home Manager (fase 2)
           home-manager.nixosModules.home-manager
+          ./system/overlays.nix
 
-          # 🦀 rust-overlay — torna `pkgs.rust-bin` disponível em
-          #    todos os módulos do sistema (incluindo development/rust.nix).
+          ./hosts/${hostname}/configuration.nix
+          ./hosts/${hostname}/hardware-configuration.nix
+
           {
-            nixpkgs.overlays = [
-              rust-overlay.overlays.default
-            ];
+            home-manager.users.${username} = import ./hosts/${hostname}/home/home.nix;
+            home-manager.extraSpecialArgs = {
+              inherit inputs hostname;
+              pkgs-unstable = import nixpkgs-unstable {
+                inherit system;
+                config.allowUnfree = true;
+              };
+            };
           }
-
-          ./configuration.nix
-          ./hosts/${hostname}/configuration.nix # ← macutm ou macvmf, nunca os dois juntos
-          ./hosts/${hostname}/hardware-configuration.nix # ← idem
         ];
       };
 
     # 🍎 home-manager standalone (macOS físico) — sem gerenciar o sistema,
-    # só pacotes + dotfiles (zsh, git, helix, tmux, wezterm, etc).
+    # só pacotes + dotfiles (zsh, git, helix, tmux, alacritty, etc).
     mkMacHome = {
       hostname,
       system ? "aarch64-darwin",
@@ -99,12 +99,7 @@
         pkgs = import nixpkgs {
           inherit system;
           config.allowUnfree = true;
-
-          # 🦀 rust-overlay também no macOS físico, para o toolchain
-          #    Rust ficar sincronizado via home-manager.
-          overlays = [
-            rust-overlay.overlays.default
-          ];
+          overlays = [rust-overlay.overlays.default];
         };
 
         extraSpecialArgs = {
@@ -117,21 +112,17 @@
         };
 
         modules = [
-          ./home/${hostname}.nix
+          ./hosts/${hostname}/home/home.nix
         ];
       };
 
     # 🧩 Sistemas suportados pelo formatter/treefmt.
-    # Inclui aarch64-darwin para o `nix fmt` funcionar também no MacBook M2.
     supportedSystems = [
       "x86_64-linux"
       "aarch64-linux"
       "aarch64-darwin"
     ];
 
-    # 🌳 Instancia o treefmt para um sistema.
-    # A RECURSÃO pelos .nix vem do arquivo ./treefmt.nix — não daqui.
-    # Aqui só montamos o wrapper que o `nix fmt` executa.
     treefmtFor = system: let
       pkgs = nixpkgs.legacyPackages.${system};
     in
@@ -166,15 +157,9 @@
       };
     };
 
-    # `nix fmt` — mesmo formatter em qualquer host (Linux ou Darwin).
     formatter = nixpkgs.lib.genAttrs supportedSystems treefmtFor;
 
-    # `nix flake check` agora também valida formatação.
     checks = nixpkgs.lib.genAttrs supportedSystems (system: {
-      # `config.build.check` é uma FUNÇÃO (self: derivation), não a
-      # derivation em si — usa `self` (o flake) como `src` do check.
-      # Sem passar `self` aqui, o output vira uma função e o
-      # `nix flake check` falha com "is not a derivation".
       formatting =
         (treefmt-nix.lib.evalModule nixpkgs.legacyPackages.${system} ./treefmt.nix).config.build.check self;
     });

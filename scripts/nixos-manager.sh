@@ -60,7 +60,7 @@ GIT_BRANCH=""
 
 # flake attr -> real machine name (used for auto-detection via `hostname`).
 # Source of truth is flake.nix (nixosConfigurations.<attr>.config.networking.hostName,
-# set from the `hostname` specialArg in modules/system/system-base.nix) — this
+# set from the `hostname` specialArg in system/profiles/base.nix) — this
 # is populated at runtime by load_flake_hosts() below, NOT hardcoded here, so
 # adding/renaming a host in flake.nix doesn't also require editing this script.
 # HOST_ATTR_TO_MACHINE_FALLBACK is only used if `nix eval`/`jq` are unavailable

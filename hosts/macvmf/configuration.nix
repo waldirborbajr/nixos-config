@@ -1,19 +1,17 @@
 # hosts/macvmf/configuration.nix
-{
-  pkgs,
-  common,
-  hostname,
-  ...
-}:
-{
-  imports = [../../modules/mac_vm.nix];
-
-  # ==================== HOME MANAGER (este host) ====================
-  home-manager.users.${common.username} = import ../../home/${hostname}.nix;
+{pkgs, ...}: {
+  imports = [
+    ./hardware-configuration.nix
+    ../../system/profiles/base.nix
+    ../../system/profiles/desktop.nix
+    ../../system/profiles/x86/desktop.nix
+    ../../system/modules/mac-family.nix
+    ../../system/modules/mac-vm.nix
+  ];
 
   # VMware Fusion (não UTM)
   virtualisation.vmware.guest.enable = true;
   environment.systemPackages = [pkgs.open-vm-tools];
+
+  system.stateVersion = "26.05";
 }
-# ==================== PAINEL DE FEATURES ====================
-// (import ../../features.nix).macvmf

@@ -1,14 +1,13 @@
-{
-  pkgs,
-  common,
-  hostname,
-  ...
-}:
-{
-  imports = [../../modules/mac_vm.nix];
-
-  # ==================== HOME MANAGER (este host) ====================
-  home-manager.users.${common.username} = import ../../home/${hostname}.nix;
+# hosts/macutm/configuration.nix
+{pkgs, ...}: {
+  imports = [
+    ./hardware-configuration.nix
+    ../../system/profiles/base.nix
+    ../../system/profiles/desktop.nix
+    ../../system/profiles/x86/desktop.nix
+    ../../system/modules/mac-family.nix
+    ../../system/modules/mac-vm.nix
+  ];
 
   environment.systemPackages = [pkgs.spice-vdagent];
 
@@ -18,6 +17,6 @@
     # último recurso se ainda falhar:
     WLR_RENDERER = "pixman";
   };
+
+  system.stateVersion = "26.05";
 }
-# ==================== PAINEL DE FEATURES ====================
-// (import ../../features.nix).macutm
