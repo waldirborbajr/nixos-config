@@ -19,22 +19,22 @@
     ../../system/modules/mac-family.nix
     ../../system/modules/broadcom-wifi.nix
 
-    ./services/wireguard.nix
-    ./services/sabnzbd.nix
-    ./services/qbittorrent.nix
-    ./services/radarr.nix
-    ./services/sonarr.nix
-    ./services/prowlarr.nix
-    ./services/seerr.nix
-    ./services/immich.nix
-    ./services/nextcloud.nix
-    ./services/paperless.nix
-    ./services/calibre.nix
-    ./services/matrix.nix
-    ./services/monitoring.nix
-    ./services/zed.nix
-    ./services/tracearr.nix
-    ./services/protonvpn-fr.nix
+    # ./services/wireguard.nix
+    # ./services/sabnzbd.nix
+    # ./services/qbittorrent.nix
+    # ./services/radarr.nix
+    # ./services/sonarr.nix
+    # ./services/prowlarr.nix
+    # ./services/seerr.nix
+    # ./services/immich.nix
+    # ./services/nextcloud.nix
+    # ./services/paperless.nix
+    # ./services/calibre.nix
+    # ./services/matrix.nix
+    # ./services/monitoring.nix
+    # ./services/zed.nix
+    # ./services/tracearr.nix
+    # ./services/protonvpn-fr.nix
   ];
 
   # O módulo hardware.bluetooth do NixOS força General.ControllerMode =
