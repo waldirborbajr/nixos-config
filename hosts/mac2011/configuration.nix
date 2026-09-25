@@ -25,14 +25,12 @@
     ./services/radarr.nix
     ./services/sonarr.nix
     ./services/prowlarr.nix
-    ./services/jellyfin.nix
     ./services/seerr.nix
     ./services/immich.nix
     ./services/nextcloud.nix
     ./services/paperless.nix
     ./services/calibre.nix
     ./services/matrix.nix
-    ./services/caddy.nix
     ./services/monitoring.nix
     ./services/restic.nix
     ./services/zed.nix
