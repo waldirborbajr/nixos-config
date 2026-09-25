@@ -26,50 +26,52 @@
     sqlite.enable = lib.mkEnableOption "SQLite development tooling";
   };
 
-  # ==================== BASE (sempre presente) ====================
-  # Ferramentas comuns a todos os ambientes de desenvolvimento.
-  #
-  # Regra: ferramentas compartilhadas entre linguagens/devshells ficam
-  # aqui. Os blocos de linguagem abaixo declaram só o que é específico
-  # daquele ambiente.
-  environment.systemPackages = with pkgs; [
-    # C/C++ / build foundation
-    gcc
-    glibc
-    clang
-    cmake
-    libtool
-    gnumake
-    sdbus-cpp
-
-    # Build/development helpers
-    pkg-config
-    openssl
-    zlib
-    jq
-
-    # Source/code navigation
-    git
-    ripgrep
-    fd
-    tree
-
-    # Debugging / tracing
-    gdb
-    lldb
-    valgrind
-    strace
-    ltrace
-    graphviz
-
-    # File watching / automation
-    watchexec
-
-    # Hardware information useful during development.
-    pciutils
-  ];
-
   config = lib.mkMerge [
+    # ==================== BASE (sempre presente) ====================
+    # Ferramentas comuns a todos os ambientes de desenvolvimento.
+    #
+    # Regra: ferramentas compartilhadas entre linguagens/devshells ficam
+    # aqui. Os blocos de linguagem abaixo declaram só o que é específico
+    # daquele ambiente.
+    {
+      environment.systemPackages = with pkgs; [
+        # C/C++ / build foundation
+        gcc
+        glibc
+        clang
+        cmake
+        libtool
+        gnumake
+        sdbus-cpp
+
+        # Build/development helpers
+        pkg-config
+        openssl
+        zlib
+        jq
+
+        # Source/code navigation
+        git
+        ripgrep
+        fd
+        tree
+
+        # Debugging / tracing
+        gdb
+        lldb
+        valgrind
+        strace
+        ltrace
+        graphviz
+
+        # File watching / automation
+        watchexec
+
+        # Hardware information useful during development.
+        pciutils
+      ];
+    }
+
     (lib.mkIf config.development.languages.nix.enable {
       # Nix language tooling: language servers and formatter.
       # These are intentionally kept out of the global NixOS package set.
