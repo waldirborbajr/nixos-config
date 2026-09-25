@@ -18,8 +18,8 @@
   repoRoot = ../../.;
 in {
   # Módulos nativos do HM — instalam o binário; a config fica no xdg abaixo.
-  programs.tmux.enable = true;
-  programs.btop.enable = true;
+  # tmux/btop têm módulo próprio agora: home/modules/tmux.nix e
+  # home/modules/btop.nix (config nativa, não xdg.configFile).
   programs.lazygit.enable = true;
   programs.yazi.enable = true;
   programs.bat.enable = true;
@@ -46,7 +46,7 @@ in {
 
   # Pacotes sem módulo HM (ou cujo módulo geraria config própria em conflito
   # com o xdg.configFile abaixo). Ferramentas de desenvolvimento compartilhadas
-  # (como ripgrep) são fornecidas por modules/dev/base.nix.
+  # (como ripgrep) são fornecidas por modules/dev.nix.
   #
   # jujutsu/lazyjj estavam soltos em environment.systemPackages por host —
   # movidos pra cá (config real deles, jujutsu.toml, só existia em
@@ -128,15 +128,8 @@ in {
       source = "${configs}/zellij";
       recursive = true;
     };
-    "tmux" = {
-      source = "${configs}/tmux";
-      recursive = true;
-    };
+    # tmux/btop: ver home/modules/tmux.nix e home/modules/btop.nix.
 
-    "btop" = {
-      source = "${configs}/btop";
-      recursive = true;
-    };
     "ripgrep" = {
       source = "${configs}/ripgrep";
       recursive = true;

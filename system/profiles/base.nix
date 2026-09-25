@@ -15,7 +15,7 @@
   sshKeysDir = "/home/${username}/.ssh";
 in {
   imports = [
-    ../modules/dev
+    ../modules/dev.nix
   ];
 
   # ==================== KERNEL ====================
@@ -48,6 +48,16 @@ in {
   networking.hostName = hostname;
   networking.networkmanager.enable = true;
   networking.firewall.allowedTCPPorts = [22];
+
+  # Tailscale — LAN local é 192.168.0.0/24; o tailnet usa a faixa própria
+  # dele (100.64.0.0/10), sem sobreposição. Nada de rota de sub-rede
+  # anunciada por enquanto — só a malha entre os hosts que a tiverem
+  # instalada.
+  services.tailscale.enable = true;
+  # As duas linhas abaixo evitam problema de DNS com o tailscale — mesmo
+  # padrão do ulyssecrn: https://github.com/tailscale/tailscale/issues/4254
+  services.resolved.enable = true;
+  networking.useNetworkd = false;
 
   # ==================== TIME / LOCALE ====================
   time.timeZone = "America/Sao_Paulo";
@@ -130,7 +140,7 @@ in {
   };
 
   # ==================== PACKAGES (núcleo mínimo, fora do painel de features) ====================
-  # git → system/modules/dev/base.nix. zsh/eza/zoxide/bat/fzf/delta/direnv
+  # git → system/modules/dev.nix. zsh/eza/zoxide/bat/fzf/delta/direnv
   # → home/modules/shell.nix e cli-and-terminal.nix (HM) — um dono só.
   environment.systemPackages = with pkgs; [
     wget

@@ -71,6 +71,11 @@
   services.power-profiles-daemon.enable = true;
   programs.dconf.enable = true;
 
+  # ==================== IMPRESSÃO / DESCOBERTA NA REDE ====================
+  services.printing.enable = true;
+  services.avahi.enable = true;
+  services.avahi.nssmdns4 = true;
+
   # direnv: só HM (home/modules/shell.nix) — tem nix-direnv + integração
   # com zsh de verdade. Um programs.direnv aqui seria redundante.
 

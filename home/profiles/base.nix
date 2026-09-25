@@ -10,6 +10,8 @@
     ../modules/shell.nix
     ../modules/editors.nix
     ../modules/cli-and-terminal.nix
+    ../modules/btop.nix
+    ../modules/tmux.nix
   ];
 
   # Emacs e Neovim desligados por padrão — ative pontualmente na máquina
