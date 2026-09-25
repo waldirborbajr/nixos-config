@@ -1,7 +1,4 @@
-{
-  pkgs,
-  ...
-}: {
+{pkgs, ...}: {
   # ZFS Event Daemon — fault/scrub/resilver notifications to Discord via the
   # Slack-compatible webhook endpoint (append /slack to a Discord webhook URL
   # and zed's bundled slack-notify zedlet works as-is).

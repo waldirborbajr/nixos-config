@@ -32,7 +32,6 @@
     ./services/calibre.nix
     ./services/matrix.nix
     ./services/monitoring.nix
-    ./services/restic.nix
     ./services/zed.nix
     ./services/tracearr.nix
     ./services/protonvpn-fr.nix

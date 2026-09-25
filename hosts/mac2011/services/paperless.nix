@@ -1,7 +1,4 @@
-{
-  lib,
-  ...
-}: {
+{lib, ...}: {
   # Paperless-ngx — OCR'd document archive. Native module rather than a
   # container: it provisions its own postgres + redis, and its unit is already
   # hardened upstream.

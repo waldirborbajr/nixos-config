@@ -1,7 +1,4 @@
-{
-  pkgs,
-  ...
-}: let
+{pkgs, ...}: let
   # Loaded AFTER config.php by the official image (it reads
   # /var/www/html/config/*.config.php in name order), so these win. Everything
   # else — secret, passwordsalt, db creds, mail, 2FA, trusted_domains,
