@@ -69,6 +69,7 @@ in {
     mupdf # lightweight PDF renderer/tools
     kdlfmt # formata os .kdl do niri/waybar
     unzip
+unrar
     zip
     p7zip
     xarchiver # GUI leve pra zip/7z/tar/rar
