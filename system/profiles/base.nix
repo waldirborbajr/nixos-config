@@ -149,6 +149,7 @@ in {
     age
     sops
     htop
+    smartmontools
   ];
 
   # ==================== SSH ====================
