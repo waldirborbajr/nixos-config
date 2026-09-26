@@ -158,12 +158,6 @@
         RUSTFLAGS = "-C link-arg=-fuse-ld=mold";
         RUSTC_WRAPPER = "${pkgs.sccache}/bin/sccache";
         CARGO_TERM_COLOR = "always";
-        # O cargo emite hyperlinks OSC 8 (ex: no link do `dev profile` do
-        # `cargo run`) quando acha que o terminal suporta. `ansi-color.el`
-        # do Emacs só entende/remove escapes SGR (cor) — OSC 8 é outro
-        # tipo de sequência e fica cru em qualquer buffer (compile, shell,
-        # eat sem term real). Mais simples desligar na fonte do que
-        # tentar filtrar isso no Emacs.
         CARGO_TERM_HYPERLINKS = "false";
       };
     })
@@ -180,11 +174,6 @@
     })
 
     (lib.mkIf config.development.languages.arduino.enable {
-      # Ferramentas Arduino do devshell. O devshell original usava
-      # arduino-nix para empacotar o core AVR dentro do arduino-cli. No
-      # módulo NixOS mantemos os binários disponíveis; cores/boards podem
-      # ser instalados com `arduino-cli core install arduino:avr`
-      # conforme o hardware/projeto.
       environment.systemPackages = with pkgs; [
         arduino-cli
         avrdude
@@ -192,7 +181,6 @@
     })
 
     (lib.mkIf config.development.languages.latex.enable {
-      # Toolchain LaTeX/Typst e utilitários específicos desse fluxo.
       environment.systemPackages = with pkgs; [
         texlive.combined.scheme-full
         tex-fmt
@@ -206,9 +194,6 @@
     })
 
     (lib.mkIf config.development.languages.postgresql.enable {
-      # Ferramentas PostgreSQL. O serviço permanece desativado por
-      # padrão: o módulo pode ser habilitado explicitamente quando um
-      # host realmente precisar do servidor.
       services.postgresql = {
         enable = lib.mkDefault false;
         package = pkgs.postgresql_16;
@@ -236,9 +221,6 @@
     })
 
     (lib.mkIf config.development.languages.mariadb.enable {
-      # Ferramentas MariaDB. O serviço fica desativado por padrão para
-      # não transformar o módulo de desenvolvimento em um daemon de
-      # sistema.
       services.mysql = {
         enable = lib.mkDefault false;
         package = pkgs.mariadb;
@@ -281,9 +263,6 @@
     })
 
     (lib.mkIf config.development.languages.ferretdb.enable {
-      # FerretDB não possui um serviço NixOS nativo aqui. Mantemos os
-      # binários disponíveis, enquanto o start/stop pode continuar sendo
-      # feito pelo devshell ou manualmente.
       environment.systemPackages = with pkgs; [
         ferretdb
         mongosh
@@ -291,9 +270,6 @@
     })
 
     (lib.mkIf config.development.languages.sqlite.enable {
-      # SQLite é tratado como um ambiente de desenvolvimento
-      # independente, assim como Rust, Go, Nix etc. Nada de SQLite fica
-      # no bloco base acima.
       environment.systemPackages = with pkgs; [
         sqlite
         sqlite-analyzer

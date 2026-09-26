@@ -18,23 +18,6 @@
     ../../system/profiles/x86/desktop.nix
     ../../system/modules/mac-family.nix
     ../../system/modules/broadcom-wifi.nix
-
-    # ./services/wireguard.nix
-    # ./services/sabnzbd.nix
-    # ./services/qbittorrent.nix
-    # ./services/radarr.nix
-    # ./services/sonarr.nix
-    # ./services/prowlarr.nix
-    # ./services/seerr.nix
-    # ./services/immich.nix
-    # ./services/nextcloud.nix
-    # ./services/paperless.nix
-    # ./services/calibre.nix
-    # ./services/matrix.nix
-    # ./services/monitoring.nix
-    # ./services/zed.nix
-    # ./services/tracearr.nix
-    # ./services/protonvpn-fr.nix
   ];
 
   # O módulo hardware.bluetooth do NixOS força General.ControllerMode =
@@ -58,25 +41,6 @@
       chirp
     ]
   );
-
-  # ── SSH ─────────────────────────────────────────────────────────────
-  services.openssh = {
-    enable = true;
-    settings = {
-      PermitRootLogin = "no";
-      PasswordAuthentication = false;
-    };
-  };
-
-  # ── Tailscale (base.nix enables it; atilla advertises LAN + exit node)
-  services.tailscale = {
-    useRoutingFeatures = "server";
-    openFirewall = true;
-    extraSetFlags = [
-      "--advertise-routes=10.10.10.0/24"
-      "--advertise-exit-node"
-    ];
-  };
 
   system.stateVersion = "26.05";
 }

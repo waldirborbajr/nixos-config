@@ -1,12 +1,14 @@
 # home/cli-and-terminal.nix
 #
-# Multiplexers (tmux/zellij), terminal emulator (wezterm), git (+ delta
-# como pager de diff) e ferramentas de CLI que precisam de arquivo de
-# config extra (bat, btop, ripgrep, oh-my-posh, lazygit, atuin, yazi,
-# jujutsu).
+# Multiplexers (tmux/zellij), terminal emulator (wezterm), fastfetch e
+# ferramentas de CLI que precisam de arquivo de config extra (bat,
+# lazygit, atuin, yazi, jujutsu, oh-my-posh). Identidade, git e os
+# utilitários sem config própria ficam em home/profiles/base.nix — só o
+# que tem pacote+config precisando andar junto fica aqui.
 #
 # Fonte ÚNICA dos binários + configs: este módulo é importado por todos
-# os hosts (Linux via home/home.nix, MacBook via home/macbook.nix).
+# os hosts (Linux via home/profiles/base.nix, MacBook via
+# hosts/macbook/home/home.nix).
 # Não declarar estes pacotes em environment.systemPackages.
 {
   lib,
@@ -25,9 +27,9 @@ in {
   programs.bat.enable = true;
 
   # Só liga o programa (garante o pacote `git` no PATH); a config em si
-  # (user, core, pull, delta etc.) vem inteira do link "git" abaixo, não
-  # de programs.git.settings/delta (que brigaria com o arquivo linkado).
-  programs.git.enable = true;
+  # (user, core, pull, delta etc.) vem inteira do link "git" — ver
+  # home/profiles/base.nix (identidade + git ficam lá, junto com o resto
+  # do que é comum a qualquer host).
 
   # nh — wrapper mais amigável pra nixos-rebuild / home-manager switch /
   # nix-collect-garbage, com diff bonito das mudanças (via nvd) e output
@@ -61,26 +63,10 @@ in {
     lazyjj
     delta # binário `delta` — ative em home/configs/git/config (core.pager = delta)
 
-    # ---- Migrados de modules/root_pkgs.nix ----
     # fastfetch já tinha a config linkada abaixo (xdg.configFile) mas o
     # binário continuava em environment.systemPackages — dois donos pra
     # metade da mesma feature. Agora os dois vivem aqui.
     fastfetch
-    gh # GitHub CLI
-    gh-dash # GitHub CLI TUI dashboard
-    asciinema
-    asciinema-agg
-    asciinema-scenario
-    mupdf # lightweight PDF renderer/tools
-    kdlfmt # formata os .kdl do niri/waybar
-    unzip
-    zip
-    p7zip
-    xarchiver # GUI leve pra zip/7z/tar/rar
-
-    # ---- Migrado de modules/mac_workstation.nix (família Mac) ----
-    ffmpeg
-    marksman # markdown LSP (sem referência no languages.toml do Helix hoje)
   ];
 
   # tmux-devshell / zellij-devshell viram comando de verdade em qualquer
@@ -163,10 +149,7 @@ in {
       recursive = true;
     };
 
-    "git" = {
-      source = "${configs}/git";
-      recursive = true;
-    };
+    # git: ver home/profiles/base.nix (identidade + git ficam lá).
 
     # jj procura em $XDG_CONFIG_HOME/jj/config.toml — não em
     # "jujutsu/", que é só o nome da pasta em home/configs/.
