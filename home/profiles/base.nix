@@ -28,6 +28,7 @@ in {
     ../modules/fastfetch.nix
     ../modules/yazi.nix
     ../modules/zsh.nix
+    ../modules/oh-my-posh.nix
     ../modules/git.nix
     ../modules/atuin.nix
     ../modules/oh-my-posh.nix
