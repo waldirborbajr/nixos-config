@@ -157,7 +157,8 @@
       };
 
       selection = {
-        semantic_escape_chars = ",│`|:\"' ()[]{}<>\\‖";
+        # Indented string: backslash is literal (avoids TOML escape breakage)
+        semantic_escape_chars = '',│`|:"' ()[]{}<>\‖'';
       };
 
       # OSC52 para clipboard do tmux; URL auto-open desabilitado (security)
