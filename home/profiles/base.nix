@@ -29,6 +29,7 @@ in {
     ../modules/yazi.nix
     ../modules/zsh.nix
     ../modules/git.nix
+    ../modules/atuin.nix
     #    ../modules/atuin.nix
     #     ../modules/fastfetch.nix
     #     ../modules/oh-my-posh.nix
