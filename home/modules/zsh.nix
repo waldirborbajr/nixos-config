@@ -2,19 +2,21 @@
 #
 # Zsh sob controle do Home Manager.
 # Conteúdo dos antigos zshenv + ZDOTDIR/{aliases,bindings,functions,fzf,
-# plugins,prompt,zoxide}.zsh embutido via envExtra / initExtra /
+# plugins,prompt,zoxide}.zsh embutido via envExtra / initContent /
 # shellAliases / plugins nativos do HM.
 {
   pkgs,
+  config,
   ...
 }: {
   programs.zsh = {
     enable = true;
-    dotDir = ".config/zsh";
+    # Absolute path — relative dotDir is deprecated in recent HM
+    dotDir = "${config.xdg.configHome}/zsh";
 
     # ---------- History (antes em zshenv) ----------
     history = {
-      path = "\${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history";
+      path = "${config.xdg.stateHome}/zsh/history";
       size = 10000;
       save = 10000;
       ignoreDups = true;
@@ -55,8 +57,7 @@
       "???" = "google";
       rmvim = "rm -rf ~/.local/share/nvim ~/.cache/nvim ~/.local/state/nvim";
 
-      # Safety / defaults (sobrescreve o ls=eza acima no final do aliases.zsh
-      # original — mantido como no arquivo fonte)
+      # Safety / defaults
       # Nota: o aliases.zsh original redefine `ls` no final. Preferimos eza.
       rm = "rm -I --preserve-root";
       cp = "cp -i";
@@ -74,9 +75,8 @@
     };
 
     # ---------- Plugins nativos do HM ----------
-    enableAutosuggestions = true;
+    autosuggestion.enable = true;
     enableCompletion = true;
-    # fast-syntax-highlighting (zdharma-continuum)
     syntaxHighlighting.enable = true;
 
     historySubstringSearch = {
@@ -100,11 +100,11 @@
       export XDG_DATA_HOME=''${XDG_DATA_HOME:-$HOME/.local/share}
       export XDG_STATE_HOME=''${XDG_STATE_HOME:-$HOME/.local/state}
 
-      # ZDOTDIR — HM já aponta .zshrc pra cá via dotDir; reforça o valor.
-      export ZDOTDIR=''${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}
+      # ZDOTDIR — reforça o valor (HM já escreve .zshrc em dotDir)
+      export ZDOTDIR=''${ZDOTDIR:-${config.xdg.configHome}/zsh}
 
       # History dir
-      [[ -d "$XDG_STATE_HOME/zsh" ]] || mkdir -p "$XDG_STATE_HOME/zsh"
+      [[ -d "${config.xdg.stateHome}/zsh" ]] || mkdir -p "${config.xdg.stateHome}/zsh"
 
       # ---------- Pager ----------
       if command -v bat >/dev/null 2>&1; then
@@ -117,7 +117,7 @@
       [[ -t 0 ]] && export GPG_TTY=$(tty)
 
       # ---------- Starship ----------
-      export STARSHIP_CONFIG="$ZDOTDIR/starship.toml"
+      export STARSHIP_CONFIG="${config.xdg.configHome}/zsh/starship.toml"
 
       # ---------- PATH ----------
       typeset -U path
@@ -146,7 +146,7 @@
     '';
 
     # ---------- .zshrc body ----------
-    initExtra = ''
+    initContent = ''
       # eza completions reuse ls
       if command -v eza >/dev/null 2>&1; then
         compdef eza=ls 2>/dev/null || true
