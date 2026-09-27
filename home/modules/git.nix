@@ -1,6 +1,7 @@
 # home/modules/git.nix
 #
-# ÚNICO dono de ~/.config/git/config e do ecossistema git.
+# ÚNICO dono de ~/.config/git/config e do ecossistema git
+# (lazygit → home/modules/lazygit.nix).
 # NÃO usar programs.git.enable nem xdg.configFile."git" em NENHUM outro módulo.
 {pkgs, ...}: {
   home.packages = with pkgs; [
@@ -11,7 +12,6 @@
     git-lfs
     git-absorb
     git-filter-repo
-    lazygit
   ];
 
   home.file.".config/git/config".text = ''
@@ -44,37 +44,5 @@
       conflictStyle = zdiff3
     [include]
       path = ~/.config/delta/themes.gitconfig
-  '';
-
-  home.file.".config/lazygit/config.yml".text = ''
-    gui:
-      theme:
-        activeBorderColor:
-          - "#cba6f7"
-          - bold
-        inactiveBorderColor:
-          - "#a6adc8"
-        optionsTextColor:
-          - "#89b4fa"
-        selectedLineBgColor:
-          - "#313244"
-        cherryPickedCommitBgColor:
-          - "#45475a"
-        cherryPickedCommitFgColor:
-          - "#cba6f7"
-        unstagedChangesColor:
-          - "#f38ba8"
-        defaultFgColor:
-          - "#cdd6f4"
-        searchingActiveBorderColor:
-          - "#f9e2af"
-      authorColors:
-        "*": "#b4befe"
-    quitOnTopLevelReturn: true
-    disableStartupPopups: true
-    git:
-      pagers:
-        - colorArg: always
-          pager: delta --dark --paging=never --line-numbers --hunk-header-style="file omit-code-fragment" --file-style="omit" --hyperlinks --hyperlinks-file-link-format="lazygit-edit://{path}:{line}"
   '';
 }

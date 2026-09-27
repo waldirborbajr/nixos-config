@@ -27,6 +27,7 @@
     ../modules/zsh.nix
     ../modules/oh-my-posh.nix
     ../modules/git.nix
+    ../modules/lazygit.nix
     ../modules/atuin.nix
     ../modules/jujutsu.nix
   ];
