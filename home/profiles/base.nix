@@ -30,12 +30,7 @@ in {
     ../modules/zsh.nix
     ../modules/git.nix
     ../modules/atuin.nix
-    #    ../modules/atuin.nix
-    #     ../modules/fastfetch.nix
-    #     ../modules/oh-my-posh.nix
-    # ../modules/ripgrep.nix
-    # ../modules/yazi.nix
-    # ../modules/alacritty.nix
+    ../modules/oh-my-posh.nix
   ];
   # ── Identidade ──────────────────────────────────────────────────────
   # Antes era home/identity.nix (arquivo próprio); o ulyssecrn não tem
