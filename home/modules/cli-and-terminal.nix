@@ -1,7 +1,7 @@
 # home/modules/cli-and-terminal.nix
 #
-# Multiplexers (zellij) e bat.
-# atuin → home/modules/atuin.nix
+# Multiplexers (zellij).
+# bat → home/modules/bat.nix
 {
   config,
   pkgs,
@@ -10,8 +10,6 @@
   configs = ../configs;
   repoRoot = ../../.;
 in {
-  programs.bat.enable = true;
-
   programs.nh = {
     enable = true;
     flake = "${config.home.homeDirectory}/nixos-config";
@@ -39,10 +37,6 @@ in {
   xdg.configFile = {
     "zellij" = {
       source = "${configs}/zellij";
-      recursive = true;
-    };
-    "bat" = {
-      source = "${configs}/bat";
       recursive = true;
     };
   };
