@@ -19,6 +19,7 @@
     ../modules/editors.nix
     ../modules/cli-and-terminal.nix
     ../modules/alacritty.nix
+    # ../modules/wezterm.nix
     ../modules/btop.nix
     ../modules/tmux.nix
     ../modules/ripgrep.nix
