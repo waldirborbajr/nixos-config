@@ -1,9 +1,15 @@
 # home/modules/git.nix
 #
-# Git sob controle do Home Manager (programs.git.settings).
-# Conteúdo do antigo home/configs/git/config embutido aqui —
-# NÃO usar xdg.configFile."git" recursive junto (conflito com git/config).
-{pkgs, ...}: {
+# Ecossistema git sob Home Manager:
+#   git, delta, gh, gh-dash, lazygit, git-lfs, git-absorb, git-filter-repo
+#
+# NÃO declarar estes pacotes/programas noutro módulo (base.nix,
+# cli-and-terminal.nix, etc.) — evita duplicata e conflito de config.
+{
+  config,
+  pkgs,
+  ...
+}: {
   programs.git = {
     enable = true;
 
@@ -11,7 +17,7 @@
       user = {
         name = "Waldir Borba Junior";
         email = "wborbajr@gmail.com";
-        signingkey = "~/.ssh/id_ed25519.pub";
+        signingkey = "${config.home.homeDirectory}/.ssh/id_ed25519.pub";
       };
 
       init.defaultBranch = "main";
@@ -33,29 +39,66 @@
       };
 
       pull.rebase = true;
-
       push.autoSetupRemote = true;
-
-      # list branches by most recent commit
       branch.sort = "-committerdate";
-
       checkout.defaultRemote = "origin";
-
-      # remove remote-tracking branches that no longer exist upstream
       fetch.prune = true;
-
-      # reuse recorded conflict resolutions automatically
       rerere.enabled = true;
-
-      # include the common ancestor in conflict markers for easier resolution
       merge.conflictStyle = "zdiff3";
     };
 
     includes = [
-      {path = "~/.config/delta/themes.gitconfig";}
+      {path = "${config.xdg.configHome}/delta/themes.gitconfig";}
     ];
   };
 
-  # delta + temas (se não estiverem noutro módulo)
-  home.packages = [pkgs.delta];
+  # GitHub CLI
+  programs.gh = {
+    enable = true;
+    settings = {
+      git_protocol = "ssh";
+      prompt = "enabled";
+    };
+  };
+
+  # LazyGit TUI (config migrada de home/configs/lazygit/config.yaml)
+  programs.lazygit = {
+    enable = true;
+    settings = {
+      gui = {
+        theme = {
+          activeBorderColor = ["#cba6f7" "bold"];
+          inactiveBorderColor = ["#a6adc8"];
+          optionsTextColor = ["#89b4fa"];
+          selectedLineBgColor = ["#313244"];
+          cherryPickedCommitBgColor = ["#45475a"];
+          cherryPickedCommitFgColor = ["#cba6f7"];
+          unstagedChangesColor = ["#f38ba8"];
+          defaultFgColor = ["#cdd6f4"];
+          searchingActiveBorderColor = ["#f9e2af"];
+        };
+        authorColors = {
+          "*" = "#b4befe";
+        };
+      };
+      quitOnTopLevelReturn = true;
+      disableStartupPopups = true;
+      git = {
+        pagers = [
+          {
+            colorArg = "always";
+            pager = "delta --dark --paging=never --line-numbers --hunk-header-style=\"file omit-code-fragment\" --file-style=\"omit\" --hyperlinks --hyperlinks-file-link-format=\"lazygit-edit://{path}:{line}\"";
+          }
+        ];
+      };
+    };
+  };
+
+  home.packages = with pkgs; [
+    delta
+    gh-dash
+    git-lfs
+    git-absorb
+    git-filter-repo
+  ];
 }

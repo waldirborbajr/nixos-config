@@ -38,11 +38,11 @@ in {
 
   home.packages = with pkgs; [
     zellij
-    oh-my-posh
+    # oh-my-posh
     # atuin
     # jujutsu
-    lazyjj
-    delta # binário — ative em home/configs/git/config (core.pager = delta)
+    # lazyjj
+    # delta # binário — ative em home/configs/git/config (core.pager = delta)
   ];
 
   home.file = {
