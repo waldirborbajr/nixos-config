@@ -24,6 +24,10 @@ in {
     ../modules/alacritty.nix
     ../modules/btop.nix
     ../modules/tmux.nix
+    ../modules/ripgrep.nix
+    ../modules/fastfetch.nix
+    ../modules/yazi.nix
+    ../modules/zsh.nix
     #    ../modules/atuin.nix
     #     ../modules/fastfetch.nix
     #     ../modules/oh-my-posh.nix
