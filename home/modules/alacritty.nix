@@ -157,8 +157,9 @@
       };
 
       selection = {
-        # Indented string: backslash is literal (avoids TOML escape breakage)
-        semantic_escape_chars = '',│`|:"' ()[]{}<>\‖'';
+        # Sem " nem \ — o serializador TOML do HM quebra escapes complexos
+        # (default do Alacritty já cobre o essencial).
+        semantic_escape_chars = ",│`|:' ()[]{}<>‖";
       };
 
       # OSC52 para clipboard do tmux; URL auto-open desabilitado (security)
