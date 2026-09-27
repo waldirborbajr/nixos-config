@@ -1,15 +1,18 @@
-# home/cli-and-terminal.nix
+# home/modules/cli-and-terminal.nix
 #
-# Multiplexers (tmux/zellij), terminal emulator (wezterm), fastfetch e
-# ferramentas de CLI que precisam de arquivo de config extra (bat,
-# lazygit, atuin, yazi, jujutsu, oh-my-posh). Identidade, git e os
-# utilitários sem config própria ficam em home/profiles/base.nix — só o
-# que tem pacote+config precisando andar junto fica aqui.
+# Multiplexers (zellij), CLI tools com config extra (bat, lazygit, atuin,
+# jujutsu, oh-my-posh). Identidade/git ficam em home/profiles/base.nix.
 #
-# Fonte ÚNICA dos binários + configs: este módulo é importado por todos
-# os hosts (Linux via home/profiles/base.nix, MacBook via
-# hosts/macbook/home/home.nix).
-# Não declarar estes pacotes em environment.systemPackages.
+# Migrados para módulos próprios (NÃO declarar de novo aqui):
+#   alacritty → home/modules/alacritty.nix  (programs.alacritty)
+#   yazi      → home/modules/yazi.nix       (programs.yazi)
+#   tmux      → home/modules/tmux.nix
+#   btop      → home/modules/btop.nix
+#   ripgrep   → home/modules/ripgrep.nix
+#   zsh       → home/modules/zsh.nix / shell.nix
+#
+# Fonte ÚNICA dos binários + configs restantes: este módulo é importado
+# por todos os hosts. Não declarar estes pacotes em environment.systemPackages.
 {
   lib,
   config,
@@ -19,24 +22,11 @@
   configs = ../configs;
   repoRoot = ../../.;
 in {
-  # Módulos nativos do HM — instalam o binário; a config fica no xdg abaixo.
-  # tmux/btop têm módulo próprio agora: home/modules/tmux.nix e
-  # home/modules/btop.nix (config nativa, não xdg.configFile).
   programs.lazygit.enable = true;
-  programs.yazi.enable = true;
   programs.bat.enable = true;
+  # yazi → home/modules/yazi.nix (não duplicar programs.yazi.enable aqui)
 
-  # Só liga o programa (garante o pacote `git` no PATH); a config em si
-  # (user, core, pull, delta etc.) vem inteira do link "git" — ver
-  # home/profiles/base.nix (identidade + git ficam lá, junto com o resto
-  # do que é comum a qualquer host).
-
-  # nh — wrapper mais amigável pra nixos-rebuild / home-manager switch /
-  # nix-collect-garbage, com diff bonito das mudanças (via nvd) e output
-  # via nix-output-monitor. `flake` aponta pro clone local do repo
-  # (mesmo caminho que nixos-manager.sh usa/espera em todo host), então
-  # `nh os switch` e `nh home switch` funcionam sem precisar passar
-  # --flake toda vez.
+  # nh — wrapper pra nixos-rebuild / home-manager switch
   programs.nh = {
     enable = true;
     flake = "${config.home.homeDirectory}/nixos-config";
@@ -46,35 +36,15 @@ in {
     };
   };
 
-  # Pacotes sem módulo HM (ou cujo módulo geraria config própria em conflito
-  # com o xdg.configFile abaixo). Ferramentas de desenvolvimento compartilhadas
-  # (como ripgrep) são fornecidas por modules/dev.nix.
-  #
-  # jujutsu/lazyjj estavam soltos em environment.systemPackages por host —
-  # movidos pra cá (config real deles, jujutsu.toml, só existia em
-  # home/configs/jujutsu/ mas nunca era linkada em lugar nenhum).
   home.packages = with pkgs; [
-    # wezterm
-    # alacritty
     zellij
     oh-my-posh
     atuin
     jujutsu
     lazyjj
-    delta # binário `delta` — ative em home/configs/git/config (core.pager = delta)
-
-    # fastfetch já tinha a config linkada abaixo (xdg.configFile) mas o
-    # binário continuava em environment.systemPackages — dois donos pra
-    # metade da mesma feature. Agora os dois vivem aqui.
-    fastfetch
+    delta # binário — ative em home/configs/git/config (core.pager = delta)
   ];
 
-  # tmux-devshell / zellij-devshell viram comando de verdade em qualquer
-  # lugar (ex: dentro de $HOME/prj/algo), não só rodando ./script.sh da
-  # raiz do nixos-config. $HOME/.local/bin já está no PATH via
-  # home/configs/zshenv. O arquivo fonte continua sendo o da raiz do
-  # repo — ./tmux-devshell.sh e ./zellij-devshell.sh continuam funcionando
-  # normalmente pra quem preferir rodar direto de dentro do repo.
   home.file = {
     ".local/bin/tmux-devshell" = {
       source = "${repoRoot}/scripts/tmux-devshell.sh";
@@ -87,50 +57,24 @@ in {
   };
 
   xdg.configFile = {
-    # Terminals
-    #
-    # alacritty.toml é comum a Linux e macOS e faz `general.import` de
-    # ~/.config/alacritty/os.toml. Esse arquivo NÃO vem do diretório
-    # "alacritty" abaixo — é resolvido aqui via hostPlatform, então o
-    # home-manager symlinka o os-linux.toml ou o os-macos.toml certo pra
-    # cada host, sem qualquer `if` dentro do TOML (que não suporta).
-    # `recursive = true` no bloco "alacritty" é o que permite essa entrada
-    # separada coexistir dentro da mesma pasta ~/.config/alacritty.
-    "alacritty" = {
-      source = "${configs}/alacritty";
-      recursive = true;
-    };
-    "alacritty/os.toml".source =
-      if pkgs.stdenv.hostPlatform.isDarwin
-      then "${configs}/alacritty-os/macos.toml"
-      else "${configs}/alacritty-os/linux.toml";
-
-    # "wezterm" = {
-    #   source = "${configs}/wezterm";
-    #   recursive = true;
-    # };
+    # alacritty → home/modules/alacritty.nix (programs.alacritty.settings)
+    # yazi      → home/modules/yazi.nix
+    # ripgrep   → home/modules/ripgrep.nix (programs.ripgrep.arguments)
+    # tmux/btop → módulos próprios
 
     "zellij" = {
       source = "${configs}/zellij";
       recursive = true;
     };
-    # tmux/btop: ver home/modules/tmux.nix e home/modules/btop.nix.
 
-    "ripgrep" = {
-      source = "${configs}/ripgrep";
-      recursive = true;
-    };
+    # oh-my-posh.old — pasta renomeada; apontar pro .old até migrar o módulo
     "oh-my-posh" = {
-      source = "${configs}/oh-my-posh";
+      source = "${configs}/oh-my-posh.old";
       recursive = true;
     };
+
     "lazygit" = {
       source = "${configs}/lazygit";
-      recursive = true;
-    };
-
-    "yazi" = {
-      source = "${configs}/yazi";
       recursive = true;
     };
 
@@ -149,19 +93,14 @@ in {
       recursive = true;
     };
 
-    # git: ver home/profiles/base.nix (identidade + git ficam lá).
-
-    # jj procura em $XDG_CONFIG_HOME/jj/config.toml — não em
-    # "jujutsu/", que é só o nome da pasta em home/configs/.
+    # jj procura em $XDG_CONFIG_HOME/jj/config.toml
     "jj/config.toml" = {
       source = "${configs}/jujutsu/jujutsu.toml";
     };
   };
 
-  # oh-my-posh grava o init script em ~/.cache/oh-my-posh com o caminho
-  # absoluto do binário no Nix store. Depois de um rebuild esse path muda
-  # e o cache antigo quebra o prompt (só aparece em hosts que rebuildaram).
-  # Limpar em toda ativação garante que o próximo shell regenere o init.
+  # oh-my-posh grava init script em ~/.cache com path do store —
+  # limpar em toda ativação evita prompt quebrado após rebuild.
   home.activation.clearOhMyPoshCache = lib.hm.dag.entryAfter ["writeBoundary"] ''
     $DRY_RUN_CMD rm -rf "${config.xdg.cacheHome}/oh-my-posh"
   '';
