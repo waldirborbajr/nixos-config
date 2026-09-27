@@ -1,10 +1,8 @@
 # home/modules/git.nix
 #
-# Ecossistema git sob Home Manager.
-# Config escrita via home.file (evita bug "outside $HOME" do programs.git
-# em alguns HM). programs.git.enable = false — só o pacote via packages.
+# ÚNICO dono de ~/.config/git/config e do ecossistema git.
+# NÃO usar programs.git.enable nem xdg.configFile."git" em NENHUM outro módulo.
 {pkgs, ...}: {
-  # Só o binário; o config NÃO passa pelo generator do programs.git
   home.packages = with pkgs; [
     git
     delta
@@ -48,7 +46,6 @@
       path = ~/.config/delta/themes.gitconfig
   '';
 
-  # LazyGit via arquivo (evita colisão com generator)
   home.file.".config/lazygit/config.yml".text = ''
     gui:
       theme:

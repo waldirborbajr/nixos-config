@@ -1,18 +1,7 @@
 # home/modules/cli-and-terminal.nix
 #
 # Multiplexers (zellij) e CLI tools restantes (bat, atuin).
-#
-# Migrados para módulos próprios (NÃO declarar de novo aqui):
-#   alacritty → home/modules/alacritty.nix
-#   yazi      → home/modules/yazi.nix
-#   tmux      → home/modules/tmux.nix
-#   btop      → home/modules/btop.nix
-#   ripgrep   → home/modules/ripgrep.nix
-#   zsh       → home/modules/zsh.nix / shell.nix
-#   git / delta / gh / lazygit → home/modules/git.nix
-#   jujutsu / lazyjj           → home/modules/jujutsu.nix
-#   fastfetch → home/modules/fastfetch.nix
-#   oh-my-posh → home/modules/oh-my-posh.nix
+# Tudo git/delta/gh/lazygit/jj/oh-my-posh/alacritty/yazi/tmux/zsh → módulos próprios.
 {
   config,
   pkgs,
@@ -53,12 +42,10 @@ in {
       source = "${configs}/zellij";
       recursive = true;
     };
-
     "atuin" = {
       source = "${configs}/atuin";
       recursive = true;
     };
-
     "bat" = {
       source = "${configs}/bat";
       recursive = true;
