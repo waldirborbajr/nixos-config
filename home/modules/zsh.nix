@@ -522,13 +522,6 @@
     enableZshIntegration = true;
   };
 
-  programs.atuin = {
-    enable = true;
-    enableZshIntegration = true;
-    settings = {
-      # Equivalente a: atuin init zsh --disable-up-arrow
-      # (setas ficam com history-substring-search)
-    };
-    flags = ["--disable-up-arrow"];
-  };
+  # atuin → home/modules/atuin.nix (programs.atuin + enableZshIntegration)
+  # Ctrl+R continua em zvm_after_init via _atuin_search_widget
 }

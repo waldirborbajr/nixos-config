@@ -1,27 +1,19 @@
 # home/modules/atuin.nix
 #
-# MIGRAÇÃO (mesmo padrão de shell.nix/btop.nix/tmux.nix): antes era
-# `home.packages = [ atuin ]` (em cli-and-terminal.nix) + xdg.configFile
-# apontando pra home/configs/atuin/config.toml. Agora é config nativa
-# via programs.atuin.settings.
+# ÚNICO dono de ~/.config/atuin/config.toml.
+# NÃO usar xdg.configFile."atuin" nem programs.atuin noutro módulo (zsh.nix,
+# cli-and-terminal.nix).
 #
-# home/configs/atuin.old/ guarda o original (renomeado, não apagado).
-#
-# ACHADO ao migrar, precisa da sua decisão: o config.toml original tinha
-#   auto_sync = true
-#   sync_address = "https://atuin.internal.leomercier.dev"
-# "leomercier.dev" não é seu domínio — isso mandaria seu histórico de
-# shell (todo comando digitado, exceto o que history_filter exclui) pro
-# servidor de sync de outra pessoa. Desliguei o auto_sync por segurança.
-# Se isso for um servidor de sync self-hosted seu, me avisa que eu ligo
-# de volta com o endereço certo.
+# enableZshIntegration injeta o init no zsh; --disable-up-arrow deixa as
+# setas com history-substring-search (bindings no zsh.nix).
 _: {
   programs.atuin = {
     enable = true;
     enableZshIntegration = true;
+    flags = ["--disable-up-arrow"];
 
     settings = {
-      auto_sync = false; # ver achado acima
+      auto_sync = false;
       # sync_address = "https://SEU-SERVIDOR-AQUI";
 
       style = "compact";

@@ -1,7 +1,7 @@
 # home/modules/cli-and-terminal.nix
 #
-# Multiplexers (zellij) e CLI tools restantes (bat, atuin).
-# Tudo git/delta/gh/lazygit/jj/oh-my-posh/alacritty/yazi/tmux/zsh → módulos próprios.
+# Multiplexers (zellij) e bat.
+# atuin → home/modules/atuin.nix
 {
   config,
   pkgs,
@@ -23,7 +23,6 @@ in {
 
   home.packages = with pkgs; [
     zellij
-    atuin
   ];
 
   home.file = {
@@ -40,10 +39,6 @@ in {
   xdg.configFile = {
     "zellij" = {
       source = "${configs}/zellij";
-      recursive = true;
-    };
-    "atuin" = {
-      source = "${configs}/atuin";
       recursive = true;
     };
     "bat" = {
