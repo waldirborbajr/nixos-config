@@ -39,8 +39,8 @@ in {
   home.packages = with pkgs; [
     zellij
     oh-my-posh
-    atuin
-    jujutsu
+    # atuin
+    # jujutsu
     lazyjj
     delta # binário — ative em home/configs/git/config (core.pager = delta)
   ];
@@ -68,34 +68,34 @@ in {
     };
 
     # oh-my-posh.old — pasta renomeada; apontar pro .old até migrar o módulo
-    "oh-my-posh" = {
-      source = "${configs}/oh-my-posh.old";
-      recursive = true;
-    };
+    # "oh-my-posh" = {
+    #   source = "${configs}/oh-my-posh.old";
+    #   recursive = true;
+    # };
 
-    "lazygit" = {
-      source = "${configs}/lazygit";
-      recursive = true;
-    };
+    # "lazygit" = {
+    #   source = "${configs}/lazygit";
+    #   recursive = true;
+    # };
 
     # fastfetch → home/modules/fastfetch.nix (programs.fastfetch.settings)
     # NÃO linkar configs/fastfetch — pasta virou fastfetch.old e o módulo
     # HM já escreve ~/.config/fastfetch/config.jsonc.
 
-    "atuin" = {
-      source = "${configs}/atuin";
-      recursive = true;
-    };
+    # "atuin" = {
+    #   source = "${configs}/atuin";
+    #   recursive = true;
+    # };
 
-    "bat" = {
-      source = "${configs}/bat";
-      recursive = true;
-    };
+    # "bat" = {
+    #   source = "${configs}/bat";
+    #   recursive = true;
+    # };
 
     # jj procura em $XDG_CONFIG_HOME/jj/config.toml
-    "jj/config.toml" = {
-      source = "${configs}/jujutsu/jujutsu.toml";
-    };
+    # "jj/config.toml" = {
+    #   source = "${configs}/jujutsu/jujutsu.toml";
+    # };
   };
 
   # oh-my-posh grava init script em ~/.cache com path do store —

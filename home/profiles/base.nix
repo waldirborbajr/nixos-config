@@ -31,6 +31,7 @@ in {
     ../modules/git.nix
     ../modules/atuin.nix
     ../modules/oh-my-posh.nix
+    ../modules/jujutsu.nix
   ];
   # ── Identidade ──────────────────────────────────────────────────────
   # Antes era home/identity.nix (arquivo próprio); o ulyssecrn não tem
