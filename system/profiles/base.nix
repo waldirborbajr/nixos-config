@@ -150,6 +150,7 @@ in {
     sops
     htop
     smartmontools
+    net-tools
   ];
 
   # ==================== SSH ====================
