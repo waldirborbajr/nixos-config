@@ -21,6 +21,7 @@ in {
     ../modules/shell.nix
     ../modules/editors.nix
     ../modules/cli-and-terminal.nix
+    ../modules/alacritty.nix
     ../modules/btop.nix
     ../modules/tmux.nix
     #    ../modules/atuin.nix

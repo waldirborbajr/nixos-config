@@ -55,7 +55,7 @@ in {
   # home/configs/jujutsu/ mas nunca era linkada em lugar nenhum).
   home.packages = with pkgs; [
     # wezterm
-    alacritty
+    # alacritty
     zellij
     oh-my-posh
     atuin
