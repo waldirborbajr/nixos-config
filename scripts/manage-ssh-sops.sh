@@ -70,10 +70,6 @@ if [[ ! -d "$repo_root/hosts/$host" ]]; then
 fi
 
 # ----- First-install bootstrap: re-exec inside `nix shell` if tools are missing -----
-# On a fresh machine (before the first nixos-rebuild), age/sops/jq/ssh-keygen
-# aren't on PATH yet. Rather than failing, pull them in via `nix shell` and
-# re-run this same script inside it. The env guard prevents infinite
-# recursion if a tool is still missing even inside that shell.
 missing_tool=false
 for tool in ssh-keygen age-keygen sops jq; do
   if ! command -v "$tool" >/dev/null 2>&1; then
@@ -102,8 +98,6 @@ if [[ ! -f $age_key_file ]]; then
   chmod 600 "$age_key_file"
 fi
 
-age_recipient="$(age-keygen -y "$age_key_file")"
-
 # ----- --clean: wipe local keys + secrets file, start fresh -----
 if $CLEAN; then
   echo "Cleaning local SSH keys and secrets file for host '$host'..."
@@ -121,9 +115,6 @@ for kind in infra github; do
 done
 
 # ----- Host key: generate locally if it doesn't exist yet -----
-# Normally created by the ssh-hostkey-bootstrap systemd service on first
-# activation, but generating it here too makes this script fully
-# self-sufficient during initial setup, before the first rebuild has run.
 if [[ ! -f $host_key_path ]]; then
   echo "Host key not found at $host_key_path — generating now (requires sudo)..."
   sudo mkdir -p /etc/ssh
@@ -132,10 +123,11 @@ fi
 
 if $CLEAN; then
   # ----- Full clean rebuild: construct one valid YAML document and encrypt -----
-  # --input-type yaml is explicit here (not inferred from extension), which
-  # is exactly what avoids the "data: |" wrapper bug from before.
-  tmp_file="$(mktemp --suffix=.yaml)"
-  trap 'rm -f "$tmp_file"' EXIT
+  # Escreve o plaintext DIRETO no caminho real (não um tmp_file em /tmp) e
+  # cifra com --in-place — mesmo motivo do bloco de criação acima: o sops
+  # casa a creation_rule do .sops.yaml pelo caminho do arquivo, e um
+  # tmp_file em /tmp nunca bate com o path_regex de nenhum host.
+  mkdir -p "$(dirname "$secrets_file")"
 
   {
     echo "borba_ssh_infra_private_key: |"
@@ -146,16 +138,22 @@ if $CLEAN; then
     echo "borba_ssh_github_public_key: $(cat "$HOME/.ssh/id_ed25519_github.pub")"
     echo "ssh_host_ed25519_key: |"
     sudo sed 's/^/  /' "$host_key_path"
-  } >"$tmp_file"
+  } >"$secrets_file"
 
-  sops --encrypt --input-type yaml --output-type yaml --age "$age_recipient" "$tmp_file" >"$secrets_file"
+  sops --encrypt --input-type yaml --output-type yaml --in-place "$secrets_file"
   chmod 600 "$secrets_file"
 
   echo "Secrets file rebuilt from scratch: $secrets_file"
 else
   # ----- Incremental mode: sops set per key, preserves unrelated secrets -----
   if [[ ! -f $secrets_file ]]; then
-    echo "{}" | sops --encrypt --input-type json --output-type yaml --age "$age_recipient" /dev/stdin >"$secrets_file"
+    # --in-place (no caminho de verdade, não /dev/stdin) é o que faz o sops
+    # achar a creation_rule certa em .sops.yaml pelo path_regex — cifrar via
+    # stdin faz o sops tentar casar "/dev/stdin" contra as regras e falhar
+    # com "no matching creation rules found", mesmo com --age explícito.
+    mkdir -p "$(dirname "$secrets_file")"
+    echo "{}" >"$secrets_file"
+    sops --encrypt --input-type json --output-type yaml --in-place "$secrets_file"
     chmod 600 "$secrets_file"
     echo "Created new empty secrets file: $secrets_file"
   fi
