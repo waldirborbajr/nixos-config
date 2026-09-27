@@ -78,10 +78,9 @@ in {
       recursive = true;
     };
 
-    "fastfetch" = {
-      source = "${configs}/fastfetch";
-      recursive = true;
-    };
+    # fastfetch → home/modules/fastfetch.nix (programs.fastfetch.settings)
+    # NÃO linkar configs/fastfetch — pasta virou fastfetch.old e o módulo
+    # HM já escreve ~/.config/fastfetch/config.jsonc.
 
     "atuin" = {
       source = "${configs}/atuin";
