@@ -23,13 +23,13 @@ in {
     ../modules/cli-and-terminal.nix
     ../modules/btop.nix
     ../modules/tmux.nix
-#    ../modules/atuin.nix
-#     ../modules/fastfetch.nix
-#     ../modules/oh-my-posh.nix
-# ../modules/ripgrep.nix
-# ../modules/yazi.nix
-# ../modules/alacritty.nix
-;
+    #    ../modules/atuin.nix
+    #     ../modules/fastfetch.nix
+    #     ../modules/oh-my-posh.nix
+    # ../modules/ripgrep.nix
+    # ../modules/yazi.nix
+    # ../modules/alacritty.nix
+  ];
   # ── Identidade ──────────────────────────────────────────────────────
   # Antes era home/identity.nix (arquivo próprio); o ulyssecrn não tem
   # um identity.nix separado — fica direto no base.nix.
