@@ -313,25 +313,3 @@ alias ping='ping -c 5'
 
 # Mede o tempo de startup do zsh (5 amostras)
 alias zsh-time='for i in $(seq 1 5); do /usr/bin/time zsh -i -c exit; done 2>&1'
-
-
-        # Cargo
-# alias cfmt = "cargo fmt --all"
-# alias tfmt = "taplo fmt"
-# alias  cu = "cargo update"
-# alias         cc = "cargo check"
-# alias         cb = "cargo build"
-# alias         cbr = "cargo build --release"
-# alias         cr = "cargo run"
-# alias         crr = "cargo run --release"
-# alias         cte = "cargo nextest run"
-
-        # Jujutsu `jj` aliases
-# alias         jjl = "jj log"
-# alias         jjs = "jj status"
-# alias         jjlo = ''jj log --template="builtin_log_oneline"''
-# alias         jjn = "jj new"
-# alias         jjd = "jj describe -m "
-# alias         jjde = "jj describe" # Loads up helix with the changed diff visible.
-# alias         jjr = "jj rebase"
-# alias         jjf = "jj git fetch --all-remotes"

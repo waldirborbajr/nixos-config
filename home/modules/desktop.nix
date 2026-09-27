@@ -1,14 +1,20 @@
 # home/modules/desktop.nix
 #
 # Notificações (mako), keyring de sessão e a parte do compositor
-# niri/waybar/wlr-which-key comum a todos os hosts (overrides por host
-# ficam em hosts/<host>/default.nix). Extraído 1:1 de home/default.nix
-# (split cirúrgico, sem mudança de comportamento).
-{pkgs, ...}: let
+# niri/waybar/wlr-which-key comum a TODOS os hosts NixOS (incluindo o
+# Dell — é o núcleo da sessão gráfica, não um extra opcional). Extras
+# só pra família Mac (não-Dell) ficam em home/profiles/x86/desktop.nix.
+# Overrides por host (input/outputs do niri) ficam em
+# hosts/<host>/home/home.nix.
+{
+  pkgs,
+  pkgs-unstable,
+  ...
+}: let
   configs = ../configs;
 in {
   # ==================== GTK / ÍCONES (sessão real, não o greeter) ====================
-  # O Papirus-Dark em modules/system/desktop-niri.nix só é usado pelo regreet
+  # O Papirus-Dark em modules/desktop_niri.nix só é usado pelo regreet
   # (tela de login) — a sessão niri em si não tinha NENHUM tema de ícones
   # apontado, então apps GTK (Nemo, etc.) e o Vicinae caíam no ícone
   # genérico "?" por falta de XDG icon theme. Mesma combinação
@@ -57,6 +63,48 @@ in {
 
   # Se quiser usar o keyring como SSH agent:
   home.sessionVariables.SSH_AUTH_SOCK = "$XDG_RUNTIME_DIR/keyring/ssh";
+
+  # ==================== SESSÃO NIRI/WAYBAR (binários) ====================
+  # Migrado de modules/root_pkgs.nix — a config de niri/waybar/wlr-which-key
+  # já é linkada logo abaixo (xdg.configFile); os outros itens não têm
+  # dotfile próprio (são referenciados de dentro do config do niri, já
+  # linkado) ou não precisam de um. noctalia/qs via writeShellScriptBin
+  # porque o noctalia-shell só existe no canal unstable (pkgs-unstable já
+  # chega ao HM via home-manager.extraSpecialArgs, ver flake.nix).
+  home.packages =
+    (with pkgs; [
+      swaylock
+      swayidle
+      grim # screenshot capture
+      slurp # screen area selector (used with grim)
+      swappy # screenshot annotation
+      cliphist # clipboard history
+      wl-clipboard
+      xwayland-satellite
+      waybar
+      fuzzel # app launcher
+      swaybg # wallpaper daemon
+      wlr-which-key # keybinding cheatsheet popup
+      orca # screen reader
+      brightnessctl
+      playerctl
+      pavucontrol
+
+      # Desktop integration
+      networkmanagerapplet
+      nextcloud-client
+      capitaine-cursors
+      qt6Packages.qt6ct # Qt theming control panel
+      seahorse # GNOME Keyring GUI
+    ])
+    ++ [
+      (pkgs.writeShellScriptBin "noctalia" ''
+        exec ${pkgs-unstable.noctalia-shell}/bin/noctalia-shell "$@"
+      '')
+      (pkgs.writeShellScriptBin "qs" ''
+        exec ${pkgs-unstable.noctalia-shell}/bin/noctalia-shell "$@"
+      '')
+    ];
 
   xdg.configFile = {
     # Compositor stack

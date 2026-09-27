@@ -1,4 +1,4 @@
-# home/modules/helix/default.nix
+# home/helix/default.nix
 #
 # Helix configurado a partir dos arquivos TOML crus em home/configs/helix/
 # (linkados via xdg.configFile), não mais gerado a partir de atributos Nix.
@@ -10,7 +10,7 @@
 # calcula isso dinamicamente pra qualquer editor ligado.
 #
 # home/configs/helix/themes/onenord.toml é a conversão TOML do tema que
-# tínhamos antes em home/modules/helix/theme.nix (já removido do repo).
+# tínhamos antes em home/helix/theme.nix (já removido do repo).
 {
   pkgs,
   lib,

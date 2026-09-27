@@ -1,12 +1,14 @@
-# home/modules/cli-and-terminal.nix
+# home/cli-and-terminal.nix
 #
-# Multiplexers (tmux/zellij), terminal emulator (wezterm), git (+ delta
-# como pager de diff) e ferramentas de CLI que precisam de arquivo de
-# config extra (bat, btop, ripgrep, oh-my-posh, lazygit, atuin, yazi,
-# jujutsu).
+# Multiplexers (tmux/zellij), terminal emulator (wezterm), fastfetch e
+# ferramentas de CLI que precisam de arquivo de config extra (bat,
+# lazygit, atuin, yazi, jujutsu, oh-my-posh). Identidade, git e os
+# utilitários sem config própria ficam em home/profiles/base.nix — só o
+# que tem pacote+config precisando andar junto fica aqui.
 #
 # Fonte ÚNICA dos binários + configs: este módulo é importado por todos
-# os hosts (Linux via home/default.nix, MacBook via hosts/macbook/home.nix).
+# os hosts (Linux via home/profiles/base.nix, MacBook via
+# hosts/macbook/home/home.nix).
 # Não declarar estes pacotes em environment.systemPackages.
 {
   lib,
@@ -15,19 +17,19 @@
   ...
 }: let
   configs = ../configs;
-  repoRoot = ../..;
+  repoRoot = ../../.;
 in {
   # Módulos nativos do HM — instalam o binário; a config fica no xdg abaixo.
-  programs.tmux.enable = true;
-  programs.btop.enable = true;
+  # tmux/btop têm módulo próprio agora: home/modules/tmux.nix e
+  # home/modules/btop.nix (config nativa, não xdg.configFile).
   programs.lazygit.enable = true;
   programs.yazi.enable = true;
   programs.bat.enable = true;
 
   # Só liga o programa (garante o pacote `git` no PATH); a config em si
-  # (user, core, pull, delta etc.) vem inteira do link "git" abaixo, não
-  # de programs.git.settings/delta (que brigaria com o arquivo linkado).
-  programs.git.enable = true;
+  # (user, core, pull, delta etc.) vem inteira do link "git" — ver
+  # home/profiles/base.nix (identidade + git ficam lá, junto com o resto
+  # do que é comum a qualquer host).
 
   # nh — wrapper mais amigável pra nixos-rebuild / home-manager switch /
   # nix-collect-garbage, com diff bonito das mudanças (via nvd) e output
@@ -46,7 +48,7 @@ in {
 
   # Pacotes sem módulo HM (ou cujo módulo geraria config própria em conflito
   # com o xdg.configFile abaixo). Ferramentas de desenvolvimento compartilhadas
-  # (como ripgrep) são fornecidas por modules/development/base.nix.
+  # (como ripgrep) são fornecidas por modules/dev.nix.
   #
   # jujutsu/lazyjj estavam soltos em environment.systemPackages por host —
   # movidos pra cá (config real deles, jujutsu.toml, só existia em
@@ -60,6 +62,11 @@ in {
     jujutsu
     lazyjj
     delta # binário `delta` — ative em home/configs/git/config (core.pager = delta)
+
+    # fastfetch já tinha a config linkada abaixo (xdg.configFile) mas o
+    # binário continuava em environment.systemPackages — dois donos pra
+    # metade da mesma feature. Agora os dois vivem aqui.
+    fastfetch
   ];
 
   # tmux-devshell / zellij-devshell viram comando de verdade em qualquer
@@ -70,11 +77,11 @@ in {
   # normalmente pra quem preferir rodar direto de dentro do repo.
   home.file = {
     ".local/bin/tmux-devshell" = {
-      source = "${repoRoot}/tmux-devshell.sh";
+      source = "${repoRoot}/scripts/tmux-devshell.sh";
       executable = true;
     };
     ".local/bin/zellij-devshell" = {
-      source = "${repoRoot}/zellij-devshell.sh";
+      source = "${repoRoot}/scripts/zellij-devshell.sh";
       executable = true;
     };
   };
@@ -107,15 +114,8 @@ in {
       source = "${configs}/zellij";
       recursive = true;
     };
-    "tmux" = {
-      source = "${configs}/tmux";
-      recursive = true;
-    };
+    # tmux/btop: ver home/modules/tmux.nix e home/modules/btop.nix.
 
-    "btop" = {
-      source = "${configs}/btop";
-      recursive = true;
-    };
     "ripgrep" = {
       source = "${configs}/ripgrep";
       recursive = true;
@@ -149,10 +149,7 @@ in {
       recursive = true;
     };
 
-    "git" = {
-      source = "${configs}/git";
-      recursive = true;
-    };
+    # git: ver home/profiles/base.nix (identidade + git ficam lá).
 
     # jj procura em $XDG_CONFIG_HOME/jj/config.toml — não em
     # "jujutsu/", que é só o nome da pasta em home/configs/.

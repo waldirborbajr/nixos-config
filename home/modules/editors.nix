@@ -1,9 +1,9 @@
-# home/modules/editors.nix
+# home/editors.nix
 #
 # Só editores de texto: Helix, Neovim e Emacs vanilla — todos com
 # enable=true/false. Helix nasce true (é o "core" de hoje); Neovim e
 # Emacs nascem false, ativados pontualmente na máquina. Git/bat/delta
-# não são editores — moram em home/modules/cli-and-terminal.nix.
+# não são editores — moram em home/cli-and-terminal.nix.
 #
 # $EDITOR/$VISUAL são calculados aqui dinamicamente a partir de qual
 # editor está ligado (prioridade: Helix > Neovim > Emacs), em vez de
