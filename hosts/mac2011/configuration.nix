@@ -31,6 +31,13 @@
   # criar contexto EGL/GBM e ficam mudos.
   hardware.graphics.enable = true;
 
+  # ==================== DEV LANGUAGES ====================
+  # Toolchains via system/modules/dev.nix (development.languages.<x>.enable).
+  development.languages = {
+    go.enable = true;
+    rust.enable = true;
+  };
+
   # Ferramentas de debug wireless (úteis só com o chip físico) +
   # Spotify: só neste host (não disponível p/ aarch64-linux das VMs UTM/Fusion)
   environment.systemPackages = lib.mkAfter (
