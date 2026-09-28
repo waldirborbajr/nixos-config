@@ -34,8 +34,21 @@
   # ==================== DEV LANGUAGES ====================
   # Toolchains via system/modules/dev.nix (development.languages.<x>.enable).
   development.languages = {
+    # ── Ativas ──
     go.enable = true;
     rust.enable = true;
+    sqlite.enable = true;
+
+    # ── Disponíveis (desligadas) ──
+    nix.enable = false;
+    python.enable = false;
+    lua.enable = false;
+    arduino.enable = false;
+    latex.enable = false;
+    postgresql.enable = false;
+    mariadb.enable = false;
+    mongodb.enable = false;
+    ferretdb.enable = false;
   };
 
   # Ferramentas de debug wireless (úteis só com o chip físico) +

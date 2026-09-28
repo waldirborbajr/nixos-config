@@ -19,7 +19,7 @@
     ../modules/editors.nix
     ../modules/cli-and-terminal.nix
     ../modules/alacritty.nix
-    # ../modules/wezterm.nix
+    # ../modules/wezterm.nix # terminal padrão continua Alacritty; ative se quiser trocar
     ../modules/btop.nix
     ../modules/tmux.nix
     ../modules/ripgrep.nix
