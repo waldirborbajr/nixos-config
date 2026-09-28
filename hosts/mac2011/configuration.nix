@@ -18,6 +18,11 @@
     ../../system/profiles/x86/desktop.nix
     ../../system/modules/mac-family.nix
     ../../system/modules/broadcom-wifi.nix
+
+    # Containers — só mac2011. Descomente pra ativar (independentes entre si):
+    # ../../system/profiles/x86/docker.nix
+    # ../../system/profiles/x86/podman.nix
+    # ../../system/profiles/x86/kubernetes.nix # k3d/kubectl/k9s — precisa de docker OU podman
   ];
 
   # O módulo hardware.bluetooth do NixOS força General.ControllerMode =
