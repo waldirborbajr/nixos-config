@@ -58,12 +58,14 @@
 
   # Ferramentas de debug wireless (úteis só com o chip físico) +
   # Spotify: só neste host (não disponível p/ aarch64-linux das VMs UTM/Fusion)
+  # Chromium: só neste host por escolha (não está em nenhum profile compartilhado)
   environment.systemPackages = lib.mkAfter (
     with pkgs; [
       iw
       wirelesstools
       spotify
       chirp
+      chromium
     ]
   );
 
