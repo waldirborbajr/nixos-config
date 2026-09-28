@@ -16,6 +16,7 @@
 in {
   imports = [
     ../modules/dev.nix
+    ../modules/ssh-trust.nix
   ];
 
   # ==================== KERNEL ====================
