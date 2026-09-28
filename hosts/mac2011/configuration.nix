@@ -66,6 +66,15 @@
       spotify
       chirp
       chromium
+
+      # Utilitários de terminal / infra (só mac2011, pra avaliar)
+      magic-wormhole-rs # envio seguro de arquivos entre hosts
+      ripgrep-all # rga: ripgrep em PDF/zip/docx etc
+      iperf3 # throughput de rede entre hosts
+      tcpdump # captura de pacotes (precisa de sudo)
+      whois
+      pwgen
+      libqalculate # qalc: calculadora com conversão de unidades
     ]
   );
 
