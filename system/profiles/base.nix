@@ -1,9 +1,10 @@
 # system/profiles/base.nix
 #
-# Perfil aplicado a TODOS os hosts NixOS. Junta o que antes eram
-# modules/base_system.nix + user_borba.nix + root_pkgs.nix + ssh.nix +
-# sops.nix + fonts.nix — cada um cobria um pedaço de config sem
-# sobreposição, então a fusão é literal (sem mudança de comportamento).
+# Perfil aplicado a TODOS os hosts NixOS, inclusive um futuro nó sem tela
+# gráfica — nada aqui pode depender de sessão gráfica (greetd/regreet,
+# polkit agent gráfico, fontes, etc.); isso tudo mora em
+# system/profiles/desktop.nix, igual à separação do ulyssecrn/nixos-config
+# (base.nix dele também não toca em nada gráfico).
 # O wiring `home-manager.users.borba` NÃO mora aqui — vive no flake.nix
 # (mkHost), um lugar só pra toda a frota.
 {
@@ -22,12 +23,9 @@ in {
   # ==================== KERNEL ====================
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  # ==================== SSH KEY DIR + REGREET DIRS (tmpfiles) ====================
+  # ==================== SSH KEY DIR (tmpfiles) ====================
   systemd.tmpfiles.rules = [
     "d ${sshKeysDir} 0700 ${username} users -"
-    "d /var/log/regreet 0755 greeter greeter -"
-    "d /var/cache/regreet 0755 greeter greeter -"
-    "d /var/lib/regreet 0755 greeter greeter -"
   ];
 
   # ==================== SLEEP POLICY ====================
@@ -38,12 +36,6 @@ in {
     AllowSuspendThenHibernate = "no";
     MemorySleepMode = "s2idle";
   };
-
-  # ==================== SECURITY / SESSION ====================
-  security.polkit.enable = true;
-  security.soteria.enable = true;
-  security.pam.services.swaylock = {};
-  services.gnome.gnome-keyring.enable = true;
 
   # ==================== NETWORK ====================
   networking.hostName = hostname;
@@ -92,12 +84,6 @@ in {
     ]; # dialout: cabo serial do CHIRP
     shell = pkgs.zsh;
   };
-
-  users.users.greeter.extraGroups = [
-    "video"
-    "input"
-    "render"
-  ];
 
   home-manager = {
     useGlobalPkgs = true;
@@ -278,27 +264,5 @@ in {
       echo "[bootstrap] you should now encrypt it with sops:"
       echo "  sops hosts/${hostname}/secrets/${hostname}.yaml"
     '';
-  };
-
-  # ==================== FONTS ====================
-  fonts = {
-    enableDefaultPackages = true;
-    packages = with pkgs; [
-      fira-code
-      nerd-fonts.fira-mono
-      nerd-fonts.fira-code
-      nerd-fonts.droid-sans-mono
-      nerd-fonts.jetbrains-mono
-      libertine
-      noto-fonts-color-emoji
-      nerd-fonts.symbols-only
-    ];
-
-    fontconfig = {
-      enable = true;
-      defaultFonts = {
-        monospace = ["JetBrainsMono Nerd Font"];
-      };
-    };
   };
 }
