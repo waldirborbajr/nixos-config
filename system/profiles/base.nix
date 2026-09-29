@@ -152,6 +152,7 @@ in {
     htop
     smartmontools
     net-tools
+    superfile
   ];
 
   # ==================== SSH ====================
