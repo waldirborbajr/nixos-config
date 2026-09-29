@@ -7,16 +7,17 @@ NixOS - BORBA JR, W - Configuration
 
 [![Nix](https://github.com/waldirborbajr/nixos-config/actions/workflows/nix.yaml/badge.svg)](https://github.com/waldirborbajr/nixos-config/actions/workflows/nix.yaml)
 
-Flake multi-host (`flake.nix` → `configuration.nix` como índice fino,
-importando módulos por tópico em `modules/` → `hosts/<host>/configuration.nix`,
-com módulos como `modules/mac_workstation.nix` para a família Mac), com
+Flake multi-host (`flake.nix` → `hosts/<host>/configuration.nix` de cada
+host, importando perfis/módulos compartilhados de `system/profiles/` e
+`system/modules/` — sem `configuration.nix` raiz único —, com módulos
+como `system/modules/mac-family.nix` para a família Mac), com
 [Home Manager](https://github.com/nix-community/home-manager) cuidando
-do usuário (`home/home.nix` + `home/configs/`) e
+do usuário (`hosts/<host>/home/home.nix` + `home/profiles/` +
+`home/modules/` + `home/configs/`) e
 [sops-nix](https://github.com/Mic92/sops-nix) cuidando dos segredos por
-host. Ver [`AUDIT-REPORT.md`](AUDIT-REPORT.md) para o histórico de
-correções aplicadas à árvore real (bugs de duplicação, docs desalinhadas)
-e [`REFACTOR-NOTES.md`](REFACTOR-NOTES.md) para o split do antigo
-`configuration.nix` monolítico em `modules/`.
+host. Ver [`docs/architecture.md`](docs/architecture.md) e
+[`docs/DENDRITIC-PATTERN.md`](docs/DENDRITIC-PATTERN.md) para mais
+detalhes de arquitetura.
 
 ## 🖥️ Supported Hardware
 
@@ -51,8 +52,8 @@ e [`REFACTOR-NOTES.md`](REFACTOR-NOTES.md) para o split do antigo
 - Storage: 120 GB SSD
 - Role: basic usage / study machine
 - Desktop: niri + waybar (Wayland, via greetd/regreet)
-- Boot: BIOS legado + GRUB (`/dev/sda` — **não confirmado ainda**, ver
-  [`TODO.md`](TODO.md)); os demais hosts usam `systemd-boot`/EFI
+- Boot: BIOS legado + GRUB (`/dev/sda`); os demais hosts usam
+  `systemd-boot`/EFI
 - Teclado: ABNT2 (`br-abnt2`)
 - Wi-Fi: Broadcom BCM4312 (LP-PHY), driver open-source `b43` + firmware
   fixado em `b43Firmware_6_30_163_46` (versão específica para chips LP-PHY;
@@ -61,19 +62,20 @@ e [`REFACTOR-NOTES.md`](REFACTOR-NOTES.md) para o split do antigo
 - Sem Vicinae, sem containers, sem pacotes pesados — é a máquina mais fraca
   do parque
 - Nota: hostname legado da máquina física era `dell1456`; o flake usa
-  `dell1564` (ver alias em `scripts/nixos-manager.sh` e em `manage-ssh-sops.sh`).
+  `dell1564` (ver alias em `nixos-manager.sh` e em `manage-ssh-sops.sh`).
   Confirme o nome de modelo real do hardware antes de considerar um dos
   dois um typo.
 
 ### 🍏 Apple Silicon VM (UTM) — `macutm`
 
 - Architecture: aarch64
-- Role: workstation em VM (UTM), perfil `qemu-guest.nix`
+- Role: workstation em VM (UTM)
 - Desktop: niri + waybar (Wayland, via greetd/regreet — renderer por
   software forçado: `WLR_RENDERER=pixman`, `GSK_RENDERER=cairo`), base
-  compartilhada com `macvmf` em `modules/mac_vm.nix`
-- Containers: `podman` com `dockerCompat = true` (só nas VMs, não no
-  hardware físico)
+  compartilhada com `macvmf` em `system/modules/mac-vm.nix`
+- Containers: nenhum por padrão — Docker/Podman/Kubernetes são opt-in
+  aqui igual em qualquer outro host (ver seção "Containers / Kubernetes"
+  abaixo); hoje só `mac2011` tem o import comentado pronto
 - `boot.kernelParams = [ "mitigations=off" ]` — ganho de performance em VM
 
 ### 🍏 Apple Silicon VM (VMware Fusion) — `macvmf`
@@ -82,8 +84,8 @@ e [`REFACTOR-NOTES.md`](REFACTOR-NOTES.md) para o split do antigo
 - Role: workstation em VM (VMware Fusion), guest agent
   `virtualisation.vmware.guest.enable`
 - Desktop: niri + waybar (Wayland, via greetd/regreet), mesma base
-  compartilhada de `macutm` (`modules/mac_vm.nix`)
-- Containers: `podman` com `dockerCompat = true`
+  compartilhada de `macutm` (`system/modules/mac-vm.nix`)
+- Containers: opt-in, mesma observação de `macutm` acima
 
 ### 🍏 MacBook M2 (físico) — `macbook` (Home Manager standalone)
 
@@ -94,93 +96,96 @@ e [`REFACTOR-NOTES.md`](REFACTOR-NOTES.md) para o split do antigo
 - Sem nix-darwin, sem niri/waybar/greetd — nenhuma gestão de sistema ou
   desktop, só `home-manager switch` cuidando de pacotes de usuário e
   dotfiles
-- Importa só um subconjunto de `home/`: `identity`, `shell`,
-  `editors`, `cli-and-terminal` — **sem** `desktop.nix` (que é só pra
-  niri/Wayland, não faz sentido em macOS)
-- `home.packages` próprios deste host (`home/macbook.nix`): hoje só
-  `darktable` — `neovim` **não** está mais aqui, foi consolidado em
-  `home/editors.nix` (ver seção "Módulos compartilhados" abaixo),
-  já que é usado por todos os hosts, não só este
-- Primeira ativação usa `home.backupFileExtension = "hm-backup"` —
-  dotfile pré-existente e não gerido pelo Nix vira `<arquivo>.hm-backup`
-  em vez de ser sobrescrito sem cópia
-- **Pacotes das VMs (`macutm`/`macvmf`) ou de `modules/packages.nix`
-  não chegam aqui** — são `nixosConfigurations` completamente separadas;
-  só o que está em `home/{identity,shell,editors,cli-and-terminal}.nix`
-  ou direto em `home/macbook.nix` é compartilhado com este host
-- Uso: `./scripts/nixos-manager.sh macbook` (ou menu `m`) — ver seção do
-  `scripts/nixos-manager.sh` abaixo
+- Importa só `home/profiles/base.nix` (shell, editors, cli-and-terminal,
+  git, terminal emulators) — **sem** `home/profiles/desktop.nix` (que é
+  só pra niri/Wayland, não faz sentido em macOS)
+- `home.packages` próprios deste host (`hosts/macbook/home/home.nix`):
+  hoje só `darktable` — editores (`neovim`/`helix`/`emacs`, toggles em
+  `home/modules/editors.nix`) vêm do `home/profiles/base.nix`
+  compartilhado, não precisam ser repetidos aqui
+- `home.homeDirectory` sobrescrito pra `/Users/borba` via `lib.mkForce`,
+  já que os módulos de identidade assumem `/home/borba` (Linux) por padrão
+- `backupFileExtension = "hm-backup"` vem de `system/profiles/base.nix`
+  (compartilhado) — dotfile pré-existente e não gerido pelo Nix vira
+  `<arquivo>.hm-backup` em vez de ser sobrescrito sem cópia, já na
+  primeira ativação
+- **Pacotes das VMs (`macutm`/`macvmf`) ou de módulos `system/*` não
+  chegam aqui** — são `nixosConfigurations` completamente separadas; só o
+  que está em `home/profiles/base.nix`/`home/modules/` ou direto em
+  `hosts/macbook/home/home.nix` é compartilhado com este host
+- Uso: `./nixos-manager.sh macbook` (ou menu `m`) — ver seção do
+  `nixos-manager.sh` abaixo
 
-### Base compartilhada da família Mac (`modules/mac_workstation.nix`)
+### Base compartilhada da família Mac (`system/modules/mac-family.nix`)
 
 Programas, teclado (`us` + variante `mac`) e browser (Firefox Developer
 Edition) usados por `mac2011`, `macutm` e `macvmf` vivem num único módulo
 comum, para não repetir 3x. `dell1564` **não** importa esse módulo — segue
 com sua própria lista de pacotes, mais enxuta, e Firefox estável.
+`system/modules/mac-vm.nix` é uma camada em cima desse, só pra
+`macutm`/`macvmf` (as duas VMs Apple Silicon).
 
 ______________________________________________________________________
 
-## 🎛️ `features.nix` — o painel único
+## 🎛️ Ligando/desligando pacotes por host
 
-Único lugar do repo onde se liga/desliga **instalação de pacotes por
-host**, independente de qual hardware é. Hoje cobre `development.languages.*`
-(linguagens/toolchains) e `containerTools.*` (docker/podman/kubernetes),
-os dois namespaces de opção que já existiam — `features.nix` só deixou
-de estar escondido dentro de `configuration.nix`, igual pros 4 hosts, sem
-como variar por máquina.
+Não existe painel único — cada `hosts/<host>/configuration.nix` é o
+lugar de editar o que é só daquele host, com dois padrões diferentes:
 
-Cada `hosts/<host>/configuration.nix` aplica o bloco do seu host no fim
-do arquivo:
-
-```nix
-} // (import ../../features.nix).dell1564
-```
-
-Pra ligar Python só no `mac2011`, por exemplo, edite **só** `features.nix`:
+**Toggle boolean** — `system/modules/dev.nix` expõe
+`development.languages.<lang>.enable` (go, rust, sqlite, nix, python,
+lua, arduino, latex, postgresql, mariadb, mongodb, ferretdb). O módulo
+já é importado por `system/profiles/base.nix` em todos os hosts; o que
+varia por host é só o valor de cada `enable`, setado dentro do
+`configuration.nix` do host:
 
 ```nix
-mac2011 = baseline // {
-  development.languages = baseline.development.languages // {
-    python.enable = true;
-  };
+development.languages = {
+  go.enable = true;
+  rust.enable = true;
+  sqlite.enable = true;
+  # o resto = false
 };
 ```
 
-Não precisa tocar em `modules/dev/python.nix` nem no host. O `hardware-configuration.nix`
-e os overrides de teclado/monitor de cada host continuam intactos, fora
-do painel — isso é hardware, não pacote.
+**Import comentado ("import = enable")** — `system/profiles/x86/{docker,podman,kubernetes}.nix`
+não têm nenhuma `option`; o módulo simplesmente liga o que declara se
+for importado. Pra ativar num host, descomente a linha correspondente
+no `imports` do `configuration.nix` dele (ver seção "Containers /
+Kubernetes" abaixo). O mesmo padrão existe no lado home-manager:
+`home/modules/wezterm.nix` e `home/modules/kitty.nix` estão escritos mas
+não importados por nenhum `home/profiles/*.nix` — o terminal padrão
+continua Alacritty.
 
-`global_constants.nix` guarda o único valor hoje compartilhado por todos
-os hosts (o `username`); é o que os módulos importam como `common`.
+Não tem `features.nix` nem `global_constants.nix` neste repo — o
+`username = "borba"` é definido direto em `flake.nix` (`outputs`) e
+passado via `specialArgs`/`extraSpecialArgs`.
 
 ______________________________________________________________________
 
-## 🧩 Módulos compartilhados (`modules/`)
+## 🧩 Perfis compartilhados (`system/profiles/`, `system/modules/`)
 
-`configuration.nix` é hoje só um índice: `imports = [ ... ]` apontando pros
-arquivos abaixo, aplicados a **todos** os hosts. Split puramente
-estrutural do antigo `configuration.nix` monolítico — mesmo comportamento,
-organizado por tópico. Detalhes de como o split foi feito e como validar
-(comparação de store path antes/depois) em
-[`REFACTOR-NOTES.md`](REFACTOR-NOTES.md).
+Cada `hosts/<host>/configuration.nix` importa um subconjunto de perfis
+e módulos compartilhados, em vez de um `configuration.nix` raiz único
+pra todos os hosts:
 
 | Arquivo | Conteúdo |
 |---|---|
-| `base_system.nix` | Kernel, tmpfiles (ssh dir + regreet), sleep policy, security/session, network, time/locale |
-| `fonts.nix` | Fontes do sistema |
-| `user_borba.nix` | Shell padrão, usuário principal, wiring do Home Manager, sudo |
-| `desktop_niri.nix` | niri, greetd/regreet, display manager, power-profiles-daemon, dconf, direnv, xdg portal |
-| `audio.nix` | PipeWire/PulseAudio/rtkit |
-| `hardware_quirks.nix` | nix-ld, bluetooth (comentários de troubleshooting preservados) |
-| `root_pkgs.nix` | allowUnfree, env vars, aliases, `environment.systemPackages`, config do Nix (gc/optimise/settings) |
-| `ssh.nix` | openssh (server) + `programs.ssh` (client config) |
-| `sops.nix` | sops + secrets + serviço de bootstrap da host key |
-| `containers_docker.nix` ⚠️ opt-in | Docker Engine (`enableOnBoot = false`, socket-activated) + grupo `docker` + `docker-compose` — import comentado, veja seção "Containers / Kubernetes" abaixo |
-| `containers_podman.nix` ⚠️ opt-in | Podman rootless + `dockerCompat` (ganha o comando `docker`) + `podman-compose`/`lazydocker` — import comentado |
-| `containers_kubernetes.nix` ⚠️ opt-in | `k3d` + `kubectl` + `k9s` (cluster local leve, sem systemd) — import comentado, precisa de um dos dois acima ligado junto |
+| `system/profiles/base.nix` | Kernel, tmpfiles (ssh dir + regreet), ssh, sops, `development.languages.*` (via `dev.nix`), ssh-trust entre hosts — importado por **todos** os hosts |
+| `system/profiles/desktop.nix` | Camada desktop (GUI) |
+| `system/profiles/server.nix` | Camada server |
+| `system/profiles/x86/desktop.nix` | Extras de desktop só pra x86_64 |
+| `system/modules/dev.nix` | `development.languages.<lang>.enable`, por host |
+| `system/modules/ssh-trust.nix` | `authorizedKeys`/`knownHosts` entre os hosts da frota |
+| `system/modules/mac-family.nix` | Teclado, Firefox Dev Edition, pacotes — só família Mac |
+| `system/modules/mac-vm.nix` | Camada em cima de `mac-family.nix`, só `macutm`/`macvmf` |
+| `system/modules/broadcom-wifi.nix` | Firmware Wi-Fi Broadcom — `dell1564` + `mac2011` |
+| `system/profiles/x86/docker.nix` ⚠️ opt-in | Docker Engine (`enableOnBoot = false`, socket-activated) + grupo `docker` + `docker-compose`/`lazydocker` — import comentado, veja seção "Containers / Kubernetes" abaixo |
+| `system/profiles/x86/podman.nix` ⚠️ opt-in | Podman rootless + `dockerCompat` (ganha o comando `docker` se o Docker Engine não estiver ligado) + `podman-compose` + timer semanal de auto-update — import comentado |
+| `system/profiles/x86/kubernetes.nix` ⚠️ opt-in | `k3d` + `kubectl` + `k9s` (cluster local leve, sem systemd) — import comentado, precisa de docker.nix ou podman.nix ligado junto |
 
-Pra editar algo, vá direto no arquivo do tópico — não precisa mais
-navegar um `configuration.nix` de 500+ linhas pra achar uma seção.
+Pra editar algo, vá direto no arquivo do tópico — não tem
+`configuration.nix` monolítico pra navegar.
 
 ______________________________________________________________________
 
@@ -188,41 +193,37 @@ ______________________________________________________________________
 
 Docker, Podman e Kubernetes local são usados só em projetos específicos,
 não no dia a dia — por isso os 3 módulos existem no repo mas ficam **com
-o import comentado** em `configuration.nix`. Pra usar:
+o import comentado**. Hoje só `hosts/mac2011/configuration.nix` tem essas
+linhas (comentadas). Pra usar:
 
 ```bash
-# configuration.nix — descomente a(s) linha(s) relevante(s):
-# ./modules/containers_docker.nix
-# ./modules/containers_podman.nix
-# ./modules/containers_kubernetes.nix
+# hosts/mac2011/configuration.nix — descomente a(s) linha(s) relevante(s):
+# ../../system/profiles/x86/docker.nix
+# ../../system/profiles/x86/podman.nix
+# ../../system/profiles/x86/kubernetes.nix
 ```
 
-depois rode o rebuild normal (`./scripts/nixos-manager.sh flake` ou `build`).
+depois rode o rebuild normal (`./nixos-manager.sh flake` ou `build`).
 Quando não precisar mais, comente de novo e rebuild — nenhum dos três
 deixa serviço rodando à toa nesse estado desligado.
 
 | Módulo | O que dá | Footprint quando ligado mas sem uso |
 |---|---|---|
-| `containers_docker.nix` | Docker Engine + `docker-compose` | Zero — `enableOnBoot = false`, o daemon só sobe ao tocar o socket (`docker ps` etc.); depois de subir, fica rodando até `systemctl stop docker` ou reboot |
-| `containers_podman.nix` | Podman rootless + `dockerCompat` (alias `docker`) + `podman-compose`/`lazydocker` | Zero sempre — sem daemon, é fork-per-comando |
-| `containers_kubernetes.nix` | `k3d` + `kubectl` + `k9s` | Zero — são só binários, sem serviço systemd; o cluster só existe entre `k3d cluster create` e `k3d cluster delete` |
+| `x86/docker.nix` | Docker Engine + `docker-compose`/`lazydocker` | Zero — `enableOnBoot = false`, o daemon só sobe ao tocar o socket (`docker ps` etc.); depois de subir, fica rodando até `systemctl stop docker` ou reboot |
+| `x86/podman.nix` | Podman rootless + `dockerCompat` (alias `docker`, só se `x86/docker.nix` não estiver ligado junto) + `podman-compose` + timer semanal de auto-update | Zero sempre — sem daemon, é fork-per-comando; o timer só mexe em containers com o label `io.containers.autoupdate = "registry"` |
+| `x86/kubernetes.nix` | `k3d` + `kubectl` + `k9s` | Zero — são só binários, sem serviço systemd; o cluster só existe entre `k3d cluster create` e `k3d cluster delete` |
 
 > **`k9s` sozinho não sobe cluster nenhum** — é só um dashboard/TUI pra um
 > cluster que já existe (via kubeconfig), local ou remoto. Pra ter
-> cluster local de verdade, `containers_kubernetes.nix` inclui `k3d` também: ele
+> cluster local de verdade, `x86/kubernetes.nix` inclui `k3d` também: ele
 > cria um cluster k3s efêmero rodando como containers, em cima do runtime
-> que você já tiver ligado (`containers_docker.nix` ou
-> `containers_podman.nix` — precisa de um dos dois, é ele quem cria os
-> nodes do cluster).
+> que você já tiver ligado (`x86/docker.nix` ou `x86/podman.nix` —
+> precisa de um dos dois, é ele quem cria os nodes do cluster).
 >
-> `containers_docker.nix` e `containers_podman.nix` são independentes:
-> dá pra ligar só um, ou os dois juntos sem conflito.
->
-> A família Mac (`modules/mac_workstation.nix`) já tem um pacote
-> `podman` cru (+ `lazydocker`) pra uso básico rootless, sem passar por
-> `containers_podman.nix`. Ligar `containers_podman.nix` num host Mac não
-> quebra nada (Nix deduplica o pacote) — só passa a ligar o
-> `dockerCompat`/rede default que o pacote cru sozinho não configura.
+> `x86/docker.nix` e `x86/podman.nix` são independentes: dá pra ligar só
+> um, ou os dois juntos — nesse caso o `dockerCompat` do Podman se
+> desliga sozinho pra não colidir com o binário `docker` do Docker
+> Engine.
 
 ______________________________________________________________________
 
@@ -240,7 +241,8 @@ This flake uses [SOPS](https://github.com/getsops/sops) (via
 (`hosts/<host>/secrets/<host>.yaml`). `nixos-rebuild switch` decrypts that
 file during activation using a local [age](https://github.com/FiloSottile/age)
 key at `~/.config/sops/age/keys.txt` (`sops.age.keyFile` in
-`configuration.nix` — per-user, not `/etc`) — but on a **genuinely fresh**
+`system/profiles/base.nix`, imported by every host — per-user, not
+`/etc`) — but on a **genuinely fresh**
 machine, neither that age key nor the encrypted secrets file exist yet, and
 the tools needed to create them (`sops`, `age`, `jq`) only get installed
 *by* a successful rebuild. That's a chicken-and-egg problem, and it's
@@ -310,11 +312,11 @@ git push origin main
 **4. Point `/etc/nixos` at the repo and run the real rebuild:**
 
 ```bash
-./scripts/nixos-manager.sh setup      # symlinks /etc/nixos -> ~/nixos-config
-./scripts/nixos-manager.sh flake      # select branch + host, then rebuild
+./nixos-manager.sh setup      # symlinks /etc/nixos -> ~/nixos-config
+./nixos-manager.sh flake      # select branch + host, then rebuild
 ```
 
-Note: `scripts/nixos-manager.sh`, `tmux-devshell.sh` and `zellij-devshell.sh`
+Note: `nixos-manager.sh`, `tmux-devshell.sh` and `zellij-devshell.sh`
 live at the **repo root**, not under `scripts/` — only
 `manage-ssh-sops.sh` and `backup-age-key.sh` live in `scripts/`. The two
 devshell launchers are also installed as commands
@@ -327,8 +329,9 @@ and encrypted secrets from step 3 already exist on disk. From here on,
 user environment, and dotfiles for zsh, git, helix, tmux, niri, waybar,
 wezterm, zellij, bat, btop, lazygit, atuin, oh-my-posh, ripgrep, and
 wlr-which-key are applied automatically from `home/configs/` — either
-via native `programs.*` modules or `xdg.configFile` (see
-`home/default.nix`). No external `~/dotfiles` repo and no manual `stow`
+via native `programs.*` modules or `xdg.configFile` (see the per-program
+files under `home/modules/`, imported by `home/profiles/base.nix` /
+`home/profiles/desktop.nix`). No external `~/dotfiles` repo and no manual `stow`
 are needed anymore.
 
 **5. Back up the age key** (do this once, right after step 3):
@@ -358,27 +361,27 @@ secret already present in the file — safe to re-run anytime.
 | 2 | `git clone ... ~/nixos-config` | git |
 | 3 | `nix shell nixpkgs#sops nixpkgs#age nixpkgs#jq nixpkgs#openssh` then `./scripts/manage-ssh-sops.sh <host> --clean` | ad-hoc `nix shell` |
 | 3b | `git add/commit/push` the encrypted secrets file | git |
-| 4 | `./scripts/nixos-manager.sh setup` then `flake` | steps 1–3 done |
+| 4 | `./nixos-manager.sh setup` then `flake` | steps 1–3 done |
 | 5 | `./scripts/backup-age-key.sh` — save output in a password manager | age key exists (step 3) |
 | 6+ | `./scripts/manage-ssh-sops.sh <host>` (no `--clean`) | system already built |
 
 ______________________________________________________________________
 
-## 🧰 `scripts/nixos-manager.sh` — rebuilds, cache, and updates
+## 🧰 `nixos-manager.sh` — rebuilds, cache, and updates
 
 Menu interativo (ou modo direto por argumento) para as tarefas do dia a dia
 de manutenção do flake: rebuild, limpeza de cache, updates, rollback,
 checagem do flake e gestão de branches. Vive na **raiz do repo**
-(`./scripts/nixos-manager.sh`) e assume um repo git em `$NIXOS_DIR` (por padrão, a
+(`./nixos-manager.sh`) e assume um repo git em `$NIXOS_DIR` (por padrão, a
 pasta onde o próprio script está).
 
 ### Uso
 
 ```bash
-./scripts/nixos-manager.sh                    # abre o menu interativo
-./scripts/nixos-manager.sh <option>           # roda direto: legacy | flake | clean | update | generation
-./scripts/nixos-manager.sh <option> <host>    # roda direto num host específico: flake dell
-NIXOS_FLAKE_ATTR=dell ./scripts/nixos-manager.sh flake   # força o host via env var
+./nixos-manager.sh                    # abre o menu interativo
+./nixos-manager.sh <option>           # roda direto: legacy | flake | clean | update | generation
+./nixos-manager.sh <option> <host>    # roda direto num host específico: flake dell
+NIXOS_FLAKE_ATTR=dell ./nixos-manager.sh flake   # força o host via env var
 ```
 
 ### Opções do menu
@@ -443,8 +446,8 @@ devshells) ou de uma seleção manual (custom).
 Os scripts-fonte vivem na **raiz do repo** (`./scripts/tmux-devshell.sh`,
 `./scripts/zellij-devshell.sh`), mas também são **instalados como comando**
 (`~/.local/bin/tmux-devshell`, `~/.local/bin/zellij-devshell` — via
-`home/cli-and-terminal.nix`, `$HOME/.local/bin` já está no `PATH`
-por `home/configs/zshenv`). Rode de dentro de **qualquer projeto** em
+`home/modules/cli-and-terminal.nix`, `$HOME/.local/bin` já está no `PATH`
+por `home/modules/zsh.nix`). Rode de dentro de **qualquer projeto** em
 `$HOME/prj/<algo>` — não precisa estar no nixos-config nem passar
 caminho nenhum:
 
@@ -599,16 +602,25 @@ troubleshooting (reset do teclado, reconexão manual via
 
 > Este fix trata do handshake de pareamento em si. Para o comportamento
 > específico do controlador Bluetooth do `mac2011` (Broadcom BR/EDR
-> clássico) dentro do NixOS, ver `hardware.bluetooth.settings.General. ControllerMode = lib.mkForce "bredr"` em `hosts/mac2011/default.nix`.
+> clássico) dentro do NixOS, ver `hardware.bluetooth.settings.General.ControllerMode = lib.mkForce "bredr"` em `hosts/mac2011/configuration.nix`.
 
 ______________________________________________________________________
 
 ## 📚 Other docs in this repo
 
-- [`DENDRITIC-PATTERN.md`](DENDRITIC-PATTERN.md) — **aspiracional, não
-  implementado.** Descreve uma arquitetura-alvo (`core.nix`, `profiles/`,
-  `modules/category/default.nix`) que não existe nesta árvore hoje; mantido
-  só como referência de design para uma eventual refatoração futura.
+- [`docs/DENDRITIC-PATTERN.md`](docs/DENDRITIC-PATTERN.md) — descreve o
+  Dendritic Pattern como arquitetura-alvo. O próprio arquivo se marca
+  como "aspiracional, não implementado" citando um `flake.nix` →
+  `configuration.nix` monolítico que **não é mais** o estado real do
+  repo — hoje já existem `system/profiles/` e `system/modules/`
+  (ver seção "Perfis compartilhados" acima), próximos do espírito do
+  padrão, ainda que sem `core.nix` nem os agregadores
+  `modules/category/default.nix` que o documento descreve. Trate o aviso
+  de status do arquivo como desatualizado, não a arquitetura descrita
+  como implementada 1:1.
+- [`docs/architecture.md`](docs/architecture.md) — outra descrição de
+  arquitetura deste repo; cheque contra a árvore real antes de confiar
+  em caminhos específicos, pelo mesmo motivo acima.
 - [`scripts/age-key-backup-e-restauracao.md`](scripts/age-key-backup-e-restauracao.md)
   — passo a passo de backup/restauração da chave age (complementa
   `scripts/backup-age-key.sh`).
