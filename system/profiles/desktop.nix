@@ -5,7 +5,34 @@
 # pra qualquer host com sessão gráfica. Junta o que antes eram
 # modules/desktop_niri.nix + audio.nix + hardware_quirks.nix — sem
 # sobreposição de opções entre os três, fusão literal.
+#
+# TUDO que depende de tela gráfica vive aqui, não em base.nix — mesma
+# separação do ulyssecrn/nixos-config, pra um host sem tela (só
+# system/profiles/base.nix) não puxar nada disso.
 {pkgs, ...}: {
+  # ==================== REGREET DIRS (tmpfiles) ====================
+  # Movido de system/profiles/base.nix: depende do usuário `greeter`
+  # abaixo, que só existe com services.greetd ligado.
+  systemd.tmpfiles.rules = [
+    "d /var/log/regreet 0755 greeter greeter -"
+    "d /var/cache/regreet 0755 greeter greeter -"
+    "d /var/lib/regreet 0755 greeter greeter -"
+  ];
+
+  # ==================== SECURITY / SESSION ====================
+  # Movido de system/profiles/base.nix (polkit agent gráfico, lock screen,
+  # keyring de sessão — nada disso faz sentido sem tela).
+  security.polkit.enable = true;
+  security.soteria.enable = true;
+  security.pam.services.swaylock = {};
+  services.gnome.gnome-keyring.enable = true;
+
+  users.users.greeter.extraGroups = [
+    "video"
+    "input"
+    "render"
+  ];
+
   # ==================== NIRI ====================
   programs.niri.enable = true;
 
@@ -138,4 +165,27 @@
   };
 
   services.blueman.enable = true;
+
+  # ==================== FONTS ====================
+  # Movido de system/profiles/base.nix.
+  fonts = {
+    enableDefaultPackages = true;
+    packages = with pkgs; [
+      fira-code
+      nerd-fonts.fira-mono
+      nerd-fonts.fira-code
+      nerd-fonts.droid-sans-mono
+      nerd-fonts.jetbrains-mono
+      libertine
+      noto-fonts-color-emoji
+      nerd-fonts.symbols-only
+    ];
+
+    fontconfig = {
+      enable = true;
+      defaultFonts = {
+        monospace = ["JetBrainsMono Nerd Font"];
+      };
+    };
+  };
 }
