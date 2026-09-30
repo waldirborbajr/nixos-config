@@ -49,6 +49,7 @@
 
   # ── Pacotes comuns (sem config própria) ──────────────────────────────
   # gh / gh-dash / delta / git → home/modules/git.nix
+  # eza → home/modules/shell.nix
   home.packages = with pkgs; [
     asciinema
     asciinema-agg
@@ -62,6 +63,21 @@
     xarchiver
     ffmpeg
     marksman
+
+    # CLI tools (faltando vs. ulyssecrn/nixos-config)
+    nmap
+    which
+    tree
+    gawk
+    yt-dlp
+    traceroute
+    dnsutils
+    xz
+    gnutar
+
+    # Monitoring tools
+    lm_sensors # sensors
+    usbutils # lsusb
   ];
 
   # editors.emacs.enable = true;
