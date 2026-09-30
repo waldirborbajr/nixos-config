@@ -5,7 +5,7 @@
 # programas e aplica os dotfiles que já existem no flake, via
 # `home-manager switch --flake .#borba@macbook`.
 {
-  pkgs,
+  # pkgs,
   lib,
   ...
 }: {
@@ -20,7 +20,7 @@
   home.homeDirectory = lib.mkForce "/Users/borba";
 
   # ==================== PACOTES EXCLUSIVOS DESTE HOST ====================
-  home.packages = with pkgs; [
-    darktable
-  ];
+ # home.packages = with pkgs; [
+    # darktable
+ # ];
 }
