@@ -18,6 +18,27 @@
   # Movidos de home/profiles/base.nix — dependem de sessão gráfica
   # (visualizador de PDF, gerenciador de arquivo GTK).
   home.packages = with pkgs; [
+    # Fonts — Hack/Noto/emoji come from Stylix (font-packages target).
+    noto-fonts-cjk-sans
+    liberation_ttf                   # Arial/Times/Courier metric substitutes
+    gyre-fonts                       # required by texlive
+    
+    # LaTeX
+    texliveFull
+    pandoc
+
+    # Utilities
+    brave
+#    obsidian
+#    nextcloud-client
+#    libreoffice
+    vlc
+    pdfchain                         # pdf merger
+#    veracrypt
+#    obs-studio
+#    calibre
+#    tio    
+
     mupdf
     xarchiver
   ];
