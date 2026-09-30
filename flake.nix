@@ -55,8 +55,10 @@
     mkHost = {
       hostname,
       system,
+      extraModules ? [],
+      builder ? nixpkgs.lib.nixosSystem,
     }:
-      nixpkgs.lib.nixosSystem {
+      builder {
         inherit system;
 
         specialArgs = {
@@ -68,25 +70,27 @@
           };
         };
 
-        modules = [
-          sops-nix.nixosModules.sops
-          home-manager.nixosModules.home-manager
-          ./system/overlays.nix
+        modules =
+          [
+            sops-nix.nixosModules.sops
+            home-manager.nixosModules.home-manager
+            ./system/overlays.nix
 
-          ./hosts/${hostname}/configuration.nix
-          ./hosts/${hostname}/hardware-configuration.nix
+            ./hosts/${hostname}/configuration.nix
+            ./hosts/${hostname}/hardware-configuration.nix
 
-          {
-            home-manager.users.${username} = import ./hosts/${hostname}/home/home.nix;
-            home-manager.extraSpecialArgs = {
-              inherit inputs hostname;
-              pkgs-unstable = import nixpkgs-unstable {
-                inherit system;
-                config.allowUnfree = true;
+            {
+              home-manager.users.${username} = import ./hosts/${hostname}/home/home.nix;
+              home-manager.extraSpecialArgs = {
+                inherit inputs hostname;
+                pkgs-unstable = import nixpkgs-unstable {
+                  inherit system;
+                  config.allowUnfree = true;
+                };
               };
-            };
-          }
-        ];
+            }
+          ]
+          ++ extraModules;
       };
 
     # 🍎 home-manager standalone (macOS físico) — sem gerenciar o sistema,
