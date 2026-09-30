@@ -5,6 +5,7 @@
 # ABNT2 + tela interna) ficam em ./modules/, não em configuration.nix.
 {...}: {
   imports = [
+    ../../../home/profiles/base.nix
     ../../../home/profiles/desktop.nix
     ./modules/niri.nix
     ./modules/waybar.nix
