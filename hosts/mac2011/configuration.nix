@@ -19,8 +19,6 @@
     ../../system/modules/mac-family.nix
     ../../system/modules/broadcom-wifi.nix
 
-    ./services/qbittorrent.nix
-
     # Containers — só mac2011. Descomente pra ativar (independentes entre si):
     # ../../system/profiles/x86/docker.nix
     # ../../system/profiles/x86/podman.nix
@@ -58,16 +56,14 @@
     ferretdb.enable = false;
   };
 
-  # Ferramentas de debug wireless (úteis só com o chip físico) +
-  # Spotify: só neste host (não disponível p/ aarch64-linux das VMs UTM/Fusion)
-  # Chromium: só neste host por escolha (não está em nenhum profile compartilhado)
+  # Ferramentas de debug wireless (úteis só com o chip físico)
+  # Spotify/Chromium saíram daqui — movidos pra home/profiles/desktop.nix
+  # (compartilhados pelos 4 hosts NixOS agora, não só mac2011).
   environment.systemPackages = lib.mkAfter (
     with pkgs; [
       iw
       wirelesstools
-      spotify
       chirp
-      chromium
 
       # Utilitários de terminal / infra (só mac2011, pra avaliar)
       magic-wormhole-rs # envio seguro de arquivos entre hosts
