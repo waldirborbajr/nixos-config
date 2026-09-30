@@ -1,8 +1,14 @@
 # home/profiles/base.nix
 #
 # Perfil base do home-manager — vale para TODOS os hosts, incluindo o
-# macbook (que não tem niri/desktop). A camada gráfica Linux vive em
-# home/profiles/desktop.nix, que importa este arquivo.
+# macbook (que não tem niri/desktop). Irmão de ./desktop.nix, não
+# importado por ele (mesmo padrão do ulyssecrn/nixos-config) — cada
+# host que precisa da camada gráfica importa os dois, lado a lado, no
+# próprio home.nix.
+#
+# Nada aqui pode depender de sessão gráfica (terminal GUI, visualizador
+# de PDF, gerenciador de arquivo GTK, etc.) — isso tudo mora em
+# home/profiles/desktop.nix.
 #
 # Igual ao base.nix do ulyssecrn: tudo que é comum a qualquer host vive
 # DIRETO aqui (identidade, pacotes utilitários sem config própria) —
@@ -18,8 +24,6 @@
     ../modules/shell.nix
     ../modules/editors.nix
     ../modules/cli-and-terminal.nix
-    ../modules/alacritty.nix
-    # ../modules/wezterm.nix # terminal padrão continua Alacritty; ative se quiser trocar
     ../modules/btop.nix
     ../modules/tmux.nix
     ../modules/ripgrep.nix
@@ -54,13 +58,11 @@
     asciinema
     asciinema-agg
     asciinema-scenario
-    mupdf
     kdlfmt
     unzip
     unrar
     zip
     p7zip
-    xarchiver
     ffmpeg
     marksman
 
