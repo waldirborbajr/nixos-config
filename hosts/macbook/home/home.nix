@@ -9,7 +9,10 @@
   lib,
   ...
 }: {
-  imports = [../../../home/profiles/base.nix];
+  imports = [
+    ../../../home/profiles/base.nix
+    ../../../home/modules/alacritty.nix # base.nix não traz terminal gráfico (movido pra desktop.nix); macOS não importa desktop.nix, então precisa direto
+  ];
 
   # identity.nix (dentro de home/profiles/base.nix) assume /home/borba
   # (Linux) — no macOS o home fica em /Users/borba. mkForce porque
