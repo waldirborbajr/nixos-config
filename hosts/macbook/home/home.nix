@@ -20,7 +20,7 @@
   home.homeDirectory = lib.mkForce "/Users/borba";
 
   # ==================== PACOTES EXCLUSIVOS DESTE HOST ====================
- # home.packages = with pkgs; [
-    # darktable
- # ];
+  # home.packages = with pkgs; [
+  # darktable
+  # ];
 }
