@@ -127,8 +127,13 @@ in {
   };
 
   # ==================== PACKAGES (núcleo mínimo, fora do painel de features) ====================
-  # git → system/modules/dev.nix. zsh/eza/zoxide/bat/fzf/delta/direnv
-  # → home/modules/shell.nix e cli-and-terminal.nix (HM) — um dono só.
+  # Regra de dono único: tem config própria (dotfile/programs.*.settings)
+  # → home-manager; genérico sem config → aqui; serve só pra uma
+  # linguagem de dev → system/modules/dev.nix.
+  # git → home/modules/git.nix (tem ~/.config/git/config).
+  # ripgrep → home/modules/ripgrep.nix (tem programs.ripgrep.arguments).
+  # zsh/eza/zoxide/bat/fzf/delta/direnv → home/modules/shell.nix e
+  # cli-and-terminal.nix (HM) — todos com config própria.
   environment.systemPackages = with pkgs; [
     wget
     curl
@@ -140,12 +145,8 @@ in {
     net-tools
     superfile
 
-    # Core — vieram de system/modules/dev.nix (faziam parte do bloco
-    # "BASE sempre presente" de lá, mas não são ferramenta de dev, são
-    # básico de sistema; todo host deve ter independente de
-    # development.languages.*).
-    git
-    ripgrep
+    # Core sem config própria — todo host, independente de
+    # development.languages.*.
     tree
   ];
 
