@@ -10,9 +10,13 @@
   ];
 
   # ==================== PACOTES EXCLUSIVOS DESTE HOST ====================
-  # Vindo de hosts/macbook/home/home.nix — darktable é exclusivo do mac2011.
+  # darktable: vindo de hosts/macbook/home/home.nix.
+  # brave/vlc: vindo de home/profiles/desktop.nix + system/profiles/x86/desktop.nix
+  # (estavam duplicados nos dois — agora só existem aqui, exclusivos do mac2011).
   home.packages = with pkgs; [
     darktable
     gnome-text-editor
+    brave
+    vlc
   ];
 }
