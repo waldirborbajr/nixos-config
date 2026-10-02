@@ -27,13 +27,13 @@
   };
 
   config = lib.mkMerge [
-    # ==================== BASE (sempre presente) ====================
-    # Ferramentas comuns a todos os ambientes de desenvolvimento.
-    #
-    # Regra: ferramentas compartilhadas entre linguagens/devshells ficam
-    # aqui. Os blocos de linguagem abaixo declaram só o que é específico
-    # daquele ambiente.
-    {
+    # ==================== BASE (só se ALGUMA linguagem estiver ativa) ====
+    # Ferramentas comuns a todos os ambientes de desenvolvimento — mas
+    # só entram se pelo menos um development.languages.*.enable = true.
+    # Com tudo desligado (ex.: host que não quer nenhuma toolchain),
+    # nada daqui instala. Os blocos de linguagem abaixo declaram só o
+    # que é específico daquele ambiente, em cima desta base.
+    (lib.mkIf (lib.any (l: l.enable) (lib.attrValues config.development.languages)) {
       environment.systemPackages = with pkgs; [
         # C/C++ / build foundation
         gcc
@@ -67,7 +67,7 @@
         # Hardware information useful during development.
         pciutils
       ];
-    }
+    })
 
     (lib.mkIf config.development.languages.nix.enable {
       # Nix language tooling: language servers and formatter.
