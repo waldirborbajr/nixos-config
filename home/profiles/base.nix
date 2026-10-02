@@ -67,9 +67,10 @@
     marksman
 
     # CLI tools (faltando vs. ulyssecrn/nixos-config)
+    # tree não entra aqui — sem config própria, mora em
+    # system/profiles/base.nix (dono único, todo host já tem).
     nmap
     which
-    tree
     gawk
     yt-dlp
     traceroute
