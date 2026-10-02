@@ -21,15 +21,14 @@
       kew
 
       flameshot
-      vlc
 
       dex
       autorandr
       xkill
 
-      # build / containers CLI (o daemon podman em si é opt-in separado,
-      # ver x86/containers.nix)
-      podman
+      # lazydocker funciona sem o módulo opt-in (x86/docker.nix ou
+      # x86/podman.nix, ver system/profiles/x86/) — só fica sem backend
+      # até um dos dois ser ligado no host.
       lazydocker
       libgcc
       libcxx
@@ -48,8 +47,5 @@
       diskonaut-ng # TUI de espaço em disco
       handy # speech to text (app tauri/rust)
       lazyrsync
-    ])
-    ++ [
-      brave # Chromium-based (unfree; allowUnfree já ligado em base.nix)
-    ];
+    ]);
 }
