@@ -139,6 +139,14 @@ in {
     smartmontools
     net-tools
     superfile
+
+    # Core — vieram de system/modules/dev.nix (faziam parte do bloco
+    # "BASE sempre presente" de lá, mas não são ferramenta de dev, são
+    # básico de sistema; todo host deve ter independente de
+    # development.languages.*).
+    git
+    ripgrep
+    tree
   ];
 
   # ==================== SSH ====================

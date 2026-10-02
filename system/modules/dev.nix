@@ -51,10 +51,7 @@
         jq
 
         # Source/code navigation
-        git
-        ripgrep
         fd
-        tree
 
         # Debugging / tracing
         gdb
