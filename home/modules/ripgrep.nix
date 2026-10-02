@@ -1,7 +1,8 @@
 # home/modules/ripgrep.nix
 #
-# Config nativa via programs.ripgrep.arguments.
-# O binário `ripgrep` em si vem de system/modules/dev.nix (ou package).
+# Dono único do ripgrep (pacote + config): tem config própria
+# (programs.ripgrep.arguments), por isso mora no home-manager, não em
+# system/profiles/base.nix nem em system/modules/dev.nix.
 _: {
   programs.ripgrep = {
     enable = true;
