@@ -73,6 +73,7 @@
       whois
       pwgen
       libqalculate # qalc: calculadora com conversão de unidades
+      telegram-desktop
     ]
   );
 
