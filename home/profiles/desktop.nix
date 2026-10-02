@@ -33,11 +33,9 @@
       pandoc
 
       # Utilities
-      brave
       #    obsidian
       #    nextcloud-client
       #    libreoffice
-      vlc
       pdfchain # pdf merger
       #    veracrypt
       #    obs-studio
