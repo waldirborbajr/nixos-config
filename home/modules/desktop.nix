@@ -104,6 +104,22 @@ in {
       (pkgs.writeShellScriptBin "qs" ''
         exec ${pkgs-unstable.noctalia-shell}/bin/noctalia-shell "$@"
       '')
+
+      # Escolhe uma imagem aleatória de ~/.local/share/wallpapers (linkado
+      # logo abaixo, a partir de $NIXOS_CONFIG_ROOT/wallpapers/ — pasta
+      # global na raiz do repo, compartilhada por todo host) e seta como
+      # fundo via swaybg. Chamado
+      # no login pelo niri (config/startup.kdl). login.jpg fica de fora —
+      # é só do regreet (tela de login), não entra no sorteio.
+      (pkgs.writeShellScriptBin "random-wallpaper" ''
+        set -euo pipefail
+        dir="$HOME/.local/share/wallpapers"
+        pic=$(${pkgs.findutils}/bin/find "$dir" -maxdepth 1 -type f \
+          \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) \
+          ! -iname 'login.jpg' \
+          | ${pkgs.coreutils}/bin/shuf -n1)
+        exec ${pkgs.swaybg}/bin/swaybg -i "$pic" -m fill
+      '')
     ];
 
   xdg.configFile = {
@@ -120,5 +136,15 @@ in {
       source = "${configs}/wlr-which-key";
       recursive = true;
     };
+  };
+
+  # Pasta global de wallpapers — $NIXOS_CONFIG_ROOT/wallpapers/ (raiz do
+  # repo, não home/configs/), mesma pra todo host. Põe as imagens lá; o
+  # random-wallpaper (acima) sorteia uma a cada login. ~/.local/share é
+  # o lugar certo pra dado estático (não é "config"), por isso home.file
+  # em vez de xdg.configFile.
+  home.file.".local/share/wallpapers" = {
+    source = ../../wallpapers;
+    recursive = true;
   };
 }

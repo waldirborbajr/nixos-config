@@ -31,9 +31,9 @@ one standalone macOS home-manager profile:
   — commented out in `home/profiles/base.nix`); check the profile
   `imports` before assuming a module is live.
 - `home/configs/` — raw dotfile contents (wezterm, niri, waybar, helix,
-  nvim, zellij, wallpapers, ...), source of truth linked in by
-  `home/modules/*.nix` via `xdg.configFile`. Several `*.old` dirs are
-  leftovers from a past migration (e.g. `zsh.old`, `tmux.old`,
+  nvim, zellij, ...), source of truth linked in by `home/modules/*.nix`
+  via `xdg.configFile`. Several `*.old` dirs are leftovers from a past
+  migration (e.g. `zsh.old`, `tmux.old`,
   `alacritty.old`) — not wired into any module, don't assume they're live.
 - `hosts/<hostname>/home/home.nix` — the home-manager entry point for
   that host (imported by `mkHost`/`mkMacHome` in `flake.nix`).
@@ -89,6 +89,10 @@ If a stricter convention is wanted later, mirror Foundry's
 ├── nixos-manager.sh            # deploy/rebuild wrapper (see below) — repo ROOT, not scripts/
 ├── treefmt.nix
 ├── .sops.yaml
+├── wallpapers/                 # global pool, same images for every host — linked by
+│                                # home/modules/desktop.nix into ~/.local/share/wallpapers;
+│                                # login.jpg is the regreet (login screen) background, excluded
+│                                # from the random pick; random-wallpaper script picks the rest
 ├── system/
 │   ├── overlays.nix            # rust-overlay wiring (pkgs.rust-bin)
 │   ├── profiles/
@@ -120,7 +124,7 @@ If a stricter convention is wanted later, mirror Foundry's
 │   │   └── {zsh,tmux,git,lazygit,atuin,btop,...}.nix
 │   ├── pkgs/
 │   └── configs/                # raw dotfile contents — SOURCE OF TRUTH, linked via xdg.configFile
-│       ├── wezterm/, niri/, waybar/, helix/, nvim/, zellij/, wallpapers/
+│       ├── wezterm/, niri/, waybar/, helix/, nvim/, zellij/
 │       └── *.old/              # leftovers from a past migration, not wired into any module
 ├── hosts/
 │   ├── dell1564/

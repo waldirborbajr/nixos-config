@@ -2,7 +2,7 @@
 
 spawn-at-startup "waybar"
 
-spawn-sh-at-startup "swaybg -i \"$HOME/Pictures/Wallpapers/wallpaper.jpg\" -m fill"
+spawn-at-startup "random-wallpaper"
 
 // Histórico de clipboard
 spawn-sh-at-startup "wl-paste --type text --watch cliphist store"

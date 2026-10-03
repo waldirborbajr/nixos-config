@@ -88,7 +88,7 @@
       };
 
       background = {
-        path = "${../../home/configs/wallpapers/login.jpg}";
+        path = "${../../wallpapers/login.jpg}";
         fit = "Fill";
       };
     };
