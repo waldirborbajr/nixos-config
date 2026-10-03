@@ -270,8 +270,10 @@ window-rule {
 }
 
 layer-rule {
-    // This is for swaybg; change for other wallpaper tools.
-    // Find the right namespace by running niri msg layers.
-    // match namespace="^wallpaper$"
+    // Escopo só pro swaybg (namespace "wallpaper" é o padrão dele).
+    // Sem o match, isso aplicava em TODA superfície layer-shell —
+    // waybar incluída. Confirme com `niri msg layers` se o namespace
+    // mudar numa versão futura do swaybg.
+    match namespace="^wallpaper$"
     place-within-backdrop true
 }
