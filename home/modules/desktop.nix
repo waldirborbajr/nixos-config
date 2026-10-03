@@ -114,7 +114,7 @@ in {
       (pkgs.writeShellScriptBin "random-wallpaper" ''
         set -euo pipefail
         dir="$HOME/.local/share/wallpapers"
-        pic=$(${pkgs.findutils}/bin/find "$dir" -maxdepth 1 -type f \
+        pic=$(${pkgs.findutils}/bin/find -L "$dir" -maxdepth 1 -type f \
           \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) \
           ! -iname 'login.jpg' \
           | ${pkgs.coreutils}/bin/shuf -n1)
