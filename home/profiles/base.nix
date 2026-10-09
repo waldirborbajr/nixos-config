@@ -55,36 +55,34 @@
   # ── Pacotes comuns (sem config própria) ──────────────────────────────
   # gh / gh-dash / delta / git → home/modules/git.nix
   # eza → home/modules/shell.nix
-  home.packages = with pkgs; [
-    asciinema
-    asciinema-agg
-    asciinema-scenario
-    kdlfmt
-    unzip
-    unrar
-    zip
-    p7zip
-    ffmpeg
-    marksman
+  home.packages = with pkgs;
+    lib.optionals pkgs.stdenv.hostPlatform.isLinux [
+      asciinema
+      asciinema-agg
+      asciinema-scenario
+      kdlfmt
+      unzip
+      unrar
+      zip
+      p7zip
+      ffmpeg
+      marksman
 
-    # CLI tools (faltando vs. ulyssecrn/nixos-config)
-    # tree não entra aqui — sem config própria, mora em
-    # system/profiles/base.nix (dono único, todo host já tem).
-    nmap
-    which
-    gawk
-    yt-dlp
-    dnsutils
-    xz
-    gnutar
-  ]
-  # traceroute, lm_sensors e usbutils só existem para Linux no nixpkgs;
-  # sem a guarda, o build aarch64-darwin (macbook) quebra.
-  ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
-    traceroute
-    lm_sensors # sensors
-    usbutils # lsusb
-  ];
+      # CLI tools (faltando vs. ulyssecrn/nixos-config)
+      # tree não entra aqui — sem config própria, mora em
+      # system/profiles/base.nix (dono único, todo host já tem).
+      nmap
+      which
+      gawk
+      yt-dlp
+      dnsutils
+      xz
+      gnutar
+
+      traceroute
+      lm_sensors # sensors
+      usbutils # lsusb
+    ];
 
   # editors.emacs.enable = true;
   # editors.neovim.enable = true;
