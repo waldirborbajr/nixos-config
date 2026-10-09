@@ -15,6 +15,7 @@
 # o que tem módulo/config dedicado entra via imports.
 {
   inputs,
+  lib,
   pkgs,
   ...
 }: {
@@ -73,12 +74,14 @@
     which
     gawk
     yt-dlp
-    traceroute
     dnsutils
     xz
     gnutar
-
-    # Monitoring tools
+  ]
+  # traceroute, lm_sensors e usbutils só existem para Linux no nixpkgs;
+  # sem a guarda, o build aarch64-darwin (macbook) quebra.
+  ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
+    traceroute
     lm_sensors # sensors
     usbutils # lsusb
   ];
