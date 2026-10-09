@@ -9,6 +9,15 @@
     ./modules/waybar.nix
   ];
 
+  # ==================== NEOVIM (só mac2011) ====================
+  # nightly = true → neovim-nightly-overlay (master do Neovim, versão
+  # mais recente que o nixpkgs estável). Trocar pra false pega o
+  # neovim do nixpkgs-unstable pinado no flake.lock.
+  editors.neovim = {
+    enable = true;
+    nightly = true;
+  };
+
   # ==================== PACOTES EXCLUSIVOS DESTE HOST ====================
   # darktable: vindo de hosts/macbook/home/home.nix.
   # brave/vlc: vindo de home/profiles/desktop.nix + system/profiles/x86/desktop.nix
