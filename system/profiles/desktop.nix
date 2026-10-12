@@ -145,6 +145,12 @@
       fontconfig # SkiaSharp (UI gráfica do RadioManager) precisa pra achar fontes
       freetype
       harfbuzz
+      # X11 — Avalonia (RadioManager) chama XInitThreads na inicialização
+      xorg.libX11
+      xorg.libXcursor
+      xorg.libXrandr
+      xorg.libXi
+      xorg.libXext
     ];
   };
 
