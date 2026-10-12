@@ -12,7 +12,7 @@
     owner = "waldirborbajr";
     repo = "NoIPClient";
     rev = "main"; # TROQUE por uma tag/commit fixo depois do primeiro build
-    hash = pkgs.lib.fakeHash; # o primeiro build mostra o hash real
+    hash = "sha256-NYFqQx0SkLfBy1JIoc5ioZ5AcC0vC5ZVQRASHqxFTk4=";
   };
   noipClient = pkgs.rustPlatform.buildRustPackage {
     pname = "noip-client";
