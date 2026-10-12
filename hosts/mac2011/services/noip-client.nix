@@ -54,7 +54,7 @@ in {
     wantedBy = ["timers.target"];
     timerConfig = {
       OnBootSec = "1min";
-      OnUnitActiveSec = "1h"; # README sugere 5min = ~288 msgs/dia no Telegram
+      OnUnitActiveSec = "3h"; # README sugere 5min = ~288 msgs/dia no Telegram
       Persistent = true;
     };
   };

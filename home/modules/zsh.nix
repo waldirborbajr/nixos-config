@@ -512,6 +512,11 @@
         # Setas -> history substring search
         bindkey '^[[A' history-substring-search-up
         bindkey '^[[B' history-substring-search-down
+
+        # Ctrl+L -> limpa a tela (zsh-vi-mode reconstrói os keymaps e
+        # perde o clear-screen padrão). Nos dois modos: insert e normal.
+        bindkey -M viins '^L' clear-screen
+        bindkey -M vicmd '^L' clear-screen
       }
     '';
   };
