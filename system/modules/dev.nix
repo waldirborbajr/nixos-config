@@ -148,6 +148,10 @@
         mold
         sccache
         llvmPackages.bintools
+
+        # ── Headers + openssl.pc (equivalente ao libssl-dev do Ubuntu) ──
+        # openssl "puro" não traz o .pc; o output .dev traz.
+        openssl.dev
       ];
 
       # ── Variáveis de ambiente ──────────────────────────────────────
@@ -156,6 +160,8 @@
         RUSTC_WRAPPER = "${pkgs.sccache}/bin/sccache";
         CARGO_TERM_COLOR = "always";
         CARGO_TERM_HYPERLINKS = "false";
+        # Faz o pkg-config (e o openssl-sys) achar openssl.pc fora do nix build
+        PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
       };
     })
 
