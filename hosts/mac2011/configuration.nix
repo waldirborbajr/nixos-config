@@ -19,6 +19,9 @@
     ../../system/modules/mac-family.nix
     ../../system/modules/broadcom-wifi.nix
 
+    # No-IP Client
+    ./services/noip-client.nix
+
     # Containers — só mac2011. Descomente pra ativar (independentes entre si):
     # ../../system/profiles/x86/docker.nix
     # ../../system/profiles/x86/podman.nix
