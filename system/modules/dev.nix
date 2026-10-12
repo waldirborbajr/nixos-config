@@ -49,6 +49,7 @@
         openssl
         zlib
         jq
+        just # command runner (justfile) — ferramenta genérica de dev
 
         # Source/code navigation
         fd
