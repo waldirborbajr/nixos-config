@@ -151,6 +151,8 @@
       xorg.libXrandr
       xorg.libXi
       xorg.libXext
+      xorg.libICE # sessão X11 (Avalonia chama IceAddConnectionWatch)
+      xorg.libSM # gerenciamento de sessão, sempre junto do libICE
     ];
   };
 
