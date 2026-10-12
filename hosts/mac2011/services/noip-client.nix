@@ -11,14 +11,17 @@
   src = pkgs.fetchFromGitHub {
     owner = "waldirborbajr";
     repo = "NoIPClient";
-    rev = "main"; # TROQUE por uma tag/commit fixo depois do primeiro build
-    hash = "sha256-NYFqQx0SkLfBy1JIoc5ioZ5AcC0vC5ZVQRASHqxFTk4=";
+    rev = "358397518583aef77abf26217a7aa4fc0f320100";
+    hash = "sha256-v6qAIA56SIQjmWJeVocLs82saYhk4HoI42Y6wZSXngY=";
   };
   noipClient = pkgs.rustPlatform.buildRustPackage {
     pname = "noip-client";
     version = "0.1.0";
     inherit src;
     cargoLock.lockFile = "${src}/Cargo.lock";
+    # openssl-sys (via reqwest/native-tls) precisa de pkg-config + openssl
+    nativeBuildInputs = [pkgs.pkg-config];
+    buildInputs = [pkgs.openssl];
   };
 in {
   # Segredo: chave `noip-env` dentro de hosts/mac2011/secrets/mac2011.yaml,
