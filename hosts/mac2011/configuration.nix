@@ -18,7 +18,6 @@
     ../../system/profiles/x86/desktop.nix
     ../../system/modules/mac-family.nix
     ../../system/modules/broadcom-wifi.nix
-
   ];
 
   # O módulo hardware.bluetooth do NixOS força General.ControllerMode =
@@ -39,7 +38,7 @@
     go.enable = true;
     rust.enable = true;
     sqlite.enable = true;
-    nix.enable = true;
+    nix.enable = false;
 
     # ── Disponíveis (desligadas) ──
     python.enable = false;
