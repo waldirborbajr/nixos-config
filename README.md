@@ -75,7 +75,7 @@ detalhes de arquitetura.
   compartilhada com `macvmf` em `system/modules/mac-vm.nix`
 - Containers: nenhum por padrão — Docker/Podman/Kubernetes são opt-in
   aqui igual em qualquer outro host (ver seção "Containers / Kubernetes"
-  abaixo); hoje só `mac2011` tem o import comentado pronto
+  abaixo); hoje só `mac2011` liga o Docker (flag `development.containers.docker.enable`)
 - `boot.kernelParams = [ "mitigations=off" ]` — ganho de performance em VM
 
 ### 🍏 Apple Silicon VM (VMware Fusion) — `macvmf`
@@ -148,11 +148,10 @@ development.languages = {
 };
 ```
 
-**Import comentado ("import = enable")** — `system/profiles/x86/{docker,podman,kubernetes}.nix`
-não têm nenhuma `option`; o módulo simplesmente liga o que declara se
-for importado. Pra ativar num host, descomente a linha correspondente
-no `imports` do `configuration.nix` dele (ver seção "Containers /
-Kubernetes" abaixo). O mesmo padrão existe no lado home-manager:
+**Flag `enable` (containers)** — `system/profiles/x86/{docker,podman,kubernetes}.nix`
+declaram `development.containers.<x>.enable` (default `false`), o mesmo
+padrão do `dev.nix`. Pra ativar num host, troque a flag no
+`configuration.nix` dele (ver seção "Containers / Kubernetes" abaixo). O mesmo padrão existe no lado home-manager:
 `home/modules/wezterm.nix` e `home/modules/kitty.nix` estão escritos mas
 não importados por nenhum `home/profiles/*.nix` — o terminal padrão
 continua Alacritty.
@@ -180,9 +179,9 @@ pra todos os hosts:
 | `system/modules/mac-family.nix` | Teclado, Firefox Dev Edition, pacotes — só família Mac |
 | `system/modules/mac-vm.nix` | Camada em cima de `mac-family.nix`, só `macutm`/`macvmf` |
 | `system/modules/broadcom-wifi.nix` | Firmware Wi-Fi Broadcom — `dell1564` + `mac2011` |
-| `system/profiles/x86/docker.nix` ⚠️ opt-in | Docker Engine (`enableOnBoot = false`, socket-activated) + grupo `docker` + `docker-compose`/`lazydocker` — import comentado, veja seção "Containers / Kubernetes" abaixo |
-| `system/profiles/x86/podman.nix` ⚠️ opt-in | Podman rootless + `dockerCompat` (ganha o comando `docker` se o Docker Engine não estiver ligado) + `podman-compose` + timer semanal de auto-update — import comentado |
-| `system/profiles/x86/kubernetes.nix` ⚠️ opt-in | `k3d` + `kubectl` + `k9s` (cluster local leve, sem systemd) — import comentado, precisa de docker.nix ou podman.nix ligado junto |
+| `system/profiles/x86/docker.nix` ⚠️ opt-in | Docker Engine (`enableOnBoot = false`, socket-activated) + grupo `docker` + `docker-compose`/`lazydocker` — flag `development.containers.docker.enable`, veja seção "Containers / Kubernetes" abaixo |
+| `system/profiles/x86/podman.nix` ⚠️ opt-in | Podman rootless + `dockerCompat` (ganha o comando `docker` se o Docker Engine não estiver ligado) + `podman-compose` + timer semanal de auto-update — flag `development.containers.podman.enable` |
+| `system/profiles/x86/kubernetes.nix` ⚠️ opt-in | `k3d` + `kubectl` + `k9s` (cluster local leve, sem systemd) — flag `development.containers.kubernetes.enable`, precisa de docker ou podman ligado no mesmo host (assertion) |
 
 Pra editar algo, vá direto no arquivo do tópico — não tem
 `configuration.nix` monolítico pra navegar.
@@ -192,26 +191,28 @@ ______________________________________________________________________
 ## 🐳 Containers / Kubernetes (opt-in, desligado por padrão)
 
 Docker, Podman e Kubernetes local são usados só em projetos específicos,
-não no dia a dia — por isso os 3 módulos existem no repo mas ficam **com
-o import comentado**. Hoje só `hosts/mac2011/configuration.nix` tem essas
-linhas (comentadas). Pra usar:
+não no dia a dia — por isso os 3 módulos existem no repo mas ficam
+**desligados** (`enable = false`). Hoje só `hosts/mac2011/configuration.nix`
+liga o Docker. Pra usar:
 
-```bash
-# hosts/mac2011/configuration.nix — descomente a(s) linha(s) relevante(s):
-# ../../system/profiles/x86/docker.nix
-# ../../system/profiles/x86/podman.nix
-# ../../system/profiles/x86/kubernetes.nix
+```nix
+# hosts/<host>/configuration.nix
+development.containers = {
+  docker.enable = true;
+  podman.enable = false;
+  kubernetes.enable = false; # precisa de docker ou podman ligado
+};
 ```
 
 depois rode o rebuild normal (`./nixos-manager.sh flake` ou `build`).
-Quando não precisar mais, comente de novo e rebuild — nenhum dos três
+Quando não precisar mais, troque pra `false` e rebuild — nenhum dos três
 deixa serviço rodando à toa nesse estado desligado.
 
 | Módulo | O que dá | Footprint quando ligado mas sem uso |
 |---|---|---|
-| `x86/docker.nix` | Docker Engine + `docker-compose`/`lazydocker` | Zero — `enableOnBoot = false`, o daemon só sobe ao tocar o socket (`docker ps` etc.); depois de subir, fica rodando até `systemctl stop docker` ou reboot |
-| `x86/podman.nix` | Podman rootless + `dockerCompat` (alias `docker`, só se `x86/docker.nix` não estiver ligado junto) + `podman-compose` + timer semanal de auto-update | Zero sempre — sem daemon, é fork-per-comando; o timer só mexe em containers com o label `io.containers.autoupdate = "registry"` |
-| `x86/kubernetes.nix` | `k3d` + `kubectl` + `k9s` | Zero — são só binários, sem serviço systemd; o cluster só existe entre `k3d cluster create` e `k3d cluster delete` |
+| `x86/docker.nix` (`development.containers.docker`) | Docker Engine + `docker-compose`/`lazydocker` | Zero — `enableOnBoot = false`, o daemon só sobe ao tocar o socket (`docker ps` etc.); depois de subir, fica rodando até `systemctl stop docker` ou reboot |
+| `x86/podman.nix` (`development.containers.podman`) | Podman rootless + `dockerCompat` (alias `docker`, só se `development.containers.docker` não estiver ligado junto) + `podman-compose` + timer semanal de auto-update | Zero sempre — sem daemon, é fork-per-comando; o timer só mexe em containers com o label `io.containers.autoupdate = "registry"` |
+| `x86/kubernetes.nix` (`development.containers.kubernetes`) | `k3d` + `kubectl` + `k9s` | Zero — são só binários, sem serviço systemd; o cluster só existe entre `k3d cluster create` e `k3d cluster delete` |
 
 > **`k9s` sozinho não sobe cluster nenhum** — é só um dashboard/TUI pra um
 > cluster que já existe (via kubeconfig), local ou remoto. Pra ter

@@ -13,9 +13,9 @@ one standalone macOS home-manager profile:
   `base.nix` (kernel, ssh, sops, dev.nix, ssh-trust.nix, boot basics —
   every host), `desktop.nix` (GUI layer), `server.nix`,
   `x86/desktop.nix` (x86-only desktop extras). `x86/docker.nix`,
-  `x86/podman.nix`, `x86/kubernetes.nix` are **import = enable**: not
-  imported by any profile, only opted into per-host (currently
-  commented out in `hosts/mac2011/configuration.nix`).
+  `x86/podman.nix`, `x86/kubernetes.nix` are imported by `base.nix` and
+  turned on per host via `development.containers.<x>.enable` (default
+  off; see `hosts/mac2011/configuration.nix`).
 - `system/modules/` — single-purpose system modules: `dev.nix`
   (`development.languages.<lang>.enable`, per-host toggle — see
   mac2011 for the pattern), `ssh-trust.nix` (SSH known_hosts +
@@ -101,9 +101,9 @@ If a stricter convention is wanted later, mirror Foundry's
 │   │   ├── server.nix
 │   │   └── x86/
 │   │       ├── desktop.nix     # x86-only desktop extras
-│   │       ├── docker.nix      # import = enable, opt-in per host
-│   │       ├── podman.nix      # import = enable, opt-in per host
-│   │       └── kubernetes.nix  # import = enable, opt-in per host (needs docker or podman)
+│   │       ├── docker.nix      # development.containers.docker.enable
+│   │       ├── podman.nix      # development.containers.podman.enable
+│   │       └── kubernetes.nix  # development.containers.kubernetes.enable (needs docker or podman)
 │   └── modules/
 │       ├── dev.nix             # development.languages.<lang>.enable, per host
 │       ├── ssh-trust.nix       # cross-host known_hosts + authorizedKeys
@@ -149,17 +149,14 @@ If a stricter convention is wanted later, mirror Foundry's
     └── logitech-k380-bluetooth-linux-fix/
 ```
 
-### `system/` vs `home/` opt-in pattern ("import = enable")
+### `system/` opt-in pattern (`enable` flags)
 
-`system/profiles/x86/{docker,podman,kubernetes}.nix` follow a pattern
-used for anything that should be opt-in per host: the module has **no**
-`options`/`enable` — if a host's `configuration.nix` imports it, it's on;
-if not, it's off. To activate, uncomment the import line in that host's
-`configuration.nix` (see `hosts/mac2011/configuration.nix`). This is
-different from `system/modules/dev.nix`, which uses real
-`development.languages.<lang>.enable` options set inside the host's
-`configuration.nix` (also per-host, but toggled with a boolean instead
-of an import).
+`system/profiles/x86/{docker,podman,kubernetes}.nix` declare real options
+(`development.containers.<x>.enable`, default `false`), the same pattern
+as `system/modules/dev.nix` (`development.languages.<lang>.enable`). They
+are imported once by `system/profiles/base.nix`, so every host has the
+options; each host turns on what it needs in its `configuration.nix`.
+Do **not** comment/uncomment imports to activate these — flip the flag.
 
 `home/modules/wezterm.nix` and `home/modules/kitty.nix` are written but
 not imported by any `home/profiles/*.nix` — same opt-in idea, at the
