@@ -146,13 +146,13 @@
       freetype
       harfbuzz
       # X11 — Avalonia (RadioManager) chama XInitThreads na inicialização
-      xorg.libX11
-      xorg.libXcursor
-      xorg.libXrandr
-      xorg.libXi
-      xorg.libXext
-      xorg.libICE # sessão X11 (Avalonia chama IceAddConnectionWatch)
-      xorg.libSM # gerenciamento de sessão, sempre junto do libICE
+      libx11
+      libxcursor
+      libxrandr
+      libxi
+      libxext
+      libice # sessão X11 (Avalonia chama IceAddConnectionWatch)
+      libsm # gerenciamento de sessão, sempre junto do libICE
     ];
   };
 
