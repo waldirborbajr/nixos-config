@@ -19,13 +19,6 @@
     ../../system/modules/mac-family.nix
     ../../system/modules/broadcom-wifi.nix
 
-    # No-IP Client
-    ./services/noip-client.nix
-
-    # Containers — só mac2011. Descomente pra ativar (independentes entre si):
-    # ../../system/profiles/x86/docker.nix
-    # ../../system/profiles/x86/podman.nix
-    # ../../system/profiles/x86/kubernetes.nix # k3d/kubectl/k9s — precisa de docker OU podman
   ];
 
   # O módulo hardware.bluetooth do NixOS força General.ControllerMode =
@@ -57,6 +50,14 @@
     mariadb.enable = false;
     mongodb.enable = false;
     ferretdb.enable = false;
+  };
+
+  # ==================== CONTAINERS (toggles — system/profiles/x86/) ====================
+  # Docker e Podman são independentes; kubernetes precisa de um dos dois.
+  development.containers = {
+    docker.enable = true;
+    podman.enable = false;
+    kubernetes.enable = false;
   };
 
   # Ferramentas de debug wireless (úteis só com o chip físico)
