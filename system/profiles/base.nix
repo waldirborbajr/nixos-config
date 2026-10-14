@@ -18,6 +18,9 @@ in {
   imports = [
     ../modules/dev.nix
     ../modules/ssh-trust.nix
+    ./x86/docker.nix
+    ./x86/podman.nix
+    ./x86/kubernetes.nix
   ];
 
   # ==================== KERNEL ====================
