@@ -39,9 +39,9 @@
     go.enable = true;
     rust.enable = true;
     sqlite.enable = true;
+    nix.enable = true;
 
     # ── Disponíveis (desligadas) ──
-    nix.enable = false;
     python.enable = false;
     lua.enable = false;
     arduino.enable = false;
