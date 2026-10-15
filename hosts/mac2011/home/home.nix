@@ -27,6 +27,14 @@
     gnome-text-editor
     brave
     vlc
-    anydesk
+    # AnyDesk: o cliente GTK falha em "cannot open display :0" com
+    # GDK_BACKEND=wayland (padrão da sessão). Forçar x11 só neste binário,
+    # sem mudar a variável global.
+    (pkgs.symlinkJoin {
+      name = "anydesk-x11";
+      paths = [pkgs.anydesk];
+      nativeBuildInputs = [pkgs.makeWrapper];
+      postBuild = "wrapProgram $out/bin/anydesk --set GDK_BACKEND x11";
+    })
   ];
 }
