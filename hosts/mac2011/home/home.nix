@@ -27,5 +27,6 @@
     gnome-text-editor
     brave
     vlc
+    anydesk
   ];
 }
