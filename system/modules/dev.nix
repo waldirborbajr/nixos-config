@@ -153,6 +153,22 @@
         # ── Headers + openssl.pc (equivalente ao libssl-dev do Ubuntu) ──
         # openssl "puro" não traz o .pc; o output .dev traz.
         openssl.dev
+
+        # ── Libs nativas de GUI/teclado/tela (winit, egui, enigo, screenshots) ──
+        # Lib (runtime) + .dev (headers + .pc) de cada uma.
+        libxcb
+        libxcb.dev
+        xdotool # libxdo (enigo)
+        libx11
+        libx11.dev
+        libxkbcommon
+        libxkbcommon.dev
+        wayland
+        wayland.dev
+        dbus
+        dbus.dev
+        libGL
+        libGL.dev
       ];
 
       # ── Variáveis de ambiente ──────────────────────────────────────
@@ -162,7 +178,15 @@
         CARGO_TERM_COLOR = "always";
         CARGO_TERM_HYPERLINKS = "false";
         # Faz o pkg-config (e o openssl-sys) achar openssl.pc fora do nix build
-        PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
+        PKG_CONFIG_PATH = lib.makeSearchPath "lib/pkgconfig" [
+          pkgs.openssl.dev
+          pkgs.libxcb.dev
+          pkgs.libx11.dev
+          pkgs.libxkbcommon.dev
+          pkgs.wayland.dev
+          pkgs.dbus.dev
+          pkgs.libGL.dev
+        ];
       };
     })
 
