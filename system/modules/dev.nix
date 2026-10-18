@@ -200,6 +200,18 @@
           pkgs.dbus.dev
           pkgs.libGL.dev
         ];
+        # Runtime (dlopen): winit/eframe carregam wayland, xkbcommon e GL em
+        # tempo de execução. O ld.so do NixOS não procura em /run/current-system,
+        # então essas libs precisam estar no LD_LIBRARY_PATH.
+        LD_LIBRARY_PATH = lib.makeLibraryPath [
+          pkgs.wayland
+          pkgs.libxkbcommon
+          pkgs.libGL
+          pkgs.libx11
+          pkgs.libxcursor
+          pkgs.libxi
+          pkgs.libxrandr
+        ];
         # Linker (mold/cc) precisa achar libxcb.so, libx11.so etc. — o link
         # sem versão nem sempre está no output .dev. Cobre lib e dev.
         LIBRARY_PATH = lib.makeSearchPath "lib" [
