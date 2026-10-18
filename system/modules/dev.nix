@@ -187,6 +187,18 @@
           pkgs.dbus.dev
           pkgs.libGL.dev
         ];
+        # Linker (mold/cc) precisa achar libxcb.so, libx11.so etc. — o link
+        # sem versão nem sempre está no output .dev. Cobre lib e dev.
+        LIBRARY_PATH = lib.makeSearchPath "lib" [
+          pkgs.libxcb
+          pkgs.xdotool
+          pkgs.libx11
+          pkgs.libxkbcommon
+          pkgs.wayland
+          pkgs.dbus
+          pkgs.libGL
+          pkgs.openssl
+        ];
       };
     })
 
