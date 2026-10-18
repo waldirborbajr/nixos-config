@@ -79,6 +79,8 @@
     xz
     gnutar
 
+    kondo
+
     # Monitoring tools
     lm_sensors # sensors
     usbutils # lsusb
