@@ -94,6 +94,10 @@
 
     # ---------- ~/.zshenv (fora do ZDOTDIR) ----------
     envExtra = ''
+      # zsh-autosuggestions envolve todo widget ligado a tecla. Sem excluir
+      # clear-screen, o Ctrl+L passa pelo wrapper e quebra. Lista padrão
+      # do plugin + clear-screen (definida antes do plugin carregar).
+      ZSH_AUTOSUGGEST_IGNORE_WIDGETS=(orig-\* beep run-help set-local-history which-command yank yank-pop zle-\* clear-screen)
       # ---------- XDG base directories ----------
       export XDG_CACHE_HOME=''${XDG_CACHE_HOME:-$HOME/.cache}
       export XDG_CONFIG_HOME=''${XDG_CONFIG_HOME:-$HOME/.config}
