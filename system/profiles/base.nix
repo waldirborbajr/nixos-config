@@ -46,11 +46,6 @@ in {
   networking.networkmanager.enable = true;
   networking.firewall.allowedTCPPorts = [22];
 
-  # As duas linhas abaixo evitam problema de DNS com o tailscale — mesmo
-  # padrão do ulyssecrn: https://github.com/tailscale/tailscale/issues/4254
-  services.resolved.enable = true;
-  networking.useNetworkd = false;
-
   # ==================== TIME / LOCALE ====================
   time.timeZone = "America/Sao_Paulo";
 

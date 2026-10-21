@@ -110,5 +110,10 @@
     ];
   };
 
+  # Ajustes de DNS usados pelo Tailscale.
+  # https://github.com/tailscale/tailscale/issues/4254
+  services.resolved.enable = true;
+  networking.useNetworkd = false;
+
   system.stateVersion = "26.05";
 }
