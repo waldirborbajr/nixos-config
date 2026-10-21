@@ -21,6 +21,7 @@ in {
     ./x86/docker.nix
     ./x86/podman.nix
     ./x86/kubernetes.nix
+    ../modules/always-on.nix
   ];
 
   # ==================== KERNEL ====================
