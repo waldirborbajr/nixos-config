@@ -87,11 +87,10 @@
   );
 
   # ==================== TAILSCALE (exit node + rota da LAN) ====================
-  # services.tailscale.enable já vem de system/profiles/base.nix (todo
-  # host). Isso aqui é a parte extra — anunciar a LAN (192.168.0.0/24)
-  # e servir de exit node — que só UM host deve fazer. Por enquanto é o
-  # mac2011, porque é o que fica ligado; mas ele não é a escolha ideal
-  # a longo prazo, pensando em consumo de energia/sempre-ligado.
+  # Tailscale ativo neste host como servidor, anunciando a LAN
+  # (192.168.0.0/24) e atuando como exit node. Só UM host deve fazer isso.
+  # Por enquanto é o mac2011, porque é o que fica ligado; mas ele não é a
+  # escolha ideal a longo prazo, pensando em consumo de energia/sempre-ligado.
   #
   # Quando o novo nó headless (só texto) entrar na rede, é melhor mover
   # este bloco pra lá (ele tende a ficar ligado 24/7, exit node pede
@@ -102,6 +101,7 @@
   #   4. No painel da tailnet (ou via `tailscale up` no host novo),
   #      aprove a rota anunciada se sua ACL não aprovar automático.
   services.tailscale = {
+    enable = true;
     useRoutingFeatures = "server";
     openFirewall = true;
     extraSetFlags = [
