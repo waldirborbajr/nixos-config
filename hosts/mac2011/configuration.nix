@@ -39,9 +39,9 @@
     go.enable = true;
     rust.enable = true;
     sqlite.enable = true;
+    nix.enable = true;
 
     # ── Disponíveis (desligadas) ──
-    nix.enable = false;
     python.enable = false;
     lua.enable = false;
     arduino.enable = false;
@@ -82,6 +82,7 @@
       pwgen
       libqalculate # qalc: calculadora com conversão de unidades
       telegram-desktop
+      # zapfast moved to unstable hosts/mac2011/home.nix
     ]
   );
 

@@ -1,5 +1,9 @@
 # hosts/mac2011/home/home.nix
-{pkgs, ...}: {
+{
+  pkgs,
+  pkgs-unstable,
+  ...
+}: {
   imports = [
     ../../../home/profiles/base.nix
     ../../../home/profiles/desktop.nix
@@ -36,5 +40,7 @@
       nativeBuildInputs = [pkgs.makeWrapper];
       postBuild = "wrapProgram $out/bin/anydesk --set GDK_BACKEND x11";
     })
+    # ZapFast (cliente WhatsApp não oficial) — só mac2011, do nixpkgs-unstable.
+    pkgs-unstable.zapfast
   ];
 }
