@@ -7,42 +7,47 @@ NixOS - BORBA JR, W - Configuration
 
 [![Nix](https://github.com/waldirborbajr/nixos-config/actions/workflows/nix.yaml/badge.svg)](https://github.com/waldirborbajr/nixos-config/actions/workflows/nix.yaml)
 
-Flake multi-host (`flake.nix` → `hosts/<host>/configuration.nix` de cada
-host, importando perfis/módulos compartilhados de `system/profiles/` e
-`system/modules/` — sem `configuration.nix` raiz único —, com módulos
-como `system/modules/mac-family.nix` para a família Mac), com
-[Home Manager](https://github.com/nix-community/home-manager) cuidando
-do usuário (`hosts/<host>/home/home.nix` + `home/profiles/` +
-`home/modules/` + `home/configs/`) e
-[sops-nix](https://github.com/Mic92/sops-nix) cuidando dos segredos por
-host. Ver [`docs/architecture.md`](docs/architecture.md) e
-[`docs/DENDRITIC-PATTERN.md`](docs/DENDRITIC-PATTERN.md) para mais
-detalhes de arquitetura.
+A multi-host flake (`flake.nix` → each host's
+`hosts/<host>/configuration.nix`, importing shared profiles/modules from
+`system/profiles/` and `system/modules/` — there is no single root
+`configuration.nix` —, with modules such as
+`system/modules/mac-family.nix` shared by the Mac family). [Home
+Manager](https://github.com/nix-community/home-manager) manages the user
+environment (`hosts/<host>/home/home.nix` + `home/profiles/` +
+`home/modules/` + `home/configs/`), while
+[sops-nix](https://github.com/Mic92/sops-nix) manages per-host secrets.
+See [`docs/architecture.md`](docs/architecture.md) for a conceptual
+overview of the layers. [`docs/DENDRITIC-PATTERN.md`](docs/DENDRITIC-PATTERN.md)
+is an aspirational reference, not a literal description of the current tree.
 
 ## 🖥️ Supported Hardware
 
-> ⚠️ Desktop stack atual (todos os 4 hosts): **niri** (Wayland
+> ⚠️ Current desktop stack (all 4 hosts): **niri** (Wayland
 > scrollable-tiling compositor) + **waybar** + **greetd + regreet**
-> (`cage` + `regreet`, tema Catppuccin Mocha) como greeter/display manager.
-> Não há i3/X11, GNOME/GDM nem `ly` em nenhum host — só a combinação acima
-> (ver seções `NIRI`, `GREETD + REGREET` em `configuration.nix`).
+> (`cage` + `regreet`, Catppuccin Mocha theme) as the greeter/display
+> manager. No host uses i3/X11, GNOME/GDM, or `ly`; all use the stack
+> above (see `system/profiles/desktop.nix`; host files import this profile
+> and add hardware-specific settings).
 
 ### 🍎 MacBook Pro 13" (2011) — `mac2011`
 
 - Architecture: x86_64
 - RAM: 16 GB
 - Storage: 500 GB SSD
-- Role: main workstation (hardware físico)
+- Role: main workstation (physical hardware)
 - Desktop: niri + waybar (Wayland, via greetd/regreet)
-- Wi-Fi: Broadcom BCM4331, driver open-source `b43` (o `broadcom-sta`
-  proprietário está desativado — quebra ao compilar contra kernel ≥ 7.1)
-- Bluetooth: `hardware.bluetooth.settings.General.ControllerMode` forçado
-  para `"bredr"` (`lib.mkForce`) — o controlador Broadcom interno é BR/EDR
-  clássico puro, sem LE de verdade; o default do módulo NixOS (`"dual"`)
-  não bate com o hardware
-- Extras só deste host: `spotify`, `chirp` (CPS de rádio), ferramentas de
-  debug wireless (`iw`, `wirelesstools`) — não disponíveis/aplicáveis nas
-  VMs aarch64
+- Wi-Fi: Broadcom BCM4331, open-source `b43` driver (the proprietary
+  `broadcom-sta` driver is disabled because it fails to build against
+  kernel ≥ 7.1)
+- Bluetooth: `hardware.bluetooth.settings.General.ControllerMode` is
+  forced to `"bredr"` (`lib.mkForce`) — the built-in Broadcom controller
+  supports classic BR/EDR only, not true LE; the NixOS module's default
+  (`"dual"`) does not match the hardware
+- Tailscale: the only host configured as a server; advertises the
+  `192.168.0.0/24` LAN route and acts as an exit node
+- Host-specific extras: `spotify`, `chirp` (radio programming software),
+  and wireless debugging tools (`iw`, `wirelesstools`), which are not
+  available or applicable to the aarch64 VMs
 - Launcher: [Vicinae](https://github.com/vicinaehq/vicinae) (Raycast-like)
 
 ### 💻 Dell Inspiron 1564 — `dell1564`
@@ -50,181 +55,180 @@ detalhes de arquitetura.
 - Architecture: x86_64
 - RAM: 4 GB
 - Storage: 120 GB SSD
-- Role: basic usage / study machine
+- Role: basic use / study machine
 - Desktop: niri + waybar (Wayland, via greetd/regreet)
-- Boot: BIOS legado + GRUB (`/dev/sda`); os demais hosts usam
+- Boot: legacy BIOS + GRUB (`/dev/sda`); the other hosts use
   `systemd-boot`/EFI
-- Teclado: ABNT2 (`br-abnt2`)
-- Wi-Fi: Broadcom BCM4312 (LP-PHY), driver open-source `b43` + firmware
-  fixado em `b43Firmware_6_30_163_46` (versão específica para chips LP-PHY;
-  o `wl` proprietário foi tentado e abandonado — incompatível com kernels
-  recentes)
-- Sem Vicinae, sem containers, sem pacotes pesados — é a máquina mais fraca
-  do parque
-- Nota: hostname legado da máquina física era `dell1456`; o flake usa
-  `dell1564` (ver alias em `nixos-manager.sh` e em `manage-ssh-sops.sh`).
-  Confirme o nome de modelo real do hardware antes de considerar um dos
-  dois um typo.
+- Keyboard: ABNT2 (`br-abnt2`)
+- Wi-Fi: Broadcom BCM4312 (LP-PHY), open-source `b43` driver + firmware
+  pinned to `b43Firmware_6_30_163_46` (a version specifically for LP-PHY
+  chips; the proprietary `wl` driver was tested and abandoned because it
+  is incompatible with recent kernels)
+- No Vicinae, containers, or heavyweight packages — this is the least
+  powerful machine in the fleet
+- Note: the machine's legacy hostname was `dell1456`; the flake uses
+  `dell1564` (see the aliases in `nixos-manager.sh` and
+  `manage-ssh-sops.sh`). Verify the machine's actual model name before
+  treating either hostname as a typo.
 
 ### 🍏 Apple Silicon VM (UTM) — `macutm`
 
 - Architecture: aarch64
-- Role: workstation em VM (UTM)
-- Desktop: niri + waybar (Wayland, via greetd/regreet — renderer por
-  software forçado: `WLR_RENDERER=pixman`, `GSK_RENDERER=cairo`), base
-  compartilhada com `macvmf` em `system/modules/mac-vm.nix`
-- Containers: nenhum por padrão — Docker/Podman/Kubernetes são opt-in
-  aqui igual em qualquer outro host (ver seção "Containers / Kubernetes"
-  abaixo); hoje só `mac2011` liga o Docker (flag `development.containers.docker.enable`)
-- `boot.kernelParams = [ "mitigations=off" ]` — ganho de performance em VM
+- Role: workstation in a VM (UTM)
+- Desktop: niri + waybar (Wayland, via greetd/regreet — software
+  rendering forced with `WLR_RENDERER=pixman` and `GSK_RENDERER=cairo`);
+  shares its base with `macvmf` in `system/modules/mac-vm.nix`
+- Containers: none by default — Docker/Podman/Kubernetes are opt-in here,
+  as on every other host (see "Containers / Kubernetes" below); currently
+  only `mac2011` enables Docker (`development.containers.docker.enable`)
+- `boot.kernelParams = [ "mitigations=off" ]` — VM performance improvement
 
 ### 🍏 Apple Silicon VM (VMware Fusion) — `macvmf`
 
 - Architecture: aarch64
-- Role: workstation em VM (VMware Fusion), guest agent
+- Role: workstation in a VM (VMware Fusion), with the guest agent
   `virtualisation.vmware.guest.enable`
-- Desktop: niri + waybar (Wayland, via greetd/regreet), mesma base
-  compartilhada de `macutm` (`system/modules/mac-vm.nix`)
-- Containers: opt-in, mesma observação de `macutm` acima
+- Desktop: niri + waybar (Wayland, via greetd/regreet), sharing the same
+  base as `macutm` (`system/modules/mac-vm.nix`)
+- Containers: opt-in; see the `macutm` note above
 
-### 🍏 MacBook M2 (físico) — `macbook` (Home Manager standalone)
+### 🍏 MacBook M2 (physical) — `macbook` (standalone Home Manager)
 
 - Architecture: aarch64-darwin
-- Role: instalador de apps no dia a dia — **não** é uma
-  `nixosConfiguration`, é uma entrada `homeConfigurations."borba@macbook"`
-  (home-manager standalone, via `mkMacHome` em `flake.nix`)
-- Sem nix-darwin, sem niri/waybar/greetd — nenhuma gestão de sistema ou
-  desktop, só `home-manager switch` cuidando de pacotes de usuário e
-  dotfiles
-- Importa só `home/profiles/base.nix` (shell, editors, cli-and-terminal,
-  git, terminal emulators) — **sem** `home/profiles/desktop.nix` (que é
-  só pra niri/Wayland, não faz sentido em macOS)
-- `home.packages` próprios deste host (`hosts/macbook/home/home.nix`):
-  hoje só `darktable` — editores (`neovim`/`helix`/`emacs`, toggles em
-  `home/modules/editors.nix`) vêm do `home/profiles/base.nix`
-  compartilhado, não precisam ser repetidos aqui
-- `home.homeDirectory` sobrescrito pra `/Users/borba` via `lib.mkForce`,
-  já que os módulos de identidade assumem `/home/borba` (Linux) por padrão
-- `backupFileExtension = "hm-backup"` vem de `system/profiles/base.nix`
-  (compartilhado) — dotfile pré-existente e não gerido pelo Nix vira
-  `<arquivo>.hm-backup` em vez de ser sobrescrito sem cópia, já na
-  primeira ativação
-- **Pacotes das VMs (`macutm`/`macvmf`) ou de módulos `system/*` não
-  chegam aqui** — são `nixosConfigurations` completamente separadas; só o
-  que está em `home/profiles/base.nix`/`home/modules/` ou direto em
-  `hosts/macbook/home/home.nix` é compartilhado com este host
-- Uso: `./nixos-manager.sh macbook` (ou menu `m`) — ver seção do
-  `nixos-manager.sh` abaixo
+- Role: daily app installation — **not** a `nixosConfiguration`, but a
+  `homeConfigurations."borba@macbook"` entry (standalone Home Manager,
+  through `mkMacHome` in `flake.nix`)
+- No nix-darwin, niri, waybar, or greetd — no system or desktop
+  management; `home-manager switch` manages user packages and dotfiles
+- Imports only `home/profiles/base.nix` (shell, editors, cli-and-terminal,
+  git, terminal emulators) — **not** `home/profiles/desktop.nix`, which
+  is for niri/Wayland and does not apply to macOS
+- Host-specific `home.packages` (`hosts/macbook/home/home.nix`): currently
+  only `darktable` — editors (`neovim`/`helix`/`emacs`, toggled in
+  `home/modules/editors.nix`) come from the shared
+  `home/profiles/base.nix` and do not need to be repeated here
+- `home.homeDirectory` is overridden to `/Users/borba` via `lib.mkForce`,
+  since identity modules assume `/home/borba` (Linux) by default
+- `backupFileExtension = "hm-backup"` comes from the shared
+  `system/profiles/base.nix` — a pre-existing dotfile not managed by Nix
+  is renamed to `<file>.hm-backup` instead of being overwritten without
+  a backup, starting with the first activation
+- **Packages from the VMs (`macutm`/`macvmf`) or `system/*` modules do not
+  reach this host** — these are entirely separate `nixosConfigurations`;
+  only settings from `home/profiles/base.nix`, `home/modules/`, or
+  `hosts/macbook/home/home.nix` are shared with this host
+- Usage: `./nixos-manager.sh macbook` (or menu option `m`) — see the
+  `nixos-manager.sh` section below
 
-### Base compartilhada da família Mac (`system/modules/mac-family.nix`)
+### Shared Mac family base (`system/modules/mac-family.nix`)
 
-Programas, teclado (`us` + variante `mac`) e browser (Firefox Developer
-Edition) usados por `mac2011`, `macutm` e `macvmf` vivem num único módulo
-comum, para não repetir 3x. `dell1564` **não** importa esse módulo — segue
-com sua própria lista de pacotes, mais enxuta, e Firefox estável.
-`system/modules/mac-vm.nix` é uma camada em cima desse, só pra
-`macutm`/`macvmf` (as duas VMs Apple Silicon).
+Programs, keyboard (`us` + `mac` variant), and browser (Firefox Developer
+Edition) shared by `mac2011`, `macutm`, and `macvmf` live in one common
+module instead of being duplicated. `dell1564` does **not** import this
+module; it has a smaller package set and stable Firefox.
+`system/modules/mac-vm.nix` adds a layer on top of this module for
+`macutm`/`macvmf` (the two Apple Silicon VMs).
 
 ______________________________________________________________________
 
-## 🎛️ Ligando/desligando pacotes por host
+## 🎛️ Enabling and disabling packages per host
 
-Não existe painel único — cada `hosts/<host>/configuration.nix` é o
-lugar de editar o que é só daquele host, com dois padrões diferentes:
+There is no central control panel — each
+`hosts/<host>/configuration.nix` is where host-specific settings belong.
+Two patterns are used:
 
-**Toggle boolean** — `system/modules/dev.nix` expõe
+**Boolean toggle** — `system/modules/dev.nix` exposes
 `development.languages.<lang>.enable` (go, rust, sqlite, nix, python,
-lua, arduino, latex, postgresql, mariadb, mongodb, ferretdb). O módulo
-já é importado por `system/profiles/base.nix` em todos os hosts; o que
-varia por host é só o valor de cada `enable`, setado dentro do
-`configuration.nix` do host:
+lua, arduino, latex, postgresql, mariadb, mongodb, ferretdb). The module
+is already imported by `system/profiles/base.nix` on every host; only the
+`enable` values vary by host, set in that host's `configuration.nix`:
 
 ```nix
 development.languages = {
   go.enable = true;
   rust.enable = true;
   sqlite.enable = true;
-  # o resto = false
+  # all others = false
 };
 ```
 
-**Flag `enable` (containers)** — `system/profiles/x86/{docker,podman,kubernetes}.nix`
-declaram `development.containers.<x>.enable` (default `false`), o mesmo
-padrão do `dev.nix`. Pra ativar num host, troque a flag no
-`configuration.nix` dele (ver seção "Containers / Kubernetes" abaixo). O mesmo padrão existe no lado home-manager:
-`home/modules/wezterm.nix` e `home/modules/kitty.nix` estão escritos mas
-não importados por nenhum `home/profiles/*.nix` — o terminal padrão
-continua Alacritty.
+**`enable` flags (containers)** —
+`system/profiles/x86/{docker,podman,kubernetes}.nix` declare
+`development.containers.<x>.enable` (default `false`), following the same
+pattern as `dev.nix`. To enable one on a host, change its flag in that
+host's `configuration.nix` (see "Containers / Kubernetes" below).
+Home Manager's `home/modules/editors.nix` also exposes `enable` options
+for editors. Alternative terminals are opt-in by import: `wezterm.nix` is
+inactive (its import is commented out in `home/profiles/desktop.nix`) and
+`kitty.nix` is not imported. Alacritty is the configured terminal.
 
-Não tem `features.nix` nem `global_constants.nix` neste repo — o
-`username = "borba"` é definido direto em `flake.nix` (`outputs`) e
-passado via `specialArgs`/`extraSpecialArgs`.
+There is no `features.nix` or `global_constants.nix` in this repository —
+`username = "borba"` is defined directly in `flake.nix` (`outputs`) and
+passed through `specialArgs`/`extraSpecialArgs`.
 
 ______________________________________________________________________
 
-## 🧩 Perfis compartilhados (`system/profiles/`, `system/modules/`)
+## 🧩 Shared profiles (`system/profiles/`, `system/modules/`)
 
-Cada `hosts/<host>/configuration.nix` importa um subconjunto de perfis
-e módulos compartilhados, em vez de um `configuration.nix` raiz único
-pra todos os hosts:
+Each `hosts/<host>/configuration.nix` imports a subset of shared profiles
+and modules instead of using one root `configuration.nix` for all hosts:
 
-| Arquivo | Conteúdo |
+| File | Contents |
 |---|---|
-| `system/profiles/base.nix` | Kernel, tmpfiles (ssh dir + regreet), ssh, sops, `development.languages.*` (via `dev.nix`), ssh-trust entre hosts — importado por **todos** os hosts |
-| `system/profiles/desktop.nix` | Camada desktop (GUI) |
-| `system/profiles/server.nix` | Camada server |
-| `system/profiles/x86/desktop.nix` | Extras de desktop só pra x86_64 |
-| `system/modules/dev.nix` | `development.languages.<lang>.enable`, por host |
-| `system/modules/ssh-trust.nix` | `authorizedKeys`/`knownHosts` entre os hosts da frota |
-| `system/modules/mac-family.nix` | Teclado, Firefox Dev Edition, pacotes — só família Mac |
-| `system/modules/mac-vm.nix` | Camada em cima de `mac-family.nix`, só `macutm`/`macvmf` |
-| `system/modules/broadcom-wifi.nix` | Firmware Wi-Fi Broadcom — `dell1564` + `mac2011` |
-| `system/profiles/x86/docker.nix` ⚠️ opt-in | Docker Engine (`enableOnBoot = false`, socket-activated) + grupo `docker` + `docker-compose`/`lazydocker` — flag `development.containers.docker.enable`, veja seção "Containers / Kubernetes" abaixo |
-| `system/profiles/x86/podman.nix` ⚠️ opt-in | Podman rootless + `dockerCompat` (ganha o comando `docker` se o Docker Engine não estiver ligado) + `podman-compose` + timer semanal de auto-update — flag `development.containers.podman.enable` |
-| `system/profiles/x86/kubernetes.nix` ⚠️ opt-in | `k3d` + `kubectl` + `k9s` (cluster local leve, sem systemd) — flag `development.containers.kubernetes.enable`, precisa de docker ou podman ligado no mesmo host (assertion) |
+| `system/profiles/base.nix` | Kernel, tmpfiles (SSH directory), SSH, SOPS, `development.languages.*` (via `dev.nix`), inter-host SSH trust — imported by **all** hosts |
+| `system/profiles/desktop.nix` | Desktop (GUI) layer |
+| `system/profiles/server.nix` | Server layer |
+| `system/profiles/x86/desktop.nix` | x86_64-only desktop extras |
+| `system/modules/dev.nix` | Per-host `development.languages.<lang>.enable` options |
+| `system/modules/ssh-trust.nix` | Fleet-wide `authorizedKeys`/`knownHosts` |
+| `system/modules/mac-family.nix` | Keyboard, Firefox Developer Edition, packages — Mac family only |
+| `system/modules/mac-vm.nix` | Layer on top of `mac-family.nix`, for `macutm`/`macvmf` only |
+| `system/modules/broadcom-wifi.nix` | Broadcom Wi-Fi firmware — `dell1564` + `mac2011` |
+| `system/profiles/x86/docker.nix` ⚠️ opt-in | Docker Engine (`enableOnBoot = false`, socket-activated) + `docker` group + `docker-compose`/`lazydocker` — `development.containers.docker.enable` flag; see "Containers / Kubernetes" below |
+| `system/profiles/x86/podman.nix` ⚠️ opt-in | Rootless Podman + `dockerCompat` (provides the `docker` command when Docker Engine is disabled) + `podman-compose` + weekly auto-update timer — `development.containers.podman.enable` flag |
+| `system/profiles/x86/kubernetes.nix` ⚠️ opt-in | `k3d` + `kubectl` + `k9s` (lightweight local cluster, no systemd) — `development.containers.kubernetes.enable` flag; requires Docker or Podman on the same host (assertion) |
 
-Pra editar algo, vá direto no arquivo do tópico — não tem
-`configuration.nix` monolítico pra navegar.
+To change something, go directly to the file for that topic — there is no
+monolithic `configuration.nix` to navigate.
 
 ______________________________________________________________________
 
-## 🐳 Containers / Kubernetes (opt-in, desligado por padrão)
+## 🐳 Containers / Kubernetes (opt-in, disabled by default)
 
-Docker, Podman e Kubernetes local são usados só em projetos específicos,
-não no dia a dia — por isso os 3 módulos existem no repo mas ficam
-**desligados** (`enable = false`). Hoje só `hosts/mac2011/configuration.nix`
-liga o Docker. Pra usar:
+Docker, Podman, and local Kubernetes are only used for specific projects,
+not day to day — so the three modules exist in the repository but remain
+**disabled** (`enable = false`). Currently only
+`hosts/mac2011/configuration.nix` enables Docker. To use them:
 
 ```nix
 # hosts/<host>/configuration.nix
 development.containers = {
   docker.enable = true;
   podman.enable = false;
-  kubernetes.enable = false; # precisa de docker ou podman ligado
+  kubernetes.enable = false; # requires Docker or Podman to be enabled
 };
 ```
 
-depois rode o rebuild normal (`./nixos-manager.sh flake` ou `build`).
-Quando não precisar mais, troque pra `false` e rebuild — nenhum dos três
-deixa serviço rodando à toa nesse estado desligado.
+Then run the usual rebuild (`./nixos-manager.sh flake` or `build`). When
+you no longer need a feature, set it to `false` and rebuild — none of the
+three leaves a service running while disabled.
 
-| Módulo | O que dá | Footprint quando ligado mas sem uso |
+| Module | What it provides | Footprint when enabled but unused |
 |---|---|---|
-| `x86/docker.nix` (`development.containers.docker`) | Docker Engine + `docker-compose`/`lazydocker` | Zero — `enableOnBoot = false`, o daemon só sobe ao tocar o socket (`docker ps` etc.); depois de subir, fica rodando até `systemctl stop docker` ou reboot |
-| `x86/podman.nix` (`development.containers.podman`) | Podman rootless + `dockerCompat` (alias `docker`, só se `development.containers.docker` não estiver ligado junto) + `podman-compose` + timer semanal de auto-update | Zero sempre — sem daemon, é fork-per-comando; o timer só mexe em containers com o label `io.containers.autoupdate = "registry"` |
-| `x86/kubernetes.nix` (`development.containers.kubernetes`) | `k3d` + `kubectl` + `k9s` | Zero — são só binários, sem serviço systemd; o cluster só existe entre `k3d cluster create` e `k3d cluster delete` |
+| `x86/docker.nix` (`development.containers.docker`) | Docker Engine + `docker-compose`/`lazydocker` | Zero until used — with `enableOnBoot = false`, the daemon starts when its socket is accessed (`docker ps`, etc.); after starting, it keeps running until `systemctl stop docker` or reboot |
+| `x86/podman.nix` (`development.containers.podman`) | Rootless Podman + `dockerCompat` (the `docker` alias, only when `development.containers.docker` is disabled) + `podman-compose` + weekly auto-update timer | Always zero — no daemon, one process per command; the timer only touches containers labeled `io.containers.autoupdate = "registry"` |
+| `x86/kubernetes.nix` (`development.containers.kubernetes`) | `k3d` + `kubectl` + `k9s` | Zero — binaries only, no systemd service; the cluster exists only between `k3d cluster create` and `k3d cluster delete` |
 
-> **`k9s` sozinho não sobe cluster nenhum** — é só um dashboard/TUI pra um
-> cluster que já existe (via kubeconfig), local ou remoto. Pra ter
-> cluster local de verdade, `x86/kubernetes.nix` inclui `k3d` também: ele
-> cria um cluster k3s efêmero rodando como containers, em cima do runtime
-> que você já tiver ligado (`x86/docker.nix` ou `x86/podman.nix` —
-> precisa de um dos dois, é ele quem cria os nodes do cluster).
+> **`k9s` does not start a cluster by itself** — it is only a dashboard/TUI
+> for an existing cluster (through kubeconfig), local or remote. To create
+> a local cluster, `x86/kubernetes.nix` also includes `k3d`, which creates
+> an ephemeral k3s cluster running in containers on top of the runtime you
+> enabled (`x86/docker.nix` or `x86/podman.nix` — one is required to create
+> the cluster nodes).
 >
-> `x86/docker.nix` e `x86/podman.nix` são independentes: dá pra ligar só
-> um, ou os dois juntos — nesse caso o `dockerCompat` do Podman se
-> desliga sozinho pra não colidir com o binário `docker` do Docker
-> Engine.
+> `x86/docker.nix` and `x86/podman.nix` are independent: you can enable
+> either one or both. If both are enabled, Podman's `dockerCompat` turns
+> itself off to avoid conflicting with Docker Engine's `docker` binary.
 
 ______________________________________________________________________
 
@@ -326,14 +330,12 @@ below) so they work from inside any project, not just the repo root.
 
 This is the first rebuild that can actually succeed, because the age key
 and encrypted secrets from step 3 already exist on disk. From here on,
-`sops`/`age`/`jq` are installed system-wide, Home Manager takes over the
-user environment, and dotfiles for zsh, git, helix, tmux, niri, waybar,
-wezterm, zellij, bat, btop, lazygit, atuin, oh-my-posh, ripgrep, and
-wlr-which-key are applied automatically from `home/configs/` — either
-via native `programs.*` modules or `xdg.configFile` (see the per-program
-files under `home/modules/`, imported by `home/profiles/base.nix` /
-`home/profiles/desktop.nix`). No external `~/dotfiles` repo and no manual `stow`
-are needed anymore.
+`sops`/`age`/`jq` are installed system-wide and Home Manager manages the
+user environment through the modules in `home/modules/`, composed by
+`home/profiles/base.nix` and `home/profiles/desktop.nix`. Program settings
+may use native `programs.*` options, inline configuration, or selected
+files from `home/configs/` linked with `xdg.configFile`. No external
+`~/dotfiles` repo or manual `stow` is needed.
 
 **5. Back up the age key** (do this once, right after step 3):
 
@@ -370,111 +372,113 @@ ______________________________________________________________________
 
 ## 🧰 `nixos-manager.sh` — rebuilds, cache, and updates
 
-Menu interativo (ou modo direto por argumento) para as tarefas do dia a dia
-de manutenção do flake: rebuild, limpeza de cache, updates, rollback,
-checagem do flake e gestão de branches. Vive na **raiz do repo**
-(`./nixos-manager.sh`) e assume um repo git em `$NIXOS_DIR` (por padrão, a
-pasta onde o próprio script está).
+Interactive menu (or direct command mode) for day-to-day flake
+maintenance: rebuilds, cache cleanup, updates, rollbacks, flake checks,
+and branch management. It lives in the **repository root**
+(`./nixos-manager.sh`) and expects a Git repository in `$NIXOS_DIR` (by
+default, the directory containing the script).
 
 ### Uso
 
 ```bash
-./nixos-manager.sh                    # abre o menu interativo
-./nixos-manager.sh <option>           # roda direto: legacy | flake | clean | update | generation
-./nixos-manager.sh <option> <host>    # roda direto num host específico: flake dell
-NIXOS_FLAKE_ATTR=dell ./nixos-manager.sh flake   # força o host via env var
+./nixos-manager.sh                    # open the interactive menu
+./nixos-manager.sh <option>           # run directly: legacy | flake | clean | update | generation
+./nixos-manager.sh <option> <host>    # run for a specific host: flake dell
+NIXOS_FLAKE_ATTR=dell ./nixos-manager.sh flake   # set the host through an environment variable
 ```
 
-### Opções do menu
+### Menu options
 
-| # | Palavra-chave | Ação |
+| # | Keyword | Action |
 |---|---|---|
-| 0 | `setup` | Setup inicial numa máquina nova (symlink `/etc/nixos` → repo, clone se necessário, detecta o host) |
-| 1 | `legacy` | Build sem flake (`nixos-rebuild switch`, usa `/etc/nixos` via symlink) |
-| 2 | `flake` | Build com flake — fluxo completo: seleciona branch → checkout → commit pendente → pull → rebuild → push |
-| 3 | `clean` | Limpa cache: modo *Quick* (gerações >14 dias) ou *Aggressive* (`nix-collect-garbage -d`), com sync do bootloader ao final |
-| 4 | `update` | Update do sistema (mesmo fluxo git do `flake`, mais `nix flake update`) |
-| 5 | `dry` | Test build (dry-run, não aplica nada) |
-| 6 | `rollback` | Rollback para a geração anterior (`nixos-rebuild switch --rollback`) |
-| 7 | `check` | `nix flake check --print-build-logs`, opcionalmente para um host específico |
-| 8 | `hosts` | Lista os hosts configurados no flake e qual bate com esta máquina |
-| 9 | `branches` | Lista branches locais + remotas, marcando a atual e as sem correspondência na origin |
-| a | `prune` | Remove branches locais que não têm mais par na `origin` (branch padrão e a atual nunca são candidatas) |
-| g | `generation` | Mostra a última geração do sistema (perfil Nix + entradas do bootloader) |
-| m | `home` / `macbook` | **Só no MacBook M2 físico**: `home-manager switch --flake ".#borba@macbook"` — standalone, não é `nixos-rebuild` (sem sudo, sem bootloader, sem geração de sistema) |
-| c | `cleanmac` / `macclean` | **Só no MacBook M2 físico**: limpeza de gerações do home-manager (`nix-collect-garbage`, Quick/Aggressive) + otimização do store — equivalente ao `clean` (3), mas sem sudo e sem sync de bootloader |
-| q | `quit` | Sai |
+| 0 | `setup` | Initial setup on a new machine (symlink `/etc/nixos` to the repo, clone if needed, detect the host) |
+| 1 | `legacy` | Build without flakes (`nixos-rebuild switch`, using `/etc/nixos` through the symlink) |
+| 2 | `flake` | Flake build — complete workflow: select branch → checkout → commit pending changes → pull → rebuild → push |
+| 3 | `clean` | Clean the store: *Quick* mode (generations older than 14 days) or *Aggressive* (`nix-collect-garbage -d`), then optionally sync the bootloader |
+| 4 | `update` | Update the system (same Git workflow as `flake`, plus `nix flake update`) |
+| 5 | `dry` | Test build (does not activate the configuration) |
+| 6 | `rollback` | Roll back to the previous generation (`nixos-rebuild switch --rollback`) |
+| 7 | `check` | Run `nix flake check --print-build-logs`, optionally for a specific host |
+| 8 | `hosts` | List the hosts configured in the flake and which one matches this machine |
+| 9 | `branches` | List local and remote branches, marking the current branch and local branches missing from `origin` |
+| a | `prune` | Remove local branches with no matching branch on `origin` (the default and current branches are never candidates) |
+| g | `generation` | Show the latest system generation (Nix profile + bootloader entries) |
+| m | `home` / `macbook` | **Physical MacBook M2 only**: `home-manager switch --flake ".#borba@macbook"` — standalone, not `nixos-rebuild` (no sudo, bootloader, or system generation) |
+| c | `cleanmac` / `macclean` | **Physical MacBook M2 only**: clean Home Manager generations (`nix-collect-garbage`, Quick/Aggressive) + optimize the store — like `clean` (3), but without sudo or bootloader sync |
+| q | `quit` | Exit |
 
-### Hosts conhecidos (flake attr → hostname real)
+### Known hosts (flake attribute → actual hostname)
 
-| Flake attr | Hostname | Label |
+| Flake attribute | Hostname | Label |
 |---|---|---|
 | `mac2011` | `mac2011` | MacBook Pro 13in (2011) |
-| `dell` | `dell1564` (alias legado: `dell1456`) | Dell Inspiron 1564 |
+| `dell` | `dell1564` (legacy alias: `dell1456`) | Dell Inspiron 1564 |
 | `m2utm` | `macutm` | MacBook M2 - UTM |
 | `macvmf` | `macvmf` | MacBook M2 - VMware Fusion |
 
-> ⚠️ `macbook` (MacBook M2 físico) **não** está nesta tabela — ele não é
-> uma `nixosConfiguration`, então não tem "flake attr" nesse sentido.
-> As opções `m`/`c` chamam direto `homeConfigurations."borba@macbook"`
-> e não passam pelo fluxo de detecção/seleção de host usado por `flake`,
-> `update`, `dry` etc.
+> ⚠️ `macbook` (physical MacBook M2) is **not** in this table — it is not
+> a `nixosConfiguration`, so it has no flake attribute in this sense.
+> Options `m`/`c` call `homeConfigurations."borba@macbook"` directly and
+> do not use the host detection/selection flow used by `flake`, `update`,
+> `dry`, etc.
 
-### Comportamento importante
+### Important behavior
 
-- **Host nunca é assumido**: se não vier por argumento nem por
-  `NIXOS_FLAKE_ATTR`, o script sempre pergunta — mesmo que a máquina atual
-  bata com um host conhecido via `hostname`, ele não usa isso como default
-  (evita rebuild no host errado quando o comando roda remotamente, ex. via
-  SSH de outra máquina).
-- **Branch também nunca é assumida** quando há mais de uma disponível: se
-  só existir a branch padrão (`main`), o script segue direto sem perguntar;
-  havendo outras branches (locais ou remotas), ele sempre pergunta qual usar
-  — em todo `flake`/`update`, nunca só na primeira vez.
-- **Dell (baixa RAM)**: builds forçadamente seriais para evitar OOM killer,
-  via flags extras aplicadas por `rebuild_extra_flags()`.
-- **Clean cache** sempre oferece sincronizar o bootloader (`nixos-rebuild boot`) depois de remover gerações antigas — sem isso, o menu de boot
-  continua listando entradas para gerações que não existem mais.
+- **The host is never assumed**: if it is not provided as an argument or
+  through `NIXOS_FLAKE_ATTR`, the script always asks — even if the current
+  machine's hostname matches a known host. This avoids rebuilding the
+  wrong host when running remotely, for example over SSH from another
+  machine.
+- **The branch is also never assumed** when more than one is available:
+  if only the default branch (`main`) exists, the script continues without
+  asking; if other local or remote branches exist, it always asks which
+  one to use for every `flake`/`update` run, not just the first time.
+- **Dell (low RAM)**: builds are forced to run serially to avoid the OOM
+  killer, using extra flags from `rebuild_extra_flags()`.
+- **Cache cleanup** always offers to sync the bootloader
+  (`nixos-rebuild boot`) after removing old generations; otherwise, the
+  boot menu may continue listing entries for generations that no longer
+  exist.
 
 ______________________________________________________________________
 
-## 🪟 `tmux-devshell` / `zellij-devshell` — profiles de devshell em qualquer projeto
+## 🪟 `tmux-devshell` / `zellij-devshell` — devshell profiles in any project
 
-Abrem uma sessão (tmux ou Zellij, mesmo profile system nos dois) com uma
-window/tab por devshell Nix, a partir de um profile pré-definido (combo de
-devshells) ou de uma seleção manual (custom).
+These commands open a tmux or Zellij session (using the same profile
+system in both) with one window/tab per Nix devshell, based on a predefined
+profile (a devshell combination) or a custom selection.
 
-Os scripts-fonte vivem na **raiz do repo** (`./scripts/tmux-devshell.sh`,
-`./scripts/zellij-devshell.sh`), mas também são **instalados como comando**
-(`~/.local/bin/tmux-devshell`, `~/.local/bin/zellij-devshell` — via
-`home/modules/cli-and-terminal.nix`, `$HOME/.local/bin` já está no `PATH`
-por `home/modules/zsh.nix`). Rode de dentro de **qualquer projeto** em
-`$HOME/prj/<algo>` — não precisa estar no nixos-config nem passar
-caminho nenhum:
+The scripts live in the **repository root** (`./scripts/tmux-devshell.sh`,
+`./scripts/zellij-devshell.sh`) and are also **installed as commands**
+(`~/.local/bin/tmux-devshell`, `~/.local/bin/zellij-devshell` — through
+`home/modules/cli-and-terminal.nix`; `home/modules/zsh.nix` adds
+`$HOME/.local/bin` to `PATH`). Run them from **any project** under
+`$HOME/prj/<something>` — the project does not need to be inside
+nixos-config, and no path argument is required:
 
 ```bash
 cd ~/prj/minha-api
-tmux-devshell rust+postgres      # ou: zellij-devshell rust+postgres
+tmux-devshell rust+postgres      # or: zellij-devshell rust+postgres
 ```
 
-Os devshells continuam vindo do nixos-config (localizado via
-`NIXOS_CONFIG_DIR`, default `$HOME/nixos-config`), mas o `cwd` de cada
-window/tab é o projeto de onde você chamou o comando — é lá que o
-`cargo build`/`go build`/etc. realmente roda.
+The devshells still come from nixos-config (located through
+`NIXOS_CONFIG_DIR`, defaulting to `$HOME/nixos-config`), but each
+window/tab uses the project directory from which the command was run as
+its `cwd` — that is where `cargo build`, `go build`, etc. actually run.
 
-### Uso
+### Usage
 
 ```bash
-tmux-devshell                # menu interativo, a partir do projeto atual
-tmux-devshell --clean        # mata a sessão existente antes de criar uma nova
-tmux-devshell go+maria       # pula o menu, usa o profile direto
+tmux-devshell                # interactive menu, starting in the current project
+tmux-devshell --clean        # kill the existing session before creating a new one
+tmux-devshell go+maria       # skip the menu and use the profile directly
 
-zellij-devshell                # idem, via Zellij
+zellij-devshell                # same, using Zellij
 zellij-devshell --clean
 zellij-devshell go+maria
 ```
 
-### Profiles pré-definidos
+### Predefined profiles
 
 | Profile | Devshells |
 |---|---|
@@ -486,47 +490,50 @@ zellij-devshell go+maria
 | `python+mongo` | python, mongodb |
 | `fullstack` | go, rust, postgresql, mariadb |
 
-Além dos profiles, a opção **custom** no menu permite selecionar
-manualmente qualquer combinação das pastas existentes em `devshells/`
-(incluindo `arduino` e `latex`, que não entram em nenhum profile
-pré-definido, e `rust+sqlite`/`go+sqlite`, que ainda não têm profile
-dedicado — só via custom).
+In addition to these profiles, the menu's **custom** option lets you
+select any combination of directories under `devshells/`, including
+`arduino` and `latex` (not included in a predefined profile) and
+`rust+sqlite`/`go+sqlite` (which do not yet have dedicated profiles and
+are available only through custom selection).
 
-> `go`/`rust`/`python` são shells **puras de linguagem** (sem
-> Postgres/MariaDB/SQLite embutido) — quem entra no jogo é o profile
-> (ou a seleção custom), combinando a linguagem com o banco que você
-> quiser naquele projeto. Exceção: se algum projeto usa uma crate/lib
-> que **linka** contra a lib nativa do banco em tempo de build (ex:
-> `sqlx`/`diesel` sem feature `bundled`), abrir o banco numa tab separada
-> não basta — a lib precisa estar no mesmo shell do build.
+> `go`/`rust`/`python` are **language-only** shells (they do not include
+> Postgres/MariaDB/SQLite). Use a profile or a custom selection to
+> combine a language with the database you need for a project. One
+> exception: if a project uses a crate/library that **links** against the
+> database's native library at build time (e.g. `sqlx`/`diesel` without
+> the `bundled` feature), running the database in a separate tab is not
+> enough — the library must be available in the build shell.
 
-### Requisitos e fallback
+### Requirements and fallback
 
-- **`fzf`** (opcional, recomendado): habilita o seletor visual, tanto para
-  escolher o profile quanto para a seleção custom de devshells, com preview
-  mostrando quais devshells cada profile inclui.
-- **Sem `fzf`**: cai automaticamente para um menu numerado no terminal —
-  nenhuma funcionalidade é perdida, só a experiência de seleção muda.
-- **`tmux-devshell`**: precisa de `tmux`.
-- **`zellij-devshell`**: precisa de `zellij`. Cada tab nasce com
-  `default_tab_template` (tab-bar + status-bar), igual ao layout `default`
-  de fábrica do Zellij — sem isso as tabs aparecem "nuas", sem barra
-  nenhuma.
+- **`fzf`** (optional, recommended): enables a visual selector for both
+  profile selection and custom devshell combinations, with a preview of
+  the devshells included in each profile.
+- **Without `fzf`**: the scripts fall back to a numbered terminal menu —
+  no functionality is lost; only the selection experience changes.
+- **`tmux-devshell`**: requires `tmux`.
+- **`zellij-devshell`**: requires `zellij`. Each tab uses
+  `default_tab_template` (tab bar + status bar), matching Zellij's default
+  layout; without it, tabs have no bars.
 
-### Variáveis de ambiente
+### Environment variables
 
-| Variável | Padrão | Descrição |
+| Variable | Default | Description |
 |---|---|---|
-| `NIXOS_CONFIG_DIR` | `$HOME/nixos-config` | Onde fica o nixos-config, pra achar `devshells/` |
-| `DEVSHELLS_DIR` | `$NIXOS_CONFIG_DIR/devshells` | Pasta com as subpastas de cada devshell |
-| `PROJECT_DIR` | `$(pwd)` no momento em que o comando é chamado | Vira o `cwd` real de cada window/tab — normalmente o projeto em `$HOME/prj/<algo>` |
-| `SESSION_PREFIX` | `dev` | Prefixo do nome da sessão (ex: `dev-minha-api-go+maria` — inclui o nome do projeto, pra não colidir entre projetos diferentes usando o mesmo profile) |
+| `NIXOS_CONFIG_DIR` | `$HOME/nixos-config` | Location of nixos-config, used to find `devshells/` |
+| `DEVSHELLS_DIR` | `$NIXOS_CONFIG_DIR/devshells` | Directory containing the devshell subdirectories |
+| `PROJECT_DIR` | `$(pwd)` when the command is run | The actual `cwd` for each window/tab — usually a project under `$HOME/prj/<something>` |
+| `SESSION_PREFIX` | `dev` | Session name prefix (e.g. `dev-my-api-go+maria` — includes the project name to avoid collisions between projects using the same profile) |
 
 ______________________________________________________________________
 
 ## 🛠️ Development Shells
 
-Development environments are organized in dedicated folders under [devshells](devshells), each with its own flake. You can enter them directly from the repository without changing the main flake configuration, or use `tmux-devshell`/`zellij-devshell` (acima) to open several at once from inside any project directory.
+Development environments are organized in dedicated folders under
+[devshells](devshells), each with its own flake. You can enter them
+directly from the repository without changing the main flake
+configuration, or use `tmux-devshell`/`zellij-devshell` (above) to open
+several at once from any project directory.
 
 ### Available environments
 
@@ -567,7 +574,7 @@ nix develop path:.
 
 ### Usage notes
 
-- Each folder contains its own [flake.nix](flake.nix) style definition for that toolchain or database.
+- Each folder contains its own `flake.nix` defining that toolchain or database.
 - The shell name is usually the same as the folder name, so `nix develop ./devshells/go` works as expected.
 - `go`/`rust`/`python` are language-only shells — no database tooling baked in. Combine with a db devshell (`postgresql`, `mariadb`, `sqlite`, `mongodb`) via a `tmux-devshell`/`zellij-devshell` profile, or run both `nix develop` shells side by side manually.
 - This keeps each environment isolated and easier to maintain.
@@ -583,47 +590,45 @@ ______________________________________________________________________
 
 ## ⌨️ Logitech K380 Bluetooth pairing (Linux)
 
-`logitech-k380-bluetooth-linux-fix/` guarda um script `expect` standalone
-(fora do flake, roda em qualquer distro com `bluetoothctl`/`bluez`) para
-contornar o pareamento do teclado K380: o `bluetoothctl` padrão mostra o
-PIN por pouco tempo (~10s) e o K380 precisa de mais tempo para digitar o
-código.
+`logitech-k380-bluetooth-linux-fix/` contains a standalone `expect` script
+(outside the flake; it runs on any distribution with
+`bluetoothctl`/`bluez`) to work around the K380 keyboard pairing issue:
+the standard `bluetoothctl` prompt displays the PIN only briefly (~10s),
+and the K380 needs more time to enter it.
 
 ```bash
 cd logitech-k380-bluetooth-linux-fix
 chmod +x pair_k380.exp
-./pair_k380.exp        # captura e exibe o PIN, dá 60s para digitar no teclado
+./pair_k380.exp        # capture and display the PIN; allow 60 seconds to enter it on the keyboard
 ```
 
-Requer `expect` + `bluez` instalados (`bluetooth`/`bluez` no host). Ver
-`pair_k380_auto.exp` para uma variante não-interativa, e o
-[README próprio](logitech-k380-bluetooth-linux-fix/README.md) para
-troubleshooting (reset do teclado, reconexão manual via
+Requires `expect` and `bluez` (`bluetooth`/`bluez` on the host). See
+`pair_k380_auto.exp` for a non-interactive variant and the
+[dedicated README](logitech-k380-bluetooth-linux-fix/README.md) for
+troubleshooting (keyboard reset, manual reconnection with
 `bluetoothctl connect <MAC>`).
 
-> Este fix trata do handshake de pareamento em si. Para o comportamento
-> específico do controlador Bluetooth do `mac2011` (Broadcom BR/EDR
-> clássico) dentro do NixOS, ver `hardware.bluetooth.settings.General.ControllerMode = lib.mkForce "bredr"` em `hosts/mac2011/configuration.nix`.
+> This fix handles the pairing handshake itself. For the NixOS-specific
+> behavior of the `mac2011` Bluetooth controller (classic Broadcom
+> BR/EDR), see
+> `hardware.bluetooth.settings.General.ControllerMode = lib.mkForce "bredr"`
+> in `hosts/mac2011/configuration.nix`.
 
 ______________________________________________________________________
 
 ## 📚 Other docs in this repo
 
-- [`docs/DENDRITIC-PATTERN.md`](docs/DENDRITIC-PATTERN.md) — descreve o
-  Dendritic Pattern como arquitetura-alvo. O próprio arquivo se marca
-  como "aspiracional, não implementado" citando um `flake.nix` →
-  `configuration.nix` monolítico que **não é mais** o estado real do
-  repo — hoje já existem `system/profiles/` e `system/modules/`
-  (ver seção "Perfis compartilhados" acima), próximos do espírito do
-  padrão, ainda que sem `core.nix` nem os agregadores
-  `modules/category/default.nix` que o documento descreve. Trate o aviso
-  de status do arquivo como desatualizado, não a arquitetura descrita
-  como implementada 1:1.
-- [`docs/architecture.md`](docs/architecture.md) — outra descrição de
-  arquitetura deste repo; cheque contra a árvore real antes de confiar
-  em caminhos específicos, pelo mesmo motivo acima.
+- [`docs/DENDRITIC-PATTERN.md`](docs/DENDRITIC-PATTERN.md) — an
+  aspirational reference. The repository uses shared profiles, modules,
+  and `enable` options for some capabilities, but does not literally
+  implement the `core.nix` and `modules/category/default.nix` aggregator
+  structure described there. Its example tree and hosts are not the source
+  of truth for the current state; see this README and `flake.nix`.
+- [`docs/architecture.md`](docs/architecture.md) — a conceptual overview
+  of the repository's layers. For current paths and implementation,
+  check the tree and the corresponding profiles/modules.
 - [`scripts/age-key-backup-e-restauracao.md`](scripts/age-key-backup-e-restauracao.md)
-  — passo a passo de backup/restauração da chave age (complementa
+  — step-by-step guide to backing up/restoring the age key (complements
   `scripts/backup-age-key.sh`).
 
 ______________________________________________________________________
@@ -632,6 +637,7 @@ ______________________________________________________________________
 https://git.voidarc.co.uk/voidarc/nixos
 ```
 
-## Arquitetura
+## Architecture
 
-Consulte `docs/architecture.md` para a separação entre sistema, development, devshells e Home Manager.
+See `docs/architecture.md` for the separation between system
+configuration, development tooling, devshells, and Home Manager.

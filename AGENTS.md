@@ -27,14 +27,16 @@ one standalone macOS home-manager profile:
   `desktop.nix`, `x86/desktop.nix`.
 - `home/modules/` — one file per program (`alacritty.nix`, `wezterm.nix`,
   `tmux.nix`, `zsh.nix`, `git.nix`, `editors.nix`, `helix/`, etc). Some
-  are created but not imported anywhere (e.g. `kitty.nix`, `wezterm.nix`
-  — commented out in `home/profiles/base.nix`); check the profile
-  `imports` before assuming a module is live.
-- `home/configs/` — raw dotfile contents (wezterm, niri, waybar, helix,
-  nvim, zellij, ...), source of truth linked in by `home/modules/*.nix`
-  via `xdg.configFile`. Several `*.old` dirs are leftovers from a past
-  migration (e.g. `zsh.old`, `tmux.old`,
-  `alacritty.old`) — not wired into any module, don't assume they're live.
+  are opt-in by import rather than by an `enable` option (e.g. `kitty.nix`
+  is not imported and `wezterm.nix` is commented out in
+  `home/profiles/desktop.nix`); check profile imports before assuming a
+  module is active. `editors.nix` is an example of Home Manager modules
+  that expose per-program enable options.
+- `home/configs/` — raw config files for programs such as niri, waybar,
+  helix, nvim, and zellij. Depending on the owning module, they may be
+  linked with `xdg.configFile` or consumed another way; not every active
+  program config lives here. Legacy files such as `zsh/.zshrc.old` and
+  `emacs/init.el.OLD` are not active configuration.
 - `hosts/<hostname>/home/home.nix` — the home-manager entry point for
   that host (imported by `mkHost`/`mkMacHome` in `flake.nix`).
   `hosts/macbook/` is the odd one out: only a `home/` dir, no
@@ -174,15 +176,18 @@ home-manager level. Alacritty is the only terminal actually wired in.
   - `specialArgs`/`extraSpecialArgs` carry `inputs`, `hostname`, and
     `pkgs-unstable` (see `flake.nix` `mkHost`/`mkMacHome`) — available to
     any NixOS or home-manager module without re-importing.
-  - Feature modules that need conditional inclusion should use a boolean
-    `enable`-style option; most current modules are unconditionally
-    imported (no feature-flag pattern in place yet, unlike Foundry).
-  - Home-manager dotfile content: prefer `xdg.configFile.<name> = { source = "${configs}/<name>"; recursive = true; }` pointing at `home/configs/`
-    over inline heredocs, so the raw dotfile stays diffable/portable.
-    Not universal: `home/modules/wezterm.nix` inlines the whole Lua
-    config via `programs.wezterm.extraConfig` instead of linking
-    `home/configs/wezterm/`, by explicit request — don't "fix" it back
-    to the `xdg.configFile` pattern without checking first.
+  - Use a boolean `enable` option for reusable optional features that
+    genuinely vary by host or need to be independently toggled. Keep
+    always-on shared configuration directly in its profile; do not add
+    an option to every module just for uniformity. Existing examples
+    include `development.languages.*`, `development.containers.*`,
+    `power.alwaysOn.enable`, and `editors.*.enable`.
+  - For Home Manager configuration, follow the owning module's existing
+    pattern. Use `xdg.configFile` to link raw files from `home/configs/`
+    when that is how the program is managed; native `programs.*` settings
+    and inline configuration are also used. In particular,
+    `home/modules/wezterm.nix` intentionally keeps its Lua config inline;
+    do not convert it to a linked file without checking first.
 
 ## Secrets
 
@@ -205,11 +210,15 @@ bootloader sync after cleanup. Key options: `flake` (build+switch),
 `clean` (GC), `rollback`, `check` (`nix flake check`), `m`/`c` for the
 `macbook` home-manager-only host.
 
-`nh` (see `home/cli-and-terminal.nix`, `programs.nh`) is also
+`nh` (see `home/modules/cli-and-terminal.nix`, `programs.nh`) is also
 available as a lighter-weight alternative for ad-hoc `nh os switch` /
 `nh home switch` / `nh clean all` outside the wrapper's git-flow — its
 `flake` is pinned to `$HOME/nixos-config`, the same local clone path
 `nixos-manager.sh` expects.
+
+For code-editing tasks, do not run a deploy, `switch`, rollback, or other
+operation that changes a host unless the user explicitly asks. Prefer a
+format check, flake evaluation, or build-only validation when available.
 
 - Format check: `nix fmt` (or `nix flake check`, which includes it).
 - Build a host without activating: `./nixos-manager.sh dry <flake-attr>`
