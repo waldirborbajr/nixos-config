@@ -18,6 +18,7 @@
     ../../system/profiles/x86/desktop.nix
     ../../system/modules/mac-family.nix
     ../../system/modules/broadcom-wifi.nix
+
   ];
 
   # O módulo hardware.bluetooth do NixOS força General.ControllerMode =
@@ -38,9 +39,9 @@
     go.enable = true;
     rust.enable = true;
     sqlite.enable = true;
-    nix.enable = false;
 
     # ── Disponíveis (desligadas) ──
+    nix.enable = false;
     python.enable = false;
     lua.enable = false;
     arduino.enable = false;
@@ -50,6 +51,10 @@
     mongodb.enable = false;
     ferretdb.enable = false;
   };
+
+  # ==================== ENERGIA ====================
+  # Ligado direto: sem hibernar, tampa ignorada (acesso via ssh/tailscale).
+  power.alwaysOn.enable = true;
 
   # ==================== CONTAINERS (toggles — system/profiles/x86/) ====================
   # Docker e Podman são independentes; kubernetes precisa de um dos dois.
@@ -76,9 +81,7 @@
       whois
       pwgen
       libqalculate # qalc: calculadora com conversão de unidades
-
       telegram-desktop
-      # zapfast
     ]
   );
 
