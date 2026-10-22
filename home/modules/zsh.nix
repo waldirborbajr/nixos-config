@@ -89,6 +89,8 @@
       {
         name = "zsh-vi-mode";
         src = pkgs.zsh-vi-mode;
+        # o pacote instala o plugin em share/, não na raiz
+        file = "share/zsh-vi-mode/zsh-vi-mode.plugin.zsh";
       }
     ];
 
