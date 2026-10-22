@@ -223,6 +223,49 @@
       zle -N _fzf_git_branch
 
       # =========================================================
+      # expurgo — limpeza total manual (mac2011). Sem parâmetros.
+      # Apaga: docker (containers, imagens, volumes, build cache),
+      # nix (gerações antigas + GC), sccache, go modcache, journal.
+      # Projetos Rust (target/) NÃO são tocados.
+      # =========================================================
+      expurgo() {
+        setopt localoptions no_unset
+
+        echo "📊 Antes:"
+        df -h / | tail -1
+
+        if command -v docker >/dev/null; then
+          echo "🐳 docker: containers, imagens, volumes, build cache"
+          local ids
+          ids=$(docker ps -aq 2>/dev/null)
+          [[ -n "$ids" ]] && docker rm -f $ids >/dev/null 2>&1
+          docker system prune -af --volumes >/dev/null 2>&1
+          docker builder prune -af >/dev/null 2>&1
+        fi
+
+        echo "❄️  nix: removendo gerações antigas + GC"
+        sudo nix-collect-garbage -d >/dev/null 2>&1
+
+        if [[ -d ~/.cache/sccache ]]; then
+          echo "🦀 sccache: limpando cache"
+          rm -rf ~/.cache/sccache
+        fi
+
+        if command -v go >/dev/null; then
+          echo "🐹 go: limpando modcache"
+          go clean -modcache
+        fi
+
+        echo "📜 journal: reduzindo para 200M"
+        sudo journalctl --vacuum-size=200M >/dev/null 2>&1
+
+        echo "📊 Depois:"
+        df -h / | tail -1
+        command -v docker >/dev/null && docker system df 2>/dev/null
+        journalctl --disk-usage 2>/dev/null
+      }
+
+      # =========================================================
       # functions.zsh
       # =========================================================
       syshealth() {
