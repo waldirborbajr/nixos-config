@@ -519,8 +519,12 @@
 
         # Ctrl+L -> limpa a tela (zsh-vi-mode reconstrói os keymaps e
         # perde o clear-screen padrão). Nos dois modos: insert e normal.
-        bindkey -M viins '^L' clear-screen
-        bindkey -M vicmd '^L' clear-screen
+        # Widget próprio que chama o builtin direto (.clear-screen), ignorando
+        # qualquer wrapper de plugin (autosuggestions) ou reset do zvm.
+        _zsh_clear_fix() { zle .clear-screen }
+        zle -N _zsh_clear_fix
+        bindkey -M viins '^L' _zsh_clear_fix
+        bindkey -M vicmd '^L' _zsh_clear_fix
       }
     '';
   };
