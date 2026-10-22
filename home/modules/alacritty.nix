@@ -263,7 +263,7 @@
           {
             key = "L";
             mods = "Control";
-            chars = "\f";
+            chars = builtins.fromJSON "\"\\f\""; # Nix não tem \f: fromJSON gera form feed (0x0C)
           }
           {
             key = "K";
