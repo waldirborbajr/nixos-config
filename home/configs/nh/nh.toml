@@ -1,0 +1,7 @@
+# Config do nh — lida por home/modules/nh.nix.
+# flake é montado no nix (depende do home do usuário), não aqui.
+
+[clean]
+enable = true
+keep_since = "4d"
+keep = 3

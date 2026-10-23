@@ -100,8 +100,8 @@ is an aspirational reference, not a literal description of the current tree.
   through `mkMacHome` in `flake.nix`)
 - No nix-darwin, niri, waybar, or greetd — no system or desktop
   management; `home-manager switch` manages user packages and dotfiles
-- Imports only `home/profiles/base.nix` (shell, editors, cli-and-terminal,
-  git, terminal emulators) — **not** `home/profiles/desktop.nix`, which
+- Imports only `home/profiles/base.nix` (shell, editors, zellij, tmux, nh,
+  tuios, git, terminal emulators) — **not** `home/profiles/desktop.nix`, which
   is for niri/Wayland and does not apply to macOS
 - Host-specific `home.packages` (`hosts/macbook/home/home.nix`): currently
   only `darktable` — editors (`neovim`/`helix`/`emacs`, toggled in
@@ -450,8 +450,9 @@ profile (a devshell combination) or a custom selection.
 
 The scripts live in the **repository root** (`./scripts/tmux-devshell.sh`,
 `./scripts/zellij-devshell.sh`) and are also **installed as commands**
-(`~/.local/bin/tmux-devshell`, `~/.local/bin/zellij-devshell` — through
-`home/modules/cli-and-terminal.nix`; `home/modules/zsh.nix` adds
+(`~/.local/bin/tmux-devshell` through `home/modules/tmux.nix`,
+`~/.local/bin/zellij-devshell` through `home/modules/zellij.nix`;
+`home/modules/zsh.nix` adds
 `$HOME/.local/bin` to `PATH`). Run them from **any project** under
 `$HOME/prj/<something>` — the project does not need to be inside
 nixos-config, and no path argument is required:

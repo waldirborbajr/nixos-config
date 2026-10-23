@@ -23,7 +23,9 @@
 
     ../modules/shell.nix
     ../modules/editors.nix
-    ../modules/cli-and-terminal.nix
+    ../modules/zellij.nix
+    ../modules/nh.nix
+    ../modules/tuios.nix
     ../modules/bat.nix
     ../modules/btop.nix
     ../modules/tmux.nix

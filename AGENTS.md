@@ -23,7 +23,7 @@ one standalone macOS home-manager profile:
   (shared only by the Mac family), `broadcom-wifi.nix` (dell1564 +
   mac2011).
 - `home/profiles/` — mirrors `system/profiles/`: `base.nix` (shell,
-  editors, cli-and-terminal, git, terminal emulators — every host),
+  editors, zellij, tmux, nh, tuios, git, terminal emulators — every host),
   `desktop.nix`, `x86/desktop.nix`.
 - `home/modules/` — one file per program (`alacritty.nix`, `wezterm.nix`,
   `tmux.nix`, `zsh.nix`, `git.nix`, `editors.nix`, `helix/`, etc). Some
@@ -114,7 +114,7 @@ If a stricter convention is wanted later, mirror Foundry's
 │       └── broadcom-wifi.nix   # shared by dell1564 + mac2011
 ├── home/
 │   ├── profiles/
-│   │   ├── base.nix            # every host: shell, editors, cli-and-terminal, git, terminal
+│   │   ├── base.nix            # every host: shell, editors, zellij, tmux, nh, tuios, git, terminal
 │   │   ├── desktop.nix
 │   │   └── x86/desktop.nix
 │   ├── modules/                # one file per program (see "Home Manager" note below)
@@ -123,10 +123,10 @@ If a stricter convention is wanted later, mirror Foundry's
 │   │   ├── kitty.nix           # written, NOT imported — opt-in
 │   │   ├── editors.nix         # helix/neovim/emacs enable toggles + $EDITOR precedence
 │   │   ├── helix/
-│   │   └── {zsh,tmux,git,lazygit,atuin,btop,...}.nix
+│   │   └── {zsh,tmux,zellij,nh,tuios,git,lazygit,atuin,btop,...}.nix
 │   ├── pkgs/
 │   └── configs/                # raw dotfile contents — SOURCE OF TRUTH, linked via xdg.configFile
-│       ├── wezterm/, niri/, waybar/, helix/, nvim/, zellij/
+│       ├── wezterm/, niri/, waybar/, helix/, nvim/, zellij/, tmux/, nh/, tuios/
 │       └── *.old/              # leftovers from a past migration, not wired into any module
 ├── hosts/
 │   ├── dell1564/
@@ -210,7 +210,7 @@ bootloader sync after cleanup. Key options: `flake` (build+switch),
 `clean` (GC), `rollback`, `check` (`nix flake check`), `m`/`c` for the
 `macbook` home-manager-only host.
 
-`nh` (see `home/modules/cli-and-terminal.nix`, `programs.nh`) is also
+`nh` (see `home/modules/nh.nix`; parameters in `home/configs/nh/nh.toml`) is also
 available as a lighter-weight alternative for ad-hoc `nh os switch` /
 `nh home switch` / `nh clean all` outside the wrapper's git-flow — its
 `flake` is pinned to `$HOME/nixos-config`, the same local clone path
