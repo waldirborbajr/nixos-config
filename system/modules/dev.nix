@@ -150,6 +150,10 @@
         sccache
         llvmPackages.bintools
 
+        # ── Flash/serial para ESP32 (Rust + esp-hal/esp-idf) ──
+        esptool # flash via python (esptool.py / esptool)
+        espflash # flash nativo em Rust, alternativa ao esptool
+
         # ── Headers + openssl.pc (equivalente ao libssl-dev do Ubuntu) ──
         # openssl "puro" não traz o .pc; o output .dev traz.
         openssl.dev
