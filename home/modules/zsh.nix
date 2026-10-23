@@ -238,7 +238,7 @@
           echo "🐳 docker: containers, imagens, volumes, build cache"
           local ids
           ids=$(docker ps -aq 2>/dev/null)
-          [[ -n "$ids" ]] && docker rm -f $ids >/dev/null 2>&1
+          [[ -n "$ids" ]] && docker rm -f ${=ids} >/dev/null 2>&1
           docker system prune -af --volumes >/dev/null 2>&1
           docker builder prune -af >/dev/null 2>&1
         fi
