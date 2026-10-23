@@ -133,6 +133,10 @@
             "rustfmt" # Formatador
             "clippy" # Linter
           ];
+          # Targets extras: a biblioteca `core` de cada target fica no toolchain.
+          targets = [
+            "aarch64-unknown-linux-gnu"
+          ];
         })
 
         # ── Ferramentas do ecossistema Rust (NÃO são parte do toolchain) ──
@@ -151,9 +155,20 @@
         llvmPackages.bintools
 
         # ── Flash/serial para ESP32 (Rust + esp-hal/esp-idf) ──
-        rustup # toolchains extras (ex.: espup/esp-rs); o toolchain padrão continua o rust-bin
-        # esptool # flash via python (esptool.py / esptool)
-        # espflash # flash nativo em Rust, alternativa ao esptool
+        espup # instala o toolchain ESP (xtensa/riscv) via rustup
+        # rustup só para toolchains extras (esp via espup). Wrapper bloqueia
+        # instalar stable/beta/nightly: o toolchain padrão é o rust-bin do Nix.
+        (pkgs.writeShellScriptBin "rustup" ''
+          case "$*" in
+            "default stable"*|"default beta"*|"default nightly"*|"toolchain install stable"*|"toolchain install beta"*|"toolchain install nightly"*|"update"*)
+              echo "rustup: bloqueado — o toolchain padrão vem do Nix (rust-bin)." >&2
+              echo "Use o toolchain do Nix ou 'espup install' para o toolchain esp." >&2
+              exit 1 ;;
+          esac
+          exec ${pkgs.rustup}/bin/rustup "$@"
+        '')
+        esptool # flash via python (esptool.py / esptool)
+        espflash # flash nativo em Rust, alternativa ao esptool
 
         # ── Headers + openssl.pc (equivalente ao libssl-dev do Ubuntu) ──
         # openssl "puro" não traz o .pc; o output .dev traz.
