@@ -155,7 +155,11 @@
         llvmPackages.bintools
 
         # Linker cruzado p/ --target aarch64-unknown-linux-gnu (rppal/rasplab)
-        pkgs.gcc-aarch64-linux-gnu
+        # O cargo do projeto procura `aarch64-linux-gnu-gcc`; o nixpkgs expõe o
+        # cross-gcc como `aarch64-unknown-linux-gnu-gcc` (pkgsCross). Wrapper faz a ponte.
+        (pkgs.writeShellScriptBin "aarch64-linux-gnu-gcc" ''
+          exec ${pkgs.pkgsCross.aarch64-multiplatform.stdenv.cc}/bin/aarch64-unknown-linux-gnu-gcc "$@"
+        '')
 
         # ── ESP32 (desativado — não está funcionando) ──
         # espup # instala o toolchain ESP (xtensa/riscv) via rustup
