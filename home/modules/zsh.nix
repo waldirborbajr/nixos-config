@@ -137,7 +137,11 @@
       export PATH="$HOME/.local/bin:$PATH"
 
       # Rust
-      [[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
+      # ~/.cargo/bin NO FIM do PATH: cargo install (espup etc.) funciona sem
+      # sobrepor o toolchain do rust-bin (que fica na frente).
+      typeset -gU path
+      path+=("$HOME/.cargo/bin")
+      export CARGO_HOME="$HOME/.cargo"
 
       # Go
       export PATH="/usr/local/go/bin:$PATH"
