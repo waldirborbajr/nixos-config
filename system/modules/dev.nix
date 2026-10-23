@@ -152,8 +152,8 @@
 
         # ── Flash/serial para ESP32 (Rust + esp-hal/esp-idf) ──
         rustup # toolchains extras (ex.: espup/esp-rs); o toolchain padrão continua o rust-bin
-        esptool # flash via python (esptool.py / esptool)
-        espflash # flash nativo em Rust, alternativa ao esptool
+        # esptool # flash via python (esptool.py / esptool)
+        # espflash # flash nativo em Rust, alternativa ao esptool
 
         # ── Headers + openssl.pc (equivalente ao libssl-dev do Ubuntu) ──
         # openssl "puro" não traz o .pc; o output .dev traz.
