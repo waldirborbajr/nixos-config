@@ -155,7 +155,7 @@
         llvmPackages.bintools
 
         # Linker cruzado p/ --target aarch64-unknown-linux-gnu (rppal/rasplab)
-        gcc-aarch64-linux-gnu
+        pkgs.gcc-aarch64-linux-gnu
 
         # ── ESP32 (desativado — não está funcionando) ──
         # espup # instala o toolchain ESP (xtensa/riscv) via rustup
