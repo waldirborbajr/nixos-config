@@ -136,6 +136,7 @@
           # Targets extras: a biblioteca `core` de cada target fica no toolchain.
           targets = [
             "aarch64-unknown-linux-gnu"
+            "aarch64-unknown-linux-musl"
           ];
         })
 
