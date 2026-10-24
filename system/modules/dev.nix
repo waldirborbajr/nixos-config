@@ -211,21 +211,21 @@
 
       # ── Variáveis de ambiente ──────────────────────────────────────
       environment.variables = {
-        RUSTFLAGS = lib.concatStringsSep " " (
-          ["-C link-arg=-fuse-ld=mold"]
-          ++ map (d: "-C link-arg=-L${d}") [
-            "${pkgs.libxcb}/lib"
-            "${pkgs.libxcb.dev}/lib"
-            "${pkgs.xdotool}/lib"
-            "${pkgs.libx11}/lib"
-            "${pkgs.libxkbcommon}/lib"
-            "${pkgs.wayland}/lib"
-            "${pkgs.dbus}/lib"
-            "${pkgs.libGL}/lib"
-            "${pkgs.openssl}/lib"
-          ]
-        );
-        RUSTC_WRAPPER = "${pkgs.sccache}/bin/sccache";
+        # RUSTFLAGS = lib.concatStringsSep " " (
+        #   ["-C link-arg=-fuse-ld=mold"]
+        #   ++ map (d: "-C link-arg=-L${d}") [
+        #     "${pkgs.libxcb}/lib"
+        #     "${pkgs.libxcb.dev}/lib"
+        #     "${pkgs.xdotool}/lib"
+        #     "${pkgs.libx11}/lib"
+        #     "${pkgs.libxkbcommon}/lib"
+        #     "${pkgs.wayland}/lib"
+        #     "${pkgs.dbus}/lib"
+        #     "${pkgs.libGL}/lib"
+        #     "${pkgs.openssl}/lib"
+        #   ]
+        # );
+        # RUSTC_WRAPPER = "${pkgs.sccache}/bin/sccache";
         CARGO_TERM_COLOR = "always";
         CARGO_TERM_HYPERLINKS = "false";
 
