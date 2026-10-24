@@ -217,6 +217,10 @@
         RUSTC_WRAPPER = "${pkgs.sccache}/bin/sccache";
         CARGO_TERM_COLOR = "always";
         CARGO_TERM_HYPERLINKS = "false";
+        # openssl-sys no build cruzado (--target aarch64): precisa do OpenSSL do
+        # TARGET, não do host. Variáveis com sufixo de target só valem para esse alvo.
+        OPENSSL_LIB_DIR_aarch64_unknown_linux_gnu = "${pkgs.pkgsCross.aarch64-multiplatform.openssl.out}/lib";
+        OPENSSL_INCLUDE_DIR_aarch64_unknown_linux_gnu = "${pkgs.pkgsCross.aarch64-multiplatform.openssl.dev}/include";
         # Faz o pkg-config (e o openssl-sys) achar openssl.pc fora do nix build
         PKG_CONFIG_PATH = lib.makeSearchPath "lib/pkgconfig" [
           pkgs.openssl.dev
