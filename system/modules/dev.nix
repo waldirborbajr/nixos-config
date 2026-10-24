@@ -155,11 +155,21 @@
         sccache
         llvmPackages.bintools
 
-        # Linker cruzado p/ --target aarch64-unknown-linux-gnu (rppal/rasplab)
+        # ── Linker cruzado p/ aarch64-unknown-linux-gnu (rppal/rasplab) ─
         # O cargo do projeto procura `aarch64-linux-gnu-gcc`; o nixpkgs expõe o
         # cross-gcc como `aarch64-unknown-linux-gnu-gcc` (pkgsCross). Wrapper faz a ponte.
         (pkgs.writeShellScriptBin "aarch64-linux-gnu-gcc" ''
           exec ${pkgs.pkgsCross.aarch64-multiplatform.stdenv.cc}/bin/aarch64-unknown-linux-gnu-gcc "$@"
+        '')
+
+        # ── Compilador C + linker + ar para aarch64-unknown-linux-musl ──
+        # Raspberry Pi 3 com binário estático (sem interpretador dinâmico).
+        # Usado pelo `ring` (build script com cc) e pelo linker do alvo musl.
+        (pkgs.writeShellScriptBin "aarch64-linux-musl-gcc" ''
+          exec ${pkgs.pkgsCross.aarch64-multiplatform-musl.stdenv.cc}/bin/${pkgs.pkgsCross.aarch64-multiplatform-musl.stdenv.cc.targetPrefix}gcc "$@"
+        '')
+        (pkgs.writeShellScriptBin "aarch64-linux-musl-ar" ''
+          exec ${pkgs.pkgsCross.aarch64-multiplatform-musl.stdenv.cc.bintools}/bin/${pkgs.pkgsCross.aarch64-multiplatform-musl.stdenv.cc.targetPrefix}ar "$@"
         '')
 
         # ── ESP32 (desativado — não está funcionando) ──
@@ -218,6 +228,13 @@
         RUSTC_WRAPPER = "${pkgs.sccache}/bin/sccache";
         CARGO_TERM_COLOR = "always";
         CARGO_TERM_HYPERLINKS = "false";
+
+        # ── Build cruzado para aarch64-unknown-linux-musl (Raspberry Pi 3) ──
+        # cc-rs (usado pelo ring e outros build scripts) e linker do cargo.
+        CC_aarch64_unknown_linux_musl = "aarch64-linux-musl-gcc";
+        AR_aarch64_unknown_linux_musl = "aarch64-linux-musl-ar";
+        CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER = "aarch64-linux-musl-gcc";
+
         # openssl-sys no build cruzado (--target aarch64): precisa do OpenSSL do
         # TARGET, não do host. Variáveis com sufixo de target só valem para esse alvo.
         OPENSSL_LIB_DIR_aarch64_unknown_linux_gnu = "${pkgs.pkgsCross.aarch64-multiplatform.openssl.out}/lib";
