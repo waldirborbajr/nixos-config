@@ -88,7 +88,7 @@
 
   # ==================== TAILSCALE (exit node + rota da LAN) ====================
   # Tailscale ativo neste host como servidor, anunciando a LAN
-  # (192.168.0.0/24) e atuando como exit node. Só UM host deve fazer isso.
+  # (192.168.1.0/24) e atuando como exit node. Só UM host deve fazer isso.
   # Por enquanto é o mac2011, porque é o que fica ligado; mas ele não é a
   # escolha ideal a longo prazo, pensando em consumo de energia/sempre-ligado.
   #
@@ -105,7 +105,7 @@
     useRoutingFeatures = "server";
     openFirewall = true;
     extraSetFlags = [
-      "--advertise-routes=192.168.0.0/24"
+      "--advertise-routes=192.168.1.0/24"
       "--advertise-exit-node"
     ];
   };
