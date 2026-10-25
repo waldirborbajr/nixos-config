@@ -99,10 +99,10 @@ in {
     ])
     ++ [
       (pkgs.writeShellScriptBin "noctalia" ''
-        exec ${pkgs-unstable.noctalia-shell}/bin/noctalia-shell "$@"
+        exec ${pkgs-unstable.noctalia}/bin/noctalia "$@"
       '')
       (pkgs.writeShellScriptBin "qs" ''
-        exec ${pkgs-unstable.noctalia-shell}/bin/noctalia-shell "$@"
+        exec ${pkgs-unstable.noctalia}/bin/noctalia "$@"
       '')
 
       # Escolhe uma imagem aleatória de ~/.local/share/wallpapers (linkado
