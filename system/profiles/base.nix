@@ -46,6 +46,12 @@ in {
   networking.networkmanager.enable = true;
   networking.firewall.allowedTCPPorts = [22];
 
+  # Nomes da LAN (192.168.1.0/24) — resolvem sem depender de DNS/mDNS.
+  networking.hosts = {
+    "192.168.1.13" = ["termux"];
+    "192.168.1.15" = ["rasplab"];
+  };
+
   # ==================== TIME / LOCALE ====================
   time.timeZone = "America/Sao_Paulo";
 
