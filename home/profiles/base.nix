@@ -23,6 +23,7 @@
 
     ../modules/shell.nix
     ../modules/editors.nix
+    ../modules/theme.nix
     ../modules/zellij.nix
     ../modules/nh.nix
     ../modules/tuios.nix

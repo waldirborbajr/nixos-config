@@ -4,6 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nix-colors.url = "github:misterio77/nix-colors";
 
     # Neovim
     neovim-nightly-overlay = {

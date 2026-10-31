@@ -1,14 +1,15 @@
 # home/modules/tmux.nix
 #
-# Só tmux: lê a config de home/configs/tmux/tmux.conf (TPM, tema, binds)
+# Só tmux: lê home/configs/tmux/tmux.conf (TPM, binds) e renderiza o tema
+# pela paleta central (renderTheme, home/modules/theme.nix).
 # e o script de devshell. Todo o conteúdo do tmux vem do arquivo, não daqui.
-_: let
+{renderTheme, ...}: let
   configs = ../configs;
   repoRoot = ../../.;
 in {
   programs.tmux = {
     enable = true;
-    extraConfig = builtins.readFile "${configs}/tmux/tmux.conf";
+    extraConfig = renderTheme (builtins.readFile "${configs}/tmux/tmux.conf");
   };
 
   home.file.".local/bin/tmux-devshell" = {

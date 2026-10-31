@@ -3,7 +3,11 @@
 # Alacritty sob controle do Home Manager (programs.alacritty).
 # Config comum + overrides por OS (Linux vs Darwin) via hostPlatform —
 # sem arquivo os.toml separado nem general.import.
-{pkgs, ...}: {
+{
+  config,
+  pkgs,
+  ...
+}: {
   programs.alacritty = {
     enable = true;
 
@@ -89,55 +93,55 @@
         multiplier = 3;
       };
 
-      # Nord (nordtheme/alacritty, official palette)
-      # https://github.com/nordtheme/alacritty
+      # Cores vindas da paleta base16 central (home/modules/theme.nix).
+      # Dim (variantes escuras) não existem no base16 e ficam literais.
       colors = {
         primary = {
-          background = "#2e3440";
-          foreground = "#d8dee9";
+          background = "#${config.colorScheme.palette.base00}";
+          foreground = "#${config.colorScheme.palette.base04}";
           dim_foreground = "#a5abb6";
         };
         cursor = {
-          text = "#2e3440";
-          cursor = "#d8dee9";
+          text = "#${config.colorScheme.palette.base00}";
+          cursor = "#${config.colorScheme.palette.base04}";
         };
         vi_mode_cursor = {
-          text = "#2e3440";
-          cursor = "#d8dee9";
+          text = "#${config.colorScheme.palette.base00}";
+          cursor = "#${config.colorScheme.palette.base04}";
         };
         selection = {
           text = "CellForeground";
-          background = "#4c566a";
+          background = "#${config.colorScheme.palette.base03}";
         };
         search = {
           matches = {
             foreground = "CellBackground";
-            background = "#88c0d0";
+            background = "#${config.colorScheme.palette.base0C}";
           };
         };
         footer_bar = {
-          background = "#434c5e";
-          foreground = "#d8dee9";
+          background = "#${config.colorScheme.palette.base02}";
+          foreground = "#${config.colorScheme.palette.base04}";
         };
         normal = {
-          black = "#3b4252";
-          red = "#bf616a";
-          green = "#a3be8c";
-          yellow = "#ebcb8b";
-          blue = "#81a1c1";
-          magenta = "#b48ead";
-          cyan = "#88c0d0";
-          white = "#e5e9f0";
+          black = "#${config.colorScheme.palette.base01}";
+          red = "#${config.colorScheme.palette.base08}";
+          green = "#${config.colorScheme.palette.base0B}";
+          yellow = "#${config.colorScheme.palette.base0A}";
+          blue = "#${config.colorScheme.palette.base0D}";
+          magenta = "#${config.colorScheme.palette.base0E}";
+          cyan = "#${config.colorScheme.palette.base0C}";
+          white = "#${config.colorScheme.palette.base05}";
         };
         bright = {
-          black = "#4c566a";
-          red = "#bf616a";
-          green = "#a3be8c";
-          yellow = "#ebcb8b";
-          blue = "#81a1c1";
-          magenta = "#b48ead";
-          cyan = "#8fbcbb";
-          white = "#eceff4";
+          black = "#${config.colorScheme.palette.base03}";
+          red = "#${config.colorScheme.palette.base08}";
+          green = "#${config.colorScheme.palette.base0B}";
+          yellow = "#${config.colorScheme.palette.base0A}";
+          blue = "#${config.colorScheme.palette.base0D}";
+          magenta = "#${config.colorScheme.palette.base0E}";
+          cyan = "#${config.colorScheme.palette.base07}";
+          white = "#${config.colorScheme.palette.base06}";
         };
         dim = {
           black = "#373e4d";
