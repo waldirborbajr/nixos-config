@@ -77,6 +77,34 @@ in {
         source = "${configs}/nvim";
         recursive = true;
       };
+      # Paleta base16 do colorScheme central (home/modules/theme.nix), lida
+      # pelo plugin base16 em lua/plugins/theme.lua.
+      "nvim/lua/theme/palette.lua".text = let
+        pal = config.colorScheme.palette;
+        entries = lib.concatStringsSep "\n" (map (k: "  ${k} = \"#${pal.${k}}\",") [
+          "base00"
+          "base01"
+          "base02"
+          "base03"
+          "base04"
+          "base05"
+          "base06"
+          "base07"
+          "base08"
+          "base09"
+          "base0A"
+          "base0B"
+          "base0C"
+          "base0D"
+          "base0E"
+          "base0F"
+        ]);
+      in ''
+        -- Gerado pelo Nix (home/modules/editors.nix). Não editar à mão.
+        return {
+        ${entries}
+        }
+      '';
     };
   };
 }
