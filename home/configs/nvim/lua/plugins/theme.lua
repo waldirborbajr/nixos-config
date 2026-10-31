@@ -10,5 +10,5 @@ return {
     end,
   },
   -- Evita que o LazyVim troque o tema padrão (tokyonight) depois do nosso.
-  { "LazyVim/LazyVim", opts = { colorscheme = "base16-colorscheme" } },
+  -- { "LazyVim/LazyVim", opts = { colorscheme = "base16-colorscheme" } },
 }
