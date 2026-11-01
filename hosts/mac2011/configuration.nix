@@ -54,7 +54,7 @@
 
   # ==================== ENERGIA ====================
   # Ligado direto: sem hibernar, tampa ignorada (acesso via ssh/tailscale).
-  power.alwaysOn.enable = true;
+  power.alwaysOn.enable = false;
 
   # ==================== CONTAINERS (toggles — system/profiles/x86/) ====================
   # Docker e Podman são independentes; kubernetes precisa de um dos dois.
