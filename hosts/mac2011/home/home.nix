@@ -44,11 +44,9 @@ in {
   # brave/vlc: vindo de home/profiles/desktop.nix + system/profiles/x86/desktop.nix
   # (estavam duplicados nos dois — agora só existem aqui, exclusivos do mac2011).
   #
-  # brave: REMOVIDO do nixpkgs unstable/26.05. Substitutos:
-  #   - LibreWolf nativo (abaixo), mantido oficialmente no nixpkgs; ou
-  #   - Flatpak com.brave.Browser (services.flatpak.enable = true no
-  #     configuration.nix e "flatpak install flathub com.brave.Browser").
-  # Aqui fica LibreWolf como padrão; troque por brave via Flatpak se preferir.
+  # brave: REMOVIDO do nixpkgs. Agora vem como Flatpak (com.brave.Browser)
+  # pelo serviço hosts/mac2011/services/flatpak.nix. LibreWolf segue como
+  # navegador nativo do Nix.
   home.packages = with pkgs; [
     darktable
     gnome-text-editor
