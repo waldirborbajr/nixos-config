@@ -18,6 +18,7 @@
     ../../system/profiles/x86/desktop.nix
     ../../system/modules/mac-family.nix
     ../../system/modules/broadcom-wifi.nix
+    ./services/flatpak.nix
   ];
 
   # O módulo hardware.bluetooth do NixOS força General.ControllerMode =
