@@ -14,8 +14,9 @@
   #   nix hash convert --hash-algo sha256 --to sri <hash-base32>
   #
   # Substitua o valor abaixo pelo hash SRI retornado.
-  anydeskFixed = pkgs.anydesk.overrideAttrs (old: {
-    src = old.src.override {
+  anydeskFixed = pkgs.anydesk.overrideAttrs (_old: {
+    src = pkgs.fetchurl {
+      url = "https://download.anydesk.com/linux/anydesk-8.1.0-amd64.tar.gz";
       hash = "sha256-zS5P2eyTHZY7cBW8mQ2Q6M0lXcx9VZZTtpG3Bb6u7IQ=";
     };
   });
