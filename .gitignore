@@ -72,3 +72,6 @@ result*
 /devshells/python/flake.lock
 /devshells/sqlite/flake.lock
 /\#configuration.nix#
+
+wallpapers/*.png
+wallpapers/*.jpg
