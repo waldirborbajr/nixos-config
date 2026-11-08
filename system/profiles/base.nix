@@ -22,6 +22,7 @@ in {
     ./x86/podman.nix
     ./x86/kubernetes.nix
     ../modules/always-on.nix
+    ../modules/flatpak.nix
   ];
 
   # ==================== KERNEL ====================

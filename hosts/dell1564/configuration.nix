@@ -20,6 +20,16 @@
     variant = "abnt2";
   };
 
+  # ==================== FLATPAK (system/modules/flatpak.nix) ====================
+  flatpak.enable = true;
+  flatpak.apps = [
+    "com.brave.Browser"
+    # "com.anydesk.Anydesk"
+    # "com.spotify.Client"
+    # "org.telegram.desktop"
+    # "org.chromium.Chromium"
+  ];
+
   # ==================== GRAPHICS ====================
   hardware.graphics.enable = true;
 

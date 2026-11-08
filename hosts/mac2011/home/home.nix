@@ -3,24 +3,7 @@
   pkgs,
   pkgs-unstable,
   ...
-}: let
-  # AnyDesk: o tarball servido em download.anydesk.com mudou sem que o
-  # nixpkgs tivesse atualizado o hash esperado (hash mismatch em
-  # anydesk-8.1.0-amd64.tar.gz). Sobrescrevemos o hash do src para o
-  # valor real do arquivo atual.
-  #
-  # Como obter o hash correto:
-  #   nix-prefetch-url https://download.anydesk.com/linux/anydesk-8.1.0-amd64.tar.gz
-  #   nix hash convert --hash-algo sha256 --to sri <hash-base32>
-  #
-  # Substitua o valor abaixo pelo hash SRI retornado.
-  anydeskFixed = pkgs.anydesk.overrideAttrs (_old: {
-    src = pkgs.fetchurl {
-      url = "https://download.anydesk.com/linux/anydesk-8.1.0-amd64.tar.gz";
-      hash = "sha256-zS5P2eyTHZY7cBW8mQ2Q6M0lXcx9VZZTtpG3Bb6u7IQ=";
-    };
-  });
-in {
+}: {
   imports = [
     ../../../home/profiles/base.nix
     ../../../home/profiles/desktop.nix
@@ -41,26 +24,17 @@ in {
 
   # ==================== PACOTES EXCLUSIVOS DESTE HOST ====================
   # darktable: vindo de hosts/macbook/home/home.nix.
-  # brave/vlc: vindo de home/profiles/desktop.nix + system/profiles/x86/desktop.nix
+  # vlc: vindo de home/profiles/desktop.nix + system/profiles/x86/desktop.nix
   # (estavam duplicados nos dois — agora só existem aqui, exclusivos do mac2011).
   #
-  # brave: REMOVIDO do nixpkgs. Agora vem como Flatpak (com.brave.Browser)
-  # pelo serviço hosts/mac2011/services/flatpak.nix. LibreWolf segue como
+  # brave, anydesk, spotify, telegram, chromium: agora via Flatpak
+  # (flatpak.apps em hosts/mac2011/configuration.nix). LibreWolf segue como
   # navegador nativo do Nix.
   home.packages = with pkgs; [
     darktable
     gnome-text-editor
     librewolf
     vlc
-    # AnyDesk: o cliente GTK falha em "cannot open display :0" com
-    # GDK_BACKEND=wayland (padrão da sessão). Forçar x11 só neste binário,
-    # sem mudar a variável global. Usa anydeskFixed (hash corrigido) acima.
-    (pkgs.symlinkJoin {
-      name = "anydesk-x11";
-      paths = [anydeskFixed];
-      nativeBuildInputs = [pkgs.makeWrapper];
-      postBuild = "wrapProgram $out/bin/anydesk --set GDK_BACKEND x11";
-    })
     # ZapFast (cliente WhatsApp não oficial) — só mac2011, do nixpkgs-unstable.
     pkgs-unstable.zapfast
   ];

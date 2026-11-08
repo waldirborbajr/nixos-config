@@ -10,8 +10,13 @@
 {
   pkgs,
   lib,
+  hostname,
   ...
-}: {
+}: let
+  # spotify/chromium vêm via Flatpak em mac2011 e dell1564
+  # (system/modules/flatpak.nix); os demais hosts NixOS seguem com a versão nix.
+  onFlatpak = builtins.elem hostname ["mac2011" "dell1564"];
+in {
   imports = [
     ../modules/emacs-vanilla.nix
     ../modules/desktop.nix
@@ -22,35 +27,36 @@
   # Movidos de home/profiles/base.nix — dependem de sessão gráfica
   # (visualizador de PDF, gerenciador de arquivo GTK).
   home.packages =
-    (with pkgs; [
-      # Fonts — Hack/Noto/emoji come from Stylix (font-packages target).
-      noto-fonts-cjk-sans
-      liberation_ttf # Arial/Times/Courier metric substitutes
-      gyre-fonts # required by texlive
+    (with pkgs;
+      [
+        # Fonts — Hack/Noto/emoji come from Stylix (font-packages target).
+        noto-fonts-cjk-sans
+        liberation_ttf # Arial/Times/Courier metric substitutes
+        gyre-fonts # required by texlive
 
-      # LaTeX
-      texliveFull
-      pandoc
+        # LaTeX
+        texliveFull
+        pandoc
 
-      # Utilities
-      #    obsidian
-      #    nextcloud-client
-      #    libreoffice
-      pdfchain # pdf merger
-      #    veracrypt
-      #    obs-studio
-      #    calibre
-      #    tio
+        # Utilities
+        #    obsidian
+        #    nextcloud-client
+        #    libreoffice
+        pdfchain # pdf merger
+        #    veracrypt
+        #    obs-studio
+        #    calibre
+        #    tio
 
-      mupdf
-      xarchiver
+        mupdf
+        xarchiver
 
-      # Movidos de hosts/mac2011/configuration.nix (environment.systemPackages)
-      # — eram só do mac2011; agora compartilhados pelos 4 hosts NixOS.
-      chromium
-    ])
+        # Movidos de hosts/mac2011/configuration.nix (environment.systemPackages)
+        # — eram só do mac2011; agora compartilhados pelos 4 hosts NixOS.
+      ]
+      ++ lib.optionals (!onFlatpak) [pkgs.chromium])
     # spotify não builda em aarch64-linux (macutm/macvmf) — só entra em
     # host x86_64 (dell1564, mac2011). Era o motivo do comentário
     # original "não disponível p/ aarch64-linux das VMs UTM/Fusion".
-    ++ lib.optionals pkgs.stdenv.hostPlatform.isx86_64 [pkgs.spotify];
+    ++ lib.optionals (pkgs.stdenv.hostPlatform.isx86_64 && !onFlatpak) [pkgs.spotify];
 }

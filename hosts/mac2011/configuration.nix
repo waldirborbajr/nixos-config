@@ -18,7 +18,6 @@
     ../../system/profiles/x86/desktop.nix
     ../../system/modules/mac-family.nix
     ../../system/modules/broadcom-wifi.nix
-    ./services/flatpak.nix
   ];
 
   # O módulo hardware.bluetooth do NixOS força General.ControllerMode =
@@ -53,6 +52,16 @@
     ferretdb.enable = false;
   };
 
+  # ==================== FLATPAK (system/modules/flatpak.nix) ====================
+  flatpak.enable = true;
+  flatpak.apps = [
+    "com.brave.Browser"
+    "com.anydesk.Anydesk"
+    "com.spotify.Client"
+    "org.telegram.desktop"
+    "org.chromium.Chromium"
+  ];
+
   # ==================== ENERGIA ====================
   # Ligado direto: sem hibernar, tampa ignorada (acesso via ssh/tailscale).
   power.alwaysOn.enable = false;
@@ -82,7 +91,6 @@
       whois
       pwgen
       libqalculate # qalc: calculadora com conversão de unidades
-      telegram-desktop
       # zapfast moved to unstable hosts/mac2011/home.nix
     ]
   );
