@@ -29,7 +29,7 @@
   home.packages = with pkgs; [
     darktable
     gnome-text-editor
-    brave
+    # brave # no more maintened
     vlc
     # AnyDesk: o cliente GTK falha em "cannot open display :0" com
     # GDK_BACKEND=wayland (padrão da sessão). Forçar x11 só neste binário,
