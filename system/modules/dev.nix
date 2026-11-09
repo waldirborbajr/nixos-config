@@ -161,6 +161,17 @@
         (pkgs.writeShellScriptBin "aarch64-linux-gnu-gcc" ''
           exec ${pkgs.pkgsCross.aarch64-multiplatform.stdenv.cc}/bin/aarch64-unknown-linux-gnu-gcc "$@"
         '')
+        # g++ / ar / ranlib no mesmo padrão: o llama.cpp (cmake, C++) usa
+        # `aarch64-linux-gnu-g++` e deriva ar/ranlib do mesmo prefixo.
+        (pkgs.writeShellScriptBin "aarch64-linux-gnu-g++" ''
+          exec ${pkgs.pkgsCross.aarch64-multiplatform.stdenv.cc}/bin/${pkgs.pkgsCross.aarch64-multiplatform.stdenv.cc.targetPrefix}g++ "$@"
+        '')
+        (pkgs.writeShellScriptBin "aarch64-linux-gnu-ar" ''
+          exec ${pkgs.pkgsCross.aarch64-multiplatform.stdenv.cc.bintools}/bin/${pkgs.pkgsCross.aarch64-multiplatform.stdenv.cc.targetPrefix}ar "$@"
+        '')
+        (pkgs.writeShellScriptBin "aarch64-linux-gnu-ranlib" ''
+          exec ${pkgs.pkgsCross.aarch64-multiplatform.stdenv.cc.bintools}/bin/${pkgs.pkgsCross.aarch64-multiplatform.stdenv.cc.targetPrefix}ranlib "$@"
+        '')
 
         # ── Compilador C + linker + ar para aarch64-unknown-linux-musl ──
         # Raspberry Pi 3 com binário estático (sem interpretador dinâmico).
