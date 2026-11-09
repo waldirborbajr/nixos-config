@@ -31,6 +31,11 @@ in {
   config = lib.mkIf cfg.enable {
     services.flatpak.enable = true;
 
+    # Os atalhos (.desktop) dos apps Flatpak ficam em
+    # /var/lib/flatpak/exports/share. Sem isso no XDG_DATA_DIRS, o rofi
+    # (drun) e outros launchers não os enxergam.
+    environment.profiles = ["/var/lib/flatpak/exports"];
+
     systemd.services.flatpak-apps = {
       description = "Install Flatpak apps from Flathub";
       wantedBy = ["multi-user.target"];

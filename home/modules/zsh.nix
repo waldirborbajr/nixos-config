@@ -14,6 +14,10 @@
     # Absolute path — relative dotDir is deprecated in recent HM
     dotDir = "${config.xdg.configHome}/zsh";
 
+    # Digitar só um diretório (ex.: ../../) faz cd. Sem isso, o zsh tenta
+    # executar o diretório e responde "permission denied".
+    autocd = true;
+
     # ---------- History (antes em zshenv) ----------
     history = {
       path = "${config.xdg.stateHome}/zsh/history";
@@ -38,6 +42,8 @@
       df = "df -h";
 
       # Navigation
+      ".." = "cd ..";
+      "..." = "cd ../..";
       "-" = "cd -";
 
       # Editor
