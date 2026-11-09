@@ -91,7 +91,6 @@
       whois
       pwgen
       libqalculate # qalc: calculadora com conversão de unidades
-      # zapfast moved to unstable hosts/mac2011/home.nix
     ]
   );
 
