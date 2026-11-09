@@ -33,6 +33,23 @@
     "render"
   ];
 
+  # ==================== LOGIN BACKGROUND (runtime) ====================
+  # Pega o primeiro wallpapers/login.* do checkout local (ex.: login.jpg,
+  # login.png) e copia para /var/lib/regreet/background. Se não existir,
+  # o regreet usa o fundo padrão. Roda a cada `nixos-rebuild switch`.
+  system.activationScripts.regreetBackground = {
+    deps = ["users"];
+    text = let
+      repo = "/home/borba/nixos-config/wallpapers";
+    in ''
+      mkdir -p /var/lib/regreet
+      src=$(ls ${repo}/login.* 2>/dev/null | head -n1 || true)
+      if [ -n "$src" ]; then
+        install -m644 "$src" /var/lib/regreet/background
+      fi
+    '';
+  };
+
   # ==================== NIRI ====================
   programs.niri.enable = true;
 
@@ -87,8 +104,11 @@
         font_name = "JetBrainsMono Nerd Font 12";
       };
 
+      # Copiado em runtime por system.activationScripts.regreetBackground.
+      # Não referencia o arquivo pelo flake: wallpapers/ é ignorado no git,
+      # e o flake só enxerga arquivos rastreados.
       background = {
-        path = "${../../wallpapers/login.jpg}";
+        path = "/var/lib/regreet/background";
         fit = "Fill";
       };
     };

@@ -7,6 +7,7 @@
 # Overrides por host (input/outputs do niri) ficam em
 # hosts/<host>/home/home.nix.
 {
+  lib,
   pkgs,
   pkgs-unstable,
   ...
@@ -109,14 +110,14 @@ in {
       # logo abaixo, a partir de $NIXOS_CONFIG_ROOT/wallpapers/ — pasta
       # global na raiz do repo, compartilhada por todo host) e seta como
       # fundo via swaybg. Chamado
-      # no login pelo niri (config/startup.kdl). login.jpg fica de fora —
+      # no login pelo niri (config/startup.kdl). login.* fica de fora —
       # é só do regreet (tela de login), não entra no sorteio.
       (pkgs.writeShellScriptBin "random-wallpaper" ''
         set -euo pipefail
         dir="$HOME/.local/share/wallpapers"
         pic=$(${pkgs.findutils}/bin/find -L "$dir" -maxdepth 1 -type f \
           \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) \
-          ! -iname 'login.jpg' \
+          ! -iname 'login.*' \
           | ${pkgs.coreutils}/bin/shuf -n1)
         exec ${pkgs.swaybg}/bin/swaybg -i "$pic" -m fill
       '')
@@ -138,13 +139,23 @@ in {
     };
   };
 
-  # Pasta global de wallpapers — $NIXOS_CONFIG_ROOT/wallpapers/ (raiz do
-  # repo, não home/configs/), mesma pra todo host. Põe as imagens lá; o
-  # random-wallpaper (acima) sorteia uma a cada login. ~/.local/share é
-  # o lugar certo pra dado estático (não é "config"), por isso home.file
-  # em vez de xdg.configFile.
-  home.file.".local/share/wallpapers" = {
-    source = ../../wallpapers;
-    recursive = true;
-  };
+  # Pasta de wallpapers — $NIXOS_CONFIG_ROOT/wallpapers/ (raiz do repo).
+  # Não usa home.file: o flake só enxerga arquivos rastreados pelo git, e
+  # wallpapers/ é ignorado (economia de espaço no versionamento). Em vez
+  # disso, o activation copia as imagens do checkout local para
+  # ~/.local/share/wallpapers a cada `nixos-rebuild switch`. login.* é
+  # excluído (é do regreet, ver system/profiles/desktop.nix).
+  home.activation.syncWallpapers = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    src="$HOME/nixos-config/wallpapers"
+    dest="$HOME/.local/share/wallpapers"
+    # Remove o symlink antigo do home.file, se ainda existir.
+    if [ -L "$dest" ]; then
+      run rm "$dest"
+    fi
+    run mkdir -p "$dest"
+    if [ -d "$src" ]; then
+      find "$src" -maxdepth 1 -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) \
+        ! -iname 'login.*' -exec $DRY_RUN_CMD cp -f {} "$dest"/ \;
+    fi
+  '';
 }
