@@ -24,16 +24,16 @@ _: {
         authorColors = {
           "*" = "#b4befe";
         };
-      };
+      }; # end gui
 
       quitOnTopLevelReturn = true;
       disableStartupPopups = true;
 
       git = {
-        pagers = [
+        diffRenderers = [
           {
             colorArg = "always";
-            pager = ''delta --dark --paging=never --line-numbers --hunk-header-style="file omit-code-fragment" --file-style="omit" --hyperlinks --hyperlinks-file-link-format="lazygit-edit://{path}:{line}"'';
+            command = ''delta --dark --paging=never --line-numbers --hunk-header-style="file omit-code-fragment" --file-style="omit" --hyperlinks --hyperlinks-file-link-format="lazygit-edit://{path}:{line}"'';
           }
         ];
       };
