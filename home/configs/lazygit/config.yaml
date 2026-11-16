@@ -5,12 +5,12 @@ git:
     command: delta --dark --paging=never --line-numbers --hunk-header-style="file
       omit-code-fragment" --file-style="omit" --hyperlinks --hyperlinks-file-link-format="lazygit-edit://{path}:{line}"
 gui:
-  authorColors:
-    '*': '#b4befe'
   theme:
     activeBorderColor:
     - '#cba6f7'
     - bold
+    authorColors:
+      '*': '#b4befe'
     cherryPickedCommitBgColor:
     - '#45475a'
     cherryPickedCommitFgColor:
