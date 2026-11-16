@@ -24,9 +24,6 @@ _: {
           ];
           searchingActiveBorderColor = ["#f9e2af"];
         };
-        authorColors = {
-          "*" = "#b4befe";
-        };
       }; # end gui
 
       quitOnTopLevelReturn = true;
