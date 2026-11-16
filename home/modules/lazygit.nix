@@ -19,6 +19,9 @@ _: {
           cherryPickedCommitFgColor = ["#cba6f7"];
           unstagedChangesColor = ["#f38ba8"];
           defaultFgColor = ["#cdd6f4"];
+          authorColors = [
+            "#b4befe"
+          ];
           searchingActiveBorderColor = ["#f9e2af"];
         };
         authorColors = {
