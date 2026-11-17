@@ -122,8 +122,10 @@ in {
     extra-substituters = [
       "https://nix-community.cachix.org"
     ];
+    # CORRIGIDO: chave correta do nix-community.cachix.org
+    # Era: nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
     extra-trusted-public-keys = [
-      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCUSeBw="
     ];
   };
 
@@ -162,7 +164,7 @@ in {
     ];
   };
 
-  # Client identities separadas por finalidade:
+  # Client identidades separadas por finalidade:
   #   infra  -> SSH entre ambientes gerenciados
   #   github -> GitHub (chave existente)
   #   gitlab -> GitLab (preparado pra uma chave dedicada)
