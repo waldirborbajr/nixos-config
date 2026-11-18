@@ -7,6 +7,14 @@
 # (base.nix dele também não toca em nada gráfico).
 # O wiring `home-manager.users.borba` NÃO mora aqui — vive no flake.nix
 # (mkHost), um lugar só pra toda a frota.
+#
+# CONTAINERS (docker/podman/kubernetes): os módulos x86 saíram daqui.
+# Cada host x86 que quiser containers importa diretamente no seu
+# configuration.nix:
+#   ../../system/profiles/x86/docker.nix
+#   ../../system/profiles/x86/podman.nix
+#   ../../system/profiles/x86/kubernetes.nix
+# Hosts aarch64 (macutm, macvmf) não importam esses módulos.
 {
   pkgs,
   hostname,
@@ -16,9 +24,6 @@
   sshKeysDir = "/home/${username}/.ssh";
 in {
   imports = [
-    ./x86/docker.nix
-    ./x86/podman.nix
-    ./x86/kubernetes.nix
     ../modules/dev.nix
     ../modules/ssh-trust.nix
     ../modules/always-on.nix
@@ -110,7 +115,7 @@ in {
   nix.gc = {
     automatic = true;
     dates = "weekly";
-    options = "--delete-older-than 3d";
+    options = "--delete-older-than 14d";
   };
   nix.optimise.automatic = true;
 
@@ -119,13 +124,17 @@ in {
       "nix-command"
       "flakes"
     ];
+    # trusted-users: necessário para que extra-substituters seja respeitado
+    # por usuários não-root (sem isso o nix ignora o cache do nix-community).
+    trusted-users = [
+      "root"
+      "${username}"
+    ];
     extra-substituters = [
       "https://nix-community.cachix.org"
     ];
-    # CORRIGIDO: chave correta do nix-community.cachix.org
-    # Era: nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
     extra-trusted-public-keys = [
-      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCUSeBw="
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
     ];
   };
 

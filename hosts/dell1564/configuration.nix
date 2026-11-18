@@ -7,6 +7,10 @@
     ../../system/profiles/base.nix
     ../../system/profiles/desktop.nix
     ../../system/modules/broadcom-wifi.nix
+    # Módulos de container — x86 only, importados por host (não pelo base.nix).
+    ../../system/profiles/x86/docker.nix
+    ../../system/profiles/x86/podman.nix
+    ../../system/profiles/x86/kubernetes.nix
   ];
 
   # networking.hostName já vem do specialArg `hostname` em
@@ -18,6 +22,14 @@
   services.xserver.xkb = {
     layout = "br";
     variant = "abnt2";
+  };
+
+  # ==================== CONTAINERS (toggles — system/profiles/x86/) ====================
+  # Docker e Podman são independentes; kubernetes precisa de um dos dois.
+  development.containers = {
+    docker.enable = false;
+    podman.enable = false;
+    kubernetes.enable = false;
   };
 
   # ==================== FLATPAK (system/modules/flatpak.nix) ====================

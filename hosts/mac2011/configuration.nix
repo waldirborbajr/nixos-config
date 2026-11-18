@@ -18,6 +18,10 @@
     ../../system/profiles/x86/desktop.nix
     ../../system/modules/mac-family.nix
     ../../system/modules/broadcom-wifi.nix
+    # Módulos de container — x86 only, importados por host (não pelo base.nix).
+    ../../system/profiles/x86/docker.nix
+    ../../system/profiles/x86/podman.nix
+    ../../system/profiles/x86/kubernetes.nix
   ];
 
   # O módulo hardware.bluetooth do NixOS força General.ControllerMode =
@@ -41,7 +45,6 @@
     nix.enable = true;
 
     # ── Disponíveis (desligadas) ──
-
     python.enable = false;
     lua.enable = false;
     arduino.enable = false;
@@ -50,6 +53,14 @@
     mariadb.enable = false;
     mongodb.enable = false;
     ferretdb.enable = false;
+  };
+
+  # ==================== CONTAINERS (toggles — system/profiles/x86/) ====================
+  # Docker e Podman são independentes; kubernetes precisa de um dos dois.
+  development.containers = {
+    docker.enable = true;
+    podman.enable = false;
+    kubernetes.enable = false;
   };
 
   # ==================== FLATPAK (system/modules/flatpak.nix) ====================
@@ -63,16 +74,10 @@
   ];
 
   # ==================== ENERGIA ====================
-  # Ligado direto: sem hibernar, tampa ignorada (acesso via ssh/tailscale).
+  # always-on desligado: mac2011 suspende normalmente quando a tampa fecha.
+  # Ligar quando virar exit node dedicado 24/7 (mover para o novo host
+  # headless quando ele existir — ver comentário do Tailscale abaixo).
   power.alwaysOn.enable = false;
-
-  # ==================== CONTAINERS (toggles — system/profiles/x86/) ====================
-  # Docker e Podman são independentes; kubernetes precisa de um dos dois.
-  development.containers = {
-    docker.enable = true;
-    podman.enable = false;
-    kubernetes.enable = false;
-  };
 
   # Ferramentas de debug wireless (úteis só com o chip físico)
   # Spotify/Chromium saíram daqui — movidos pra home/profiles/desktop.nix

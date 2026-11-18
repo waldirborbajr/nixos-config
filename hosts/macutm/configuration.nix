@@ -1,4 +1,8 @@
 # hosts/macutm/configuration.nix
+# aarch64-linux — VM UTM no MacBook M2.
+# Não importa os módulos x86/docker, x86/podman, x86/kubernetes —
+# esses módulos são x86 only e saíram do base.nix. Containers não
+# estão disponíveis neste host.
 {pkgs, ...}: {
   imports = [
     ./hardware-configuration.nix
