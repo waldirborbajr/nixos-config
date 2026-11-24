@@ -582,21 +582,25 @@
       }
 
       # =========================================================
-      # Atuin — roda DEPOIS de zsh-vi-mode terminar de carregar.
+      # ATUIN + zsh-vi-mode — FIX DEFINITIVO
       #
-      # O enableZshIntegration do HM já injeta `eval "$(atuin init zsh ...)"`
-      # no .zshrc, mas isso acontece ANTES do zsh-vi-mode resetar os keymaps,
-      # então o binding do Ctrl+R se perde. Aqui registramos o widget na
-      # lista zvm_after_init_commands — o zsh-vi-mode executa essa lista
-      # após finalizar o setup, momento em que (re)bindamos o Ctrl+R em
-      # viins/vicmd. O _atuin_search_widget já existe (a init do HM rodou),
-      # e zvm_bindkey garante que o binding sobreviva ao reset.
+      # O zsh-vi-mode faz "lazy-load" dos keymaps DEPOIS do .zshrc ser
+      # carregado, sobrescrevendo o Ctrl+R que o Atuin tenta bindar.
+      #
+      # A solução (confirmada pela doc oficial do Atuin e issue #1826 do
+      # atuinsh/atuin) é REAVALIAR o init do Atuin DEPOIS que o zsh-vi-mode
+      # termina de montar os keymaps, e então bindar o widget correto.
+      #
+      # Para Atuin > 17.2.1, o widget ZLE chama-se "atuin-search"
+      # (o antigo "_atuin_search_widget" foi renomeado).
       # =========================================================
       _atuin_after_zvm() {
-        if typeset -f _atuin_search_widget >/dev/null 2>&1; then
-          zvm_bindkey viins '^R' _atuin_search_widget
-          zvm_bindkey vicmd '^R' _atuin_search_widget
-        fi
+        # Re-injeta as hooks e widgets do Atuin após o reset do zvm
+        eval "$(atuin init zsh --disable-up-arrow)"
+
+        # Bind explícito nos dois keymaps relevantes do modo vi
+        zvm_bindkey viins '^R' atuin-search
+        zvm_bindkey vicmd '^R' atuin-search
       }
       zvm_after_init_commands+=(_atuin_after_zvm)
     '';
