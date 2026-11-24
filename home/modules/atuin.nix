@@ -16,8 +16,8 @@ _: {
       auto_sync = false;
       # sync_address = "https://SEU-SERVIDOR-AQUI";
 
-      style = "compact";
-      inline_height = 0;
+      style = "auto";
+      inline_height = 20;
 
       history_filter = [
         "^cd"
