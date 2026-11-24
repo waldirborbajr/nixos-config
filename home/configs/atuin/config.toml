@@ -2,8 +2,8 @@ auto_sync = true
 sync_address = "https://atuin.internal.leomercier.dev"
 sync_frequency = "5m"
 
-style = "compact"
-inline_height = 0
+style = "auto"
+inline_height = 20
 
 history_filter = [
   "^cd",
