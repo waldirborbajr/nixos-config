@@ -19,17 +19,17 @@ _: {
       style = "auto";
       inline_height = 20;
 
-history_filter = [
-  "^cd$"
-  "^clear$"
-  "^e$"
-  "^exit$"
-  "^htop$"
-  "^ls$"
-  "^rm$"
-  "^shred$"
-  "^z$"
-];
+      history_filter = [
+        "^cd$"
+        "^clear$"
+        "^e$"
+        "^exit$"
+        "^htop$"
+        "^ls$"
+        "^rm$"
+        "^shred$"
+        "^z$"
+      ];
 
       enter_accept = true;
       theme.name = "catppuccin-mocha";

@@ -551,41 +551,54 @@
 
       zvm_after_init() {
         # Navegação por palavra
-        bindkey '^[[1;5C' forward-word
-        bindkey '^[[1;5D' backward-word
+        zvm_bindkey viins '^[[1;5C' forward-word
+        zvm_bindkey viins '^[[1;5D' backward-word
+        zvm_bindkey vicmd '^[[1;5C' forward-word
+        zvm_bindkey vicmd '^[[1;5D' backward-word
 
         # Ctrl+F -> fzf file picker (sem hidden)
         zvm_bindkey viins '^F' _fzf_file_no_hidden
+        zvm_bindkey vicmd '^F' _fzf_file_no_hidden
 
         # Ctrl+G -> fzf git branch checkout
         zvm_bindkey viins '^G' _fzf_git_branch
+        zvm_bindkey vicmd '^G' _fzf_git_branch
 
         # Ctrl+\ -> toggle autosuggestions
         zvm_bindkey viins '^\' autosuggest-toggle
 
-        # Ctrl+R -> atuin history
-        # IMPORTANTE: zsh-vi-mode reseta os keymaps de viins/vicmd, então o
-        # bindkey simples '^R' (default em emacs) não chega a valer no modo
-        # de inserção. Por isso bindamos explicitamente em viins e vicmd via
-        # zvm_bindkey (equivalente a bindkey -M <keymap> '^R' ...).
-        if typeset -f _atuin_search_widget >/dev/null 2>&1; then
-          zvm_bindkey viins '^R' _atuin_search_widget
-          zvm_bindkey vicmd '^R' _atuin_search_widget
-        fi
-
         # Setas -> history substring search
         zvm_bindkey viins '^[[A' history-substring-search-up
         zvm_bindkey viins '^[[B' history-substring-search-down
+        zvm_bindkey vicmd '^[[A' history-substring-search-up
+        zvm_bindkey vicmd '^[[B' history-substring-search-down
 
         # Ctrl+L -> limpa a tela (zsh-vi-mode reconstrói os keymaps e
-        # perde o clear-screen padrão). Nos dois modos: insert e normal.
-        # Widget próprio que chama o builtin direto (.clear-screen), ignorando
-        # qualquer wrapper de plugin (autosuggestions) ou reset do zvm.
+        # perde o clear-screen padrão). Widget próprio que chama o builtin.
         _zsh_clear_fix() { zle .clear-screen }
         zle -N _zsh_clear_fix
         zvm_bindkey viins '^L' _zsh_clear_fix
         zvm_bindkey vicmd '^L' _zsh_clear_fix
       }
+
+      # =========================================================
+      # Atuin — roda DEPOIS de zsh-vi-mode terminar de carregar.
+      #
+      # O enableZshIntegration do HM já injeta `eval "$(atuin init zsh ...)"`
+      # no .zshrc, mas isso acontece ANTES do zsh-vi-mode resetar os keymaps,
+      # então o binding do Ctrl+R se perde. Aqui registramos o widget na
+      # lista zvm_after_init_commands — o zsh-vi-mode executa essa lista
+      # após finalizar o setup, momento em que (re)bindamos o Ctrl+R em
+      # viins/vicmd. O _atuin_search_widget já existe (a init do HM rodou),
+      # e zvm_bindkey garante que o binding sobreviva ao reset.
+      # =========================================================
+      _atuin_after_zvm() {
+        if typeset -f _atuin_search_widget >/dev/null 2>&1; then
+          zvm_bindkey viins '^R' _atuin_search_widget
+          zvm_bindkey vicmd '^R' _atuin_search_widget
+        fi
+      }
+      zvm_after_init_commands+=(_atuin_after_zvm)
     '';
   };
 
@@ -596,5 +609,5 @@
   };
 
   # atuin → home/modules/atuin.nix (programs.atuin + enableZshIntegration)
-  # Ctrl+R continua em zvm_after_init via _atuin_search_widget
+  # Ctrl+R é rebindado em zvm_after_init_commands (ver initContent acima).
 }
