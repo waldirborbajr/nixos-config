@@ -555,22 +555,27 @@
         bindkey '^[[1;5D' backward-word
 
         # Ctrl+F -> fzf file picker (sem hidden)
-        bindkey '^F' _fzf_file_no_hidden
+        zvm_bindkey viins '^F' _fzf_file_no_hidden
 
         # Ctrl+G -> fzf git branch checkout
-        bindkey '^G' _fzf_git_branch
+        zvm_bindkey viins '^G' _fzf_git_branch
 
         # Ctrl+\ -> toggle autosuggestions
-        bindkey '^\' autosuggest-toggle
+        zvm_bindkey viins '^\' autosuggest-toggle
 
         # Ctrl+R -> atuin history
+        # IMPORTANTE: zsh-vi-mode reseta os keymaps de viins/vicmd, então o
+        # bindkey simples '^R' (default em emacs) não chega a valer no modo
+        # de inserção. Por isso bindamos explicitamente em viins e vicmd via
+        # zvm_bindkey (equivalente a bindkey -M <keymap> '^R' ...).
         if typeset -f _atuin_search_widget >/dev/null 2>&1; then
-          bindkey '^R' _atuin_search_widget
+          zvm_bindkey viins '^R' _atuin_search_widget
+          zvm_bindkey vicmd '^R' _atuin_search_widget
         fi
 
         # Setas -> history substring search
-        bindkey '^[[A' history-substring-search-up
-        bindkey '^[[B' history-substring-search-down
+        zvm_bindkey viins '^[[A' history-substring-search-up
+        zvm_bindkey viins '^[[B' history-substring-search-down
 
         # Ctrl+L -> limpa a tela (zsh-vi-mode reconstrói os keymaps e
         # perde o clear-screen padrão). Nos dois modos: insert e normal.
@@ -578,8 +583,8 @@
         # qualquer wrapper de plugin (autosuggestions) ou reset do zvm.
         _zsh_clear_fix() { zle .clear-screen }
         zle -N _zsh_clear_fix
-        bindkey -M viins '^L' _zsh_clear_fix
-        bindkey -M vicmd '^L' _zsh_clear_fix
+        zvm_bindkey viins '^L' _zsh_clear_fix
+        zvm_bindkey vicmd '^L' _zsh_clear_fix
       }
     '';
   };
